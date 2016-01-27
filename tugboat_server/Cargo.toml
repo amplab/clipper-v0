@@ -1,0 +1,19 @@
+[package]
+name = "tugboat_server"
+version = "0.1.0"
+authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
+build = "build.rs"
+
+[[bin]]
+name = "tugboat_server"
+path = "src/main.rs"
+
+[build-dependencies]
+capnpc = "*"
+
+[dependencies]
+hyper = "0.7"
+capnp = "0.6.1"
+gj = "0.1.1"
+capnp-rpc = "0.6.1"
+
