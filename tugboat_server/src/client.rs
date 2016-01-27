@@ -20,15 +20,18 @@
 // THE SOFTWARE.
 
 
-use gj::Promise;
-use gj::io::{AsyncRead, AsyncWrite, unix};
+// use gj::{Promise, EventLoop};
+
+use gj;
+// use gj::{EventLoop, Promise};
+// use gj::io::{AsyncRead, AsyncWrite, unix};
 use std::time::Duration;
 use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
 use std::net::ToSocketAddrs;
 use feature_capnp::feature;
 
 
-pub fn client() {
+pub fn main() {
 
   gj::EventLoop::top_level(|wait_scope| {
     let addr1 = try!("127.0.0.1:6001".to_socket_addrs()).next().expect("couldn't parse");
@@ -49,17 +52,17 @@ pub fn client() {
                                            Default::default()));
     let mut rpc_system2 = RpcSystem::new(network2, None);
     let feature2: feature::Client = rpc_system2.bootstrap(rpc_twoparty_capnp::Side::Server);
-    let feature_vec = vec![2u8,3u8,4u8];
+    let feature_vec = [2u8,3u8,4u8];
 
     let predict1 = {
         let mut request = feature1.compute_feature_request();
-        request.get().set_input(vec![2u8,3u8,4u8]);
+        request.get().set_input(&feature_vec);
         let predict_promise = request.send();
         // let read_promise = predict_promise.pipeline.get_value().read_request().send();
 
         let response = try!(predict_promise.promise.wait(wait_scope));
 
-        try!(response.get()).get_value()
+        try!(response.get()).get_result()
     };
     println!("got a response: {}", predict1);
 
