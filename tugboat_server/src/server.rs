@@ -206,6 +206,8 @@ impl feature::Server for FeatureImpl {
                         -> Promise<(), Error> {
         let reader: data::Reader = pry!(pry!(params.get()).get_input());
         println!("size of buffer: {}", reader.len());
+        println!("buffer: {:?}", reader);
+
         results.get().set_result(11.5);
         Promise::ok(())
     }
@@ -215,6 +217,8 @@ impl feature::Server for FeatureImpl {
 
 // Current working theory: accept_loop accepts a connection on the bound address which
 // gives it a reader and write
+// Occasionally get an error: "RROR: Failed: Protocol wrong type for socket (os error 41)"
+// Might be explained by http://erickt.github.io/blog/2014/11/19/adventures-in-debugging-a-potential-osx-kernel-bug/
 pub fn accept_loop(listener: tcp::Listener,
                    mut task_set: TaskSet<(), Box<::std::error::Error>>,
                    feat: feature::Client,

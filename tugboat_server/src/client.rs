@@ -66,6 +66,18 @@ pub fn main() {
     };
     println!("got a response: {}", predict1);
 
+    let predict2 = {
+        let mut request = feature2.compute_feature_request();
+        request.get().set_input(&[6u8,7u8,8u8,9u8,2u8]);
+        let predict_promise = request.send();
+        // let read_promise = predict_promise.pipeline.get_value().read_request().send();
+
+        let response = try!(predict_promise.promise.wait(wait_scope));
+
+        try!(response.get()).get_result()
+    };
+    println!("got a response: {}", predict2);
+
     // let add = {
     //     // Get the "add" function from the server.
     //     let mut request = calculator1.get_operator_request();
