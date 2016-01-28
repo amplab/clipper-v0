@@ -68,7 +68,7 @@ pub fn main() {
 
     let predict2 = {
         let mut request = feature2.compute_feature_request();
-        request.get().set_input(&[6u8,7u8,8u8,9u8,2u8]);
+        request.get().set_input(&[127,128,255,12,255]);
         let predict_promise = request.send();
         // let read_promise = predict_promise.pipeline.get_value().read_request().send();
 
