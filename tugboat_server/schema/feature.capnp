@@ -3,7 +3,7 @@
 interface Feature {
 # This should be generic
 
-  computeFeature @0 (input: Data) -> (result: Float64);
+  computeFeature @0 (inp: List(Float64)) -> (result: Float64);
 
   # computeFeatureBatch @1 (inputs: List(Data)) -> (result: List(Float64)); 
   #

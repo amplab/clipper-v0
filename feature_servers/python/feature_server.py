@@ -6,8 +6,14 @@ import socket
 import random
 import capnp
 import os
+from sklearn.externals import joblib
+import numpy as np
+# from collections import OrderedDict
+from sklearn import linear_model as lm
+import sklearn.svm as svm
 capnp.remove_import_hook()
 feature_capnp = capnp.load(os.path.abspath('../../tugboat_server/schema/feature.capnp'))
+from sample_feature import TestFeature
 
 
 
@@ -115,31 +121,59 @@ feature_capnp = capnp.load(os.path.abspath('../../tugboat_server/schema/feature.
 #     def getOperator(self, op, **kwargs):
 #         return OperatorImpl(op)
 
+def load_model(pickle_path):
+    # pickle_loc = "%s/features/%s/%s.pkl" % (self.namespace, lf, lf)
+    feature = joblib.load(pickle_path)
+    name = os.path.basename(pickle_path).strip(".pkl")
+    return (name, feature)
+
+
 class FeatureImpl(feature_capnp.Feature.Server):
+    
 
-    def computeFeature(self, input, _context, **kwargs):
-        print(_context.params)
-        # print(type(input))
+    def __init__(self, path):
+        self.name, self.model = load_model(path)
+        print("started")
 
-        print("input: %s" % "test")
-        return 13.2
+
+    # def load_feature_functions(self):
+    #     feature_objects = []
+    #     feature_names = [line.strip() for line in open(self.model_path, 'r')]
+    #     for lf in feature_names:
+    #         pickle_loc = "%s/features/%s/%s.pkl" % (self.namespace, lf, lf)
+    #         feature = joblib.load(pickle_loc) 
+    #         feature_objects.append(feature)
+    #     return (feature_objects, feature_names)
+
+    def computeFeature(self, inp, _context, **kwargs):
+        # print(_context.params)
+        # s = name
+        print(type(self.model))
+        pred = self.model.predict(np.array(inp).reshape(1, -1))[0]
+        print("Model predicted: %f" % pred)
+        return float(pred)
 
 def parse_args():
     parser = argparse.ArgumentParser(usage='''Runs the server bound to the\
 given address/port ADDRESS may be '*' to bind to all local addresses.\
 :PORT may be omitted to choose a port automatically. ''')
 
-    parser.add_argument("address", help="ADDRESS[:PORT]")
+    parser.add_argument("address", type=str, help="ADDRESS[:PORT]")
+    parser.add_argument("modelpath", help="full path to pickled model file")
 
     return parser.parse_args()
 
 
 def main():
-    address = parse_args().address
+    args = parse_args()
+    address = args.address
+    model_path = args.modelpath
+    # print(model_path)
 
-    server = capnp.TwoPartyServer(address, bootstrap=FeatureImpl())
+    server = capnp.TwoPartyServer(address, bootstrap=FeatureImpl(model_path))
     server.run_forever()
 
 if __name__ == '__main__':
     main()
+
 

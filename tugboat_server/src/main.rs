@@ -19,7 +19,7 @@ pub fn main() {
     if args.len() >= 2 {
         match &args[1][..] {
             "client" => return client::main(),
-            "server" => return server::main(),
+            // "server" => return server::main(),
             _ => ()
         }
     }
