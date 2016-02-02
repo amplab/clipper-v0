@@ -1,6 +1,19 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
+
+import findspark
+findspark.init()
+
+import pyspark
+import sys
+import time
+import os
+import numpy
+from pyspark import SparkConf, SparkContext
+from pyspark.mllib.regression import LabeledPoint
+from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+
 import argparse
 import socket
 import random
@@ -121,18 +134,19 @@ from sample_feature import TestFeature
 #     def getOperator(self, op, **kwargs):
 #         return OperatorImpl(op)
 
-def load_model(pickle_path):
+def load_scikit_model(pickle_path):
     # pickle_loc = "%s/features/%s/%s.pkl" % (self.namespace, lf, lf)
     feature = joblib.load(pickle_path)
     name = os.path.basename(pickle_path).strip(".pkl")
     return (name, feature)
 
 
-class FeatureImpl(feature_capnp.Feature.Server):
+
+class ScikitFeatureImpl(feature_capnp.Feature.Server):
     
 
     def __init__(self, path):
-        self.name, self.model = load_model(path)
+        self.name, self.model = load_scikit_model(path)
         print("started")
 
 
@@ -153,6 +167,39 @@ class FeatureImpl(feature_capnp.Feature.Server):
         print("Model predicted: %f" % pred)
         return float(pred)
 
+class PySparkFeatureImpl(feature_capnp.Feature.Server):
+    # TODO: find out how to stop spark context
+    def __init__(self, path):
+
+        conf = SparkConf() \
+            .setAppName("crankshaw-pyspark") \
+            .set("spark.executor.memory", "2g") \
+            .set("spark.kryoserializer.buffer.mb", "128") \
+            .set("master", "local")
+        sc = SparkContext(conf=conf, batchSize=10)
+        self.model = LogisticRegressionModel.load(sc, path)
+        # path = '/Users/crankshaw/model-serving/tugboat/feature_servers/python/spark_model'
+        # self.name, self.model = load_pyspark_model(path)
+
+        print("started")
+
+    def computeFeature(self, inp, _context, **kwargs):
+        # print(_context.params)
+        # s = name
+        # print(type(self.model))
+        x = [float(v)/255.0 for v in inp]
+        pred = self.model.predict(x)
+        print("GREPTHIS Model predicted: %f" % pred)
+        return float(pred)
+
+    # def load_pyspark_model(self, sc, path):
+    #     # pickle_loc = "%s/features/%s/%s.pkl" % (self.namespace, lf, lf)
+    #
+    #     sameModel = LogisticRegressionModel.load(sc, path)
+    #     feature = joblib.load(pickle_path)
+    #     name = os.path.basename(pickle_path).strip(".pkl")
+    #     return (name, feature)
+
 def parse_args():
     parser = argparse.ArgumentParser(usage='''Runs the server bound to the\
 given address/port ADDRESS may be '*' to bind to all local addresses.\
@@ -170,7 +217,8 @@ def main():
     model_path = args.modelpath
     # print(model_path)
 
-    server = capnp.TwoPartyServer(address, bootstrap=FeatureImpl(model_path))
+    # server = capnp.TwoPartyServer(address, bootstrap=ScikitFeatureImpl(model_path))
+    server = capnp.TwoPartyServer(address, bootstrap=PySparkFeatureImpl(model_path))
     server.run_forever()
 
 if __name__ == '__main__':
