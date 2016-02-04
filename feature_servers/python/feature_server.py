@@ -217,8 +217,8 @@ def main():
     model_path = args.modelpath
     # print(model_path)
 
-    # server = capnp.TwoPartyServer(address, bootstrap=ScikitFeatureImpl(model_path))
-    server = capnp.TwoPartyServer(address, bootstrap=PySparkFeatureImpl(model_path))
+    server = capnp.TwoPartyServer(address, bootstrap=ScikitFeatureImpl(model_path))
+    # server = capnp.TwoPartyServer(address, bootstrap=PySparkFeatureImpl(model_path))
     server.run_forever()
 
 if __name__ == '__main__':

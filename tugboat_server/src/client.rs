@@ -82,6 +82,10 @@ pub fn main() {
     }).expect("top level error");
 }
 
+fn random_features(d: usize) -> Vec<f64> {
+    let mut rng = thread_rng();
+    rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
+}
 
 pub fn other_main() {
 
@@ -90,23 +94,25 @@ pub fn other_main() {
     let feature_cache: Arc<RwLock<HashMap<u32, f64>>> = Arc::new(RwLock::new(HashMap::new()));
 
     let addr: SocketAddr = "127.0.0.1:6001".to_socket_addrs().unwrap().next().expect("couldn't parse");
-
-    {
+    let handle = {
         let thread_cache = feature_cache.clone();
         thread::spawn(move || {
             feature_worker(rx, thread_cache, addr);
-        });
-    }
-    let mut rng = thread_rng();
-    let feature_vec = rng.gen_iter::<f64>().take(784).collect::<Vec<f64>>();
+        })
+    };
 
     thread::sleep(Duration::new(3, 0));
-    tx.send((11_u32, feature_vec)).unwrap();
+    tx.send((11_u32, random_features(784))).unwrap();
+    tx.send((12_u32, random_features(784))).unwrap();
+    tx.send((13_u32, random_features(784))).unwrap();
+    tx.send((14_u32, random_features(784))).unwrap();
 
-    {
-        let c = (&feature_cache).read().unwrap();
-        println!("{:?}", c.get(&11_u32));
-    }
+    // {
+    //     let c = (&feature_cache).read().unwrap();
+    //     println!("{:?}", c.get(&11_u32));
+    // }
+    println!("waiting for feature to finish");
+    handle.join().unwrap();
     println!("done");
     
 }
