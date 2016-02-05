@@ -147,7 +147,7 @@ class ScikitFeatureImpl(feature_capnp.Feature.Server):
 
     def __init__(self, path):
         self.name, self.model = load_scikit_model(path)
-        print("started")
+        print("started sklearn")
 
 
     # def load_feature_functions(self):
@@ -181,7 +181,7 @@ class PySparkFeatureImpl(feature_capnp.Feature.Server):
         # path = '/Users/crankshaw/model-serving/tugboat/feature_servers/python/spark_model'
         # self.name, self.model = load_pyspark_model(path)
 
-        print("started")
+        print("started spark")
 
     def computeFeature(self, inp, _context, **kwargs):
         # print(_context.params)
@@ -206,7 +206,9 @@ given address/port ADDRESS may be '*' to bind to all local addresses.\
 :PORT may be omitted to choose a port automatically. ''')
 
     parser.add_argument("address", type=str, help="ADDRESS[:PORT]")
+    parser.add_argument("framework", type=str, help="spark|sklearn")
     parser.add_argument("modelpath", help="full path to pickled model file")
+
 
     return parser.parse_args()
 
@@ -216,9 +218,13 @@ def main():
     address = args.address
     model_path = args.modelpath
     # print(model_path)
-
-    server = capnp.TwoPartyServer(address, bootstrap=ScikitFeatureImpl(model_path))
-    # server = capnp.TwoPartyServer(address, bootstrap=PySparkFeatureImpl(model_path))
+    if args.framework == "spark":
+        server = capnp.TwoPartyServer(address, bootstrap=PySparkFeatureImpl(model_path))
+    elif args.framework == "sklearn":
+        server = capnp.TwoPartyServer(address, bootstrap=ScikitFeatureImpl(model_path))
+    else:
+        print("%s is unsupported framework" % args.system)
+        return
     server.run_forever()
 
 if __name__ == '__main__':

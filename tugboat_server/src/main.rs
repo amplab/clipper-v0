@@ -5,6 +5,7 @@
 extern crate capnp;
 extern crate capnp_rpc;
 extern crate rand;
+extern crate time;
 #[macro_use]
 extern crate gj;
 
@@ -19,7 +20,7 @@ pub fn main() {
     let args : Vec<String> = ::std::env::args().collect();
     if args.len() >= 2 {
         match &args[1][..] {
-            "client" => return client::other_main(),
+            "client" => return client::main(),
             // "server" => return server::main(),
             _ => ()
         }
