@@ -25,7 +25,7 @@ import numpy as np
 from sklearn import linear_model as lm
 import sklearn.svm as svm
 capnp.remove_import_hook()
-feature_capnp = capnp.load(os.path.abspath('../../tugboat_server/schema/feature.capnp'))
+feature_capnp = capnp.load(os.path.abspath('../../clipper_server/schema/feature.capnp'))
 from sample_feature import TestFeature
 
 

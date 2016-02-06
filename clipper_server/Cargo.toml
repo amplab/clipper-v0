@@ -1,11 +1,11 @@
 [package]
-name = "tugboat_server"
+name = "clipper"
 version = "0.1.0"
 authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
 build = "build.rs"
 
 [[bin]]
-name = "tugboat_server"
+name = "clipper"
 path = "src/main.rs"
 
 [build-dependencies]
@@ -19,3 +19,5 @@ capnp-rpc = "0.6.1"
 rand = "0.3"
 time = "0.1"
 
+[dependencies.eventual]
+git = "https://github.com/carllerche/eventual"
