@@ -9,6 +9,7 @@ extern crate time;
 #[macro_use]
 extern crate gj;
 extern crate eventual;
+extern crate mio;
 
 pub mod feature_capnp {
   include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));
@@ -26,7 +27,8 @@ pub fn main() {
         match &args[1][..] {
             "client" => return client::main(),
             "gj_timers" => return bench::gj_timers(args[2].parse::<u32>().unwrap()),
-            "ev_timers" => return bench::eventual_timers(args[2].parse::<u32>().unwrap()),
+            // "ev_timers" => return bench::eventual_timers(args[2].parse::<u32>().unwrap()),
+            "mio_timers" => return bench::mio_timers(args[2].parse::<u32>().unwrap()),
             _ => ()
         }
     }

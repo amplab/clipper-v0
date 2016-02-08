@@ -8,6 +8,9 @@ build = "build.rs"
 name = "clipper"
 path = "src/main.rs"
 
+[profile.release]
+debug = true
+
 [build-dependencies]
 capnpc = "*"
 
@@ -18,6 +21,7 @@ gj = "0.1.1"
 capnp-rpc = "0.6.1"
 rand = "0.3"
 time = "0.1"
+mio = "0.5"
 
 [dependencies.eventual]
 git = "https://github.com/carllerche/eventual"
