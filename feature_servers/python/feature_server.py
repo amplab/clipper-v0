@@ -27,118 +27,34 @@ import sklearn.svm as svm
 capnp.remove_import_hook()
 feature_capnp = capnp.load(os.path.abspath('../../clipper_server/schema/feature.capnp'))
 from sample_feature import TestFeature
+import graphlab as gl 
 
 
+def load_gl_model(local_path):
+    return gl.load_model(local_path)
 
-
-
-# def evaluate_impl(expression, params=None):
-#     '''Implementation of CalculatorImpl::evaluate(), also shared by
-#     FunctionImpl::call().  In the latter case, `params` are the parameter
-#     values passed to the function; in the former case, `params` is just an
-#     empty list.'''
-#
-#     which = expression.which()
-#
-#     if which == 'literal':
-#         return capnp.Promise(expression.literal)
-#     elif which == 'previousResult':
-#         return read_value(expression.previousResult)
-#     elif which == 'parameter':
-#         assert expression.parameter < len(params)
-#         return capnp.Promise(params[expression.parameter])
-#     elif which == 'call':
-#         call = expression.call
-#         func = call.function
-#
-#         # Evaluate each parameter.
-#         paramPromises = [evaluate_impl(param, params) for param in call.params]
-#
-#         joinedParams = capnp.join_promises(paramPromises)
-#         # When the parameters are complete, call the function.
-#         ret = (joinedParams
-#                .then(lambda vals: func.call(vals))
-#                .then(lambda result: result.value))
-#
-#         return ret
-#     else:
-#         raise ValueError("Unknown expression type: " + which)
-#
-#
-# class ValueImpl(calculator_capnp.Calculator.Value.Server):
-#
-#     "Simple implementation of the Calculator.Value Cap'n Proto interface."
-#
-#     def __init__(self, value):
-#         self.value = value
-#
-#     def read(self, **kwargs):
-#         return self.value
-#
-#
-# class FunctionImpl(calculator_capnp.Calculator.Function.Server):
-#
-#     '''Implementation of the Calculator.Function Cap'n Proto interface, where the
-#     function is defined by a Calculator.Expression.'''
-#
-#     def __init__(self, paramCount, body):
-#         self.paramCount = paramCount
-#         self.body = body.as_builder()
-#
-#     def call(self, params, _context, **kwargs):
-#         '''Note that we're returning a Promise object here, and bypassing the
-#         helper functionality that normally sets the results struct from the
-#         returned object. Instead, we set _context.results directly inside of
-#         another promise'''
-#
-#         assert len(params) == self.paramCount
-#         # using setattr because '=' is not allowed inside of lambdas
-#         return evaluate_impl(self.body, params).then(lambda value: setattr(_context.results, 'value', value))
-#
-#
-# class OperatorImpl(calculator_capnp.Calculator.Function.Server):
-#
-#     '''Implementation of the Calculator.Function Cap'n Proto interface, wrapping
-#     basic binary arithmetic operators.'''
-#
-#     def __init__(self, op):
-#         self.op = op
-#
-#     def call(self, params, **kwargs):
-#         assert len(params) == 2
-#
-#         op = self.op
-#
-#         if op == 'add':
-#             return params[0] + params[1]
-#         elif op == 'subtract':
-#             return params[0] - params[1]
-#         elif op == 'multiply':
-#             return params[0] * params[1]
-#         elif op == 'divide':
-#             return params[0] / params[1]
-#         else:
-#             raise ValueError('Unknown operator')
-#
-#
-# class CalculatorImpl(calculator_capnp.Calculator.Server):
-#
-#     "Implementation of the Calculator Cap'n Proto interface."
-#
-#     def evaluate(self, expression, _context, **kwargs):
-#         return evaluate_impl(expression).then(lambda value: setattr(_context.results, 'value', ValueImpl(value)))
-#
-#     def defFunction(self, paramCount, body, _context, **kwargs):
-#         return FunctionImpl(paramCount, body)
-#
-#     def getOperator(self, op, **kwargs):
-#         return OperatorImpl(op)
 
 def load_scikit_model(pickle_path):
     # pickle_loc = "%s/features/%s/%s.pkl" % (self.namespace, lf, lf)
     feature = joblib.load(pickle_path)
     name = os.path.basename(pickle_path).strip(".pkl")
     return (name, feature)
+
+
+class DNNFeatureImpl(feature_capnp.Feature.Server):
+    """
+        Returns the probabilities of each label after
+        doing DNN Features -> Multiclass linear model.
+        For now for timing purposes, just compute the features
+        then return 1.
+    """
+    def __init__(self, path):
+        self.model = load_gl_model(path)
+        print("started Dato DNN")
+
+
+    def computeFeature(self, inp, _context, **kwargs):
+        pass
 
 
 

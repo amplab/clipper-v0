@@ -7,6 +7,8 @@ use eventual;
 use mio;
 use eventual::Async;
 use std::thread;
+use std::sync::mpsc;
+use rand::{thread_rng, Rng};
 // use mio::util::Slab;
 // use mio::{EventLoop, Handler};
 
@@ -110,7 +112,7 @@ pub fn mio_timers(num_events: u32) {
     let sender = event_loop.channel();
     thread::spawn(move || {
         thread::sleep(::std::time::Duration::new(3, 0));
-        for i in (0..num_events) {
+        for i in 0..num_events {
             let _ = sender.send(123);
         }
     });
@@ -119,7 +121,53 @@ pub fn mio_timers(num_events: u32) {
 
 
 
+/// hand-rolled queue
 
+
+
+pub fn clipper_timers(num_events: u32) {
+    let (sender, receiver) = mpsc::channel::<(time::PreciseTime, u32)>();
+    let epsilon = time::Duration::milliseconds(3);
+    let sla = time::Duration::milliseconds(20);
+
+    thread::spawn(move|| {
+        loop {
+            // NOTE: this is a blocking call
+            let (req_time, hash) = receiver.recv().unwrap();
+            // if elapsed_time is less than SLA (+- epsilon wiggle room) then wait
+            let elapsed_time = req_time.to(time::PreciseTime::now());
+            if elapsed_time < sla - epsilon {
+                let sleep_time = ::std::time::Duration::new(
+                    0, (sla - elapsed_time).num_nanoseconds().unwrap() as u32);
+                println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+                thread::sleep(sleep_time);
+            }
+            // return result
+            let end_time = time::PreciseTime::now();
+            let latency = req_time.to(end_time).num_milliseconds();
+            println!("latency: {} ms", latency);
+        }
+        // receiver.unwrap();
+    });
+
+    println!("sending batch with no delays");
+    for i in 0..num_events {
+        sender.send((time::PreciseTime::now(), 11)).unwrap();
+    }
+
+    
+    println!("sleeping...");
+    thread::sleep(::std::time::Duration::new(10, 0));
+
+    println!("sending batch with random delays");
+    let mut rng = thread_rng();
+    for i in 0..num_events {
+        let max_delay_millis = 10;
+        let delay = rng.gen_range(0, max_delay_millis*1000*1000);
+        thread::sleep(::std::time::Duration::new(0, delay));
+        sender.send((time::PreciseTime::now(), 14)).unwrap();
+    }
+}
 
 
 
