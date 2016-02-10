@@ -1,4 +1,8 @@
 
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(unused_must_use)]
+#![allow(dead_code)]
 use gj;
 // use gj::{EventLoop, Promise};
 // use gj::io::Timer;

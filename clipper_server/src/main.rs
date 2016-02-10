@@ -16,9 +16,9 @@ pub mod feature_capnp {
   include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));
 }
 
+pub mod linalg;
 pub mod server;
 pub mod digits;
-pub mod linalg;
 pub mod bench;
 
 pub fn main() {

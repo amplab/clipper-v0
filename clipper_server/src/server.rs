@@ -19,6 +19,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unused_mut)]
 
 // use gj::{Promise, EventLoop};
 
@@ -39,8 +43,9 @@ use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
+use linalg;
 
-const SLA: u64 = 5;
+const SLA: i64 = 20;
 
 
 // pub fn benchmark(num_requests: usize, features: &Vec<FeatureHandle>) {
@@ -63,8 +68,10 @@ const SLA: u64 = 5;
 //
 //     }
 // }
-//
-fn anytime_features(hash_id: u32, features: &Vec<FeatureHandle>) -> Vec<f64> {
+
+
+
+fn anytime_features(features: &Vec<FeatureHandle>, input: &Vec<f64>) -> Vec<f64> {
     // TODO check caches
     // for f in features {
     //     f.cache.read()
@@ -72,54 +79,48 @@ fn anytime_features(hash_id: u32, features: &Vec<FeatureHandle>) -> Vec<f64> {
     vec![-3.2, 5.1]
 }
 
-pub struct Reporter;
-
-impl gj::TaskReaper<(), ::std::io::Error> for Reporter {
-    fn task_failed(&mut self, error: ::std::io::Error) {
-        println!("Task failed: {}", error);
-    }
-}
-
-fn start_request(features: Vec<FeatureHandle>, hash_id: u32, input: Vec<f64>, counter: Arc<AtomicUsize>)
-    -> Promise<f64, ::std::io::Error> {
-
-    let start_time = time::PreciseTime::now();
-    get_features(&features, hash_id, input);
-    gj::io::Timer.after_delay(::std::time::Duration::from_millis(SLA)).then(move |()| {
- 
-        println!("responding to request");
-        let fs = anytime_features(hash_id, &features);
-        let end_time = time::PreciseTime::now();
-        let latency = start_time.to(end_time).num_milliseconds();
-        println!("latency: {} ms", latency);
-        counter.fetch_add(1, Ordering::Relaxed);
-        Promise::ok(1.2_f64)
-    })
-}
-
 
 struct Request {
     start_time: time::PreciseTime,
-    hash: u32,
-    input: Vec<f64>
+    user: u32, // TODO: remove this because each feature has it's own hash
+    input: Vec<f64>,
 }
 
 impl Request {
 
-    fn new(hash: u32, input: Vec<f64>) -> Request {
-        Request { start_time: time::PreciseTime::now(), hash: hash, input: input}
+    fn new(user: u32, input: Vec<f64>) -> Request {
+        Request { start_time: time::PreciseTime::now(), user: user, input: input}
     }
 
 }
 
+struct Update {
+    start_time: time::PreciseTime, // just for monitoring purposes
+    user: u32,
+    input: Vec<f64>,
+    label: f32,
+}
 
-// struct EventWorker {
-//
-//
-// }
+fn start_update_worker(feature_handles: Vec<FeatureHandle>) -> mpsc::Sender<Update> {
+    panic!("unimplemented method");
+}
 
-fn start_response_worker(sla_millis: u64,
-                         feature_handles: Vec<FeatureHandle>) -> mpsc::Sender<Request> {
+// TODO make into a trait to support various kinds of models
+struct TaskModel {
+    w: Vec<f64>
+}
+
+// Because we don't have a good concurrent hash map, assume we know how many
+// users there will be ahead of time. Then we can have a vec of RwLock.
+fn make_prediction(features: &Vec<FeatureHandle>, input: &Vec<f64>,
+                   task_model: &TaskModel) -> f64 {
+    let fs = anytime_features(features, input);
+    linalg::dot(&fs, &task_model.w)
+}
+
+fn start_prediction_worker(sla_millis: i64,
+                           feature_handles: Vec<FeatureHandle>,
+                           user_models: Arc<Vec<RwLock<TaskModel>>>) -> mpsc::Sender<Request> {
 
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(3);
@@ -138,10 +139,13 @@ fn start_response_worker(sla_millis: u64,
             }
             // TODO: actually compute prediction
             // return result
+            assert!(req.user < user_models.len() as u32);
+            let lock = (&user_models).get(*(&req.user) as usize).unwrap();
+            let task_model = lock.read().unwrap();
+            let pred = make_prediction(&feature_handles, &req.input, &task_model);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
             println!("latency: {} ms", latency);
-
             // TODO actually respond to request
         }
     });
@@ -149,64 +153,100 @@ fn start_response_worker(sla_millis: u64,
     sender
 }
 
-// round robin work scheduler
-// fn get_next_worker()
+
 
 struct Dispatcher {
     workers: Vec<mpsc::Sender<Request>>,
-    next_worker: Arc<AtomicUsize>
+    next_worker: usize,
+    features: Vec<FeatureHandle>,
 }
 
 impl Dispatcher {
 
-    fn new(num_workers: u32, sla_millis: u32) -> Dispatcher {
-        let worker_threads = Vec::new();
+    fn new(num_workers: usize,
+           sla_millis: i64,
+           features: Vec<FeatureHandle>,
+           user_models: Arc<Vec<RwLock<TaskModel>>>) -> Dispatcher {
+        println!("creating dispatcher with {} workers", num_workers);
+        let mut worker_threads = Vec::new();
         for _ in 0..num_workers {
-            worker_threads.push(start_response_worker(SLA, features.clone()));
+            let worker = start_prediction_worker(sla_millis,
+                                                 features.clone(),
+                                                 user_models.clone());
+            worker_threads.push(worker);
         }
-        Dispatcher {workers: worker_threads, next_worker: Arc::new(AtomicUsize::new(0))}
+        Dispatcher {workers: worker_threads, next_worker: 0, features: features}
     }
 
-    fn dispatch(req: Request) {
-    get_features(
-        
-
+    /// Dispatch a request.
+    ///
+    /// Requires self to be mutable so that we can increment `next_worker`
+    fn dispatch(&mut self, req: Request) {
+        get_features(&self.features, req.input.clone());
+        self.workers[self.next_worker].send(req).unwrap();
+        self.increment_worker();
     }
 
+    // for now do round robin scheduling
+    fn increment_worker(&mut self) {
+        self.next_worker = (self.next_worker + 1) % self.workers.len();
+    }
+}
 
-
-    
-
+fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<TaskModel>>> {
+    let mut rng = thread_rng();
+    let mut models = Vec::with_capacity(num_users);
+    for i in 0..num_users {
+        let model = RwLock::new(TaskModel {
+            w: rng.gen_iter::<f64>().take(num_features).collect::<Vec<f64>>()
+        });
+        models.push(model);
+    }
+    Arc::new(models)
 }
 
 pub fn main() {
-
-
-
+    let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string()];
     let names = vec!["sklearn".to_string(), "spark".to_string()];
-    let (features, handles): (Vec<_>, Vec<_>) =
-                              vec!["127.0.0.1:6001".to_string(),
-                                            "127.0.0.1:6002".to_string()]
-                                           .into_iter()
-                                           .map(|a| get_addr(a))
-                                           .zip(names.into_iter())
-                                           .map(|(a, n)| create_feature_worker(a, n))
-                                           .unzip();
-                                           // .collect();
-    // .next().expect("couldn't parse");
+    let num_features = names.len();
+    let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
+                                                        .map(|a| get_addr(a))
+                                                        .zip(names.into_iter())
+                                                        .map(|(a, n)| create_feature_worker(a, n))
+                                                        .unzip();
 
+    let num_events = 100;
     let num_workers = num_cpus::get();
-
-
-
-    let counter = Arc::new(AtomicUsize::new(0));
+    let mut dispatcher = Dispatcher::new(num_workers,
+                                         SLA,
+                                         features,
+                                         init_user_models(100, num_features));
 
     thread::sleep(::std::time::Duration::new(3, 0));
     let new_request = Request::new(11_u32, random_features(784));
-    // start_request()
-    //
-    // Promise::all((0..7).map(|h| start_request(features.clone(), h, random_features(784), counter.clone())))
-    //     .wait(wait_scope);
+    dispatcher.dispatch(new_request);
+
+
+
+    println!("sending batch with no delays");
+    for i in 0..num_events {
+        dispatcher.dispatch(Request::new(i as u32, random_features(784)));
+    }
+
+    
+    println!("sleeping...");
+    thread::sleep(::std::time::Duration::new(10, 0));
+
+    println!("sending batch with random delays");
+    let mut rng = thread_rng();
+    for i in 0..num_events {
+        let max_delay_millis = 10;
+        let delay = rng.gen_range(0, max_delay_millis*1000*1000);
+        thread::sleep(::std::time::Duration::new(0, delay));
+        dispatcher.dispatch(Request::new(i as u32, random_features(784)));
+        // sender.send((time::PreciseTime::now(), 14)).unwrap();
+    }
+
 
 
     // get_features(&features, 11_u32, random_features(784));
@@ -214,10 +254,6 @@ pub fn main() {
     // get_features(&features, 13_u32, random_features(784));
     // get_features(&features, 14_u32, random_features(784));
 
-    // {
-    //     let c = (&feature_cache).read().unwrap();
-    //     println!("{:?}", c.get(&11_u32));
-    // }
     println!("waiting for features to finish");
     for h in handles {
         h.join().unwrap();
@@ -226,7 +262,8 @@ pub fn main() {
     println!("done");
 }
 
-fn get_features(fs: &Vec<FeatureHandle>, hash: u32, input: Vec<f64>) {
+fn get_features(fs: &Vec<FeatureHandle>, input: Vec<f64>) {
+    let hash = 11_u32;
     for f in fs {
         f.queue.send((hash, input.clone())).unwrap();
     }
