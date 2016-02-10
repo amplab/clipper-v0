@@ -10,6 +10,7 @@ extern crate time;
 extern crate gj;
 extern crate eventual;
 extern crate mio;
+extern crate num_cpus;
 
 pub mod feature_capnp {
   include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));

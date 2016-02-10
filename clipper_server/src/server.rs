@@ -38,53 +38,7 @@ use std::sync::mpsc;
 use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::{AtomicUsize, Ordering};
-
-
-// pub fn main() {
-//
-//     gj::EventLoop::top_level(|wait_scope| {
-//         let addr1 = try!("127.0.0.1:6001".to_socket_addrs()).next().expect("couldn't parse");
-//         let addr2 = try!("127.0.0.1:6002".to_socket_addrs()).next().expect("couldn't parse");
-//
-//         let (reader1, writer1) = try!(::gj::io::tcp::Stream::connect(addr1).wait(wait_scope))
-//                                      .split();
-//         let network1 = Box::new(twoparty::VatNetwork::new(reader1,
-//                                                           writer1,
-//                                                           rpc_twoparty_capnp::Side::Client,
-//                                                           Default::default()));
-//         let mut rpc_system1 = RpcSystem::new(network1, None);
-//         let feature1: feature::Client = rpc_system1.bootstrap(rpc_twoparty_capnp::Side::Server);
-//
-//         let feature_vec = vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-//
-//         // let feature_list = primitive_list::
-//         println!("{}", feature_vec.len());
-//
-//         let predict1 = {
-//             let mut request = feature1.compute_feature_request();
-//
-//             {
-//                 let mut builder = request.get();
-//                 let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
-//                 for i in 0..feature_vec.len() {
-//                     inp_entries.set(i as u32, feature_vec[i]);
-//                 }
-//             }
-//
-//             // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
-//             let predict_promise = request.send();
-//             // let read_promise = predict_promise.pipeline.get_value().read_request().send();
-//
-//             let response = try!(predict_promise.promise.wait(wait_scope));
-//
-//             try!(response.get()).get_result()
-//         };
-//         println!("got a response: {}", predict1);
-//         Ok(())
-//     }).expect("top level error");
-// }
-
-
+use num_cpus;
 
 const SLA: u64 = 5;
 
@@ -143,6 +97,88 @@ fn start_request(features: Vec<FeatureHandle>, hash_id: u32, input: Vec<f64>, co
     })
 }
 
+
+struct Request {
+    start_time: time::PreciseTime,
+    hash: u32,
+    input: Vec<f64>
+}
+
+impl Request {
+
+    fn new(hash: u32, input: Vec<f64>) -> Request {
+        Request { start_time: time::PreciseTime::now(), hash: hash, input: input}
+    }
+
+}
+
+
+// struct EventWorker {
+//
+//
+// }
+
+fn start_response_worker(sla_millis: u64,
+                         feature_handles: Vec<FeatureHandle>) -> mpsc::Sender<Request> {
+
+    let sla = time::Duration::milliseconds(sla_millis);
+    let epsilon = time::Duration::milliseconds(3);
+    let (sender, receiver) = mpsc::channel::<Request>();
+    let join_guard = thread::spawn(move || {
+        println!("starting new response worker with {}ms SLA", sla_millis);
+        loop {
+            let req = receiver.recv().unwrap();
+            // if elapsed_time is less than SLA (+- epsilon wiggle room) then wait
+            let elapsed_time = req.start_time.to(time::PreciseTime::now());
+            if elapsed_time < sla - epsilon {
+                let sleep_time = ::std::time::Duration::new(
+                    0, (sla - elapsed_time).num_nanoseconds().unwrap() as u32);
+                println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+                thread::sleep(sleep_time);
+            }
+            // TODO: actually compute prediction
+            // return result
+            let end_time = time::PreciseTime::now();
+            let latency = req.start_time.to(end_time).num_milliseconds();
+            println!("latency: {} ms", latency);
+
+            // TODO actually respond to request
+        }
+    });
+    // (join_guard, sender)
+    sender
+}
+
+// round robin work scheduler
+// fn get_next_worker()
+
+struct Dispatcher {
+    workers: Vec<mpsc::Sender<Request>>,
+    next_worker: Arc<AtomicUsize>
+}
+
+impl Dispatcher {
+
+    fn new(num_workers: u32, sla_millis: u32) -> Dispatcher {
+        let worker_threads = Vec::new();
+        for _ in 0..num_workers {
+            worker_threads.push(start_response_worker(SLA, features.clone()));
+        }
+        Dispatcher {workers: worker_threads, next_worker: Arc::new(AtomicUsize::new(0))}
+    }
+
+    fn dispatch(req: Request) {
+    get_features(
+        
+
+    }
+
+
+
+    
+
+}
+
 pub fn main() {
 
 
@@ -159,18 +195,18 @@ pub fn main() {
                                            // .collect();
     // .next().expect("couldn't parse");
 
+    let num_workers = num_cpus::get();
+
 
 
     let counter = Arc::new(AtomicUsize::new(0));
 
     thread::sleep(::std::time::Duration::new(3, 0));
-    gj::EventLoop::top_level(|wait_scope| {
-        // let ts = gj::TaskSet::new(Box::new(Reporter));
-        Promise::all((0..7).map(|h| start_request(features.clone(), h, random_features(784), counter.clone())))
-            .wait(wait_scope);
-        Ok(())
-    });
-    println!("exiting event loop");
+    let new_request = Request::new(11_u32, random_features(784));
+    // start_request()
+    //
+    // Promise::all((0..7).map(|h| start_request(features.clone(), h, random_features(784), counter.clone())))
+    //     .wait(wait_scope);
 
 
     // get_features(&features, 11_u32, random_features(784));
@@ -200,6 +236,7 @@ fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();
     rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
 }
+
 
 #[derive(Clone)]
 struct FeatureHandle {
