@@ -80,7 +80,7 @@ class ScikitFeatureImpl(feature_capnp.Feature.Server):
         # s = name
         print(type(self.model))
         pred = self.model.predict(np.array(inp).reshape(1, -1))[0]
-        print("Model predicted: %f" % pred)
+        print("SKLEARN: model predicted: %f" % pred)
         return float(pred)
 
 class PySparkFeatureImpl(feature_capnp.Feature.Server):
@@ -105,7 +105,7 @@ class PySparkFeatureImpl(feature_capnp.Feature.Server):
         # print(type(self.model))
         x = [float(v)/255.0 for v in inp]
         pred = self.model.predict(x)
-        print("GREPTHIS Model predicted: %f" % pred)
+        print("PYSPARK: model predicted: %f" % pred)
         return float(pred)
 
     # def load_pyspark_model(self, sc, path):

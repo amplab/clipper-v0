@@ -48,6 +48,7 @@ use linalg;
 const SLA: i64 = 20;
 
 
+
 // pub fn benchmark(num_requests: usize, features: &Vec<FeatureHandle>) {
 //
 //     let train_path = "/Users/crankshaw/model-serving/data/mnist_data/train-mnist-dense-with-labels\
@@ -118,15 +119,17 @@ fn make_prediction(features: &Vec<FeatureHandle>, input: &Vec<f64>,
     linalg::dot(&fs, &task_model.w)
 }
 
-fn start_prediction_worker(sla_millis: i64,
+fn start_prediction_worker(worker_id: i32,
+                           sla_millis: i64,
                            feature_handles: Vec<FeatureHandle>,
-                           user_models: Arc<Vec<RwLock<TaskModel>>>) -> mpsc::Sender<Request> {
+                           user_models: Arc<Vec<RwLock<TaskModel>>>,
+                           counter: Arc<AtomicUsize>) -> mpsc::Sender<Request> {
 
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(3);
     let (sender, receiver) = mpsc::channel::<Request>();
     let join_guard = thread::spawn(move || {
-        println!("starting new response worker with {}ms SLA", sla_millis);
+        println!("starting response worker {} with {}ms SLA", worker_id, sla_millis);
         loop {
             let req = receiver.recv().unwrap();
             // if elapsed_time is less than SLA (+- epsilon wiggle room) then wait
@@ -134,18 +137,21 @@ fn start_prediction_worker(sla_millis: i64,
             if elapsed_time < sla - epsilon {
                 let sleep_time = ::std::time::Duration::new(
                     0, (sla - elapsed_time).num_nanoseconds().unwrap() as u32);
-                println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+                // println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
                 thread::sleep(sleep_time);
             }
             // TODO: actually compute prediction
             // return result
-            assert!(req.user < user_models.len() as u32);
+            debug_assert!(req.user < user_models.len() as u32);
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
             let task_model = lock.read().unwrap();
             let pred = make_prediction(&feature_handles, &req.input, &task_model);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
-            println!("latency: {} ms", latency);
+            counter.fetch_add(1, Ordering::Relaxed);
+            if latency > 25 {
+                println!("worked {} made prediction. latency: {} ms", worker_id, latency);
+            }
             // TODO actually respond to request
         }
     });
@@ -166,13 +172,16 @@ impl Dispatcher {
     fn new(num_workers: usize,
            sla_millis: i64,
            features: Vec<FeatureHandle>,
-           user_models: Arc<Vec<RwLock<TaskModel>>>) -> Dispatcher {
+           user_models: Arc<Vec<RwLock<TaskModel>>>,
+           counter: Arc<AtomicUsize>) -> Dispatcher {
         println!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
-        for _ in 0..num_workers {
-            let worker = start_prediction_worker(sla_millis,
+        for i in 0..num_workers {
+            let worker = start_prediction_worker(i as i32,
+                                                 sla_millis,
                                                  features.clone(),
-                                                 user_models.clone());
+                                                 user_models.clone(),
+                                                 counter.clone());
             worker_threads.push(worker);
         }
         Dispatcher {workers: worker_threads, next_worker: 0, features: features}
@@ -182,7 +191,7 @@ impl Dispatcher {
     ///
     /// Requires self to be mutable so that we can increment `next_worker`
     fn dispatch(&mut self, req: Request) {
-        get_features(&self.features, req.input.clone());
+        // get_features(&self.features, req.input.clone());
         self.workers[self.next_worker].send(req).unwrap();
         self.increment_worker();
     }
@@ -209,52 +218,61 @@ pub fn main() {
     let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string()];
     let names = vec!["sklearn".to_string(), "spark".to_string()];
     let num_features = names.len();
+    let num_users = 500;
     let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
                                                         .map(|a| get_addr(a))
                                                         .zip(names.into_iter())
                                                         .map(|(a, n)| create_feature_worker(a, n))
                                                         .unzip();
 
-    let num_events = 100;
-    let num_workers = num_cpus::get();
+    let counter = Arc::new(AtomicUsize::new(0));
+    let num_events = 500000;
+    // let num_workers = num_cpus::get();
+    let num_workers = 4;
     let mut dispatcher = Dispatcher::new(num_workers,
                                          SLA,
                                          features,
-                                         init_user_models(100, num_features));
+                                         init_user_models(num_users, num_features),
+                                         counter.clone());
 
+    // create monitoring thread to check incremental thruput
     thread::sleep(::std::time::Duration::new(3, 0));
-    let new_request = Request::new(11_u32, random_features(784));
-    dispatcher.dispatch(new_request);
+    let mon_thread_join_handle = {
+        let counter = counter.clone();
+        thread::spawn(move || {
+            let bench_start = time::PreciseTime::now();
+            let mut last_count = 0;
+            let mut last_time = bench_start;
+            loop {
+                thread::sleep(::std::time::Duration::new(3, 0));
+                let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
+                let cur_count = counter.load(Ordering::Relaxed);
+                println!("processed {} events in {} seconds: {} preds/sec",
+                         cur_count - last_count,
+                         cur_time,
+                         ((cur_count - last_count) as f64 / cur_time));
+
+                if cur_count >= num_events {
+                    println!("BENCHMARK FINISHED");
+                    break;
+                }
+                println!("sleeping...");
+            }
+        })
+    };
+    // let new_request = Request::new(11_u32, random_features(784));
+    // dispatcher.dispatch(new_request);
 
 
 
     println!("sending batch with no delays");
-    for i in 0..num_events {
-        dispatcher.dispatch(Request::new(i as u32, random_features(784)));
-    }
-
-    
-    println!("sleeping...");
-    thread::sleep(::std::time::Duration::new(10, 0));
-
-    println!("sending batch with random delays");
     let mut rng = thread_rng();
-    for i in 0..num_events {
-        let max_delay_millis = 10;
-        let delay = rng.gen_range(0, max_delay_millis*1000*1000);
-        thread::sleep(::std::time::Duration::new(0, delay));
-        dispatcher.dispatch(Request::new(i as u32, random_features(784)));
-        // sender.send((time::PreciseTime::now(), 14)).unwrap();
+    for _ in 0..num_events {
+        dispatcher.dispatch(Request::new(rng.gen_range(0, num_users as u32), random_features(784)));
     }
-
-
-
-    // get_features(&features, 11_u32, random_features(784));
-    // get_features(&features, 12_u32, random_features(784));
-    // get_features(&features, 13_u32, random_features(784));
-    // get_features(&features, 14_u32, random_features(784));
 
     println!("waiting for features to finish");
+    mon_thread_join_handle.join().unwrap();
     for h in handles {
         h.join().unwrap();
     }
