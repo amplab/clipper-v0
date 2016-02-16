@@ -20,6 +20,8 @@ import numpy
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+from pyspark.mllib.tree import RandomForest
+
 
 
 # from cvm.svm import SVC
@@ -42,15 +44,7 @@ def parseData(line, obj):
     fields = line.strip().split(',')
     return LabeledPoint(obj(int(fields[0])), [float(v)/255.0 for v in fields[1:]])
 
-
-
-if __name__ == "__main__":
-    # if (len(sys.argv) != 1):
-    #     print "Usage: [SPARKDIR]/bin/spark-submit --driver-memory 2g " + \
-    #         "mnist.py"
-    #     sys.exit(1)
-
-    # set up environment
+def train_logistic_regression():
     conf = SparkConf() \
         .setAppName("crankshaw-pyspark") \
         .set("spark.executor.memory", "2g") \
@@ -99,3 +93,36 @@ if __name__ == "__main__":
 
     # clean up
     sc.stop()
+
+def train_random_forest(num_trees):
+    conf = SparkConf() \
+        .setAppName("crankshaw-pyspark") \
+        .set("spark.executor.memory", "2g") \
+        .set("spark.kryoserializer.buffer.mb", "128") \
+        .set("master", "local")
+    sc = SparkContext(conf=conf, batchSize=10)
+
+    print 'Parsing data'
+    time_start = time.time()
+    data_path = os.path.expanduser("~/mnist/data/train.data")
+    trainRDD = sc.textFile(data_path).map(lambda line: parseData(line, objective)).cache()
+    # testRDD = sc.textFile('/Users/crankshaw/model-serving/data/mnist_data/test-mnist-dense-with-labels.data').map(lambda line: parseData(line, objective)).cache()
+
+    print 'Fitting model'
+    rf = RandomForest.trainClassifier(trainRDD, 2, {}, num_trees)
+    rf.save(sc, "spark_models/%drf_pred_1" % num_trees)
+    # lrm.save(sc, path)
+
+    sc.stop()
+
+
+if __name__ == "__main__":
+    train_random_forest(50)
+    train_random_forest(100)
+    train_random_forest(500)
+    # if (len(sys.argv) != 1):
+    #     print "Usage: [SPARKDIR]/bin/spark-submit --driver-memory 2g " + \
+    #         "mnist.py"
+    #     sys.exit(1)
+
+    # set up environment

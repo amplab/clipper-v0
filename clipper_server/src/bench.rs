@@ -13,6 +13,8 @@ use eventual::Async;
 use std::thread;
 use std::sync::mpsc;
 use rand::{thread_rng, Rng};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 // use mio::util::Slab;
 // use mio::{EventLoop, Handler};
 
@@ -128,16 +130,16 @@ pub fn mio_timers(num_events: u32) {
 /// hand-rolled queue
 
 
+fn sleep_queue(counter: Arc<AtomicUsize>) -> mpsc::Sender<time::PreciseTime> {
 
-pub fn clipper_timers(num_events: u32) {
-    let (sender, receiver) = mpsc::channel::<(time::PreciseTime, u32)>();
+    let (sender, receiver) = mpsc::channel::<time::PreciseTime>();
     let epsilon = time::Duration::milliseconds(3);
     let sla = time::Duration::milliseconds(20);
 
     thread::spawn(move|| {
         loop {
             // NOTE: this is a blocking call
-            let (req_time, hash) = receiver.recv().unwrap();
+            let req_time = receiver.recv().unwrap();
             // if elapsed_time is less than SLA (+- epsilon wiggle room) then wait
             let elapsed_time = req_time.to(time::PreciseTime::now());
             if elapsed_time < sla - epsilon {
@@ -147,30 +149,96 @@ pub fn clipper_timers(num_events: u32) {
                 thread::sleep(sleep_time);
             }
             // return result
+            counter.fetch_add(1, Ordering::Relaxed);
             let end_time = time::PreciseTime::now();
             let latency = req_time.to(end_time).num_milliseconds();
-            println!("latency: {} ms", latency);
+            // if latency > 25 {
+            //     println!("latency: {} ms", latency);
+            // }
+            // println!("latency: {} ms", latency);
         }
         // receiver.unwrap();
     });
+    sender
+}
+
+pub fn clipper_timers(num_events: u32, num_threads: usize) {
+    // let (sender, receiver) = mpsc::channel::<(time::PreciseTime, u32)>();
+
+    // let num_threads = 1;
+    println!("running benchmark with {} events, {} threads", num_events, num_threads);
+    let counter = Arc::new(AtomicUsize::new(0));
+    let mut senders = Vec::new();
+    for _ in 0..num_threads {
+        senders.push(sleep_queue(counter.clone()));
+    }
+
+    // thread::spawn(move|| {
+    //     loop {
+    //         // NOTE: this is a blocking call
+    //         let (req_time, hash) = receiver.recv().unwrap();
+    //         // if elapsed_time is less than SLA (+- epsilon wiggle room) then wait
+    //         let elapsed_time = req_time.to(time::PreciseTime::now());
+    //         if elapsed_time < sla - epsilon {
+    //             let sleep_time = ::std::time::Duration::new(
+    //                 0, (sla - elapsed_time).num_nanoseconds().unwrap() as u32);
+    //             println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+    //             thread::sleep(sleep_time);
+    //         }
+    //         // return result
+    //         let end_time = time::PreciseTime::now();
+    //         let latency = req_time.to(end_time).num_milliseconds();
+    //         // println!("latency: {} ms", latency);
+    //     }
+    //     // receiver.unwrap();
+    // });
+
+    thread::sleep(::std::time::Duration::new(3, 0));
+    let mon_thread_join_handle = {
+        let counter = counter.clone();
+        thread::spawn(move || {
+            let bench_start = time::PreciseTime::now();
+            let mut last_count = 0;
+            let mut last_time = bench_start;
+            loop {
+                thread::sleep(::std::time::Duration::new(1, 0));
+                let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
+                let cur_count = counter.load(Ordering::Relaxed);
+                println!("processed {} events in {} seconds: {} preds/sec",
+                         cur_count - last_count,
+                         cur_time,
+                         ((cur_count - last_count) as f64 / cur_time));
+
+                if cur_count >= num_events as usize {
+                    println!("BENCHMARK FINISHED");
+                    break;
+                }
+                println!("sleeping...");
+            }
+        })
+    };
 
     println!("sending batch with no delays");
+    let mut cur_sender = 0;
     for i in 0..num_events {
-        sender.send((time::PreciseTime::now(), 11)).unwrap();
+        senders[cur_sender].send(time::PreciseTime::now()).unwrap();
+        cur_sender = (cur_sender + 1) % num_threads;
     }
 
-    
-    println!("sleeping...");
-    thread::sleep(::std::time::Duration::new(10, 0));
+    //
+    // println!("sleeping...");
+    // thread::sleep(::std::time::Duration::new(10, 0));
+    //
+    // println!("sending batch with random delays");
+    // let mut rng = thread_rng();
+    // for i in 0..num_events {
+    //     let max_delay_millis = 10;
+    //     let delay = rng.gen_range(0, max_delay_millis*1000*1000);
+    //     thread::sleep(::std::time::Duration::new(0, delay));
+    //     sender.send((time::PreciseTime::now(), 14)).unwrap();
+    // }
 
-    println!("sending batch with random delays");
-    let mut rng = thread_rng();
-    for i in 0..num_events {
-        let max_delay_millis = 10;
-        let delay = rng.gen_range(0, max_delay_millis*1000*1000);
-        thread::sleep(::std::time::Duration::new(0, delay));
-        sender.send((time::PreciseTime::now(), 14)).unwrap();
-    }
+    mon_thread_join_handle.join().unwrap();
 }
 
 

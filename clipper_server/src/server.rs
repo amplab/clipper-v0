@@ -191,7 +191,7 @@ impl Dispatcher {
     ///
     /// Requires self to be mutable so that we can increment `next_worker`
     fn dispatch(&mut self, req: Request) {
-        // get_features(&self.features, req.input.clone());
+        get_features(&self.features, req.input.clone());
         self.workers[self.next_worker].send(req).unwrap();
         self.increment_worker();
     }
@@ -215,8 +215,10 @@ fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<Tas
 }
 
 pub fn main() {
-    let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string()];
-    let names = vec!["sklearn".to_string(), "spark".to_string()];
+    // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string()];
+    // let names = vec!["sklearn".to_string(), "spark".to_string()];
+    let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
+    let names = vec!["10rf".to_string(), "100rf".to_string(), "500rf".to_string()];
     let num_features = names.len();
     let num_users = 500;
     let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
@@ -228,7 +230,7 @@ pub fn main() {
     let counter = Arc::new(AtomicUsize::new(0));
     let num_events = 500000;
     // let num_workers = num_cpus::get();
-    let num_workers = 4;
+    let num_workers = 8;
     let mut dispatcher = Dispatcher::new(num_workers,
                                          SLA,
                                          features,
@@ -279,6 +281,10 @@ pub fn main() {
     // handle.join().unwrap();
     println!("done");
 }
+
+// pub fn eval_feature_latency() {
+//
+// }
 
 fn get_features(fs: &Vec<FeatureHandle>, input: Vec<f64>) {
     let hash = 11_u32;
@@ -407,7 +413,7 @@ fn feature_send_loop(name: String,
         })
     } else {
         // if there's nothing in the queue, we don't need to spin, back off a little bit
-        println!("nothing in queue, waiting 1 s");
+        // println!("nothing in queue, waiting 1 s");
         // TODO change to 5ms
         gj::io::Timer.after_delay(::std::time::Duration::from_millis(1000))
                      .then(move |()| feature_send_loop(name, feature_rpc, rx))

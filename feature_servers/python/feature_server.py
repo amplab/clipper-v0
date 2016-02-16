@@ -13,6 +13,7 @@ import numpy
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+from pyspark.mllib.tree import RandomForestModel
 
 import argparse
 import socket
@@ -20,6 +21,7 @@ import random
 import capnp
 import os
 from sklearn.externals import joblib
+print(joblib.__version__)
 import numpy as np
 # from collections import OrderedDict
 from sklearn import linear_model as lm
@@ -27,11 +29,11 @@ import sklearn.svm as svm
 capnp.remove_import_hook()
 feature_capnp = capnp.load(os.path.abspath('../../clipper_server/schema/feature.capnp'))
 from sample_feature import TestFeature
-import graphlab as gl 
+# import graphlab as gl 
 
 
-def load_gl_model(local_path):
-    return gl.load_model(local_path)
+# def load_gl_model(local_path):
+#     return gl.load_model(local_path)
 
 
 def load_scikit_model(pickle_path):
@@ -93,7 +95,8 @@ class PySparkFeatureImpl(feature_capnp.Feature.Server):
             .set("spark.kryoserializer.buffer.mb", "128") \
             .set("master", "local")
         sc = SparkContext(conf=conf, batchSize=10)
-        self.model = LogisticRegressionModel.load(sc, path)
+        # self.model = LogisticRegressionModel.load(sc, path)
+        self.model = RandomForestModel.load(sc, path)
         # path = '/Users/crankshaw/model-serving/tugboat/feature_servers/python/spark_model'
         # self.name, self.model = load_pyspark_model(path)
 

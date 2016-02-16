@@ -29,7 +29,7 @@ pub fn main() {
             "gj_timers" => return bench::gj_timers(args[2].parse::<u32>().unwrap()),
             // "ev_timers" => return bench::eventual_timers(args[2].parse::<u32>().unwrap()),
             "mio_timers" => return bench::mio_timers(args[2].parse::<u32>().unwrap()),
-            "clipper_timers" => return bench::clipper_timers(args[2].parse::<u32>().unwrap()),
+            "clipper_timers" => return bench::clipper_timers(args[2].parse::<u32>().unwrap(), args[3].parse::<usize>().unwrap()),
             _ => ()
         }
     }
