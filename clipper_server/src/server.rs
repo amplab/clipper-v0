@@ -149,9 +149,9 @@ fn start_prediction_worker(worker_id: i32,
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
             counter.fetch_add(1, Ordering::Relaxed);
-            if latency > 25 {
-                println!("worked {} made prediction. latency: {} ms", worker_id, latency);
-            }
+            // if latency > 25 {
+            //     println!("worked {} made prediction. latency: {} ms", worker_id, latency);
+            // }
             // TODO actually respond to request
         }
     });
@@ -215,10 +215,10 @@ fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<Tas
 }
 
 pub fn main() {
-    // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string()];
-    // let names = vec!["sklearn".to_string(), "spark".to_string()];
+    // let addr_vec = vec!["127.0.0.1:6001".to_string()];
+    // let names = vec!["sklearn".to_string()];
     let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
-    let names = vec!["10rf".to_string(), "100rf".to_string(), "500rf".to_string()];
+    let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
     let num_features = names.len();
     let num_users = 500;
     let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
@@ -228,9 +228,9 @@ pub fn main() {
                                                         .unzip();
 
     let counter = Arc::new(AtomicUsize::new(0));
-    let num_events = 500000;
+    let num_events = 100;
     // let num_workers = num_cpus::get();
-    let num_workers = 8;
+    let num_workers = 1;
     let mut dispatcher = Dispatcher::new(num_workers,
                                          SLA,
                                          features,
@@ -398,11 +398,11 @@ fn feature_send_loop(name: String,
                 Ok(response) => {
                     let result = response.get().unwrap().get_result();
                     let end_time = time::PreciseTime::now();
-                    let latency = start_time.to(end_time).num_microseconds().unwrap();
-                    // println!("got response: {} from {} in {} us, putting in cache",
-                    //          result,
-                    //          name,
-                    //          latency);
+                    let latency = start_time.to(end_time).num_milliseconds();
+                    println!("got response: {} from {} in {} ms, putting in cache",
+                             result,
+                             name,
+                             latency);
                     feature_send_loop(name, feature_rpc, rx)
                 }
                 Err(e) => {
@@ -420,4 +420,87 @@ fn feature_send_loop(name: String,
     }
 }
 
+pub fn feature_lats_main() {
+
+    // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
+    // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
+    let addr_vec = vec!["127.0.0.1:6001".to_string()];
+    let names = vec!["SVM_SKLEARN".to_string()];
+    let num_features = names.len();
+    let handles: Vec<::std::thread::JoinHandle<()>> = addr_vec.into_iter()
+                                            .map(|a| get_addr(a))
+                                            .zip(names.into_iter())
+                                            .map(|(a, n)| create_blocking_features(n, a))
+                                            .collect();
+                                            // .unzip();
+
+    for h in handles {
+        h.join().unwrap();
+    }
+    // handle.join().unwrap();
+    println!("done");
+}
+
+fn create_blocking_features(name: String, address: SocketAddr)
+                            -> ::std::thread::JoinHandle<()> {
+    // let name = name.clone();
+    thread::spawn(move || {
+        blocking_feature_requests(name, address);
+    })
+}
+
+fn blocking_feature_requests(name: String, address: SocketAddr) {
+
+    let num_events = 150;
+    EventLoop::top_level(move |wait_scope| {
+        let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
+            .split();
+        let network = Box::new(twoparty::VatNetwork::new(reader,
+                                                         writer,
+                                                         rpc_twoparty_capnp::Side::Client,
+                                                         Default::default()));
+        let mut rpc_system = RpcSystem::new(network, None);
+        let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
+        println!("rpc connection established");
+        // feature_send_loop(name, feature_rpc, rx).lift()
+
+        for _ in 0..num_events {
+
+            let start_time = time::PreciseTime::now();
+            let feature_vec = random_features(784);
+
+            // println!("sending {} reqs", new_features.len());
+            // println!("sending request");
+
+            let mut request = feature_rpc.compute_feature_request();
+            {
+                let mut builder = request.get();
+                let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
+                for i in 0..feature_vec.len() {
+                    inp_entries.set(i as u32, feature_vec[i]);
+                }
+            }
+
+            // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
+            
+            let name = name.clone();
+            try!(request.send().promise.then(move |response| {
+                let res = pry!(response.get()).get_result();
+                // let result = response.get().unwrap().get_result();
+                let end_time = time::PreciseTime::now();
+                let latency = start_time.to(end_time).num_milliseconds();
+                println!("got response: {} from {} in {} ms, putting in cache",
+                         res,
+                         name,
+                         latency);
+                // feature_send_loop(name, feature_rpc, rx)
+                Promise::ok(())
+            }).wait(wait_scope));
+            thread::sleep(::std::time::Duration::new(1, 0));
+        }
+        println!("done with requests");
+        Ok(())
+    })
+    .expect("top level error");
+}
 

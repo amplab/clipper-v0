@@ -26,6 +26,7 @@ pub fn main() {
     if args.len() >= 2 {
         match &args[1][..] {
             "start" => return server::main(),
+            "feature_lats" => return server::feature_lats_main(),
             "gj_timers" => return bench::gj_timers(args[2].parse::<u32>().unwrap()),
             // "ev_timers" => return bench::eventual_timers(args[2].parse::<u32>().unwrap()),
             "mio_timers" => return bench::mio_timers(args[2].parse::<u32>().unwrap()),
