@@ -3,7 +3,8 @@
 from __future__ import print_function, absolute_import
 
 import findspark
-findspark.init('/crankshaw-local/spark-1.6.0-bin-hadoop2.4')
+# findspark.init('/crankshaw-local/spark-1.6.0-bin-hadoop2.4')
+findspark.init()
 
 import pyspark
 import sys
@@ -36,7 +37,7 @@ from sample_feature import TestFeature
 # def load_gl_model(local_path):
 #     return gl.load_model(local_path)
 
-import caffe
+# import caffe
 
 def load_scikit_model(pickle_path):
     # pickle_loc = "%s/features/%s/%s.pkl" % (self.namespace, lf, lf)
