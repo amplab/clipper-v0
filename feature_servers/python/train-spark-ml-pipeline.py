@@ -78,7 +78,8 @@ def train_random_forest(num_trees):
 
     print('Parsing data')
     time_start = time.time()
-    data_path = os.path.expanduser("~/mnist/train-mnist-dense-with-labels.data")
+    # data_path = os.path.expanduser("~/mnist/train-mnist-dense-with-labels.data")
+    data_path = os.path.expanduser("/crankshaw-local/mnist/data/train.data")
     trainRDD = sc.textFile(data_path).map(lambda line: parseData(line, objective)).cache()
     df = sql.createDataFrame(trainRDD)
     print(df.dtypes)
@@ -112,4 +113,4 @@ def train_random_forest(num_trees):
     sc.stop()
 
 if __name__=='__main__':
-    train_random_forest(10)
+    train_random_forest(100)

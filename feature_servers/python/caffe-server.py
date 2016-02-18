@@ -7,12 +7,14 @@ import time
 import os
 import numpy
 import datetime
+import cPickle
 
 import argparse
 import socket
 import random
 import capnp
 import numpy as np
+import pandas as pd
 import caffe
 import datetime
 import logging
@@ -23,7 +25,7 @@ feature_capnp = capnp.load(os.path.abspath('../../clipper_server/schema/feature.
 
 
 # REPO_DIRNAME = os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/../..')
-REPO_DIRNAME = os.path.expanduser("~/model-serving/caffe")
+REPO_DIRNAME = os.path.expanduser("/crankshaw-local/caffe")
 
 
 class ImagenetClassifier(object):
@@ -47,7 +49,7 @@ class ImagenetClassifier(object):
     default_args['raw_scale'] = 255.
 
     def __init__(self, model_def_file, pretrained_model_file, mean_file,
-                 raw_scale, class_labels_file, bet_file, image_dim, gpu_mode):
+                 raw_scale, class_labels_file, bet_file, image_dim):
         logging.info('Loading net and associated files...')
         caffe.set_mode_cpu()
         self.net = caffe.Classifier(
@@ -110,7 +112,7 @@ class CaffeFeatureImpl(feature_capnp.Feature.Server):
         self.clf = ImagenetClassifier(**ImagenetClassifier.default_args)
         self.clf.net.forward()
         print("started caffe\n")
-        image_file = "/Users/crankshaw/model-serving/caffe/examples/images/cat.jpg"
+        image_file = "/crankshaw-local/caffe/examples/images/cat.jpg"
         self.test_image = exifutil.open_oriented_im(image_file)
 
 
@@ -118,7 +120,7 @@ class CaffeFeatureImpl(feature_capnp.Feature.Server):
     def computeFeature(self, inp, _context, **kwargs):
 
         start = datetime.datetime.now()
-        image = caffe.io.load_image(string_buffer)
+        # image = caffe.io.load_image(string_buffer)
         result = self.clf.classify_image(self.test_image)
         print(result)
         pred = 0.2
