@@ -4,16 +4,24 @@ from __future__ import absolute_import
 import findspark
 findspark.init()
 import os
+import datetime
 
 
 from pyspark import SparkConf, SparkContext
-from pyspark.sql import SQLContext
+from pyspark.sql import SQLContext, Row
+from pyspark.sql.types import ArrayType, DoubleType
 from pyspark.ml import Pipeline
 from pyspark.ml.classification import RandomForestClassifier
 from pyspark.ml.feature import StringIndexer, VectorIndexer
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.mllib.regression import LabeledPoint
+from pyspark.mllib.linalg import DenseVector
 import time
+import numpy as np
+import argparse
+import capnp
+capnp.remove_import_hook()
+feature_capnp = capnp.load(os.path.abspath('../../clipper_server/schema/feature.capnp'))
 
 # # Load and parse the data file, converting it to a DataFrame.
 # data = sqlContext.read.text.load("mnist/train-mnist-dense-with-labels.data")
@@ -66,15 +74,12 @@ def parseData(line, obj):
 
 
 
-def train_random_forest(num_trees):
-    conf = SparkConf() \
-            .setAppName("crankshaw-pyspark") \
-            .set("spark.executor.memory", "2g") \
-            .set("spark.kryoserializer.buffer.mb", "128") \
-            .set("master", "local")
-
-    sc = SparkContext(conf=conf, batchSize=10)
-    sql = SQLContext(sc)
+def train_random_forest(sc, sql, num_trees):
+    x = DenseVector([float(v)/255.0 for v in range(1, 785)])
+    FeatureVec = Row("features")
+    fv = FeatureVec(x)
+    rdd = sc.parallelize([fv])
+    test_df = sql.createDataFrame([FeatureVec(x)])
 
     print('Parsing data')
     time_start = time.time()
@@ -88,11 +93,13 @@ def train_random_forest(num_trees):
     rf = RandomForestClassifier(labelCol="indexedLabel", featuresCol="features", numTrees=num_trees)
     pipeline = Pipeline(stages=[labelIndexer, rf])
 
-    # Train model.  This also runs the indexers.
+    # Train model. This also runs the indexers.
     model = pipeline.fit(df)
+    print(model.transform(test_df))
 
     rfModel = model.stages[1]
     print(rfModel)  # summary only
+    return model
     # Make predictions.
     # predictions = model.transform()
 
@@ -112,5 +119,79 @@ def train_random_forest(num_trees):
 
     sc.stop()
 
+
+
+class PySparkMLFeatureImpl(feature_capnp.Feature.Server):
+    # TODO: find out how to stop spark context
+    def __init__(self, sc, sql, model):
+        self.sc = sc
+        self.sql = sql
+        self.model = model
+
+    def computeFeature(self, inp, _context, **kwargs):
+        # print(_context.params)
+        # s = name
+        # print(type(self.model))
+        start = datetime.datetime.now()
+        print(inp)
+        x = DenseVector([float(v)/255.0 for v in inp])
+        FeatureVec = Row("features")
+        # fv = FeatureVec(x)
+        # rdd = sc.parallelize([fv])
+        test_df = sql.createDataFrame([FeatureVec(x)])
+        # df = sql.createDataFrame(sc.parallelize(Row(features = x)))
+        # pred = 1.1
+        pred = self.model.transform(test_df)
+        
+        print(pred)
+        # print("PYSPARK: model predicted: %f" % pred)
+        end = datetime.datetime.now()
+        print("%s: %f ms\n" % ("spark.ml", (end-start).total_seconds() * 1000))
+        return pred.collect()[0].prediction
+
+def parse_args():
+    parser = argparse.ArgumentParser(usage='''Runs the server bound to the\
+given address/port ADDRESS may be '*' to bind to all local addresses.\
+:PORT may be omitted to choose a port automatically. ''')
+
+    parser.add_argument("address", type=str, help="ADDRESS[:PORT]")
+    parser.add_argument("numtrees", type=int, help="number of trees")
+    # parser.add_argument("framework", type=str, help="spark|sklearn")
+    # parser.add_argument("modelpath", help="full path to pickled model file")
+
+
+    return parser.parse_args()
+
 if __name__=='__main__':
-    train_random_forest(100)
+
+    args = parse_args()
+    address = args.address
+    numtrees = args.numtrees
+
+    conf = SparkConf() \
+            .setAppName("crankshaw-pyspark") \
+            .set("spark.executor.memory", "10g") \
+            .set("spark.kryoserializer.buffer.mb", "128") \
+            .set("master", "local")
+
+    sc = SparkContext(conf=conf, batchSize=1)
+    sql = SQLContext(sc)
+    rf = train_random_forest(sc, sql, numtrees)
+
+    server = capnp.TwoPartyServer(address, bootstrap=PySparkMLFeatureImpl(sc, sql, rf))
+    server.run_forever()
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+

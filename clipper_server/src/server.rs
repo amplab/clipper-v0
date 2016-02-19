@@ -424,8 +424,8 @@ pub fn feature_lats_main() {
 
     // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
     // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
-    let addr_vec = vec!["127.0.0.1:6004".to_string()];
-    let names = vec!["CAFFE".to_string()];
+    let addr_vec = vec!["127.0.0.1:6006".to_string()];
+    let names = vec!["PYSPARK ML PIPELINE".to_string()];
     let num_features = names.len();
     let handles: Vec<::std::thread::JoinHandle<()>> = addr_vec.into_iter()
                                             .map(|a| get_addr(a))
