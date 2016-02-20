@@ -168,17 +168,16 @@ class UserResults:
 def eval_user(dr, uname, tmp_fname):
 
     samples = get_data_for_user(os.path.join(dr, uname))
+    holdout_sample = samples[-1]
+    samples = samples[:-1] # remove last sample
+
     # print(samples)
     model_dir_path = "/crankshaw-local/timit_models/models"
     gen_model_path = os.path.join(model_dir_path, "undersampled_general_model")
     dr_models = [os.path.join(model_dir_path, "dr%d_model" % d) for d in range(1,9)]
     gen_model_path = os.path.join(model_dir_path, "undersampled_general_model")
-    models = [gen_model_path, dr_models[0]]
+    # models = [gen_model_path, dr_models[0]]
     models = dr_models + [gen_model_path]
-    max_corr = 0
-    max_acc = 0
-    max_corr_model = ""
-    max_acc_model = ""
     model_results = {}
     for m in models:
         corrs = []
@@ -193,12 +192,35 @@ def eval_user(dr, uname, tmp_fname):
         model_results[model_name] = ModelResults(corrs, inserts, nums)
     learned_model = find_learned_model(model_results, len(samples))
     # print("learned model sequence: %s" % str(learned_model))
-    learned_acc = eval_model_acc(model_results, learned_model)
-    general_acc = model_results["undersampled_general_model"]
-    dialect_acc = model_results["%s_model" % os.path.basename(dr)]
+    # learned_acc = eval_model_acc(model_results, learned_model)
+    # general_acc = model_results["undersampled_general_model"]
+    # dialect_acc = model_results["%s_model" % os.path.basename(dr)]
+
+    ### Accuracy on held out sample
+
+    learned_model_paths = [os.path.join(model_dir_path, m) for m in learned_model]
+    learned_acc = eval_heldout_accuracy(holdout_sample, learned_model_paths, tmp_fname)
+    general_acc = eval_heldout_accuracy(holdout_sample, [gen_model_path], tmp_fname)
+    dialect_acc = eval_heldout_accuracy(holdout_sample,
+                                        [os.path.join(model_dir_path, "%s_model" % os.path.basename(dr))],
+                                        tmp_fname)
+    # general_acc = model_results["undersampled_general_model"]
+    # dialect_acc = model_results["%s_model" % os.path.basename(dr)]
     return UserResults(uname, learned_acc, general_acc, dialect_acc, learned_model)
     # print("learned_acc: %f, general_acc: %f, dialect_acc: %f" % (learned_acc, general_acc, dialect_acc))
     # print("user: %s, most correct: %s, most accurate: %s" % (uname, max_corr_model, max_acc_model))
+
+def eval_heldout_accuracy(sample, models, tmp_fname):
+    corr = []
+    inserts = []
+    total = []
+    for m in models:
+        (c, i, n) = predict(sample + ".wav", sample + ".lab", m, tmp_fname)
+        corr.append(c)
+        inserts.append(i)
+        total.append(n)
+    return ModelResults(corr, inserts, total)
+
 
 def eval_model_acc(model_results, learned_model):
     corr = []
@@ -258,9 +280,9 @@ def main(proc_num, min_dr, max_dr):
                 user_res = eval_user(test_dr_dir, u, tmp_fname)
                 json.dump(user_res, rf, cls=MyEncoder)
                 iii += 1
-                if iii > 3:
-                    break
-            break
+            #     if iii > 3:
+            #         break
+            # break
         rf.write("\n]")
 
 if __name__=='__main__':
@@ -268,6 +290,8 @@ if __name__=='__main__':
     (min_dialect,max_dialect) = tuple([int(m) for m in sys.argv[2].split(":")])
     print("processing drs %d to %d" % (min_dialect, max_dialect))
     main(proc_num, min_dialect, max_dialect)
+
+    print("\n\nPROCESS %d FINISHED" % proc_num)
 
 
 
