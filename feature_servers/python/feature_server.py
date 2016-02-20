@@ -120,8 +120,8 @@ class PySparkFeatureImpl(feature_capnp.Feature.Server):
             .set("spark.kryoserializer.buffer.mb", "128") \
             .set("master", "local")
         sc = SparkContext(conf=conf, batchSize=10)
-        # self.model = LogisticRegressionModel.load(sc, path)
-        self.model = RandomForestModel.load(sc, path)
+        self.model = LogisticRegressionModel.load(sc, path)
+        # self.model = RandomForestModel.load(sc, path)
         self.path = path
         # path = '/Users/crankshaw/model-serving/tugboat/feature_servers/python/spark_model'
         # self.name, self.model = load_pyspark_model(path)

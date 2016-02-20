@@ -4,7 +4,7 @@ import sklearn.linear_model as lm
 import sklearn.svm as svm
 from sklearn.externals import joblib
 
-def load_digits(digits_location, digits_filename = "train-mnist-dense-with-labels.data"):
+def load_digits(digits_location, digits_filename = "train.data"):
     digits_path = digits_location + "/" + digits_filename
     print "Source file:", digits_path
     df = pd.read_csv(digits_path, sep=",", header=None)
@@ -43,11 +43,13 @@ class TestFeature:
         return hash(x.data.tobytes())
 
 if __name__=='__main__':
-    digits_loc = "/Users/crankshaw/velox-centipede/data/mnist"
-    label = 2
-    f = TestFeature(digits_loc, label)
-    f_name = "predict_%d_svm" % label
-    joblib.dump(f, '%s/%s.pkl' % (f_name, f_name)) 
+    digits_loc = "/crankshaw-local/mnist/data"
+    for label in range(10):
+        print "training label %d" % label
+        # label = 2
+        f = TestFeature(digits_loc, label)
+        f_name = "predict_%d_svm" % label
+        joblib.dump(f, 'sklearn_models%s/%s.pkl' % (f_name, f_name)) 
     # f = joblib.load('test_model/predict_1_svm.pkl') 
     # print "model trained"
     # test_x, test_y = load_digits(digits_loc, digits_filename="test-mnist-dense-with-labels.data")

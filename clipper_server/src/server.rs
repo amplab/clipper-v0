@@ -424,8 +424,10 @@ pub fn feature_lats_main() {
 
     // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
     // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
-    let addr_vec = vec!["127.0.0.1:6006".to_string()];
-    let names = vec!["PYSPARK ML PIPELINE".to_string()];
+    let addr_vec = (1..11).map(|i| format!("127.0.0.1:600{}", i)).collect::<Vec<String>>();
+    let names = (1..11).map(|i| format!("Spark_predictor_{}", i)).collect::<Vec<String>>();
+    // let addr_vec = vec!["127.0.0.1:6006".to_string()];
+    // let names = vec!["PYSPARK ML PIPELINE".to_string()];
     let num_features = names.len();
     let handles: Vec<::std::thread::JoinHandle<()>> = addr_vec.into_iter()
                                             .map(|a| get_addr(a))
@@ -444,6 +446,7 @@ pub fn feature_lats_main() {
 fn create_blocking_features(name: String, address: SocketAddr)
                             -> ::std::thread::JoinHandle<()> {
     // let name = name.clone();
+    println!("{}", name);
     thread::spawn(move || {
         blocking_feature_requests(name, address);
     })
@@ -451,7 +454,7 @@ fn create_blocking_features(name: String, address: SocketAddr)
 
 fn blocking_feature_requests(name: String, address: SocketAddr) {
 
-    let num_events = 150;
+    let num_events = 5000;
     EventLoop::top_level(move |wait_scope| {
         let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
             .split();
@@ -496,7 +499,7 @@ fn blocking_feature_requests(name: String, address: SocketAddr) {
                 // feature_send_loop(name, feature_rpc, rx)
                 Promise::ok(())
             }).wait(wait_scope));
-            thread::sleep(::std::time::Duration::new(1, 0));
+            // thread::sleep(::std::time::Duration::new(1, 0));
         }
         println!("done with requests");
         Ok(())
