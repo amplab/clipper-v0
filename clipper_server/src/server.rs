@@ -43,33 +43,34 @@ use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
-use linalg;
+use linear_models::linalg;
+use digits;
 
 const SLA: i64 = 20;
 
 
-
 // pub fn benchmark(num_requests: usize, features: &Vec<FeatureHandle>) {
 //
-//     let train_path = "/Users/crankshaw/model-serving/data/mnist_data/train-mnist-dense-with-labels\
-//                       .data";
-//     let test_path = "/Users/crankshaw/model-serving/data/mnist_data/test-mnist-dense-with-labels.\
-//                      data";
+//     // let train_path = "/Users/crankshaw/model-serving/data/mnist_data/train-mnist-dense-with-labels\
+//     //                   .data";
+//     // let test_path = "/Users/crankshaw/model-serving/data/mnist_data/test-mnist-dense-with-labels.\
+//     //                  data";
 //
-//     let all_train_data = digits::load_mnist_dense(train_path).unwrap();
-//     let norm_train_data = digits::normalize(&all_train_data);
-//     println!("Training data loaded: {} points", norm_train_data.ys.len());
-//
+//     // let all_train_data = digits::load_mnist_dense(train_path).unwrap();
+//     // let norm_train_data = digits::normalize(&all_train_data);
+//     // println!("Training data loaded: {} points", norm_train_data.ys.len());
+//     //
+//     let test_path = "/crankshaw-local/mnist/data/test.data";
 //     let all_test_data = digits::load_mnist_dense(test_path).unwrap();
 //     let norm_test_data = digits::normalize(&all_test_data);
 //
 //     println!("Test data loaded: {} points", norm_test_data.ys.len());
 //
-//     for i in 0..200 {
-//
-//     }
+//     // for i in 0..200 {
+//     //
+//     // }
 // }
-
+//
 
 
 fn anytime_features(features: &Vec<FeatureHandle>, input: &Vec<f64>) -> Vec<f64> {
@@ -214,6 +215,9 @@ fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<Tas
     Arc::new(models)
 }
 
+
+
+
 pub fn main() {
     // let addr_vec = vec!["127.0.0.1:6001".to_string()];
     // let names = vec!["sklearn".to_string()];
@@ -221,6 +225,12 @@ pub fn main() {
     let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
     let num_features = names.len();
     let num_users = 500;
+    let test_data_path = "/crankshaw-local/mnist/data/test.data";
+    let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
+    let norm_test_data = digits::normalize(&all_test_data);
+
+    println!("Test data loaded: {} points", norm_test_data.ys.len());
+
     let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
                                                         .map(|a| get_addr(a))
                                                         .zip(names.into_iter())

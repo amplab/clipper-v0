@@ -11,12 +11,13 @@ extern crate gj;
 extern crate eventual;
 extern crate mio;
 extern crate num_cpus;
+extern crate linear_models;
 
 pub mod feature_capnp {
   include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));
 }
 
-pub mod linalg;
+// pub mod linalg;
 pub mod server;
 pub mod digits;
 pub mod bench;

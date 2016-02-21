@@ -22,6 +22,7 @@ import socket
 import random
 import capnp
 import os
+from numpy.random import exponential as expn
 from sklearn.externals import joblib
 # print(joblib.__version__)
 import numpy as np
@@ -31,6 +32,9 @@ import sklearn.svm as svm
 capnp.remove_import_hook()
 feature_capnp = capnp.load(os.path.abspath('../../clipper_server/schema/feature.capnp'))
 from sample_feature import TestFeature
+
+EXPN_SCALE_PARAM = 5.0
+
 # import graphlab as gl 
 
 
@@ -104,9 +108,10 @@ class ScikitFeatureImpl(feature_capnp.Feature.Server):
         # s = name
         start = datetime.datetime.now()
         pred = self.model.predict(np.array(inp).reshape(1, -1))[0]
+        time.sleep(expn(EXPN_SCALE_PARAM) / 1000.0)
         end = datetime.datetime.now()
         print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
-        pred = 0.2
+        # pred = 0.2
         # print("SKLEARN: model predicted: %f" % pred)
         return float(pred)
 
@@ -136,6 +141,7 @@ class PySparkFeatureImpl(feature_capnp.Feature.Server):
         x = [float(v)/255.0 for v in inp]
         pred = 1.1
         pred = self.model.predict(x)
+        time.sleep(expn(EXPN_SCALE_PARAM) / 1000.0)
         # print("PYSPARK: model predicted: %f" % pred)
         end = datetime.datetime.now()
         print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
