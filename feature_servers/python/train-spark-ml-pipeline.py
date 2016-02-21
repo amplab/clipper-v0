@@ -83,8 +83,8 @@ def train_random_forest(sc, sql, num_trees):
 
     print('Parsing data')
     time_start = time.time()
-    # data_path = os.path.expanduser("~/mnist/train-mnist-dense-with-labels.data")
-    data_path = os.path.expanduser("/crankshaw-local/mnist/data/train.data")
+    data_path = os.path.expanduser("~/model-serving/data/mnist_data/train-mnist-dense-with-labels.data")
+    # data_path = os.path.expanduser("/crankshaw-local/mnist/data/train.data")
     trainRDD = sc.textFile(data_path).map(lambda line: parseData(line, objective)).cache()
     df = sql.createDataFrame(trainRDD)
     print(df.dtypes)
@@ -143,11 +143,13 @@ class PySparkMLFeatureImpl(feature_capnp.Feature.Server):
         # pred = 1.1
         pred = self.model.transform(test_df)
         
-        print(pred)
+        # print(pred)
         # print("PYSPARK: model predicted: %f" % pred)
         end = datetime.datetime.now()
         print("%s: %f ms\n" % ("spark.ml", (end-start).total_seconds() * 1000))
-        return pred.collect()[0].prediction
+        ppp = pred.collect()[0].prediction
+        print(ppp)
+        return ppp
 
 def parse_args():
     parser = argparse.ArgumentParser(usage='''Runs the server bound to the\
@@ -170,7 +172,7 @@ if __name__=='__main__':
 
     conf = SparkConf() \
             .setAppName("crankshaw-pyspark") \
-            .set("spark.executor.memory", "10g") \
+            .set("spark.executor.memory", "8g") \
             .set("spark.kryoserializer.buffer.mb", "128") \
             .set("master", "local")
 
