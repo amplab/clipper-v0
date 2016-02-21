@@ -45,6 +45,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
 use linear_models::linalg;
 use digits;
+use features;
 
 const SLA: i64 = 20;
 
@@ -73,7 +74,7 @@ const SLA: i64 = 20;
 //
 
 
-fn anytime_features(features: &Vec<FeatureHandle>, input: &Vec<f64>) -> Vec<f64> {
+fn anytime_features(features: &Vec<features::FeatureHandle>, input: &Vec<f64>) -> Vec<f64> {
     // TODO check caches
     // for f in features {
     //     f.cache.read()
@@ -103,7 +104,7 @@ struct Update {
     label: f32,
 }
 
-fn start_update_worker(feature_handles: Vec<FeatureHandle>) -> mpsc::Sender<Update> {
+fn start_update_worker(feature_handles: Vec<features::FeatureHandle>) -> mpsc::Sender<Update> {
     panic!("unimplemented method");
 }
 
@@ -114,7 +115,7 @@ struct TaskModel {
 
 // Because we don't have a good concurrent hash map, assume we know how many
 // users there will be ahead of time. Then we can have a vec of RwLock.
-fn make_prediction(features: &Vec<FeatureHandle>, input: &Vec<f64>,
+fn make_prediction(features: &Vec<features::FeatureHandle>, input: &Vec<f64>,
                    task_model: &TaskModel) -> f64 {
     let fs = anytime_features(features, input);
     linalg::dot(&fs, &task_model.w)
@@ -122,7 +123,7 @@ fn make_prediction(features: &Vec<FeatureHandle>, input: &Vec<f64>,
 
 fn start_prediction_worker(worker_id: i32,
                            sla_millis: i64,
-                           feature_handles: Vec<FeatureHandle>,
+                           feature_handles: Vec<features::FeatureHandle>,
                            user_models: Arc<Vec<RwLock<TaskModel>>>,
                            counter: Arc<AtomicUsize>) -> mpsc::Sender<Request> {
 
@@ -165,14 +166,14 @@ fn start_prediction_worker(worker_id: i32,
 struct Dispatcher {
     workers: Vec<mpsc::Sender<Request>>,
     next_worker: usize,
-    features: Vec<FeatureHandle>,
+    features: Vec<features::FeatureHandle>,
 }
 
 impl Dispatcher {
 
     fn new(num_workers: usize,
            sla_millis: i64,
-           features: Vec<FeatureHandle>,
+           features: Vec<features::FeatureHandle>,
            user_models: Arc<Vec<RwLock<TaskModel>>>,
            counter: Arc<AtomicUsize>) -> Dispatcher {
         println!("creating dispatcher with {} workers", num_workers);
@@ -218,24 +219,28 @@ fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<Tas
 
 
 
-pub fn main() {
+pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     // let addr_vec = vec!["127.0.0.1:6001".to_string()];
     // let names = vec!["sklearn".to_string()];
-    let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
-    let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
-    let num_features = names.len();
+    // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
+    // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
+    let num_features = feature_addrs.len();
     let num_users = 500;
-    let test_data_path = "/crankshaw-local/mnist/data/test.data";
-    let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
-    let norm_test_data = digits::normalize(&all_test_data);
+    // let test_data_path = "/crankshaw-local/mnist/data/test.data";
+    // let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
+    // let norm_test_data = digits::normalize(&all_test_data);
 
-    println!("Test data loaded: {} points", norm_test_data.ys.len());
+    // println!("Test data loaded: {} points", norm_test_data.ys.len());
 
-    let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
-                                                        .map(|a| get_addr(a))
-                                                        .zip(names.into_iter())
-                                                        .map(|(a, n)| create_feature_worker(a, n))
-                                                        .unzip();
+    // let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
+    //                                                     .map(|a| features::get_addr(a))
+    //                                                     .zip(names.into_iter())
+    //                                                     .map(|(a, n)| create_feature_worker(a, n))
+    //                                                     .unzip();
+    let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
+                              .map(|(n, a)| features::create_feature_worker(n, a))
+                              .unzip();
+
 
     let counter = Arc::new(AtomicUsize::new(0));
     let num_events = 100;
@@ -280,7 +285,8 @@ pub fn main() {
     println!("sending batch with no delays");
     let mut rng = thread_rng();
     for _ in 0..num_events {
-        dispatcher.dispatch(Request::new(rng.gen_range(0, num_users as u32), random_features(784)));
+        dispatcher.dispatch(Request::new(rng.gen_range(0, num_users as u32),
+                            features::random_features(784)));
     }
 
     println!("waiting for features to finish");
@@ -296,224 +302,13 @@ pub fn main() {
 //
 // }
 
-fn get_features(fs: &Vec<FeatureHandle>, input: Vec<f64>) {
+fn get_features(fs: &Vec<features::FeatureHandle>, input: Vec<f64>) {
     let hash = 11_u32;
     for f in fs {
         f.queue.send((hash, input.clone())).unwrap();
     }
 }
 
-fn random_features(d: usize) -> Vec<f64> {
-    let mut rng = thread_rng();
-    rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
-}
 
 
-#[derive(Clone)]
-struct FeatureHandle {
-    // addr: SocketAddr,
-    name: String,
-    queue: mpsc::Sender<(u32, Vec<f64>)>,
-    // TODO: need a better concurrent hashmap: preferable lock free wait free
-    // This should actually be reasonably simple, because we don't need to resize
-    // (fixed size cache) and things never get evicted. Neither of these is strictly
-    // true but it's a good approximation for now.
-    cache: Arc<RwLock<HashMap<u32, f64>>>,
-    // thread_handle: ::std::thread::JoinHandle<()>,
-}
-
-fn create_feature_worker(addr: SocketAddr, name: String)
-    -> (FeatureHandle, ::std::thread::JoinHandle<()>) {
-
-    let (tx, rx) = mpsc::channel();
-
-    let feature_cache: Arc<RwLock<HashMap<u32, f64>>> = Arc::new(RwLock::new(HashMap::new()));
-    let handle = {
-        let thread_cache = feature_cache.clone();
-        let name = name.clone();
-        thread::spawn(move || {
-            feature_worker(name, rx, thread_cache, addr);
-        })
-    };
-    (FeatureHandle {
-        name: name.clone(),
-        queue: tx,
-        cache: feature_cache,
-        // thread_handle: handle,
-    }, handle)
-}
-
-fn get_addr(a: String) -> SocketAddr {
-    a.to_socket_addrs().unwrap().next().unwrap()
-}
-
-
-fn feature_worker(name: String,
-                  rx: mpsc::Receiver<(u32, Vec<f64>)>,
-                  cache: Arc<RwLock<HashMap<u32, f64>>>,
-                  address: SocketAddr) {
-    println!("starting worker: {}", name);
-
-    EventLoop::top_level(move |wait_scope| {
-        let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
-                                   .split();
-        let network = Box::new(twoparty::VatNetwork::new(reader,
-                                                         writer,
-                                                         rpc_twoparty_capnp::Side::Client,
-                                                         Default::default()));
-        let mut rpc_system = RpcSystem::new(network, None);
-        let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
-        println!("rpc connection established");
-        feature_send_loop(name, feature_rpc, rx).lift().wait(wait_scope)
-    })
-        .expect("top level error");
-}
-
-
-fn feature_send_loop(name: String,
-                     feature_rpc: feature::Client,
-                     rx: mpsc::Receiver<(u32, Vec<f64>)>)
-                     -> Promise<(), ::std::io::Error> {
-
-    // TODO batch feature requests
-    // let mut new_features = Vec::new();
-    // while rx.try_recv() {
-    //     let data = rx.recv().unwrap();
-    //     new_features.push(data);
-    // }
-    // println!("entering feature_send_loop");
-
-
-    // try_recv() never blocks, will return immediately if pending data, else will error
-    if let Ok(input) = rx.try_recv() {
-
-        let start_time = time::PreciseTime::now();
-        let feature_vec = input.1;
-
-        // println!("sending {} reqs", new_features.len());
-        // println!("sending request");
-
-        let mut request = feature_rpc.compute_feature_request();
-        {
-            let mut builder = request.get();
-            let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
-            for i in 0..feature_vec.len() {
-                inp_entries.set(i as u32, feature_vec[i]);
-            }
-        }
-
-        // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
-        request.send().promise.then_else(move |r| {
-            match r {
-                Ok(response) => {
-                    let result = response.get().unwrap().get_result();
-                    let end_time = time::PreciseTime::now();
-                    let latency = start_time.to(end_time).num_milliseconds();
-                    println!("got response: {} from {} in {} ms, putting in cache",
-                             result,
-                             name,
-                             latency);
-                    feature_send_loop(name, feature_rpc, rx)
-                }
-                Err(e) => {
-                    println!("failed: {}", e);
-                    feature_send_loop(name, feature_rpc, rx)
-                }
-            }
-        })
-    } else {
-        // if there's nothing in the queue, we don't need to spin, back off a little bit
-        // println!("nothing in queue, waiting 1 s");
-        // TODO change to 5ms
-        gj::io::Timer.after_delay(::std::time::Duration::from_millis(1000))
-                     .then(move |()| feature_send_loop(name, feature_rpc, rx))
-    }
-}
-
-pub fn feature_lats_main() {
-
-    // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
-    // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
-    // let addr_vec = (1..11).map(|i| format!("127.0.0.1:600{}", i)).collect::<Vec<String>>();
-    // let names = (1..11).map(|i| format!("Spark_predictor_{}", i)).collect::<Vec<String>>();
-    let addr_vec = vec!["169.229.49.167:6001".to_string()];
-    let names = vec!["CAFFE on c67 with GPU".to_string()];
-    let num_features = names.len();
-    let handles: Vec<::std::thread::JoinHandle<()>> = addr_vec.into_iter()
-                                            .map(|a| get_addr(a))
-                                            .zip(names.into_iter())
-                                            .map(|(a, n)| create_blocking_features(n, a))
-                                            .collect();
-                                            // .unzip();
-
-    for h in handles {
-        h.join().unwrap();
-    }
-    // handle.join().unwrap();
-    println!("done");
-}
-
-fn create_blocking_features(name: String, address: SocketAddr)
-                            -> ::std::thread::JoinHandle<()> {
-    // let name = name.clone();
-    println!("{}", name);
-    thread::spawn(move || {
-        blocking_feature_requests(name, address);
-    })
-}
-
-fn blocking_feature_requests(name: String, address: SocketAddr) {
-
-    let num_events = 5000;
-    EventLoop::top_level(move |wait_scope| {
-        let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
-            .split();
-        let network = Box::new(twoparty::VatNetwork::new(reader,
-                                                         writer,
-                                                         rpc_twoparty_capnp::Side::Client,
-                                                         Default::default()));
-        let mut rpc_system = RpcSystem::new(network, None);
-        let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
-        println!("rpc connection established");
-        // feature_send_loop(name, feature_rpc, rx).lift()
-
-        for _ in 0..num_events {
-
-            let start_time = time::PreciseTime::now();
-            let feature_vec = random_features(784);
-
-            // println!("sending {} reqs", new_features.len());
-            // println!("sending request");
-
-            let mut request = feature_rpc.compute_feature_request();
-            {
-                let mut builder = request.get();
-                let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
-                for i in 0..feature_vec.len() {
-                    inp_entries.set(i as u32, feature_vec[i]);
-                }
-            }
-
-            // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
-            
-            let name = name.clone();
-            try!(request.send().promise.then(move |response| {
-                let res = pry!(response.get()).get_result();
-                // let result = response.get().unwrap().get_result();
-                let end_time = time::PreciseTime::now();
-                let latency = start_time.to(end_time).num_milliseconds();
-                println!("got response: {} from {} in {} ms, putting in cache",
-                         res,
-                         name,
-                         latency);
-                // feature_send_loop(name, feature_rpc, rx)
-                Promise::ok(())
-            }).wait(wait_scope));
-            // thread::sleep(::std::time::Duration::new(1, 0));
-        }
-        println!("done with requests");
-        Ok(())
-    })
-    .expect("top level error");
-}
 

@@ -23,47 +23,6 @@ pub struct TrainingData {
     pub ys: Arc<Vec<f64>>
 }
 
-
-// pub fn bench_load_and_parse() -> i64 {
-//     let start = PreciseTime::now();
-//     let fname = "/Users/crankshaw/model-serving/velox-centipede/data/mnist/test-mnist-dense-with-labels.data";
-//     load_mnist_dense(fname);
-//     let end = PreciseTime::now();
-//     let dur = start.to(end).num_milliseconds();
-//     println!("Load and parse time: {}", dur);
-//     dur
-// }
-//
-// pub fn bench_load_do_nothing() -> i64 {
-//     let start = PreciseTime::now();
-//     let fname = "/Users/crankshaw/model-serving/velox-centipede/data/mnist/test-mnist-dense-with-labels.data";
-//     read_mnist(fname);
-//     let end = PreciseTime::now();
-//     let dur = start.to(end).num_milliseconds();
-//     println!("Read time: {}", dur);
-//     dur
-// }
-
-// fn read_mnist(fpath: &str) -> Result<Vec<String>, String> {
-//     let path = Path::new(fpath);
-//     let display = path.display();
-//
-//     let file = match File::open(&path) {
-//         // The `description` method of `io::Error` returns a string that
-//         // describes the error
-//         Err(why) => return Err(format!("couldn't open {}: REASON: {}", display,
-//                                                    Error::description(&why))),
-//         Ok(file) => BufReader::new(file),
-//     };
-//
-//     let mut line_strs: Vec<String> = Vec::new();
-//     for line in file.lines().filter_map(|result| result.ok()) {
-//         line_strs.push(line);
-//     }
-//     Ok(line_strs)
-//         
-// }
-
 pub fn load_mnist_dense(fpath: &str) -> Result<TrainingData, String> {
     let path = Path::new(fpath);
     let display = path.display();
@@ -255,6 +214,8 @@ pub fn create_online_dataset(
     }
     tasks
 }
+
+
 
 pub fn create_mtl_datasets(
     training_data: &TrainingData,
