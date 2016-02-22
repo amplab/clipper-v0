@@ -3,6 +3,8 @@ import numpy as np
 import sklearn.linear_model as lm
 import sklearn.svm as svm
 from sklearn.externals import joblib
+import os
+import sys
 
 def load_digits(digits_location, digits_filename = "train.data"):
     digits_path = digits_location + "/" + digits_filename
@@ -44,12 +46,18 @@ class TestFeature:
 
 if __name__=='__main__':
     digits_loc = "/crankshaw-local/mnist/data"
-    for label in range(10):
-        print "training label %d" % label
-        # label = 2
-        f = TestFeature(digits_loc, label)
+    
+    start = int(sys.argv[1])
+    end = int(sys.argv[2])
+    for label in range(start,end + 1):
         f_name = "predict_%d_svm" % label
-        joblib.dump(f, 'sklearn_models%s/%s.pkl' % (f_name, f_name)) 
+        try:
+            os.mkdir('sklearn_models/%s' % f_name)
+        except OSError:
+            print("directory already exists. Might overwrite existing file")
+        print "training label %d" % label
+        f = TestFeature(digits_loc, label)
+        joblib.dump(f, 'sklearn_models/%s/%s.pkl' % (f_name, f_name)) 
     # f = joblib.load('test_model/predict_1_svm.pkl') 
     # print "model trained"
     # test_x, test_y = load_digits(digits_loc, digits_filename="test-mnist-dense-with-labels.data")
