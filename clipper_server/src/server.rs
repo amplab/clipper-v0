@@ -1,41 +1,15 @@
-// Copyright (c) 2013-2015 Sandstorm Development Group, Inc. and contributors
-// Licensed under the MIT License:
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unused_mut)]
 
-// use gj::{Promise, EventLoop};
-
 use gj;
 use gj::{EventLoop, Promise};
-// use gj::io;
 use capnp;
-// use std::time::{Duration, PreciseTime};
 use time;
 use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
 use std::net::{ToSocketAddrs, SocketAddr};
 use feature_capnp::feature;
-// use capnp::{primitive_list, message};
 use std::thread;
 use std::sync::{RwLock, Arc};
 use std::sync::mpsc;
@@ -50,37 +24,14 @@ use features;
 const SLA: i64 = 20;
 
 
-// pub fn benchmark(num_requests: usize, features: &Vec<FeatureHandle>) {
-//
-//     // let train_path = "/Users/crankshaw/model-serving/data/mnist_data/train-mnist-dense-with-labels\
-//     //                   .data";
-//     // let test_path = "/Users/crankshaw/model-serving/data/mnist_data/test-mnist-dense-with-labels.\
-//     //                  data";
-//
-//     // let all_train_data = digits::load_mnist_dense(train_path).unwrap();
-//     // let norm_train_data = digits::normalize(&all_train_data);
-//     // println!("Training data loaded: {} points", norm_train_data.ys.len());
-//     //
-//     let test_path = "/crankshaw-local/mnist/data/test.data";
-//     let all_test_data = digits::load_mnist_dense(test_path).unwrap();
-//     let norm_test_data = digits::normalize(&all_test_data);
-//
-//     println!("Test data loaded: {} points", norm_test_data.ys.len());
-//
-//     // for i in 0..200 {
-//     //
+
+// fn anytime_features(features: &Vec<features::FeatureHandle>, input: &Vec<f64>) -> Vec<f64> {
+//     // TODO check caches
+//     // for f in features {
+//     //     f.cache.read()
 //     // }
+//     vec![-3.2, 5.1]
 // }
-//
-
-
-fn anytime_features(features: &Vec<features::FeatureHandle>, input: &Vec<f64>) -> Vec<f64> {
-    // TODO check caches
-    // for f in features {
-    //     f.cache.read()
-    // }
-    vec![-3.2, 5.1]
-}
 
 
 struct Request {
@@ -108,17 +59,41 @@ fn start_update_worker(feature_handles: Vec<features::FeatureHandle>) -> mpsc::S
     panic!("unimplemented method");
 }
 
-// TODO make into a trait to support various kinds of models
-struct TaskModel {
-    w: Vec<f64>
+trait TaskModel {
+    /// Make a prediction with the available features
+    fn predict(&self, fs: Vec<f64>, missing_fs: Vec<i32>) -> f64;
+
+
+    // fn update_anytime_features(&mut self, fs: Vec<f64>, missing_fs: Vec<i32>);
+
+    // fn train(&mut self,
 }
 
 // Because we don't have a good concurrent hash map, assume we know how many
 // users there will be ahead of time. Then we can have a vec of RwLock.
-fn make_prediction(features: &Vec<features::FeatureHandle>, input: &Vec<f64>,
+fn make_prediction(feature_handles: &Vec<features::FeatureHandle>, input: &Vec<f64>,
                    task_model: &TaskModel) -> f64 {
-    let fs = anytime_features(features, input);
-    linalg::dot(&fs, &task_model.w)
+
+    
+    let mut missing_feature_indexes: Vec<i32> = Vec::new();
+    let mut features: Vec<f64> = Vec::capacity(features.len());
+    let mut i = 0;
+    for fh in feature_handles {
+        let hash = fh.hasher.hash(input);
+        let mut cache_reader = fh.cache.read().unwrap();
+        let cache_entry = cache_reader.get(hash);
+        match cache_entry {
+            Some(v) => features.append(v),
+            None => {
+                features.append(0.0);
+                missing_feature_indexes.append(i);
+            }
+        };
+        i += 1
+    }
+
+    let anytime_features = task_model.predict(features, missing_feature_indexes);
+    task_model.predict(anytime_features);
 }
 
 fn start_prediction_worker(worker_id: i32,
@@ -204,17 +179,17 @@ impl Dispatcher {
     }
 }
 
-fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<TaskModel>>> {
-    let mut rng = thread_rng();
-    let mut models = Vec::with_capacity(num_users);
-    for i in 0..num_users {
-        let model = RwLock::new(TaskModel {
-            w: rng.gen_iter::<f64>().take(num_features).collect::<Vec<f64>>()
-        });
-        models.push(model);
-    }
-    Arc::new(models)
-}
+// fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<TaskModel>>> {
+//     let mut rng = thread_rng();
+//     let mut models = Vec::with_capacity(num_users);
+//     for i in 0..num_users {
+//         let model = RwLock::new(TaskModel {
+//             w: rng.gen_iter::<f64>().take(num_features).collect::<Vec<f64>>()
+//         });
+//         models.push(model);
+//     }
+//     Arc::new(models)
+// }
 
 
 

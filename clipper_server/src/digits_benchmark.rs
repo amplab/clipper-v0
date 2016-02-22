@@ -4,6 +4,7 @@ use server;
 use digits;
 use features;
 use linear_models::{linalg, linear};
+use server::TaskModel;
 
 pub fn run(features: Vec<(String, SocketAddr)>,
        num_users: isize,
@@ -36,95 +37,24 @@ pub fn run(features: Vec<(String, SocketAddr)>,
 struct TrainedTask {
     pub task_id: usize,
     pub pref: f64,
+    // raw inputs for training data
     pub test_x: Vec<Arc<Vec<f64>>>,
     pub test_y: Vec<f64>,
     model: linear::LogisticRegressionModel,
     /// anytime estimator for each feature in case we don't have it in time
-    pub anytime_estimators: Arc<RwLock<HashMap<String, f64>>>
+    pub anytime_estimators: Arc<RwLock<Vec<f64>>>
 }
 
-/// Wait until all features for all tasks have been computed asynchronously
-fn get_all_train_features(tasks: Vec<DigitsTask>, feature_handles: &Vec<FeatureHandle>) {
+impl TrainedTask {
 
-    for t in &tasks {
-        for x in t.offline_train_x {
-            server::get_features(feature_handles, (&x).clone());
-        }
-    }
-    println!("request all training features");
-    loop {
-        let sleep_secs = 5;
-        println!("Sleeping {} seconds...", sleep_secs);
-        thread::sleep(::std::time::Duration::new(sleep_secs, 0));
-        for t in &tasks {
-            for x in t.offline_train_x {
-
-
-            }
-        }
-
-
-    }
-
-
-}
-
-fn pretrain_task_models(tasks: Vec<DigitsTask>, feature_handles: Vec<FeatureHandle>) 
-    -> Vec<(DigitsTask, TaskModel)> {
-
-    
-    let mut trained_tasks = Vec::new();
-
-    let tasks_with_models = tasks.into_iter().enumerate().map(|t| {
-        let mut x_features: Vec<Arc<Vec<f64>>> = Vec::new();
-        for x in t.offline_train_x {
-            server::get_features(feature_handles, (&x).clone());
-        }
-        (t, TaskModel::train(i, t.pref, t.offline_train_x, t.offline_train_y))
-    }).collect::<Vec<_>>();
-    tasks_with_models
-}
-
-// #[allow(dead_code)]
-#[derive(Debug)]
-pub struct TaskModel {
-    tid: usize, //model/task ID
-    pub pref: f64,
-    model: linear::LogisticRegressionModel
-}
-
-impl TaskModel {
-
-    /// Constructs a new `TaskModel`
-    /// `k` is the dimension of the model.
-    /// `tid` is the task id assigned to this task (e.g. user ID).
-    // pub fn new(k: usize, tid: usize) -> TaskModel {
-    //     TaskModel {
-    //         w: linalg::gen_normal_vec(k),
-    //         tid: tid,
-    //         k: k,
-    //         model: None
-    //     }
-    // }
-
-    pub fn get_id(&self) -> usize {
-        self.tid
-    }
-
-    // pub fn get_wi(&self, i: usize) -> f64 {
-    //     if i >= self.w.len() {
-    //         0.0
-    //     } else {
-    //         self.w[i]
-    //     }
-    // }
-
-    pub fn get_labels(&self) -> (f64, f64) {
-        self.model.get_labels()
-    }
-
-
-    pub fn train(tid: usize, pref: f64, xs: &Vec<Arc<Vec<f64>>>, ys: &Vec<f64>) -> TaskModel {
+    /// Note that `xs` contains the featurized training data,
+    /// while `test_x` contains the raw test inputs.
+    pub fn train(tid: usize,
+                 pref: f64,
+                 xs: &Vec<Arc<Vec<f64>>>,
+                 ys: &Vec<f64>,
+                 test_x: Vec<Arc<Vec<f64>>>,
+                 test_y: Vec<f64>) -> TrainedTask {
         let params = linear::Struct_parameter {
             solver_type: linear::L2R_LR,
             eps: 0.0001,
@@ -137,11 +67,15 @@ impl TaskModel {
         };
         let prob = linear::Problem::from_training_data(xs, ys);
         let model = linear::train_logistic_regression(prob, params);
+        let (anytime_estimators, _) = linear_models::linalg::mean_and_var(xs);
 
-        TaskModel {
-            tid: tid,
+        TrainedTask {
+            task_id: tid,
             pref: pref,
-            model: model
+            test_x: test_x,
+            test_y: test_y,
+            model: model,
+            anytime_estimators: Arc::new(RwLock::new(anytime_estimators))
         }
     }
 
@@ -149,3 +83,70 @@ impl TaskModel {
         self.model.logistic_regression_predict(x)
     }
 }
+
+
+impl TaskModel for TrainedTask {
+
+    fn predict(&self, mut fs: Vec<f64>, missing_fs: &Vec<i32>) -> f64 {
+        for i in missing_fs {
+            fs[i] = self.anytime_estimators[i];
+        }
+        self.model.predict(fs)
+    }
+
+}
+
+
+/// Wait until all features for all tasks have been computed asynchronously
+fn get_all_train_features(tasks: &Vec<DigitsTask>, feature_handles: &Vec<FeatureHandle>) {
+    for t in tasks {
+        for x in t.offline_train_x {
+            server::get_features(feature_handles, (&x).clone());
+        }
+    }
+    println!("requesting all training features");
+    loop {
+        let sleep_secs = 5;
+        println!("Sleeping {} seconds...", sleep_secs);
+        thread::sleep(::std::time::Duration::new(sleep_secs, 0));
+        let mut done = true;
+        for t in tasks {
+            for x in t.offline_train_x {
+                for fh in feature_handles {
+                    let hash = fh.hasher.hash(x);
+                    let mut cache_reader = fh.cache.read().unwrap();
+                    let cache_entry = cache_reader.get(hash);
+                    if cache_entry.is_none() {
+                        done = false;
+                        break;
+                    }
+                }
+                if done == false { break; }
+            }
+            if done == false { break; }
+        }
+        // if we reach the end and done is still true, we have all features
+        if done == true { break; }
+    }
+    println!("all features have been cached");
+}
+
+fn pretrain_task_models(tasks: Vec<DigitsTask>, feature_handles: Vec<FeatureHandle>) 
+    -> Arc<Vec<RwLock<TrainedTask>>> {
+
+    get_all_train_features(&tasks, &feature_handles);
+
+
+    
+    let mut trained_tasks = Vec::new();
+
+    let tasks_with_models = tasks.into_iter().enumerate().map(|t| {
+        let mut x_features: Vec<Arc<Vec<f64>>> = Vec::new();
+        for x in t.offline_train_x {
+            server::get_features(feature_handles, (&x).clone());
+        }
+        // (t, TaskModel::train(i, t.pref, t.offline_train_x, t.offline_train_y))
+    }).collect::<Vec<_>>();
+
+}
+
