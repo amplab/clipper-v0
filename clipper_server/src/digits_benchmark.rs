@@ -30,15 +30,84 @@ pub fn run(features: Vec<(String, SocketAddr)>,
                               .map(|(n, a)| features::create_feature_worker(n, a))
                               .unzip();
     let trained_tasks = pretrain_task_models(tasks, &features);
+    let num_events = num_users * num_test_examples;
 
     let num_workers = 2;
-    let counter = Arc::new(AtomicUsize::new(0));
+    let correct_counter = Arc::new(AtomicUsize::new(0));
+    let total_counter = Arc::new(AtomicUsize::new(0));
+    let processed_counter = Arc::new(AtomicUsize::new(0));
     let mut dispatcher = Dispatcher::new(num_workers,
                                          server::SLA,
                                          features,
                                          trained_tasks.clone(),
-                                         counter.clone());
+                                         correct_counter.clone(),
+                                         total_counter.clone(),
+                                         processed_counter.clone());
+
+    thread::sleep(::std::time::Duration::new(3, 0));
+    let mon_thread_join_handle = launch_monitor_thread(correct_counter.clone(),
+                                                       total_counter.clone(),
+                                                       processed_counter.clone(),
+                                                       num_events);
+
+    let mut rng = thread_rng();
+    for _ in 0..num_events {
+        // TODO dispatch events
+        let user = rng.gen_range(0, num_users);
+        let example_idx = rng.gen_range(0, num_test_examples);
+        let input = (&trained_tasks)[user].read().unwrap().test_x[example_idx].clone();
+        let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
+        dispatcher.dispatch(Request::new_with_label(user, input, true_label));
+    }
+
+    println!("waiting for features to finish");
+    mon_thread_join_handle.join().unwrap();
+
+    // TODO: do something with latencies
+    for fh in &features {
+        let cur_lats = fh.read().unwrap();
+        println!("{}, {:?}", fh.name, cur_lats);
+    }
+
+    for h in handles {
+        h.join().unwrap();
+    }
+    // handle.join().unwrap();
+    println!("done");
 }
+
+fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
+                         total_counter: Arc<AtomicUsize>,
+                         processed_counter: Arc<AtomicUsize>,
+                         num_events: i32) {
+
+    // let counter = counter.clone();
+    thread::spawn(move || {
+        let bench_start = time::PreciseTime::now();
+        let mut last_count = 0;
+        let mut last_time = bench_start;
+        loop {
+            thread::sleep(::std::time::Duration::new(3, 0));
+            let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
+            let cur_count = processed_counter.load(Ordering::Relaxed);
+            println!("processed {} events in {} seconds: {} preds/sec",
+                     cur_count - last_count,
+                     cur_time,
+                     ((cur_count - last_count) as f64 / cur_time));
+
+            let cur_correct = correct_counter.load(Ordering::Relaxed);
+            let cur_total = total_counter.load(Ordering::Relaxed);
+            println!("current accuracy: {} out of {} correct {}, ({}%)",
+                     cur_correct, cur_total, (cur_correct as f64/cur_total as f64)*100.0);
+            if cur_count >= num_events {
+                println!("BENCHMARK FINISHED");
+                break;
+            }
+            println!("sleeping...");
+        }
+    })
+}
+
 
 /// Benchmark struct containing the trained model for
 /// a task as well as some test data to evaluate the task on

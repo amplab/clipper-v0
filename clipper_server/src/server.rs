@@ -38,12 +38,22 @@ struct Request {
     start_time: time::PreciseTime,
     user: u32, // TODO: remove this because each feature has it's own hash
     input: Vec<f64>,
+    true_label: Option<f64> // used to evaluate accuracy
 }
 
 impl Request {
 
     fn new(user: u32, input: Vec<f64>) -> Request {
-        Request { start_time: time::PreciseTime::now(), user: user, input: input}
+        Request { start_time: time::PreciseTime::now(), user: user, input: input, true_label: None}
+    }
+
+    fn new_with_label(user: u32, input: Vec<f64>, label: f64) -> Request {
+        Request {
+            start_time: time::PreciseTime::now(),
+            user: user,
+            input: input,
+            true_label: Some(label)
+        }
     }
 
 }
@@ -100,7 +110,10 @@ fn start_prediction_worker(worker_id: i32,
                            sla_millis: i64,
                            feature_handles: Vec<features::FeatureHandle>,
                            user_models: Arc<Vec<RwLock<TaskModel>>>,
-                           counter: Arc<AtomicUsize>) -> mpsc::Sender<Request> {
+                           correct_counter: Arc<AtomicUsize>,
+                           total_counter: Arc<AtomicUsize>,
+                           processed_counter: Arc<AtomicUsize>
+                           ) -> mpsc::Sender<Request> {
 
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(3);
@@ -125,11 +138,13 @@ fn start_prediction_worker(worker_id: i32,
             let pred = make_prediction(&feature_handles, &req.input, &task_model);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
-            counter.fetch_add(1, Ordering::Relaxed);
-            // if latency > 25 {
-            //     println!("worked {} made prediction. latency: {} ms", worker_id, latency);
-            // }
-            // TODO actually respond to request
+            processed_counter.fetch_add(1, Ordering::Relaxed);
+            if req.true_label.is_some() {
+                total_counter.fetch_add(1, Ordering::Relaxed);
+                if req.true_label.unwrap() == pred {
+                    correct_counter.fetch_add(1, Ordering::Relaxed);
+                }
+            }
         }
     });
     // (join_guard, sender)
@@ -150,7 +165,10 @@ impl Dispatcher {
            sla_millis: i64,
            features: Vec<features::FeatureHandle>,
            user_models: Arc<Vec<RwLock<TaskModel>>>,
-           counter: Arc<AtomicUsize>) -> Dispatcher {
+           correct_counter: Arc<AtomicUsize>,
+           total_counter: Arc<AtomicUsize>,
+           processed_counter: Arc<AtomicUsize>
+           ) -> Dispatcher {
         println!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
         for i in 0..num_workers {
@@ -158,7 +176,9 @@ impl Dispatcher {
                                                  sla_millis,
                                                  features.clone(),
                                                  user_models.clone(),
-                                                 counter.clone());
+                                                 correct_counter.clone(),
+                                                 total_counter.clone(),
+                                                 processed_counter.clone());
             worker_threads.push(worker);
         }
         Dispatcher {workers: worker_threads, next_worker: 0, features: features}
@@ -217,7 +237,9 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
                               .unzip();
 
 
-    let counter = Arc::new(AtomicUsize::new(0));
+    let correct_counter = Arc::new(AtomicUsize::new(0));
+    let total_counter = Arc::new(AtomicUsize::new(0));
+    let processed_counter = Arc::new(AtomicUsize::new(0));
     let num_events = 100;
     // let num_workers = num_cpus::get();
     let num_workers = 1;
@@ -225,37 +247,13 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
                                          SLA,
                                          features,
                                          init_user_models(num_users, num_features),
-                                         counter.clone());
+                                         correct_counter.clone(),
+                                         total_counter.clone(),
+                                         processed_counter.clone());
 
     // create monitoring thread to check incremental thruput
     thread::sleep(::std::time::Duration::new(3, 0));
-    let mon_thread_join_handle = {
-        let counter = counter.clone();
-        thread::spawn(move || {
-            let bench_start = time::PreciseTime::now();
-            let mut last_count = 0;
-            let mut last_time = bench_start;
-            loop {
-                thread::sleep(::std::time::Duration::new(3, 0));
-                let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
-                let cur_count = counter.load(Ordering::Relaxed);
-                println!("processed {} events in {} seconds: {} preds/sec",
-                         cur_count - last_count,
-                         cur_time,
-                         ((cur_count - last_count) as f64 / cur_time));
-
-                if cur_count >= num_events {
-                    println!("BENCHMARK FINISHED");
-                    break;
-                }
-                println!("sleeping...");
-            }
-        })
-    };
-    // let new_request = Request::new(11_u32, random_features(784));
-    // dispatcher.dispatch(new_request);
-
-
+    let mon_thread_join_handle = launch_monitor_thread(processed_counter.clone(), num_events);
 
     println!("sending batch with no delays");
     let mut rng = thread_rng();
@@ -279,6 +277,32 @@ fn get_features(fs: &Vec<features::FeatureHandle>, input: Vec<f64>) {
         let h = f.hasher.hash(&input);
         f.queue.send((h, input.clone())).unwrap();
     }
+}
+
+fn launch_monitor_thread(counter: Arc<AtomicUsize>,
+                             num_events: i32) {
+
+    // let counter = counter.clone();
+    thread::spawn(move || {
+        let bench_start = time::PreciseTime::now();
+        let mut last_count = 0;
+        let mut last_time = bench_start;
+        loop {
+            thread::sleep(::std::time::Duration::new(3, 0));
+            let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
+            let cur_count = counter.load(Ordering::Relaxed);
+            println!("processed {} events in {} seconds: {} preds/sec",
+                     cur_count - last_count,
+                     cur_time,
+                     ((cur_count - last_count) as f64 / cur_time));
+
+            if cur_count >= num_events {
+                println!("BENCHMARK FINISHED");
+                break;
+            }
+            println!("sleeping...");
+        }
+    })
 }
 
 
