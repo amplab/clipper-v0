@@ -20,8 +20,9 @@ use num_cpus;
 use linear_models::linalg;
 use digits;
 use features;
+use features::FeatureHash;
 
-const SLA: i64 = 20;
+pub const SLA: i64 = 20;
 
 
 
@@ -34,7 +35,7 @@ const SLA: i64 = 20;
 // }
 
 
-struct Request {
+pub struct Request {
     start_time: time::PreciseTime,
     user: u32, // TODO: remove this because each feature has it's own hash
     input: Vec<f64>,
@@ -43,11 +44,11 @@ struct Request {
 
 impl Request {
 
-    fn new(user: u32, input: Vec<f64>) -> Request {
+    pub fn new(user: u32, input: Vec<f64>) -> Request {
         Request { start_time: time::PreciseTime::now(), user: user, input: input, true_label: None}
     }
 
-    fn new_with_label(user: u32, input: Vec<f64>, label: f64) -> Request {
+    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64) -> Request {
         Request {
             start_time: time::PreciseTime::now(),
             user: user,
@@ -65,13 +66,13 @@ struct Update {
     label: f32,
 }
 
-fn start_update_worker(feature_handles: Vec<features::FeatureHandle>) -> mpsc::Sender<Update> {
-    panic!("unimplemented method");
-}
+// fn start_update_worker(feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>) -> mpsc::Sender<Update> {
+//     panic!("unimplemented method");
+// }
 
-trait TaskModel {
+pub trait TaskModel {
     /// Make a prediction with the available features
-    fn predict(&self, fs: Vec<f64>, missing_fs: Vec<i32>) -> f64;
+    fn predict(&self, mut fs: Vec<f64>, missing_fs: Vec<usize>) -> f64;
 
 
     // fn update_anytime_features(&mut self, fs: Vec<f64>, missing_fs: Vec<i32>);
@@ -79,41 +80,50 @@ trait TaskModel {
     // fn train(&mut self,
 }
 
+struct DummyTaskModel;
+
+impl TaskModel for DummyTaskModel {
+    fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>) -> f64 {
+        0.3
+    }
+}
+
 // Because we don't have a good concurrent hash map, assume we know how many
 // users there will be ahead of time. Then we can have a vec of RwLock.
-fn make_prediction(feature_handles: &Vec<features::FeatureHandle>, input: &Vec<f64>,
-                   task_model: &TaskModel) -> f64 {
+fn make_prediction<T: TaskModel, H: features::FeatureHash + Send + Sync>(feature_handles: &Vec<features::FeatureHandle<H>>, input: &Vec<f64>,
+                   task_model: &T) -> f64 {
 
     
-    let mut missing_feature_indexes: Vec<i32> = Vec::new();
-    let mut features: Vec<f64> = Vec::capacity(features.len());
+    let mut missing_feature_indexes: Vec<usize> = Vec::new();
+    let mut features: Vec<f64> = Vec::new();
     let mut i = 0;
     for fh in feature_handles {
         let hash = fh.hasher.hash(input);
         let mut cache_reader = fh.cache.read().unwrap();
-        let cache_entry = cache_reader.get(hash);
+        let cache_entry = cache_reader.get(&hash);
         match cache_entry {
-            Some(v) => features.append(v),
+            Some(v) => features.push(*v),
             None => {
-                features.append(0.0);
-                missing_feature_indexes.append(i);
+                features.push(0.0);
+                missing_feature_indexes.push(i);
             }
         };
         i += 1
     }
 
-    let anytime_features = task_model.predict(features, missing_feature_indexes);
-    task_model.predict(anytime_features);
+    task_model.predict(features, missing_feature_indexes)
 }
 
-fn start_prediction_worker(worker_id: i32,
+fn start_prediction_worker<T, H>(worker_id: i32,
                            sla_millis: i64,
-                           feature_handles: Vec<features::FeatureHandle>,
-                           user_models: Arc<Vec<RwLock<TaskModel>>>,
+                           feature_handles: Vec<features::FeatureHandle<H>>,
+                           user_models: Arc<Vec<RwLock<T>>>,
                            correct_counter: Arc<AtomicUsize>,
                            total_counter: Arc<AtomicUsize>,
                            processed_counter: Arc<AtomicUsize>
-                           ) -> mpsc::Sender<Request> {
+                           ) -> mpsc::Sender<Request> 
+                           where T: TaskModel + Send + Sync + 'static,
+                                 H: features::FeatureHash + Send + Sync + 'static {
 
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(3);
@@ -134,8 +144,8 @@ fn start_prediction_worker(worker_id: i32,
             // return result
             debug_assert!(req.user < user_models.len() as u32);
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
-            let task_model = lock.read().unwrap();
-            let pred = make_prediction(&feature_handles, &req.input, &task_model);
+            let task_model: &T = &lock.read().unwrap();
+            let pred = make_prediction(&feature_handles, &req.input, task_model);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
             processed_counter.fetch_add(1, Ordering::Relaxed);
@@ -153,18 +163,18 @@ fn start_prediction_worker(worker_id: i32,
 
 
 
-struct Dispatcher {
+pub struct Dispatcher {
     workers: Vec<mpsc::Sender<Request>>,
     next_worker: usize,
-    features: Vec<features::FeatureHandle>,
+    features: Vec<features::FeatureHandle<features::SimpleHasher>>,
 }
 
 impl Dispatcher {
 
-    fn new(num_workers: usize,
+    pub fn new<T: TaskModel + Send + Sync + 'static>(num_workers: usize,
            sla_millis: i64,
-           features: Vec<features::FeatureHandle>,
-           user_models: Arc<Vec<RwLock<TaskModel>>>,
+           features: Vec<features::FeatureHandle<features::SimpleHasher>>,
+           user_models: Arc<Vec<RwLock<T>>>,
            correct_counter: Arc<AtomicUsize>,
            total_counter: Arc<AtomicUsize>,
            processed_counter: Arc<AtomicUsize>
@@ -187,7 +197,7 @@ impl Dispatcher {
     /// Dispatch a request.
     ///
     /// Requires self to be mutable so that we can increment `next_worker`
-    fn dispatch(&mut self, req: Request) {
+    pub fn dispatch(&mut self, req: Request) {
         get_features(&self.features, req.input.clone());
         self.workers[self.next_worker].send(req).unwrap();
         self.increment_worker();
@@ -199,17 +209,17 @@ impl Dispatcher {
     }
 }
 
-// fn init_user_models(num_users: usize, num_features: usize) -> Arc<Vec<RwLock<TaskModel>>> {
-//     let mut rng = thread_rng();
-//     let mut models = Vec::with_capacity(num_users);
-//     for i in 0..num_users {
-//         let model = RwLock::new(TaskModel {
-//             w: rng.gen_iter::<f64>().take(num_features).collect::<Vec<f64>>()
-//         });
-//         models.push(model);
-//     }
-//     Arc::new(models)
-// }
+
+fn init_user_models(num_users: usize, num_features: usize)
+    -> Arc<Vec<RwLock<DummyTaskModel>>> {
+    let mut rng = thread_rng();
+    let mut models = Vec::with_capacity(num_users);
+    for i in 0..num_users {
+        let model = RwLock::new(DummyTaskModel);
+        models.push(model);
+    }
+    Arc::new(models)
+}
 
 
 
@@ -272,7 +282,7 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
 }
 
 // TODO this is a lot of unnecessary copies of the input
-fn get_features(fs: &Vec<features::FeatureHandle>, input: Vec<f64>) {
+pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>, input: Vec<f64>) {
     for f in fs {
         let h = f.hasher.hash(&input);
         f.queue.send((h, input.clone())).unwrap();
@@ -280,7 +290,7 @@ fn get_features(fs: &Vec<features::FeatureHandle>, input: Vec<f64>) {
 }
 
 fn launch_monitor_thread(counter: Arc<AtomicUsize>,
-                             num_events: i32) {
+                             num_events: i32) -> ::std::thread::JoinHandle<()> {
 
     // let counter = counter.clone();
     thread::spawn(move || {
@@ -296,7 +306,7 @@ fn launch_monitor_thread(counter: Arc<AtomicUsize>,
                      cur_time,
                      ((cur_count - last_count) as f64 / cur_time));
 
-            if cur_count >= num_events {
+            if cur_count >= num_events as usize {
                 println!("BENCHMARK FINISHED");
                 break;
             }

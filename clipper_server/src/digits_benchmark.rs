@@ -1,19 +1,29 @@
 
 
+use time;
+use std::ptr;
+use std::thread;
+use std::sync::{RwLock, Arc};
+use std::sync::mpsc;
+use std::collections::HashMap;
+use rand::{thread_rng, Rng};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::net::{ToSocketAddrs, SocketAddr};
 use server;
 use digits;
 use features;
+use features::FeatureHash;
 use linear_models::{linalg, linear};
 use server::TaskModel;
 
-pub fn run(features: Vec<(String, SocketAddr)>,
-       num_users: isize,
+pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
+       num_users: usize,
        num_train_examples: usize,
        num_test_examples: usize,
        mnist_path: String) {
 
     println!("starting digits");
-    let all_test_data = digits::load_mnist_dense(mnist_path).unwrap();
+    let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
     let norm_test_data = digits::normalize(&all_test_data);
 
     println!("Test data loaded: {} points", norm_test_data.ys.len());
@@ -23,7 +33,7 @@ pub fn run(features: Vec<(String, SocketAddr)>,
                                               num_train_examples,
                                               0,
                                               num_test_examples,
-                                              num_users);
+                                              num_users as usize);
 
 
     let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
@@ -36,9 +46,9 @@ pub fn run(features: Vec<(String, SocketAddr)>,
     let correct_counter = Arc::new(AtomicUsize::new(0));
     let total_counter = Arc::new(AtomicUsize::new(0));
     let processed_counter = Arc::new(AtomicUsize::new(0));
-    let mut dispatcher = Dispatcher::new(num_workers,
+    let mut dispatcher = server::Dispatcher::new(num_workers,
                                          server::SLA,
-                                         features,
+                                         features.clone(),
                                          trained_tasks.clone(),
                                          correct_counter.clone(),
                                          total_counter.clone(),
@@ -48,16 +58,16 @@ pub fn run(features: Vec<(String, SocketAddr)>,
     let mon_thread_join_handle = launch_monitor_thread(correct_counter.clone(),
                                                        total_counter.clone(),
                                                        processed_counter.clone(),
-                                                       num_events);
+                                                       num_events as i32);
 
     let mut rng = thread_rng();
     for _ in 0..num_events {
         // TODO dispatch events
-        let user = rng.gen_range(0, num_users);
-        let example_idx = rng.gen_range(0, num_test_examples);
-        let input = (&trained_tasks)[user].read().unwrap().test_x[example_idx].clone();
+        let user: usize = rng.gen_range(0, num_users as usize);
+        let example_idx: usize = rng.gen_range(0, num_test_examples);
+        let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
         let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
-        dispatcher.dispatch(Request::new_with_label(user, input, true_label));
+        dispatcher.dispatch(server::Request::new_with_label(user as u32, input, true_label));
     }
 
     println!("waiting for features to finish");
@@ -65,7 +75,7 @@ pub fn run(features: Vec<(String, SocketAddr)>,
 
     // TODO: do something with latencies
     for fh in &features {
-        let cur_lats = fh.read().unwrap();
+        let cur_lats: &Vec<i64> = &fh.latencies.read().unwrap();
         println!("{}, {:?}", fh.name, cur_lats);
     }
 
@@ -79,7 +89,7 @@ pub fn run(features: Vec<(String, SocketAddr)>,
 fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
                          total_counter: Arc<AtomicUsize>,
                          processed_counter: Arc<AtomicUsize>,
-                         num_events: i32) {
+                         num_events: i32) -> ::std::thread::JoinHandle<()> {
 
     // let counter = counter.clone();
     thread::spawn(move || {
@@ -97,9 +107,9 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
 
             let cur_correct = correct_counter.load(Ordering::Relaxed);
             let cur_total = total_counter.load(Ordering::Relaxed);
-            println!("current accuracy: {} out of {} correct {}, ({}%)",
+            println!("current accuracy: {} out of {} correct, ({}%)",
                      cur_correct, cur_total, (cur_correct as f64/cur_total as f64)*100.0);
-            if cur_count >= num_events {
+            if cur_count >= num_events as usize {
                 println!("BENCHMARK FINISHED");
                 break;
             }
@@ -145,7 +155,7 @@ impl TrainedTask {
         };
         let prob = linear::Problem::from_training_data(xs, ys);
         let model = linear::train_logistic_regression(prob, params);
-        let (anytime_estimators, _) = linear_models::linalg::mean_and_var(xs);
+        let (anytime_estimators, _) = linalg::mean_and_var(xs);
 
         TrainedTask {
             task_id: tid,
@@ -157,29 +167,40 @@ impl TrainedTask {
         }
     }
 
-    pub fn predict(&self, x: &Vec<f64>) -> f64 {
-        self.model.logistic_regression_predict(x)
-    }
+    // pub fn predict(&self, x: &Vec<f64>) -> f64 {
+    //     self.model.logistic_regression_predict(x)
+    // }
 }
 
 
 impl TaskModel for TrainedTask {
 
-    fn predict(&self, mut fs: Vec<f64>, missing_fs: &Vec<i32>) -> f64 {
-        for i in missing_fs {
-            fs[i] = self.anytime_estimators[i];
+    fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>) -> f64 {
+        let mut fs = fs.clone();
+        let estimators = self.anytime_estimators.read().unwrap();
+        for i in &missing_fs {
+            fs[*i] = estimators[*i];
         }
-        self.model.predict(fs)
+        self.model.logistic_regression_predict(&fs)
+        // self.model.predict(fs)
     }
 
 }
 
 
 /// Wait until all features for all tasks have been computed asynchronously
-fn get_all_train_features(tasks: &Vec<DigitsTask>, feature_handles: &Vec<FeatureHandle>) {
-    for t in tasks {
-        for x in t.offline_train_x {
-            server::get_features(feature_handles, (&x).clone());
+fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
+                          feature_handles: &Vec<features::FeatureHandle<features::SimpleHasher>>) {
+    for t in tasks.iter() {
+
+        // let ttt: &digits::DigitsTask = t;
+
+        for x in t.offline_train_x.iter() {
+            let mut xv: Vec<f64> = Vec::new();
+            for i in x.iter() {
+                xv.push(*i);
+            }
+            server::get_features(feature_handles, xv);
         }
     }
     println!("requesting all training features");
@@ -188,12 +209,12 @@ fn get_all_train_features(tasks: &Vec<DigitsTask>, feature_handles: &Vec<Feature
         println!("Sleeping {} seconds...", sleep_secs);
         thread::sleep(::std::time::Duration::new(sleep_secs, 0));
         let mut done = true;
-        for t in tasks {
-            for x in t.offline_train_x {
+        for t in tasks.iter() {
+            for x in t.offline_train_x.iter() {
                 for fh in feature_handles {
-                    let hash = fh.hasher.hash(x);
+                    let hash = fh.hasher.hash(&x);
                     let mut cache_reader = fh.cache.read().unwrap();
-                    let cache_entry = cache_reader.get(hash);
+                    let cache_entry = cache_reader.get(&hash);
                     if cache_entry.is_none() {
                         done = false;
                         break;
@@ -209,30 +230,31 @@ fn get_all_train_features(tasks: &Vec<DigitsTask>, feature_handles: &Vec<Feature
     println!("all features have been cached");
 }
 
-fn pretrain_task_models(tasks: Vec<DigitsTask>, feature_handles: &Vec<FeatureHandle>) 
+fn pretrain_task_models(tasks: Vec<digits::DigitsTask>,
+                        feature_handles: &Vec<features::FeatureHandle<features::SimpleHasher>>) 
     -> Arc<Vec<RwLock<TrainedTask>>> {
 
     get_all_train_features(&tasks, feature_handles);
     let mut trained_tasks = Vec::new();
     let mut cur_tid = 0;
-    for t in &task {
-        let mut training_data = Vec::new();
-        for x in t.offline_train_x {
-            let mut x_features = Vec::new();
+    for t in tasks.iter() {
+        let mut training_data: Vec<Arc<Vec<f64>>> = Vec::new();
+        for x in t.offline_train_x.iter() {
+            let mut x_features: Vec<f64> = Vec::new();
             for fh in feature_handles {
-                let hash = fh.hasher.hash(x);
+                let hash = fh.hasher.hash(&x);
                 let mut cache_reader = fh.cache.read().unwrap();
-                x_features.append(cache_reader.get(hash).unwrap());
+                x_features.push(*cache_reader.get(&hash).unwrap());
             }
-            training_data.append(Arc::new(x_features));
+            training_data.push(Arc::new(x_features));
         }
         let new_trained_task = TrainedTask::train(cur_tid,
                                                   t.pref,
                                                   &training_data,
                                                   &t.offline_train_y,
-                                                  t.test_x,
-                                                  t.test_y);
-        trained_tasks.append(RwLock::new(new_trained_task));
+                                                  t.test_x.clone(),
+                                                  t.test_y.clone());
+        trained_tasks.push(RwLock::new(new_trained_task));
         cur_tid += 1;
     }
     Arc::new(trained_tasks)

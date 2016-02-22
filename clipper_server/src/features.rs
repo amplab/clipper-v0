@@ -18,12 +18,12 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
 use linear_models::linalg;
 use digits;
-use std::hash::Hash;
+use std::hash::{Hash, SipHasher, Hasher};
 
-type hashkey = u64;
+pub type hashkey = u64;
 
 #[derive(Clone)]
-pub struct FeatureHandle {
+pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
     // addr: SocketAddr,
     pub name: String,
     pub queue: mpsc::Sender<(hashkey, Vec<f64>)>,
@@ -32,23 +32,34 @@ pub struct FeatureHandle {
     // (fixed size cache) and things never get evicted. Neither of these is strictly
     // true but it's a good approximation for now.
     pub cache: Arc<RwLock<HashMap<hashkey, f64>>>,
-    pub hasher: Arc<FeatureHash>,
+    pub hasher: Arc<H>,
     pub latencies: Arc<RwLock<Vec<i64>>>
     // thread_handle: ::std::thread::JoinHandle<()>,
 }
 
 
-trait FeatureHash {
+pub trait FeatureHash {
     fn hash(&self, input: &Vec<f64>) -> hashkey;
 }
 
+#[derive(Clone)]
 pub struct SimpleHasher;
 
-impl FeatureHash for SimpleHash {
+impl FeatureHash for SimpleHasher {
     fn hash(&self, input: &Vec<f64>) -> hashkey {
-        input.hash() as hashkey
+        // lame way to get around rust's lack of floating point equality. Basically,
+        // we need a better hash function.
+        let mut int_vec: Vec<i32> = Vec::new();
+        for i in input {
+            let iv = (i * 10000000.0) as i32;
+            int_vec.push(iv);
+        }
+        let mut s = SipHasher::new();
+        int_vec.hash(&mut s);
+        s.finish()
     }
 }
+
 
 // pub struct LocalitySensitiveHash {
 //     hash_size: i32
@@ -66,7 +77,7 @@ impl FeatureHash for SimpleHash {
 
 
 pub fn create_feature_worker(name: String, addr: SocketAddr)
-    -> (FeatureHandle, ::std::thread::JoinHandle<()>) {
+    -> (FeatureHandle<SimpleHasher>, ::std::thread::JoinHandle<()>) {
 
     let (tx, rx) = mpsc::channel();
 
@@ -84,7 +95,7 @@ pub fn create_feature_worker(name: String, addr: SocketAddr)
         name: name.clone(),
         queue: tx,
         cache: feature_cache,
-        hasher: SimpleHasher,
+        hasher: Arc::new(SimpleHasher),
         latencies: latencies
         // thread_handle: handle,
     }, handle)
@@ -165,13 +176,13 @@ fn feature_send_loop(name: String,
 
                     {
                         let mut l = latencies.write().unwrap();
-                        l.append(latency);
+                        l.push(latency);
                         let mut w = cache.write().unwrap();
-                        if !w.contains_key(hash) {
+                        if !w.contains_key(&hash) {
                             w.insert(hash, result);
                         } else {
-                            let existing_res = w.get(hash).unwrap();
-                            if result != existing_res {
+                            let existing_res = w.get(&hash).unwrap();
+                            if result != *existing_res {
                                 println!("{} CACHE ERR: existing: {}, new: {}",
                                          name, existing_res, result);
                             } else {

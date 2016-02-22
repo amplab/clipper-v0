@@ -23,7 +23,7 @@ pub struct TrainingData {
     pub ys: Arc<Vec<f64>>
 }
 
-pub fn load_mnist_dense(fpath: &str) -> Result<TrainingData, String> {
+pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
     let path = Path::new(fpath);
     let display = path.display();
 
