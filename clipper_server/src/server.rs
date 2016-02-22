@@ -298,14 +298,11 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     println!("done");
 }
 
-// pub fn eval_feature_latency() {
-//
-// }
-
+// TODO this is a lot of unnecessary copies of the input
 fn get_features(fs: &Vec<features::FeatureHandle>, input: Vec<f64>) {
-    let hash = 11_u32;
     for f in fs {
-        f.queue.send((hash, input.clone())).unwrap();
+        let h = f.hasher.hash(&input);
+        f.queue.send((h, input.clone())).unwrap();
     }
 }
 

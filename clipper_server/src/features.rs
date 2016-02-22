@@ -18,37 +18,74 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
 use linear_models::linalg;
 use digits;
+use std::hash::Hash;
+
+type hashkey = u64;
 
 #[derive(Clone)]
 pub struct FeatureHandle {
     // addr: SocketAddr,
     pub name: String,
-    pub queue: mpsc::Sender<(u32, Vec<f64>)>,
+    pub queue: mpsc::Sender<(hashkey, Vec<f64>)>,
     // TODO: need a better concurrent hashmap: preferable lock free wait free
     // This should actually be reasonably simple, because we don't need to resize
     // (fixed size cache) and things never get evicted. Neither of these is strictly
     // true but it's a good approximation for now.
-    pub cache: Arc<RwLock<HashMap<u32, f64>>>,
+    pub cache: Arc<RwLock<HashMap<hashkey, f64>>>,
+    pub hasher: Arc<FeatureHash>,
+    pub latencies: Arc<RwLock<Vec<i64>>>
     // thread_handle: ::std::thread::JoinHandle<()>,
 }
+
+
+trait FeatureHash {
+    fn hash(&self, input: &Vec<f64>) -> hashkey;
+}
+
+pub struct SimpleHasher;
+
+impl FeatureHash for SimpleHash {
+    fn hash(&self, input: &Vec<f64>) -> hashkey {
+        input.hash() as hashkey
+    }
+}
+
+// pub struct LocalitySensitiveHash {
+//     hash_size: i32
+// }
+//
+// impl FeatureHash for LocalitySensitiveHash {
+//     fn hash(&self, input: &Vec<f64>) -> u64 {
+//         
+//     }
+// }
+
+
+
+
+
 
 pub fn create_feature_worker(name: String, addr: SocketAddr)
     -> (FeatureHandle, ::std::thread::JoinHandle<()>) {
 
     let (tx, rx) = mpsc::channel();
 
-    let feature_cache: Arc<RwLock<HashMap<u32, f64>>> = Arc::new(RwLock::new(HashMap::new()));
+    let feature_cache: Arc<RwLock<HashMap<hashkey, f64>>> = Arc::new(RwLock::new(HashMap::new()));
+    let latencies: Arc<RwLock<Vec<i64>>> = Arc::new(RwLock::new(Vec::new()));
     let handle = {
         let thread_cache = feature_cache.clone();
+        let latencies = latencies.clone();
         let name = name.clone();
         thread::spawn(move || {
-            feature_worker(name, rx, thread_cache, addr);
+            feature_worker(name, rx, thread_cache, addr, latencies);
         })
     };
     (FeatureHandle {
         name: name.clone(),
         queue: tx,
         cache: feature_cache,
+        hasher: SimpleHasher,
+        latencies: latencies
         // thread_handle: handle,
     }, handle)
 }
@@ -58,9 +95,10 @@ pub fn get_addr(a: String) -> SocketAddr {
 }
 
 fn feature_worker(name: String,
-                  rx: mpsc::Receiver<(u32, Vec<f64>)>,
-                  cache: Arc<RwLock<HashMap<u32, f64>>>,
-                  address: SocketAddr) {
+                  rx: mpsc::Receiver<(hashkey, Vec<f64>)>,
+                  cache: Arc<RwLock<HashMap<hashkey, f64>>>,
+                  address: SocketAddr,
+                  latencies: Arc<RwLock<Vec<i64>>>) {
     println!("starting worker: {}", name);
 
     EventLoop::top_level(move |wait_scope| {
@@ -73,14 +111,17 @@ fn feature_worker(name: String,
         let mut rpc_system = RpcSystem::new(network, None);
         let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
         println!("rpc connection established");
-        feature_send_loop(name, feature_rpc, rx).lift().wait(wait_scope)
+        feature_send_loop(name, feature_rpc, rx, cache, latencies)
+            .lift().wait(wait_scope)
     }).expect("top level error");
 }
 
 
 fn feature_send_loop(name: String,
                      feature_rpc: feature::Client,
-                     rx: mpsc::Receiver<(u32, Vec<f64>)>)
+                     rx: mpsc::Receiver<(u64, Vec<f64>)>,
+                     cache: Arc<RwLock<HashMap<hashkey, f64>>>,
+                     latencies: Arc<RwLock<Vec<i64>>>)
                      -> Promise<(), ::std::io::Error> {
 
     // TODO batch feature requests
@@ -96,11 +137,11 @@ fn feature_send_loop(name: String,
     if let Ok(input) = rx.try_recv() {
 
         let start_time = time::PreciseTime::now();
+        let hash = input.0;
         let feature_vec = input.1;
 
-        // println!("sending {} reqs", new_features.len());
-        // println!("sending request");
 
+        // TODO(caching): check for cache presence before sending request
         let mut request = feature_rpc.compute_feature_request();
         {
             let mut builder = request.get();
@@ -116,16 +157,33 @@ fn feature_send_loop(name: String,
                 Ok(response) => {
                     let result = response.get().unwrap().get_result();
                     let end_time = time::PreciseTime::now();
-                    let latency = start_time.to(end_time).num_milliseconds();
+                    let latency = start_time.to(end_time).num_microseconds().unwrap();
                     println!("got response: {} from {} in {} ms, putting in cache",
                              result,
                              name,
-                             latency);
-                    feature_send_loop(name, feature_rpc, rx)
+                             (latency as f64) / 1000.0);
+
+                    {
+                        let mut l = latencies.write().unwrap();
+                        l.append(latency);
+                        let mut w = cache.write().unwrap();
+                        if !w.contains_key(hash) {
+                            w.insert(hash, result);
+                        } else {
+                            let existing_res = w.get(hash).unwrap();
+                            if result != existing_res {
+                                println!("{} CACHE ERR: existing: {}, new: {}",
+                                         name, existing_res, result);
+                            } else {
+                                println!("{} CACHE HIT", name);
+                            }
+                        }
+                    }
+                    feature_send_loop(name, feature_rpc, rx, cache, latencies)
                 }
                 Err(e) => {
                     println!("failed: {}", e);
-                    feature_send_loop(name, feature_rpc, rx)
+                    feature_send_loop(name, feature_rpc, rx, cache, latencies)
                 }
             }
         })
@@ -134,7 +192,7 @@ fn feature_send_loop(name: String,
         // println!("nothing in queue, waiting 1 s");
         // TODO change to 5ms
         gj::io::Timer.after_delay(::std::time::Duration::from_millis(1000))
-                     .then(move |()| feature_send_loop(name, feature_rpc, rx))
+                     .then(move |()| feature_send_loop(name, feature_rpc, rx, cache, latencies))
     }
 }
 
