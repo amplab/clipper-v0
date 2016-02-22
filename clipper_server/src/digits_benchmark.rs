@@ -29,6 +29,15 @@ pub fn run(features: Vec<(String, SocketAddr)>,
     let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
                               .map(|(n, a)| features::create_feature_worker(n, a))
                               .unzip();
+    let trained_tasks = pretrain_task_models(tasks, &features);
+
+    let num_workers = 2;
+    let counter = Arc::new(AtomicUsize::new(0));
+    let mut dispatcher = Dispatcher::new(num_workers,
+                                         server::SLA,
+                                         features,
+                                         trained_tasks.clone(),
+                                         counter.clone());
 }
 
 /// Benchmark struct containing the trained model for
@@ -131,22 +140,47 @@ fn get_all_train_features(tasks: &Vec<DigitsTask>, feature_handles: &Vec<Feature
     println!("all features have been cached");
 }
 
-fn pretrain_task_models(tasks: Vec<DigitsTask>, feature_handles: Vec<FeatureHandle>) 
+fn pretrain_task_models(tasks: Vec<DigitsTask>, feature_handles: &Vec<FeatureHandle>) 
     -> Arc<Vec<RwLock<TrainedTask>>> {
 
-    get_all_train_features(&tasks, &feature_handles);
-
-
-    
+    get_all_train_features(&tasks, feature_handles);
     let mut trained_tasks = Vec::new();
-
-    let tasks_with_models = tasks.into_iter().enumerate().map(|t| {
-        let mut x_features: Vec<Arc<Vec<f64>>> = Vec::new();
+    let mut cur_tid = 0;
+    for t in &task {
+        let mut training_data = Vec::new();
         for x in t.offline_train_x {
-            server::get_features(feature_handles, (&x).clone());
+            let mut x_features = Vec::new();
+            for fh in feature_handles {
+                let hash = fh.hasher.hash(x);
+                let mut cache_reader = fh.cache.read().unwrap();
+                x_features.append(cache_reader.get(hash).unwrap());
+            }
+            training_data.append(Arc::new(x_features));
         }
-        // (t, TaskModel::train(i, t.pref, t.offline_train_x, t.offline_train_y))
-    }).collect::<Vec<_>>();
-
+        let new_trained_task = TrainedTask::train(cur_tid,
+                                                  t.pref,
+                                                  &training_data,
+                                                  &t.offline_train_y,
+                                                  t.test_x,
+                                                  t.test_y);
+        trained_tasks.append(RwLock::new(new_trained_task));
+        cur_tid += 1;
+    }
+    Arc::new(trained_tasks)
 }
+
+
+//
+//     
+//     let mut trained_tasks = Vec::new();
+//
+//     let tasks_with_models = tasks.into_iter().enumerate().map(|t| {
+//         let mut x_features: Vec<Arc<Vec<f64>>> = Vec::new();
+//         for x in t.offline_train_x {
+//             server::get_features(feature_handles, (&x).clone());
+//         }
+//         // (t, TaskModel::train(i, t.pref, t.offline_train_x, t.offline_train_y))
+//     }).collect::<Vec<_>>();
+//
+// }
 
