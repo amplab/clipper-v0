@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-for i in {1..10}
+for i in {1..9}
 do
-  echo "starting spark server"
+  echo "starting spark server $i"
   python feature_server.py 127.0.0.1:600$i spark spark_models/lg_predict_$i &
+  # python feature_server.py 127.0.0.1:600$i sklearn sklearn_models/predict_"$i"_svm/predict_"$i"_svm.pkl &
 
  done
+
+echo "starting spark server 10"
+python feature_server.py 127.0.0.1:6010 spark spark_models/lg_predict_10 &
 
 # echo "starting sklearn server"
 # python feature_server.py 127.0.0.1:6001 spark spark_models/10rf_pred_1 &

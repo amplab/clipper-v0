@@ -108,7 +108,7 @@ class ScikitFeatureImpl(feature_capnp.Feature.Server):
         # s = name
         start = datetime.datetime.now()
         pred = self.model.predict(np.array(inp).reshape(1, -1))[0]
-        time.sleep(expn(EXPN_SCALE_PARAM) / 1000.0)
+        # time.sleep(expn(EXPN_SCALE_PARAM) / 1000.0)
         end = datetime.datetime.now()
         print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
         # pred = 0.2
@@ -141,7 +141,7 @@ class PySparkFeatureImpl(feature_capnp.Feature.Server):
         x = [float(v)/255.0 for v in inp]
         pred = 1.1
         pred = self.model.predict(x)
-        time.sleep(expn(EXPN_SCALE_PARAM) / 1000.0)
+        # time.sleep(expn(EXPN_SCALE_PARAM) / 1000.0)
         # print("PYSPARK: model predicted: %f" % pred)
         end = datetime.datetime.now()
         print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))

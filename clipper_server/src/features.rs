@@ -143,6 +143,9 @@ fn feature_send_loop(name: String,
     // }
     // println!("entering feature_send_loop");
 
+    // TODO: this should be configurable, and in fact other threads should
+    // be able to change this while the system is runnning
+    let max_batch_size = 50;
 
     // try_recv() never blocks, will return immediately if pending data, else will error
     if let Ok(input) = rx.try_recv() {
@@ -169,10 +172,10 @@ fn feature_send_loop(name: String,
                     let result = response.get().unwrap().get_result();
                     let end_time = time::PreciseTime::now();
                     let latency = start_time.to(end_time).num_microseconds().unwrap();
-                    println!("got response: {} from {} in {} ms, putting in cache",
-                             result,
-                             name,
-                             (latency as f64) / 1000.0);
+                    // println!("got response: {} from {} in {} ms, putting in cache",
+                    //          result,
+                    //          name,
+                    //          (latency as f64) / 1000.0);
 
                     {
                         let mut l = latencies.write().unwrap();
@@ -183,10 +186,10 @@ fn feature_send_loop(name: String,
                         } else {
                             let existing_res = w.get(&hash).unwrap();
                             if result != *existing_res {
-                                println!("{} CACHE ERR: existing: {}, new: {}",
-                                         name, existing_res, result);
+                                // println!("{} CACHE ERR: existing: {}, new: {}",
+                                //          name, existing_res, result);
                             } else {
-                                println!("{} CACHE HIT", name);
+                                // println!("{} CACHE HIT", name);
                             }
                         }
                     }
@@ -297,3 +300,21 @@ pub fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();
     rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn simple_hasher() {
+        let v1: Vec<f64> = vec![1.1, 2.2, 3.3];
+        let v2: Vec<f64> = vec![0.0000001, 222324.98, 0.31231411];
+        let s = SimpleHasher;
+        assert_eq!(4, add_two(2));
+    }
+}
+
+
+
+

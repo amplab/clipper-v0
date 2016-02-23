@@ -8,8 +8,8 @@ build = "build.rs"
 name = "clipper"
 path = "src/main.rs"
 
-# [profile.release]
-# debug = true
+[profile.release]
+debug = true
 
 # [build-dependencies]
 # capnpc = "*"
@@ -25,6 +25,7 @@ num_cpus = "0.2"
 toml = "0.1"
 docopt = "0.6"
 rustc-serialize = "0.3"  # if you're using `derive(RustcDecodable)`
+# quickersort = "1.0.1"
 # getopts = "0.2"
 # capnp = "0.6.1"
 # gj = "0.1.1"
@@ -43,5 +44,6 @@ git = "https://github.com/dcrankshaw/capnp-rpc-rust"
 git = "https://github.com/carllerche/eventual"
 
 [dependencies.linear-models]
-git = "https://github.com/dcrankshaw/rust-linear-models"
+# git = "https://github.com/dcrankshaw/rust-linear-models"
+path = "/crankshaw-local/rust-linear-models"
 

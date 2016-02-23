@@ -15,6 +15,7 @@ use features;
 use features::FeatureHash;
 use linear_models::{linalg, linear};
 use server::TaskModel;
+// use quickersort;
 
 pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
        num_users: usize,
@@ -67,7 +68,17 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
         let example_idx: usize = rng.gen_range(0, num_test_examples);
         let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
         let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
-        dispatcher.dispatch(server::Request::new_with_label(user as u32, input, true_label));
+        // random delay
+        
+        let sleep_time_ms: u32 = rng.gen_range(0, 100);
+        let ms_to_ns_factor = 1000*1000;
+        // let sleep_time = ::std::time::Duration::new(0,sleep_time_ms * ms_to_ns_factor);
+        let sleep_time = ::std::time::Duration::new(1, 0);
+        // println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+        thread::sleep(sleep_time);
+        let max_features = features.len();
+        dispatcher.dispatch(server::Request::new_with_label(user as u32, input, true_label),
+                            features.len());
     }
 
     println!("waiting for features to finish");
@@ -76,7 +87,7 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     // TODO: do something with latencies
     for fh in &features {
         let cur_lats: &Vec<i64> = &fh.latencies.read().unwrap();
-        println!("{}, {:?}", fh.name, cur_lats);
+        // println!("{}, {:?}", fh.name, cur_lats);
     }
 
     for h in handles {
@@ -143,6 +154,7 @@ impl TrainedTask {
                  ys: &Vec<f64>,
                  test_x: Vec<Arc<Vec<f64>>>,
                  test_y: Vec<f64>) -> TrainedTask {
+        println!("training task: {}", tid);
         let params = linear::Struct_parameter {
             solver_type: linear::L2R_LR,
             eps: 0.0001,
@@ -174,8 +186,10 @@ impl TrainedTask {
 
 
 impl TaskModel for TrainedTask {
-
     fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>) -> f64 {
+        if missing_fs.len() > 0 {
+            println!("missing {} features", missing_fs.len());
+        }
         let mut fs = fs.clone();
         let estimators = self.anytime_estimators.read().unwrap();
         for i in &missing_fs {
@@ -185,12 +199,35 @@ impl TaskModel for TrainedTask {
         // self.model.predict(fs)
     }
 
+    fn rank_features(&self) -> Vec<usize> {
+        let mut ws = self.model.w.clone();
+        // this is a very slow sort, but we expect the
+        // number of features to be pretty small so this is
+        // probably okay.
+        
+        let mut feature_order = Vec::new();
+        while !ws.is_empty() {
+            // TODO: rank by highest val or absolute value?
+            let mut next_highest = ws[0].abs();
+            let mut highest_index = 0;
+            for (i, v) in ws.iter().enumerate() {
+                if v.abs() > next_highest {
+                    next_highest = v.abs();
+                    highest_index = i;
+                }
+            }
+            feature_order.push(highest_index);
+            ws.remove(highest_index);
+        }
+        feature_order
+    }
 }
 
 
 /// Wait until all features for all tasks have been computed asynchronously
 fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
                           feature_handles: &Vec<features::FeatureHandle<features::SimpleHasher>>) {
+    let num_features = feature_handles.len();
     for t in tasks.iter() {
 
         // let ttt: &digits::DigitsTask = t;
@@ -200,12 +237,12 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
             for i in x.iter() {
                 xv.push(*i);
             }
-            server::get_features(feature_handles, xv);
+            server::get_features(feature_handles, xv, (0..num_features).collect());
         }
     }
     println!("requesting all training features");
     loop {
-        let sleep_secs = 5;
+        let sleep_secs = 10;
         println!("Sleeping {} seconds...", sleep_secs);
         thread::sleep(::std::time::Duration::new(sleep_secs, 0));
         let mut done = true;
@@ -228,12 +265,14 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
         if done == true { break; }
     }
     println!("all features have been cached");
+    thread::sleep(::std::time::Duration::new(10, 0));
 }
 
 fn pretrain_task_models(tasks: Vec<digits::DigitsTask>,
                         feature_handles: &Vec<features::FeatureHandle<features::SimpleHasher>>) 
     -> Arc<Vec<RwLock<TrainedTask>>> {
 
+    println!("pretraining task models");
     get_all_train_features(&tasks, feature_handles);
     let mut trained_tasks = Vec::new();
     let mut cur_tid = 0;

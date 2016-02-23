@@ -74,6 +74,8 @@ pub trait TaskModel {
     /// Make a prediction with the available features
     fn predict(&self, mut fs: Vec<f64>, missing_fs: Vec<usize>) -> f64;
 
+    fn rank_features(&self) -> Vec<usize>;
+
 
     // fn update_anytime_features(&mut self, fs: Vec<f64>, missing_fs: Vec<i32>);
 
@@ -85,6 +87,10 @@ struct DummyTaskModel;
 impl TaskModel for DummyTaskModel {
     fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>) -> f64 {
         0.3
+    }
+
+    fn rank_features(&self) -> Vec<usize> {
+        return (0..10).into_iter().collect::<Vec<usize>>()
     }
 }
 
@@ -163,42 +169,58 @@ fn start_prediction_worker<T, H>(worker_id: i32,
 
 
 
-pub struct Dispatcher {
+pub struct Dispatcher<T: TaskModel + Send + Sync + 'static> {
     workers: Vec<mpsc::Sender<Request>>,
     next_worker: usize,
-    features: Vec<features::FeatureHandle<features::SimpleHasher>>,
+    feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
+    user_models: Arc<Vec<RwLock<T>>>,
 }
 
-impl Dispatcher {
+impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
 
-    pub fn new<T: TaskModel + Send + Sync + 'static>(num_workers: usize,
+    // pub fn new<T: TaskModel + Send + Sync + 'static>(num_workers: usize,
+    pub fn new(num_workers: usize,
            sla_millis: i64,
-           features: Vec<features::FeatureHandle<features::SimpleHasher>>,
+           feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
            user_models: Arc<Vec<RwLock<T>>>,
            correct_counter: Arc<AtomicUsize>,
            total_counter: Arc<AtomicUsize>,
            processed_counter: Arc<AtomicUsize>
-           ) -> Dispatcher {
+           ) -> Dispatcher<T> {
         println!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
         for i in 0..num_workers {
             let worker = start_prediction_worker(i as i32,
                                                  sla_millis,
-                                                 features.clone(),
+                                                 feature_handles.clone(),
                                                  user_models.clone(),
                                                  correct_counter.clone(),
                                                  total_counter.clone(),
                                                  processed_counter.clone());
             worker_threads.push(worker);
         }
-        Dispatcher {workers: worker_threads, next_worker: 0, features: features}
+        Dispatcher {
+            workers: worker_threads,
+            next_worker: 0,
+            feature_handles: feature_handles,
+            user_models: user_models
+        }
     }
 
     /// Dispatch a request.
     ///
     /// Requires self to be mutable so that we can increment `next_worker`
-    pub fn dispatch(&mut self, req: Request) {
-        get_features(&self.features, req.input.clone());
+    pub fn dispatch(&mut self, req: Request, max_features: usize) {
+
+        let mut features_indexes: Vec<usize> = (0..self.feature_handles.len()).into_iter().collect();
+        if max_features < self.feature_handles.len() {
+            let model = self.user_models[req.user as usize].read().unwrap();
+            features_indexes = model.rank_features();
+            while max_features < features_indexes.len() {
+                features_indexes.pop();
+            }
+        }
+        get_features(&self.feature_handles, req.input.clone(), features_indexes);
         self.workers[self.next_worker].send(req).unwrap();
         self.increment_worker();
     }
@@ -255,7 +277,7 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     let num_workers = 1;
     let mut dispatcher = Dispatcher::new(num_workers,
                                          SLA,
-                                         features,
+                                         features.clone(),
                                          init_user_models(num_users, num_features),
                                          correct_counter.clone(),
                                          total_counter.clone(),
@@ -265,11 +287,12 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     thread::sleep(::std::time::Duration::new(3, 0));
     let mon_thread_join_handle = launch_monitor_thread(processed_counter.clone(), num_events);
 
+    let num_features = features.len();
     println!("sending batch with no delays");
     let mut rng = thread_rng();
     for _ in 0..num_events {
         dispatcher.dispatch(Request::new(rng.gen_range(0, num_users as u32),
-                            features::random_features(784)));
+                            features::random_features(784)), num_features);
     }
 
     println!("waiting for features to finish");
@@ -282,11 +305,22 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
 }
 
 // TODO this is a lot of unnecessary copies of the input
-pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>, input: Vec<f64>) {
-    for f in fs {
+/// Request the features for `input` from the feature servers indicated
+/// by `feature_indexes`. This allows a prediction worker to request
+/// only a subset of features to reduce the load on feature servers when
+/// the system is under heavy load.
+pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
+                    input: Vec<f64>,
+                    feature_indexes: Vec<usize>) {
+    for idx in feature_indexes.iter() {
+        let f = &fs[*idx];
         let h = f.hasher.hash(&input);
         f.queue.send((h, input.clone())).unwrap();
     }
+    // for f in fs {
+    //     let h = f.hasher.hash(&input);
+    //     f.queue.send((h, input.clone())).unwrap();
+    // }
 }
 
 fn launch_monitor_thread(counter: Arc<AtomicUsize>,

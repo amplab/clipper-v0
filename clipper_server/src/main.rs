@@ -16,6 +16,7 @@ extern crate toml;
 // extern crate getopts;
 extern crate rustc_serialize;
 extern crate docopt;
+// extern crate quickersort;
 
 use docopt::Docopt;
 use std::error::Error;
@@ -46,15 +47,18 @@ Clipper Server
 
 Usage:
   clipper digits --conf=</path/to/features.toml> --mnist=<test.data>
+  clipper digits --conf=</path/to/features.toml> --mnist=<test.data> --users=<num_users> --traindata=<num_examples> --testdata=<num_examples>
+  clipper digits --conf=</path/to/features.toml> --mnist=<test.data>
   clipper featurelats --conf=</path/to/features.toml>
   clipper start --conf=</path/to/features.toml>
+  clipper -h
 
 Options:
   -h --help                             Show this screen.
   --conf=</path/to/features>            Path to features config file.
   --users=<num_users>                   Number of users [default: 100]
-  --traindata=<num_examples>            Number of training examples per user [default: 10]
-  --testdata=<num_examples>             Number of test examples per user [default: 20]
+  --traindata=<num_examples>            Number of training examples per user [default: 30]
+  --testdata=<num_examples>             Number of test examples per user [default: 10]
   --mnist=</path/to/mnist/test.data>    Path to mnist data file
   
 ";
