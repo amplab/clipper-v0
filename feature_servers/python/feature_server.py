@@ -139,7 +139,7 @@ class PySparkFeatureImpl(feature_capnp.Feature.Server):
         # print(type(self.model))
         start = datetime.datetime.now()
         x = [float(v)/255.0 for v in inp]
-        pred = 1.1
+        # pred = 1.1
         pred = self.model.predict(x)
         # time.sleep(expn(EXPN_SCALE_PARAM) / 1000.0)
         # print("PYSPARK: model predicted: %f" % pred)

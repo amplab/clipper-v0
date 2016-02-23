@@ -73,7 +73,7 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
         let sleep_time_ms: u32 = rng.gen_range(0, 100);
         let ms_to_ns_factor = 1000*1000;
         // let sleep_time = ::std::time::Duration::new(0,sleep_time_ms * ms_to_ns_factor);
-        let sleep_time = ::std::time::Duration::new(1, 0);
+        let sleep_time = ::std::time::Duration::new(5, 0);
         // println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
         thread::sleep(sleep_time);
         let max_features = features.len();
@@ -154,7 +154,6 @@ impl TrainedTask {
                  ys: &Vec<f64>,
                  test_x: Vec<Arc<Vec<f64>>>,
                  test_y: Vec<f64>) -> TrainedTask {
-        println!("training task: {}", tid);
         let params = linear::Struct_parameter {
             solver_type: linear::L2R_LR,
             eps: 0.0001,
@@ -237,7 +236,10 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
             for i in x.iter() {
                 xv.push(*i);
             }
-            server::get_features(feature_handles, xv, (0..num_features).collect());
+            server::get_features(feature_handles,
+                                 xv,
+                                 (0..num_features).collect(),
+                                 time::PreciseTime::now());
         }
     }
     println!("requesting all training features");

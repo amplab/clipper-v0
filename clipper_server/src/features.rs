@@ -20,18 +20,24 @@ use linear_models::linalg;
 use digits;
 use std::hash::{Hash, SipHasher, Hasher};
 
-pub type hashkey = u64;
+pub type HashKey = u64;
+
+pub struct FeatureReq {
+    pub hash_key: HashKey,
+    pub input: Vec<f64>,
+    pub req_start_time: time::PreciseTime,
+}
 
 #[derive(Clone)]
 pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
     // addr: SocketAddr,
     pub name: String,
-    pub queue: mpsc::Sender<(hashkey, Vec<f64>)>,
+    pub queue: mpsc::Sender<FeatureReq>,
     // TODO: need a better concurrent hashmap: preferable lock free wait free
     // This should actually be reasonably simple, because we don't need to resize
     // (fixed size cache) and things never get evicted. Neither of these is strictly
     // true but it's a good approximation for now.
-    pub cache: Arc<RwLock<HashMap<hashkey, f64>>>,
+    pub cache: Arc<RwLock<HashMap<HashKey, f64>>>,
     pub hasher: Arc<H>,
     pub latencies: Arc<RwLock<Vec<i64>>>
     // thread_handle: ::std::thread::JoinHandle<()>,
@@ -39,14 +45,14 @@ pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
 
 
 pub trait FeatureHash {
-    fn hash(&self, input: &Vec<f64>) -> hashkey;
+    fn hash(&self, input: &Vec<f64>) -> HashKey;
 }
 
 #[derive(Clone)]
 pub struct SimpleHasher;
 
 impl FeatureHash for SimpleHasher {
-    fn hash(&self, input: &Vec<f64>) -> hashkey {
+    fn hash(&self, input: &Vec<f64>) -> HashKey {
         // lame way to get around rust's lack of floating point equality. Basically,
         // we need a better hash function.
         let mut int_vec: Vec<i32> = Vec::new();
@@ -81,7 +87,7 @@ pub fn create_feature_worker(name: String, addr: SocketAddr)
 
     let (tx, rx) = mpsc::channel();
 
-    let feature_cache: Arc<RwLock<HashMap<hashkey, f64>>> = Arc::new(RwLock::new(HashMap::new()));
+    let feature_cache: Arc<RwLock<HashMap<HashKey, f64>>> = Arc::new(RwLock::new(HashMap::new()));
     let latencies: Arc<RwLock<Vec<i64>>> = Arc::new(RwLock::new(Vec::new()));
     let handle = {
         let thread_cache = feature_cache.clone();
@@ -106,8 +112,8 @@ pub fn get_addr(a: String) -> SocketAddr {
 }
 
 fn feature_worker(name: String,
-                  rx: mpsc::Receiver<(hashkey, Vec<f64>)>,
-                  cache: Arc<RwLock<HashMap<hashkey, f64>>>,
+                  rx: mpsc::Receiver<FeatureReq>,
+                  cache: Arc<RwLock<HashMap<HashKey, f64>>>,
                   address: SocketAddr,
                   latencies: Arc<RwLock<Vec<i64>>>) {
     println!("starting worker: {}", name);
@@ -130,8 +136,8 @@ fn feature_worker(name: String,
 
 fn feature_send_loop(name: String,
                      feature_rpc: feature::Client,
-                     rx: mpsc::Receiver<(u64, Vec<f64>)>,
-                     cache: Arc<RwLock<HashMap<hashkey, f64>>>,
+                     rx: mpsc::Receiver<FeatureReq>,
+                     cache: Arc<RwLock<HashMap<HashKey, f64>>>,
                      latencies: Arc<RwLock<Vec<i64>>>)
                      -> Promise<(), ::std::io::Error> {
 
@@ -148,20 +154,19 @@ fn feature_send_loop(name: String,
     let max_batch_size = 50;
 
     // try_recv() never blocks, will return immediately if pending data, else will error
-    if let Ok(input) = rx.try_recv() {
+    if let Ok(req) = rx.try_recv() {
 
         let start_time = time::PreciseTime::now();
-        let hash = input.0;
-        let feature_vec = input.1;
-
-
+        let hash = req.hash_key;
+        println!("hash in feature send loop: {}", hash);
+        // let feature_vec = req.input;
         // TODO(caching): check for cache presence before sending request
         let mut request = feature_rpc.compute_feature_request();
         {
             let mut builder = request.get();
-            let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
-            for i in 0..feature_vec.len() {
-                inp_entries.set(i as u32, feature_vec[i]);
+            let mut inp_entries = builder.init_inp(req.input.len() as u32);
+            for i in 0..req.input.len() {
+                inp_entries.set(i as u32, req.input[i]);
             }
         }
 
@@ -172,10 +177,12 @@ fn feature_send_loop(name: String,
                     let result = response.get().unwrap().get_result();
                     let end_time = time::PreciseTime::now();
                     let latency = start_time.to(end_time).num_microseconds().unwrap();
-                    // println!("got response: {} from {} in {} ms, putting in cache",
-                    //          result,
-                    //          name,
-                    //          (latency as f64) / 1000.0);
+                    let req_latency = req.req_start_time.to(end_time).num_microseconds().unwrap();
+                    println!("got response: {} from {} in {} ms, time from req: {} ms, putting in cache",
+                             result,
+                             name,
+                             (latency as f64) / 1000.0,
+                             (req_latency as f64) / 1000.0);
 
                     {
                         let mut l = latencies.write().unwrap();
@@ -302,18 +309,18 @@ pub fn random_features(d: usize) -> Vec<f64> {
 }
 
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn simple_hasher() {
-        let v1: Vec<f64> = vec![1.1, 2.2, 3.3];
-        let v2: Vec<f64> = vec![0.0000001, 222324.98, 0.31231411];
-        let s = SimpleHasher;
-        assert_eq!(4, add_two(2));
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     #[test]
+//     fn simple_hasher() {
+//         let v1: Vec<f64> = vec![1.1, 2.2, 3.3];
+//         let v2: Vec<f64> = vec![0.0000001, 222324.98, 0.31231411];
+//         let s = SimpleHasher;
+//         assert_eq!(4, add_two(2));
+//     }
+// }
 
 
 

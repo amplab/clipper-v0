@@ -22,7 +22,7 @@ use digits;
 use features;
 use features::FeatureHash;
 
-pub const SLA: i64 = 20;
+pub const SLA: i64 = 100;
 
 
 
@@ -96,8 +96,11 @@ impl TaskModel for DummyTaskModel {
 
 // Because we don't have a good concurrent hash map, assume we know how many
 // users there will be ahead of time. Then we can have a vec of RwLock.
-fn make_prediction<T: TaskModel, H: features::FeatureHash + Send + Sync>(feature_handles: &Vec<features::FeatureHandle<H>>, input: &Vec<f64>,
-                   task_model: &T) -> f64 {
+fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
+                      input: &Vec<f64>,
+                      task_model: &T) -> f64
+                      where T: TaskModel,
+                            H: features::FeatureHash + Send + Sync {
 
     
     let mut missing_feature_indexes: Vec<usize> = Vec::new();
@@ -105,6 +108,7 @@ fn make_prediction<T: TaskModel, H: features::FeatureHash + Send + Sync>(feature
     let mut i = 0;
     for fh in feature_handles {
         let hash = fh.hasher.hash(input);
+        println!("hash in prediction: {}", hash);
         let mut cache_reader = fh.cache.read().unwrap();
         let cache_entry = cache_reader.get(&hash);
         match cache_entry {
@@ -220,7 +224,10 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
                 features_indexes.pop();
             }
         }
-        get_features(&self.feature_handles, req.input.clone(), features_indexes);
+        get_features(&self.feature_handles,
+                     req.input.clone(),
+                     features_indexes,
+                     req.start_time.clone());
         self.workers[self.next_worker].send(req).unwrap();
         self.increment_worker();
     }
@@ -311,11 +318,17 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
 /// the system is under heavy load.
 pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
                     input: Vec<f64>,
-                    feature_indexes: Vec<usize>) {
+                    feature_indexes: Vec<usize>,
+                    req_start: time::PreciseTime) {
     for idx in feature_indexes.iter() {
         let f = &fs[*idx];
         let h = f.hasher.hash(&input);
-        f.queue.send((h, input.clone())).unwrap();
+        let req = features::FeatureReq {
+            hash_key: h,
+            input: input.clone(),
+            req_start_time: req_start.clone()
+        };
+        f.queue.send(req).unwrap();
     }
     // for f in fs {
     //     let h = f.hasher.hash(&input);
