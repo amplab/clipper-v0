@@ -2,20 +2,22 @@
 #![crate_type="bin"]
 
 
-extern crate capnp;
-extern crate capnp_rpc;
+// extern crate capnp;
+// extern crate capnp_rpc;
 extern crate rand;
 extern crate time;
-#[macro_use]
-extern crate gj;
-extern crate eventual;
-extern crate mio;
+// #[macro_use]
+// extern crate gj;
+// extern crate eventual;
+// extern crate mio;
 extern crate num_cpus;
 extern crate linear_models;
 extern crate toml;
 // extern crate getopts;
 extern crate rustc_serialize;
 extern crate docopt;
+extern crate net2;
+extern crate byteorder;
 // extern crate quickersort;
 
 use docopt::Docopt;
@@ -30,16 +32,17 @@ use std::io::{BufReader, BufWriter};
 use std::env;
 use std::net::{ToSocketAddrs, SocketAddr};
 
-pub mod feature_capnp {
-  include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));
-}
+// pub mod feature_capnp {
+//   include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));
+// }
 
 // pub mod linalg;
 pub mod server;
 pub mod digits;
-pub mod bench;
+// pub mod bench;
 pub mod features;
 pub mod digits_benchmark;
+// pub mod rpc;
 
 
 const USAGE: &'static str = "
@@ -95,7 +98,8 @@ pub fn main() {
                             args.flag_testdata,
                             mnist_path);
     } else if args.cmd_featurelats {
-        features::feature_lats_main(features);
+        // features::feature_lats_main(features);
+        println!("unimplemented");
     } else if args.cmd_start {
         server::main(features);
     }

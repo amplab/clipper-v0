@@ -2,15 +2,11 @@
 name = "clipper"
 version = "0.1.0"
 dependencies = [
- "capnp 0.6.2 (git+https://github.com/dcrankshaw/capnproto-rust)",
- "capnp-rpc 0.6.2 (git+https://github.com/dcrankshaw/capnp-rpc-rust)",
- "capnpc 0.6.0 (git+https://github.com/dcrankshaw/capnpc-rust)",
+ "byteorder 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "docopt 0.6.78 (registry+https://github.com/rust-lang/crates.io-index)",
- "eventual 0.1.5 (git+https://github.com/carllerche/eventual)",
- "gj 0.1.2 (git+https://github.com/dcrankshaw/gj)",
  "hyper 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "linear-models 0.1.0",
- "mio 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "linear-models 0.1.0 (git+https://github.com/dcrankshaw/rust-linear-models)",
+ "net2 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "num_cpus 0.2.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -46,49 +42,6 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "bytes"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "capnp"
-version = "0.6.2"
-source = "git+https://github.com/dcrankshaw/capnproto-rust#7475515d83101e63c5a923536f59a98612f9f795"
-dependencies = [
- "byteorder 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "gj 0.1.2 (git+https://github.com/dcrankshaw/gj)",
-]
-
-[[package]]
-name = "capnp-gj"
-version = "0.1.0"
-source = "git+https://github.com/dcrankshaw/capnp-gj#175da187a6f4f0265368aa85db60f3cc3b7671d7"
-dependencies = [
- "byteorder 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "capnp 0.6.2 (git+https://github.com/dcrankshaw/capnproto-rust)",
- "gj 0.1.2 (git+https://github.com/dcrankshaw/gj)",
-]
-
-[[package]]
-name = "capnp-rpc"
-version = "0.6.2"
-source = "git+https://github.com/dcrankshaw/capnp-rpc-rust#8ed1a9e779894fb8830a90c9b5153bac0cecbc64"
-dependencies = [
- "capnp 0.6.2 (git+https://github.com/dcrankshaw/capnproto-rust)",
- "capnp-gj 0.1.0 (git+https://github.com/dcrankshaw/capnp-gj)",
- "capnpc 0.6.0 (git+https://github.com/dcrankshaw/capnpc-rust)",
- "gj 0.1.2 (git+https://github.com/dcrankshaw/gj)",
-]
-
-[[package]]
-name = "capnpc"
-version = "0.6.0"
-source = "git+https://github.com/dcrankshaw/capnpc-rust#88acfa4fafd90345820248b4b0d858474838d49c"
-dependencies = [
- "capnp 0.6.2 (git+https://github.com/dcrankshaw/capnproto-rust)",
-]
-
-[[package]]
 name = "cfg-if"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -115,16 +68,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "eventual"
-version = "0.1.5"
-source = "git+https://github.com/carllerche/eventual#611adf7fbc4e8e5a37856e2727b61cd309db5a3d"
-dependencies = [
- "log 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "syncbox 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "time 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "gcc"
 version = "0.3.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -139,15 +82,6 @@ version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "winapi 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "gj"
-version = "0.1.2"
-source = "git+https://github.com/dcrankshaw/gj#efc42edd0b08de4023f53bb459ec8e9c326e848b"
-dependencies = [
- "mio 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "nix 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -224,6 +158,7 @@ dependencies = [
 [[package]]
 name = "linear-models"
 version = "0.1.0"
+source = "git+https://github.com/dcrankshaw/rust-linear-models#7d19d11f405f106c3bb2724b1ac1aa93b9196129"
 dependencies = [
  "libc 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.13 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -262,34 +197,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mio"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "bytes 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "miow 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "net2 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "nix 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "slab 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "time 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
- "winapi 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "miow"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "kernel32-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "net2 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "winapi 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "ws2_32-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "net2"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -299,15 +206,6 @@ dependencies = [
  "libc 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "ws2_32-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "nix"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "bitflags 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -426,11 +324,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "slab"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
 name = "solicit"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -443,15 +336,6 @@ dependencies = [
 name = "strsim"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "syncbox"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "log 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "time 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [[package]]
 name = "tempdir"

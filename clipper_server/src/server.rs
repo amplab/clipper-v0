@@ -1,18 +1,17 @@
 #![allow(unused_variables)]
-#![allow(unused_imports)]
+// #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unused_mut)]
 
-use gj;
-use gj::{EventLoop, Promise};
-use capnp;
+// use gj;
+// use gj::{EventLoop, Promise};
+// use capnp;
 use time;
-use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
+// use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
 use std::net::{ToSocketAddrs, SocketAddr};
-use feature_capnp::feature;
+// use feature_capnp::feature;
 use std::thread;
-use std::sync::{RwLock, Arc};
-use std::sync::mpsc;
+use std::sync::{mpsc, RwLock, Arc};
 use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::{AtomicUsize, Ordering};

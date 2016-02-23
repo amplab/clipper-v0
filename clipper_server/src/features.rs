@@ -1,15 +1,15 @@
 
-use gj;
-use gj::{EventLoop, Promise};
+// use gj;
+// use gj::{EventLoop, Promise};
 // use gj::io;
-use capnp;
+// use capnp;
 // use std::time::{Duration, PreciseTime};
 use time;
-use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
-use std::net::{ToSocketAddrs, SocketAddr};
-use feature_capnp::feature;
+// use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
+use std::net::{ToSocketAddrs, SocketAddr, TcpStream};
+// use feature_capnp::feature;
 // use capnp::{primitive_list, message};
-use std::thread;
+use std::{thread, mem, slice};
 use std::sync::{RwLock, Arc};
 use std::sync::mpsc;
 use std::collections::HashMap;
@@ -19,6 +19,10 @@ use num_cpus;
 use linear_models::linalg;
 use digits;
 use std::hash::{Hash, SipHasher, Hasher};
+use std::io::{Read, Write};
+// use std::net::{self};
+use net2::{TcpBuilder, TcpStreamExt};
+use byteorder::{LittleEndian, WriteBytesExt};
 
 pub type HashKey = u64;
 
@@ -111,197 +115,302 @@ pub fn get_addr(a: String) -> SocketAddr {
     a.to_socket_addrs().unwrap().next().unwrap()
 }
 
+
+
 fn feature_worker(name: String,
                   rx: mpsc::Receiver<FeatureReq>,
                   cache: Arc<RwLock<HashMap<HashKey, f64>>>,
                   address: SocketAddr,
                   latencies: Arc<RwLock<Vec<i64>>>) {
+
     println!("starting worker: {}", name);
+    let mut stream: TcpStream = TcpStream::connect(address).unwrap();
+    stream.set_nodelay(true).unwrap();
+    stream.set_read_timeout(None).unwrap();
+    let max_batch_size = 10;
 
-    EventLoop::top_level(move |wait_scope| {
-        let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
-                                   .split();
-        let network = Box::new(twoparty::VatNetwork::new(reader,
-                                                         writer,
-                                                         rpc_twoparty_capnp::Side::Client,
-                                                         Default::default()));
-        let mut rpc_system = RpcSystem::new(network, None);
-        let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
-        println!("rpc connection established");
-        feature_send_loop(name, feature_rpc, rx, cache, latencies)
-            .lift().wait(wait_scope)
-    }).expect("top level error");
-}
-
-
-fn feature_send_loop(name: String,
-                     feature_rpc: feature::Client,
-                     rx: mpsc::Receiver<FeatureReq>,
-                     cache: Arc<RwLock<HashMap<HashKey, f64>>>,
-                     latencies: Arc<RwLock<Vec<i64>>>)
-                     -> Promise<(), ::std::io::Error> {
-
-    // TODO batch feature requests
-    // let mut new_features = Vec::new();
-    // while rx.try_recv() {
-    //     let data = rx.recv().unwrap();
-    //     new_features.push(data);
-    // }
-    // println!("entering feature_send_loop");
-
-    // TODO: this should be configurable, and in fact other threads should
-    // be able to change this while the system is runnning
-    let max_batch_size = 50;
-
-    // try_recv() never blocks, will return immediately if pending data, else will error
-    if let Ok(req) = rx.try_recv() {
-
+    loop {
+        let mut batch: Vec<FeatureReq> = Vec::new();
         let start_time = time::PreciseTime::now();
-        let hash = req.hash_key;
-        println!("hash in feature send loop: {}", hash);
-        // let feature_vec = req.input;
-        // TODO(caching): check for cache presence before sending request
-        let mut request = feature_rpc.compute_feature_request();
-        {
-            let mut builder = request.get();
-            let mut inp_entries = builder.init_inp(req.input.len() as u32);
-            for i in 0..req.input.len() {
-                inp_entries.set(i as u32, req.input[i]);
+        while batch.len() < max_batch_size {
+            if let Ok(req) = rx.try_recv() {
+                batch.push(req);
+            } else {
+                break;
             }
         }
-
-        // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
-        request.send().promise.then_else(move |r| {
-            match r {
-                Ok(response) => {
-                    let result = response.get().unwrap().get_result();
-                    let end_time = time::PreciseTime::now();
-                    let latency = start_time.to(end_time).num_microseconds().unwrap();
-                    let req_latency = req.req_start_time.to(end_time).num_microseconds().unwrap();
-                    println!("got response: {} from {} in {} ms, time from req: {} ms, putting in cache",
-                             result,
-                             name,
-                             (latency as f64) / 1000.0,
-                             (req_latency as f64) / 1000.0);
-
-                    {
-                        let mut l = latencies.write().unwrap();
-                        l.push(latency);
-                        let mut w = cache.write().unwrap();
-                        if !w.contains_key(&hash) {
-                            w.insert(hash, result);
-                        } else {
-                            let existing_res = w.get(&hash).unwrap();
-                            if result != *existing_res {
-                                // println!("{} CACHE ERR: existing: {}, new: {}",
-                                //          name, existing_res, result);
-                            } else {
-                                // println!("{} CACHE HIT", name);
-                            }
-                        }
-                    }
-                    feature_send_loop(name, feature_rpc, rx, cache, latencies)
-                }
-                Err(e) => {
-                    println!("failed: {}", e);
-                    feature_send_loop(name, feature_rpc, rx, cache, latencies)
-                }
+        if batch.len() > 0 {
+            // send batch
+            let mut header_wtr: Vec<u8> = vec![];
+            header_wtr.write_u16::<LittleEndian>(batch.len() as u16).unwrap();
+            stream.write_all(&header_wtr).unwrap();
+            for r in batch.iter() {
+                stream.write_all(floats_to_bytes(r.input.clone())).unwrap();
             }
-        })
-    } else {
-        // if there's nothing in the queue, we don't need to spin, back off a little bit
-        // println!("nothing in queue, waiting 1 s");
-        // TODO change to 5ms
-        gj::io::Timer.after_delay(::std::time::Duration::from_millis(1000))
-                     .then(move |()| feature_send_loop(name, feature_rpc, rx, cache, latencies))
+            stream.flush();
+
+            // read response: assumes 1 f64 for each entry in batch
+            let num_response_bytes = batch.len()*mem::size_of::<f64>();
+            let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
+            stream.read_exact(&mut response_buffer).unwrap();
+            // make immutable
+            let response_buffer = response_buffer;
+            let response_floats = bytes_to_floats(&response_buffer);
+            let end_time = time::PreciseTime::now();
+            let latency = start_time.to(end_time).num_microseconds().unwrap();
+            let max_req_latency = batch.first().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
+            let min_req_latency = batch.last().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
+
+            println!("feature: {}, batch_size: {}, latency: {}, max_req_latency: {}, min_req_latency{}",
+                     name, batch.len(), (latency as f64 / 1000.0),
+                    (max_req_latency as f64 / 1000.0),
+                    (min_req_latency as f64 / 1000.0));
+            let mut l = latencies.write().unwrap();
+            l.push(latency);
+            let mut w = cache.write().unwrap();
+            for r in 0..batch.len() {
+                let hash = batch[r].hash_key;
+                if !w.contains_key(&hash) {
+                    w.insert(hash, response_floats[r]);
+                } //else {
+                //     let existing_res = w.get(&hash).unwrap();
+                //     if result != *existing_res {
+                //         // println!("{} CACHE ERR: existing: {}, new: {}",
+                //         //          name, existing_res, result);
+                //     } else {
+                //         // println!("{} CACHE HIT", name);
+                //     }
+                // }
+            }
+        } else {
+            // Nothing in queue
+            let sleep_secs = 1;
+            println!("Nothing in {} queue. Sleeping {}s", name, sleep_secs);
+        }
     }
 }
 
 
-
-
-pub fn feature_lats_main(feature_addrs: Vec<(String, SocketAddr)>) {
-
-    // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
-    // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
-    // let addr_vec = (1..11).map(|i| format!("127.0.0.1:600{}", i)).collect::<Vec<String>>();
-    // let names = (1..11).map(|i| format!("Spark_predictor_{}", i)).collect::<Vec<String>>();
-    // let addr_vec = vec!["169.229.49.167:6001".to_string()];
-    // let names = vec!["CAFFE on c67 with GPU".to_string()];
-    let num_features = feature_addrs.len();
-    let handles: Vec<::std::thread::JoinHandle<()>> =
-            feature_addrs.into_iter().map(|(n, a)| create_blocking_features(n, a)).collect();
-
-    for h in handles {
-        h.join().unwrap();
-    }
-    // handle.join().unwrap();
-    println!("done");
+// TODO: this is super broken, and for some reason the
+// 
+fn floats_to_bytes<'a>(v: Vec<f64>) -> &'a [u8] {
+    let byte_arr: &[u8] = unsafe {
+        let float_ptr: *const f64 = v[..].as_ptr();
+        let num_elems = v.len()*mem::size_of::<f64>();
+        slice::from_raw_parts(float_ptr as *const u8, num_elems)
+    };
+    byte_arr
 }
 
-fn create_blocking_features(name: String, address: SocketAddr)
-                            -> ::std::thread::JoinHandle<()> {
-    // let name = name.clone();
-    println!("{}", name);
-    thread::spawn(move || {
-        blocking_feature_requests(name, address);
-    })
+// fn ints_to_bytes<'a>(v: Vec<u32>) -> &'a [u8] {
+//     let byte_arr: &[u8] = unsafe {
+//         let int_ptr: *const u32 = v[..].as_ptr();
+//         let num_elems = v.len()*mem::size_of::<u32>();
+//         slice::from_raw_parts(int_ptr as *const u8, num_elems)
+//     };
+//     byte_arr
+// }
+
+fn bytes_to_floats(bytes: &[u8]) -> &[f64] {
+    let float_arr: &[f64] = unsafe {
+        let byte_ptr: *const u8 = bytes.as_ptr();
+        let num_elems = bytes.len() / mem::size_of::<f64>();
+        slice::from_raw_parts(byte_ptr as *const f64, num_elems)
+    };
+    float_arr
 }
 
-fn blocking_feature_requests(name: String, address: SocketAddr) {
+// fn feature_worker(name: String,
+//                   rx: mpsc::Receiver<FeatureReq>,
+//                   cache: Arc<RwLock<HashMap<HashKey, f64>>>,
+//                   address: SocketAddr,
+//                   latencies: Arc<RwLock<Vec<i64>>>) {
+//     println!("starting worker: {}", name);
+//
+//     EventLoop::top_level(move |wait_scope| {
+//         let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
+//                                    .split();
+//         let network = Box::new(twoparty::VatNetwork::new(reader,
+//                                                          writer,
+//                                                          rpc_twoparty_capnp::Side::Client,
+//                                                          Default::default()));
+//         let mut rpc_system = RpcSystem::new(network, None);
+//         let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
+//         println!("rpc connection established");
+//         feature_send_loop(name, feature_rpc, rx, cache, latencies)
+//             .lift().wait(wait_scope)
+//     }).expect("top level error");
+// }
 
-    let num_events = 5000;
-    EventLoop::top_level(move |wait_scope| {
-        let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
-            .split();
-        let network = Box::new(twoparty::VatNetwork::new(reader,
-                                                         writer,
-                                                         rpc_twoparty_capnp::Side::Client,
-                                                         Default::default()));
-        let mut rpc_system = RpcSystem::new(network, None);
-        let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
-        println!("rpc connection established");
-        // feature_send_loop(name, feature_rpc, rx).lift()
 
-        for _ in 0..num_events {
+// fn feature_send_loop(name: String,
+//                      feature_rpc: feature::Client,
+//                      rx: mpsc::Receiver<FeatureReq>,
+//                      cache: Arc<RwLock<HashMap<HashKey, f64>>>,
+//                      latencies: Arc<RwLock<Vec<i64>>>)
+//                      -> Promise<(), ::std::io::Error> {
+//
+//     // TODO batch feature requests
+//     // let mut new_features = Vec::new();
+//     // while rx.try_recv() {
+//     //     let data = rx.recv().unwrap();
+//     //     new_features.push(data);
+//     // }
+//     // println!("entering feature_send_loop");
+//
+//     // TODO: this should be configurable, and in fact other threads should
+//     // be able to change this while the system is runnning
+//     let max_batch_size = 50;
+//
+//     // try_recv() never blocks, will return immediately if pending data, else will error
+//     if let Ok(req) = rx.try_recv() {
+//
+//         let start_time = time::PreciseTime::now();
+//         let hash = req.hash_key;
+//         println!("hash in feature send loop: {}", hash);
+//         // let feature_vec = req.input;
+//         // TODO(caching): check for cache presence before sending request
+//         let mut request = feature_rpc.compute_feature_request();
+//         {
+//             let mut builder = request.get();
+//             let mut inp_entries = builder.init_inp(req.input.len() as u32);
+//             for i in 0..req.input.len() {
+//                 inp_entries.set(i as u32, req.input[i]);
+//             }
+//         }
+//
+//         // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
+//         request.send().promise.then_else(move |r| {
+//             match r {
+//                 Ok(response) => {
+//                     let result = response.get().unwrap().get_result();
+//                     let end_time = time::PreciseTime::now();
+//                     let latency = start_time.to(end_time).num_microseconds().unwrap();
+//                     let req_latency = req.req_start_time.to(end_time).num_microseconds().unwrap();
+//                     println!("got response: {} from {} in {} ms, time from req: {} ms, putting in cache",
+//                              result,
+//                              name,
+//                              (latency as f64) / 1000.0,
+//                              (req_latency as f64) / 1000.0);
+//
+//                     {
+//                         let mut l = latencies.write().unwrap();
+//                         l.push(latency);
+//                         let mut w = cache.write().unwrap();
+//                         if !w.contains_key(&hash) {
+//                             w.insert(hash, result);
+//                         } else {
+//                             let existing_res = w.get(&hash).unwrap();
+//                             if result != *existing_res {
+//                                 // println!("{} CACHE ERR: existing: {}, new: {}",
+//                                 //          name, existing_res, result);
+//                             } else {
+//                                 // println!("{} CACHE HIT", name);
+//                             }
+//                         }
+//                     }
+//                     feature_send_loop(name, feature_rpc, rx, cache, latencies)
+//                 }
+//                 Err(e) => {
+//                     println!("failed: {}", e);
+//                     feature_send_loop(name, feature_rpc, rx, cache, latencies)
+//                 }
+//             }
+//         })
+//     } else {
+//         // if there's nothing in the queue, we don't need to spin, back off a little bit
+//         // println!("nothing in queue, waiting 1 s");
+//         // TODO change to 5ms
+//         gj::io::Timer.after_delay(::std::time::Duration::from_millis(1000))
+//                      .then(move |()| feature_send_loop(name, feature_rpc, rx, cache, latencies))
+//     }
+// }
 
-            let start_time = time::PreciseTime::now();
-            let feature_vec = random_features(784);
 
-            // println!("sending {} reqs", new_features.len());
-            // println!("sending request");
 
-            let mut request = feature_rpc.compute_feature_request();
-            {
-                let mut builder = request.get();
-                let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
-                for i in 0..feature_vec.len() {
-                    inp_entries.set(i as u32, feature_vec[i]);
-                }
-            }
 
-            // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
-            
-            let name = name.clone();
-            try!(request.send().promise.then(move |response| {
-                let res = pry!(response.get()).get_result();
-                // let result = response.get().unwrap().get_result();
-                let end_time = time::PreciseTime::now();
-                let latency = start_time.to(end_time).num_milliseconds();
-                println!("got response: {} from {} in {} ms, putting in cache",
-                         res,
-                         name,
-                         latency);
-                // feature_send_loop(name, feature_rpc, rx)
-                Promise::ok(())
-            }).wait(wait_scope));
-            // thread::sleep(::std::time::Duration::new(1, 0));
-        }
-        println!("done with requests");
-        Ok(())
-    })
-    .expect("top level error");
-}
+// pub fn feature_lats_main(feature_addrs: Vec<(String, SocketAddr)>) {
+//
+//     // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
+//     // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
+//     // let addr_vec = (1..11).map(|i| format!("127.0.0.1:600{}", i)).collect::<Vec<String>>();
+//     // let names = (1..11).map(|i| format!("Spark_predictor_{}", i)).collect::<Vec<String>>();
+//     // let addr_vec = vec!["169.229.49.167:6001".to_string()];
+//     // let names = vec!["CAFFE on c67 with GPU".to_string()];
+//     let num_features = feature_addrs.len();
+//     let handles: Vec<::std::thread::JoinHandle<()>> =
+//             feature_addrs.into_iter().map(|(n, a)| create_blocking_features(n, a)).collect();
+//
+//     for h in handles {
+//         h.join().unwrap();
+//     }
+//     // handle.join().unwrap();
+//     println!("done");
+// }
+//
+// fn create_blocking_features(name: String, address: SocketAddr)
+//                             -> ::std::thread::JoinHandle<()> {
+//     // let name = name.clone();
+//     println!("{}", name);
+//     thread::spawn(move || {
+//         blocking_feature_requests(name, address);
+//     })
+// }
+//
+// fn blocking_feature_requests(name: String, address: SocketAddr) {
+//
+//     let num_events = 5000;
+//     EventLoop::top_level(move |wait_scope| {
+//         let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
+//             .split();
+//         let network = Box::new(twoparty::VatNetwork::new(reader,
+//                                                          writer,
+//                                                          rpc_twoparty_capnp::Side::Client,
+//                                                          Default::default()));
+//         let mut rpc_system = RpcSystem::new(network, None);
+//         let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
+//         println!("rpc connection established");
+//         // feature_send_loop(name, feature_rpc, rx).lift()
+//
+//         for _ in 0..num_events {
+//
+//             let start_time = time::PreciseTime::now();
+//             let feature_vec = random_features(784);
+//
+//             // println!("sending {} reqs", new_features.len());
+//             // println!("sending request");
+//
+//             let mut request = feature_rpc.compute_feature_request();
+//             {
+//                 let mut builder = request.get();
+//                 let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
+//                 for i in 0..feature_vec.len() {
+//                     inp_entries.set(i as u32, feature_vec[i]);
+//                 }
+//             }
+//
+//             // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
+//             
+//             let name = name.clone();
+//             try!(request.send().promise.then(move |response| {
+//                 let res = pry!(response.get()).get_result();
+//                 // let result = response.get().unwrap().get_result();
+//                 let end_time = time::PreciseTime::now();
+//                 let latency = start_time.to(end_time).num_milliseconds();
+//                 println!("got response: {} from {} in {} ms, putting in cache",
+//                          res,
+//                          name,
+//                          latency);
+//                 // feature_send_loop(name, feature_rpc, rx)
+//                 Promise::ok(())
+//             }).wait(wait_scope));
+//             // thread::sleep(::std::time::Duration::new(1, 0));
+//         }
+//         println!("done with requests");
+//         Ok(())
+//     })
+//     .expect("top level error");
+// }
 
 pub fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();
