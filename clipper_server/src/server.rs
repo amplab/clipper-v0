@@ -21,7 +21,7 @@ use digits;
 use features;
 use features::FeatureHash;
 
-pub const SLA: i64 = 100;
+pub const SLA: i64 = 20;
 
 
 
@@ -107,7 +107,7 @@ fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
     let mut i = 0;
     for fh in feature_handles {
         let hash = fh.hasher.hash(input);
-        println!("hash in prediction: {}", hash);
+        // println!("hash in prediction: {}", hash);
         let mut cache_reader = fh.cache.read().unwrap();
         let cache_entry = cache_reader.get(&hash);
         match cache_entry {
@@ -135,10 +135,10 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                                  H: features::FeatureHash + Send + Sync + 'static {
 
     let sla = time::Duration::milliseconds(sla_millis);
-    let epsilon = time::Duration::milliseconds(3);
+    let epsilon = time::Duration::milliseconds(sla_millis / 5);
     let (sender, receiver) = mpsc::channel::<Request>();
     let join_guard = thread::spawn(move || {
-        println!("starting response worker {} with {}ms SLA", worker_id, sla_millis);
+        println!("starting response worker {} with {} ms SLA", worker_id, sla_millis);
         loop {
             let req = receiver.recv().unwrap();
             // if elapsed_time is less than SLA (+- epsilon wiggle room) then wait
@@ -151,12 +151,14 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             }
             // TODO: actually compute prediction
             // return result
+            let pred_loop_start = time::PreciseTime::now();
             debug_assert!(req.user < user_models.len() as u32);
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
             let task_model: &T = &lock.read().unwrap();
             let pred = make_prediction(&feature_handles, &req.input, task_model);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
+            println!("prediction latency: {} ms", latency);
             processed_counter.fetch_add(1, Ordering::Relaxed);
             if req.true_label.is_some() {
                 total_counter.fetch_add(1, Ordering::Relaxed);
@@ -164,6 +166,9 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                     correct_counter.fetch_add(1, Ordering::Relaxed);
                 }
             }
+            let pred_loop_end = time::PreciseTime::now();
+            let pred_loop_latency = pred_loop_start.to(pred_loop_end).num_microseconds().unwrap() as f64;
+            // println!("pred LOOP latency: {} (ms)", pred_loop_latency / 1000.0);
         }
     });
     // (join_guard, sender)

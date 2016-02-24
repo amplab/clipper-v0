@@ -127,66 +127,70 @@ fn feature_worker(name: String,
     let mut stream: TcpStream = TcpStream::connect(address).unwrap();
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();
-    let max_batch_size = 10;
+    let max_batch_size = 50;
 
     loop {
         let mut batch: Vec<FeatureReq> = Vec::new();
+        // block until new request, then try to get more requests
+        let first_req = rx.recv().unwrap();
+        batch.push(first_req);
         let start_time = time::PreciseTime::now();
         while batch.len() < max_batch_size {
             if let Ok(req) = rx.try_recv() {
+                // let req_latency = req.req_start_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
+                // println!("req->features latency {} (ms)", (req_latency as f64 / 1000.0));
                 batch.push(req);
             } else {
                 break;
             }
         }
-        if batch.len() > 0 {
-            // send batch
-            let mut header_wtr: Vec<u8> = vec![];
-            header_wtr.write_u16::<LittleEndian>(batch.len() as u16).unwrap();
-            stream.write_all(&header_wtr).unwrap();
-            for r in batch.iter() {
-                stream.write_all(floats_to_bytes(r.input.clone())).unwrap();
-            }
-            stream.flush();
-
-            // read response: assumes 1 f64 for each entry in batch
-            let num_response_bytes = batch.len()*mem::size_of::<f64>();
-            let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
-            stream.read_exact(&mut response_buffer).unwrap();
-            // make immutable
-            let response_buffer = response_buffer;
-            let response_floats = bytes_to_floats(&response_buffer);
-            let end_time = time::PreciseTime::now();
-            let latency = start_time.to(end_time).num_microseconds().unwrap();
-            let max_req_latency = batch.first().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
-            let min_req_latency = batch.last().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
-
-            println!("feature: {}, batch_size: {}, latency: {}, max_req_latency: {}, min_req_latency{}",
-                     name, batch.len(), (latency as f64 / 1000.0),
-                    (max_req_latency as f64 / 1000.0),
-                    (min_req_latency as f64 / 1000.0));
-            let mut l = latencies.write().unwrap();
-            l.push(latency);
-            let mut w = cache.write().unwrap();
-            for r in 0..batch.len() {
-                let hash = batch[r].hash_key;
-                if !w.contains_key(&hash) {
-                    w.insert(hash, response_floats[r]);
-                } //else {
-                //     let existing_res = w.get(&hash).unwrap();
-                //     if result != *existing_res {
-                //         // println!("{} CACHE ERR: existing: {}, new: {}",
-                //         //          name, existing_res, result);
-                //     } else {
-                //         // println!("{} CACHE HIT", name);
-                //     }
-                // }
-            }
-        } else {
-            // Nothing in queue
-            let sleep_secs = 1;
-            println!("Nothing in {} queue. Sleeping {}s", name, sleep_secs);
+        assert!(batch.len() > 0);
+        // send batch
+        let mut header_wtr: Vec<u8> = vec![];
+        header_wtr.write_u16::<LittleEndian>(batch.len() as u16).unwrap();
+        stream.write_all(&header_wtr).unwrap();
+        for r in batch.iter() {
+            stream.write_all(floats_to_bytes(r.input.clone())).unwrap();
         }
+        stream.flush();
+
+        // read response: assumes 1 f64 for each entry in batch
+        let num_response_bytes = batch.len()*mem::size_of::<f64>();
+        let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
+        stream.read_exact(&mut response_buffer).unwrap();
+        // make immutable
+        let response_buffer = response_buffer;
+        let response_floats = bytes_to_floats(&response_buffer);
+        let end_time = time::PreciseTime::now();
+        let latency = start_time.to(end_time).num_microseconds().unwrap();
+        let max_req_latency = batch.first().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
+        let min_req_latency = batch.last().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
+
+        let mut l = latencies.write().unwrap();
+        l.push(latency);
+        let mut w = cache.write().unwrap();
+        for r in 0..batch.len() {
+            let hash = batch[r].hash_key;
+            if !w.contains_key(&hash) {
+                w.insert(hash, response_floats[r]);
+            } //else {
+            //     let existing_res = w.get(&hash).unwrap();
+            //     if result != *existing_res {
+            //         // println!("{} CACHE ERR: existing: {}, new: {}",
+            //         //          name, existing_res, result);
+            //     } else {
+            //         // println!("{} CACHE HIT", name);
+            //     }
+            // }
+        }
+        let loop_end_time = time::PreciseTime::now();
+        let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap();
+        println!("feature: {}, batch_size: {}, latency: {}, max_req_latency: {}, min_req_latency {}, loop_latency: {}",
+                 name, batch.len(), (latency as f64 / 1000.0),
+                (max_req_latency as f64 / 1000.0),
+                (min_req_latency as f64 / 1000.0),
+                (loop_latency as f64 / 1000.0)
+                );
     }
 }
 

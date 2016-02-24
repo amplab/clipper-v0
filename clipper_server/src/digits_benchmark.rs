@@ -73,10 +73,11 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
         let sleep_time_ms: u32 = rng.gen_range(0, 100);
         let ms_to_ns_factor = 1000*1000;
         // let sleep_time = ::std::time::Duration::new(0,sleep_time_ms * ms_to_ns_factor);
-        let sleep_time = ::std::time::Duration::new(5, 0);
+        let sleep_time = ::std::time::Duration::new(2, 0);
         // println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
         thread::sleep(sleep_time);
         let max_features = features.len();
+        // println!("dispatching request");
         dispatcher.dispatch(server::Request::new_with_label(user as u32, input, true_label),
                             features.len());
     }

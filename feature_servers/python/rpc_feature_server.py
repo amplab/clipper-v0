@@ -4,7 +4,9 @@ import struct
 import SocketServer
 import numpy as np
 import time
+import datetime
 import sys
+import os
 import findspark
 # findspark.init('/crankshaw-local/spark-1.6.0-bin-hadoop2.4')
 findspark.init()
@@ -26,8 +28,8 @@ BYTES_IN_DOUBLE = 8
 
 class FeatureTCPHandler(SocketServer.BaseRequestHandler):
 
-    def __init__(self, model):
-        self.model = model
+    # def __init__(self, model):
+    #     self.model = model
 
     def handle(self):
         print("HANDLING CONNECTION")
@@ -46,7 +48,6 @@ class FeatureTCPHandler(SocketServer.BaseRequestHandler):
                 # time.sleep(0.5)
             header, data = (data[:header_bytes], data[header_bytes:])
             batch_size = struct.unpack("<H", header)[0]
-            assert batch_size == 2
             # print("BATCH SIZE: %d" % batch_size)
             total_bytes = batch_size * VECTOR_LENGTH * BYTES_IN_DOUBLE
             # print("total bytes expected: %d" % total_bytes)
@@ -68,7 +69,7 @@ class FeatureTCPHandler(SocketServer.BaseRequestHandler):
                 sep_feature_vecs.append(fv)
                 # print(fv)
 
-            preds = self.model.compute_features(preds)
+            preds = self.server.model.compute_features(sep_feature_vecs)
             assert len(preds) == batch_size
             assert preds.dtype == np.dtype('float64')
             self.request.sendall(preds.tobytes())
@@ -90,7 +91,7 @@ class SparkLRServer:
         preds = []
         for i in inputs:
             # TODO is making an RDD faster? probably not
-            preds.append(self.model.predict(x))
+            preds.append(float(self.model.predict(i)))
         end = datetime.datetime.now()
         print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
         preds = np.array(preds)
@@ -114,7 +115,7 @@ class SparkRFServer:
         preds = []
         for i in inputs:
             # TODO is making an RDD faster? probably not
-            preds.append(self.model.predict(x))
+            preds.append(self.model.predict(i))
         end = datetime.datetime.now()
         print("%s: %f ms\n" % (os.path.basename(self.path), (end-start).total_seconds() * 1000))
         preds = np.array(preds)
@@ -148,14 +149,12 @@ class SklearnServer:
 
 def parse_args():
     parser = argparse.ArgumentParser(usage='''Runs the server''')
-
     parser.add_argument("ip", type=str, help="ADDRESS")
     parser.add_argument("port", type=int, help="PORT")
     parser.add_argument("framework", type=str, help="spark|sklearn")
     parser.add_argument("modelpath", help="full path to pickled model file")
-
-
     return parser.parse_args()
+
 
 if __name__=='__main__':
 
@@ -163,17 +162,18 @@ if __name__=='__main__':
     model_path = args.modelpath
     # print(model_path)
     model = None
-    if args.framework == "spark-rf":
+    if args.framework == "sparkrf":
         model = SparkRFServer(model_path)
-    elif args.framework == "spark-lr":
+    elif args.framework == "sparklr":
         model = SparkLRServer(model_path)
     elif args.framework == "sklearn":
         model = SklearnServer(model_path)
     else:
         print("%s is unsupported framework" % args.framework)
-        return
+        sys.exit(1)
     print("Starting server")
-    server = SocketServer.TCPServer((args.ip, args.port), FeatureTCPHandler(model))
+    server = SocketServer.TCPServer((args.ip, args.port), FeatureTCPHandler)
+    server.model = model
     server.serve_forever()
 
 
