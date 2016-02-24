@@ -109,7 +109,7 @@ fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
     let mut features: Vec<f64> = Vec::new();
     let mut i = 0;
     for fh in feature_handles {
-        let hash = fh.hasher.hash(input);
+        let hash = fh.hasher.hash(input, Some(req_id));
         // println!("hash in prediction: {}", hash);
         let mut cache_reader = fh.cache.read().unwrap();
         let cache_entry = cache_reader.get(&hash);
@@ -235,7 +235,8 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
         get_features(&self.feature_handles,
                      req.input.clone(),
                      features_indexes,
-                     req.start_time.clone());
+                     req.start_time.clone(),
+                     Some(req.req_number));
         self.workers[self.next_worker].send(req).unwrap();
         self.increment_worker();
     }
@@ -327,10 +328,11 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
 pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
                     input: Vec<f64>,
                     feature_indexes: Vec<usize>,
-                    req_start: time::PreciseTime) {
+                    req_start: time::PreciseTime,
+                    salt: Option<i32>) {
     for idx in feature_indexes.iter() {
         let f = &fs[*idx];
-        let h = f.hasher.hash(&input);
+        let h = f.hasher.hash(&input, salt);
         let req = features::FeatureReq {
             hash_key: h,
             input: input.clone(),

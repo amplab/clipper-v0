@@ -49,20 +49,23 @@ pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
 
 
 pub trait FeatureHash {
-    fn hash(&self, input: &Vec<f64>) -> HashKey;
+    fn hash(&self, input: &Vec<f64>, salt: Option<i32>) -> HashKey;
 }
 
 #[derive(Clone)]
 pub struct SimpleHasher;
 
 impl FeatureHash for SimpleHasher {
-    fn hash(&self, input: &Vec<f64>) -> HashKey {
+    fn hash(&self, input: &Vec<f64>, salt: Option<i32>) -> HashKey {
         // lame way to get around rust's lack of floating point equality. Basically,
         // we need a better hash function.
         let mut int_vec: Vec<i32> = Vec::new();
         for i in input {
             let iv = (i * 10000000.0) as i32;
             int_vec.push(iv);
+        }
+        if salt.is_some() {
+            int_vec.push(salt.unwrap());
         }
         let mut s = SipHasher::new();
         int_vec.hash(&mut s);
@@ -127,7 +130,7 @@ fn feature_worker(name: String,
     let mut stream: TcpStream = TcpStream::connect(address).unwrap();
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();
-    let max_batch_size = 300;
+    let max_batch_size = 100;
 
     loop {
         let mut batch: Vec<FeatureReq> = Vec::new();

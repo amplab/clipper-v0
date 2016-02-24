@@ -43,6 +43,15 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     let trained_tasks = pretrain_task_models(tasks, &features);
     // let num_events = num_users * num_test_examples;
     let num_events = 10000000;
+    
+    // TODO (function call is so this won't compile)
+    // clear_cache();
+    println!("clearing caches");
+    for f in features.iter() {
+        let mut w = f.cache.write().unwrap();
+        w.clear();
+
+    }
 
     let num_workers = 4;
     let correct_counter = Arc::new(AtomicUsize::new(0));
@@ -63,8 +72,8 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
                                                        num_events as i32);
 
     let mut rng = thread_rng();
-    let target_qps = 10000;
-    let query_batch_size = 1000;
+    let target_qps = 20000;
+    let query_batch_size = 100;
     let mut events_fired = 0;
     let batches_per_sec = target_qps / query_batch_size + 1;
     let ms_per_sec = 1000; // just labeling my magic number
@@ -75,13 +84,14 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
             let example_idx: usize = rng.gen_range(0, num_test_examples);
             let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
             let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
-            let max_features = features.len();
+            // let max_features = features.len();
+            let max_features = 7;
             let r = server::Request::new_with_label(user as u32, input, true_label, events_fired);
             // dispatcher.dispatch(r, features.len());
-            dispatcher.dispatch(r, 5);
+            dispatcher.dispatch(r, max_features);
             events_fired += 1;
         }
-        // thread::sleep(::std::time::Duration::from_millis(sleep_time_ms));
+        thread::sleep(::std::time::Duration::from_millis(sleep_time_ms));
 
     }
     // for _ in 0..num_events {
@@ -178,7 +188,8 @@ impl TrainedTask {
                  test_x: Vec<Arc<Vec<f64>>>,
                  test_y: Vec<f64>) -> TrainedTask {
         let params = linear::Struct_parameter {
-            solver_type: linear::L2R_LR,
+            // solver_type: linear::L2R_LR,
+            solver_type: linear::L1R_LR,
             eps: 0.0001,
             C: 1.0f64,
             nr_weight: 0,
@@ -209,9 +220,9 @@ impl TrainedTask {
 
 impl TaskModel for TrainedTask {
     fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
-        if missing_fs.len() > 5 {
-            println!("{}: missing {} features", debug_str, missing_fs.len());
-        }
+        // if missing_fs.len() > 5 {
+        //     println!("{}: missing {} features", debug_str, missing_fs.len());
+        // }
         let mut fs = fs.clone();
         let estimators = self.anytime_estimators.read().unwrap();
         for i in &missing_fs {
@@ -262,7 +273,8 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
             server::get_features(feature_handles,
                                  xv,
                                  (0..num_features).collect(),
-                                 time::PreciseTime::now());
+                                 time::PreciseTime::now(),
+                                 None);
         }
     }
     println!("requesting all training features");
@@ -274,7 +286,7 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
         for t in tasks.iter() {
             for x in t.offline_train_x.iter() {
                 for fh in feature_handles {
-                    let hash = fh.hasher.hash(&x);
+                    let hash = fh.hasher.hash(&x, None);
                     let mut cache_reader = fh.cache.read().unwrap();
                     let cache_entry = cache_reader.get(&hash);
                     if cache_entry.is_none() {
@@ -306,7 +318,7 @@ fn pretrain_task_models(tasks: Vec<digits::DigitsTask>,
         for x in t.offline_train_x.iter() {
             let mut x_features: Vec<f64> = Vec::new();
             for fh in feature_handles {
-                let hash = fh.hasher.hash(&x);
+                let hash = fh.hasher.hash(&x, None);
                 let mut cache_reader = fh.cache.read().unwrap();
                 x_features.push(*cache_reader.get(&hash).unwrap());
             }

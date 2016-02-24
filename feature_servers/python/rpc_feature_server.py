@@ -172,7 +172,7 @@ if __name__=='__main__':
         print("%s is unsupported framework" % args.framework)
         sys.exit(1)
     print("Starting server")
-    # server = SocketServer.TCPServer((args.ip, args.port), FeatureTCPHandler)
+    server = SocketServer.TCPServer((args.ip, args.port), FeatureTCPHandler)
     # This works, but hard to clean up from
     # server = SocketServer.ForkingTCPServer((args.ip, args.port), FeatureTCPHandler)
     server.model = model
