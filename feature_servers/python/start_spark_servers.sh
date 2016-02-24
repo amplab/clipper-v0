@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+killall python
+sleep 10
+# killall python
+# sleep 5
+
 for i in {1..9}
 do
   echo "starting spark server $i"
@@ -10,3 +15,6 @@ do
 
 echo "starting spark server 10"
 python rpc_feature_server.py 127.0.0.1 6010 sparklr spark_models/lg_predict_10 &
+
+sleep 15
+ps aux | grep python

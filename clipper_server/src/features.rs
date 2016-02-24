@@ -127,7 +127,7 @@ fn feature_worker(name: String,
     let mut stream: TcpStream = TcpStream::connect(address).unwrap();
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();
-    let max_batch_size = 50;
+    let max_batch_size = 300;
 
     loop {
         let mut batch: Vec<FeatureReq> = Vec::new();
@@ -173,15 +173,16 @@ fn feature_worker(name: String,
             let hash = batch[r].hash_key;
             if !w.contains_key(&hash) {
                 w.insert(hash, response_floats[r]);
-            } //else {
-            //     let existing_res = w.get(&hash).unwrap();
-            //     if result != *existing_res {
-            //         // println!("{} CACHE ERR: existing: {}, new: {}",
-            //         //          name, existing_res, result);
-            //     } else {
-            //         // println!("{} CACHE HIT", name);
-            //     }
-            // }
+            } else {
+                // println!("CACHE HIT");
+                // let existing_res = w.get(&hash).unwrap();
+                // if result != *existing_res {
+                //     // println!("{} CACHE ERR: existing: {}, new: {}",
+                //     //          name, existing_res, result);
+                // } else {
+                //     println!("{} CACHE HIT", name);
+                // }
+            }
         }
         let loop_end_time = time::PreciseTime::now();
         let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap();

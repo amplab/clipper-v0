@@ -38,21 +38,23 @@ pub struct Request {
     start_time: time::PreciseTime,
     user: u32, // TODO: remove this because each feature has it's own hash
     input: Vec<f64>,
-    true_label: Option<f64> // used to evaluate accuracy
+    true_label: Option<f64>, // used to evaluate accuracy,
+    req_number: i32
 }
 
 impl Request {
 
-    pub fn new(user: u32, input: Vec<f64>) -> Request {
-        Request { start_time: time::PreciseTime::now(), user: user, input: input, true_label: None}
+    pub fn new(user: u32, input: Vec<f64>, req_num: i32) -> Request {
+        Request { start_time: time::PreciseTime::now(), user: user, input: input, true_label: None, req_number: req_num}
     }
 
-    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64) -> Request {
+    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64, req_num: i32) -> Request {
         Request {
             start_time: time::PreciseTime::now(),
             user: user,
             input: input,
-            true_label: Some(label)
+            true_label: Some(label),
+            req_number: req_num
         }
     }
 
@@ -71,7 +73,7 @@ struct Update {
 
 pub trait TaskModel {
     /// Make a prediction with the available features
-    fn predict(&self, mut fs: Vec<f64>, missing_fs: Vec<usize>) -> f64;
+    fn predict(&self, mut fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64;
 
     fn rank_features(&self) -> Vec<usize>;
 
@@ -84,7 +86,7 @@ pub trait TaskModel {
 struct DummyTaskModel;
 
 impl TaskModel for DummyTaskModel {
-    fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>) -> f64 {
+    fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
         0.3
     }
 
@@ -97,7 +99,8 @@ impl TaskModel for DummyTaskModel {
 // users there will be ahead of time. Then we can have a vec of RwLock.
 fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
                       input: &Vec<f64>,
-                      task_model: &T) -> f64
+                      task_model: &T,
+                      req_id: i32) -> f64
                       where T: TaskModel,
                             H: features::FeatureHash + Send + Sync {
 
@@ -120,7 +123,8 @@ fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
         i += 1
     }
 
-    task_model.predict(features, missing_feature_indexes)
+    let debug_str = format!("req {}", req_id);
+    task_model.predict(features, missing_feature_indexes, &debug_str)
 }
 
 fn start_prediction_worker<T, H>(worker_id: i32,
@@ -155,7 +159,7 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             debug_assert!(req.user < user_models.len() as u32);
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
             let task_model: &T = &lock.read().unwrap();
-            let pred = make_prediction(&feature_handles, &req.input, task_model);
+            let pred = make_prediction(&feature_handles, &req.input, task_model, req.req_number);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
             // println!("prediction latency: {} ms", latency);
@@ -301,9 +305,9 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     let num_features = features.len();
     println!("sending batch with no delays");
     let mut rng = thread_rng();
-    for _ in 0..num_events {
+    for i in 0..num_events {
         dispatcher.dispatch(Request::new(rng.gen_range(0, num_users as u32),
-                            features::random_features(784)), num_features);
+                            features::random_features(784), i), num_features);
     }
 
     println!("waiting for features to finish");
