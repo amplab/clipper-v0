@@ -41,7 +41,8 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
                               .map(|(n, a)| features::create_feature_worker(n, a))
                               .unzip();
     let trained_tasks = pretrain_task_models(tasks, &features);
-    let num_events = num_users * num_test_examples;
+    // let num_events = num_users * num_test_examples;
+    let num_events = 100000;
 
     let num_workers = 2;
     let correct_counter = Arc::new(AtomicUsize::new(0));
@@ -62,25 +63,45 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
                                                        num_events as i32);
 
     let mut rng = thread_rng();
-    for _ in 0..num_events {
-        // TODO dispatch events
-        let user: usize = rng.gen_range(0, num_users as usize);
-        let example_idx: usize = rng.gen_range(0, num_test_examples);
-        let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
-        let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
-        // random delay
-        
-        let sleep_time_ms: u32 = rng.gen_range(0, 100);
-        let ms_to_ns_factor = 1000*1000;
-        // let sleep_time = ::std::time::Duration::new(0,sleep_time_ms * ms_to_ns_factor);
-        let sleep_time = ::std::time::Duration::new(2, 0);
-        // println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
-        thread::sleep(sleep_time);
-        let max_features = features.len();
-        // println!("dispatching request");
-        dispatcher.dispatch(server::Request::new_with_label(user as u32, input, true_label),
-                            features.len());
+    let target_qps = 1000;
+    let query_batch_size = 100;
+    let mut events_fired = 0;
+    let batches_per_sec = target_qps / query_batch_size;
+    let ms_per_sec = 1000; // just labeling my magic number
+    let sleep_time_ms = ms_per_sec / batches_per_sec;
+    while events_fired < num_events {
+        for _ in 0..query_batch_size {
+            let user: usize = rng.gen_range(0, num_users as usize);
+            let example_idx: usize = rng.gen_range(0, num_test_examples);
+            let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
+            let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
+            let max_features = features.len();
+            let r = server::Request::new_with_label(user as u32, input, true_label);
+            dispatcher.dispatch(r, features.len());
+            events_fired += 1;
+        }
+        thread::sleep(::std::time::Duration::from_millis(sleep_time_ms));
+
     }
+    // for _ in 0..num_events {
+    //     // TODO dispatch events
+    //     let user: usize = rng.gen_range(0, num_users as usize);
+    //     let example_idx: usize = rng.gen_range(0, num_test_examples);
+    //     let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
+    //     let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
+    //     // random delay
+    //     
+    //     let sleep_time_ms: u32 = rng.gen_range(0, 100);
+    //     let ms_to_ns_factor = 1000*1000;
+    //     // let sleep_time = ::std::time::Duration::new(0,sleep_time_ms * ms_to_ns_factor);
+    //     let sleep_time = ::std::time::Duration::new(2, 0);
+    //     // println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+    //     thread::sleep(sleep_time);
+    //     let max_features = features.len();
+    //     // println!("dispatching request");
+    //     dispatcher.dispatch(server::Request::new_with_label(user as u32, input, true_label),
+    //                         features.len());
+    // }
 
     println!("waiting for features to finish");
     mon_thread_join_handle.join().unwrap();

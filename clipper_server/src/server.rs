@@ -158,7 +158,7 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             let pred = make_prediction(&feature_handles, &req.input, task_model);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_milliseconds();
-            println!("prediction latency: {} ms", latency);
+            // println!("prediction latency: {} ms", latency);
             processed_counter.fetch_add(1, Ordering::Relaxed);
             if req.true_label.is_some() {
                 total_counter.fetch_add(1, Ordering::Relaxed);

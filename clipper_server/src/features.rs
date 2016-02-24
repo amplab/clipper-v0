@@ -185,12 +185,12 @@ fn feature_worker(name: String,
         }
         let loop_end_time = time::PreciseTime::now();
         let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap();
-        println!("feature: {}, batch_size: {}, latency: {}, max_req_latency: {}, min_req_latency {}, loop_latency: {}",
-                 name, batch.len(), (latency as f64 / 1000.0),
-                (max_req_latency as f64 / 1000.0),
-                (min_req_latency as f64 / 1000.0),
-                (loop_latency as f64 / 1000.0)
-                );
+        // println!("feature: {}, batch_size: {}, latency: {}, max_req_latency: {}, min_req_latency {}, loop_latency: {}",
+        //          name, batch.len(), (latency as f64 / 1000.0),
+        //         (max_req_latency as f64 / 1000.0),
+        //         (min_req_latency as f64 / 1000.0),
+        //         (loop_latency as f64 / 1000.0)
+        //         );
     }
 }
 
