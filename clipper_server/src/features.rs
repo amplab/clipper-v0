@@ -89,7 +89,8 @@ impl FeatureHash for SimpleHasher {
 
 
 
-pub fn create_feature_worker(name: String, addr: SocketAddr)
+pub fn create_feature_worker(name: String, addr: SocketAddr,
+                             batch_size: usize)
     -> (FeatureHandle<SimpleHasher>, ::std::thread::JoinHandle<()>) {
 
     let (tx, rx) = mpsc::channel();
@@ -101,7 +102,7 @@ pub fn create_feature_worker(name: String, addr: SocketAddr)
         let latencies = latencies.clone();
         let name = name.clone();
         thread::spawn(move || {
-            feature_worker(name, rx, thread_cache, addr, latencies);
+            feature_worker(name, rx, thread_cache, addr, latencies, batch_size);
         })
     };
     (FeatureHandle {
@@ -124,13 +125,14 @@ fn feature_worker(name: String,
                   rx: mpsc::Receiver<FeatureReq>,
                   cache: Arc<RwLock<HashMap<HashKey, f64>>>,
                   address: SocketAddr,
-                  latencies: Arc<RwLock<Vec<i64>>>) {
+                  latencies: Arc<RwLock<Vec<i64>>>,
+                  batch_size: usize) {
 
     println!("starting worker: {}", name);
     let mut stream: TcpStream = TcpStream::connect(address).unwrap();
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();
-    let max_batch_size = 100;
+    let max_batch_size = batch_size;
 
     loop {
         let mut batch: Vec<FeatureReq> = Vec::new();

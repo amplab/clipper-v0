@@ -17,32 +17,44 @@ use linear_models::{linalg, linear};
 use server::TaskModel;
 // use quickersort;
 
+pub struct DigitsBenchConfig {
+  pub num_users: usize,
+  pub num_train_examples: usize,
+  pub num_test_examples: usize,
+  pub mnist_path: String,
+  pub num_events: usize,
+  pub num_workers: usize,
+  pub target_qps: usize,
+  pub query_batch_size: usize,
+  pub max_features: usize,
+  pub salt_hash: bool, // do we want cache hits or not
+  pub feature_batch_size: usize
+}
+
+
 pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
-       num_users: usize,
-       num_train_examples: usize,
-       num_test_examples: usize,
-       mnist_path: String) {
+           dc: DigitsBenchConfig) {
 
     println!("starting digits");
-    let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
+    let all_test_data = digits::load_mnist_dense(&dc.mnist_path).unwrap();
     let norm_test_data = digits::normalize(&all_test_data);
 
     println!("Test data loaded: {} points", norm_test_data.ys.len());
 
     let tasks = digits::create_online_dataset(&norm_test_data,
                                               &norm_test_data,
-                                              num_train_examples,
+                                              dc.num_train_examples,
                                               0,
-                                              num_test_examples,
-                                              num_users as usize);
+                                              dc.num_test_examples,
+                                              dc.num_users as usize);
 
 
     let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
-                              .map(|(n, a)| features::create_feature_worker(n, a))
+                              .map(|(n, a)| features::create_feature_worker(n, a, dc.feature_batch_size))
                               .unzip();
     let trained_tasks = pretrain_task_models(tasks, &features);
     // let num_events = num_users * num_test_examples;
-    let num_events = 10000000;
+    let num_events = dc.num_events;
     
     // TODO (function call is so this won't compile)
     // clear_cache();
@@ -53,7 +65,7 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
 
     }
 
-    let num_workers = 4;
+    let num_workers = dc.num_workers;
     let correct_counter = Arc::new(AtomicUsize::new(0));
     let total_counter = Arc::new(AtomicUsize::new(0));
     let processed_counter = Arc::new(AtomicUsize::new(0));
@@ -72,21 +84,21 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
                                                        num_events as i32);
 
     let mut rng = thread_rng();
-    let target_qps = 20000;
-    let query_batch_size = 100;
+    let target_qps = dc.target_qps;
+    let query_batch_size = dc.query_batch_size;
     let mut events_fired = 0;
     let batches_per_sec = target_qps / query_batch_size + 1;
     let ms_per_sec = 1000; // just labeling my magic number
-    let sleep_time_ms = ms_per_sec / batches_per_sec;
+    let sleep_time_ms = ms_per_sec / batches_per_sec as u64;
     while events_fired < num_events {
         for _ in 0..query_batch_size {
-            let user: usize = rng.gen_range(0, num_users as usize);
-            let example_idx: usize = rng.gen_range(0, num_test_examples);
+            let user: usize = rng.gen_range(0, dc.num_users as usize);
+            let example_idx: usize = rng.gen_range(0, dc.num_test_examples);
             let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
             let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
             // let max_features = features.len();
-            let max_features = 7;
-            let r = server::Request::new_with_label(user as u32, input, true_label, events_fired);
+            let max_features = dc.max_features;
+            let r = server::Request::new_with_label(user as u32, input, true_label, events_fired as i32);
             // dispatcher.dispatch(r, features.len());
             dispatcher.dispatch(r, max_features);
             events_fired += 1;
@@ -140,15 +152,17 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
         let bench_start = time::PreciseTime::now();
         let mut last_count = 0;
         let mut last_time = bench_start;
+        // let mut total_count = 0;
         loop {
             thread::sleep(::std::time::Duration::new(3, 0));
-            let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
+            let cur_time = time::PreciseTime::now();
+            let elapsed_time = last_time.to(cur_time).num_milliseconds() as f64 / 1000.0;
+            // let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
             let cur_count = processed_counter.load(Ordering::Relaxed);
             println!("processed {} events in {} seconds: {} preds/sec",
                      cur_count - last_count,
-                     cur_time,
-                     ((cur_count - last_count) as f64 / cur_time));
-
+                     elapsed_time,
+                     ((cur_count - last_count) as f64 / elapsed_time));
             let cur_correct = correct_counter.load(Ordering::Relaxed);
             let cur_total = total_counter.load(Ordering::Relaxed);
             println!("current accuracy: {} out of {} correct, ({}%)",
@@ -157,6 +171,8 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
                 println!("BENCHMARK FINISHED");
                 break;
             }
+            last_count = cur_count;
+            last_time = cur_time;
             println!("sleeping...");
         }
     })

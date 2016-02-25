@@ -49,20 +49,15 @@ const USAGE: &'static str = "
 Clipper Server
 
 Usage:
-  clipper digits --conf=</path/to/features.toml> --mnist=<test.data>
-  clipper digits --conf=</path/to/features.toml> --mnist=<test.data> --users=<num_users> --traindata=<num_examples> --testdata=<num_examples>
-  clipper digits --conf=</path/to/features.toml> --mnist=<test.data>
+  clipper digits --feature_conf=</path/to/features.toml> --bench_conf=<digits.conf>
   clipper featurelats --conf=</path/to/features.toml>
   clipper start --conf=</path/to/features.toml>
   clipper -h
 
 Options:
-  -h --help                             Show this screen.
-  --conf=</path/to/features>            Path to features config file.
-  --users=<num_users>                   Number of users [default: 100]
-  --traindata=<num_examples>            Number of training examples per user [default: 30]
-  --testdata=<num_examples>             Number of test examples per user [default: 10]
-  --mnist=</path/to/mnist/test.data>    Path to mnist data file
+  -h --help                              Show this screen.
+  --conf=</path/to/features>             Path to features config file.
+  --bench_conf=</path/to/digits.conf>    Path to mnist data file
   
 ";
 
@@ -70,11 +65,8 @@ Options:
 struct Args {
     // flag_speed: isize,
     // flag_drifting: bool,
-    flag_mnist: Option<String>,
-    flag_conf: String,
-    flag_users: usize,
-    flag_traindata: usize,
-    flag_testdata: usize,
+    flag_bench_conf: Option<String>,
+    flag_feature_conf: String,
     cmd_digits: bool,
     cmd_featurelats: bool,
     cmd_start: bool,
@@ -88,15 +80,12 @@ pub fn main() {
 
     println!("{:?}", args);
 
-    let features = parse_feature_config(&args.flag_conf);
+    let features = parse_feature_config(&args.flag_feature_conf);
     // let features = parse_feature_config(&"features.toml".to_string());
     if args.cmd_digits {
-      let mnist_path = args.flag_mnist.expect("Running digits requires path to mnist data file");
-      digits_benchmark::run(features,
-                            args.flag_users,
-                            args.flag_traindata,
-                            args.flag_testdata,
-                            mnist_path);
+      let digits_conf = parse_digits_config(&args.flag_bench_conf.unwrap());
+
+      digits_benchmark::run(features, digits_conf);
     } else if args.cmd_featurelats {
         // features::feature_lats_main(features);
         println!("unimplemented");
@@ -149,6 +138,61 @@ fn parse_feature_config(fname: &String) -> Vec<(String, SocketAddr)> {
                      .collect::<Vec<_>>();
     println!("{:?}", fs);
     fs
+}
+
+
+fn parse_digits_config(fname: &String) -> digits_benchmark::DigitsBenchConfig {
+    let path = Path::new(fname);
+    let display = path.display();
+
+    let mut file = match File::open(&path) {
+        // The `description` method of `io::Error` returns a string that
+        // describes the error
+        Err(why) => panic!(format!("couldn't open {}: REASON: {}", display,
+                                                   Error::description(&why))),
+        Ok(file) => BufReader::new(file),
+    };
+
+    let mut toml_string = String::new();
+    match file.read_to_string(&mut toml_string) {
+      Err(why) => panic!("couldn't read {}: {}", display,
+                         Error::description(&why)),
+                         Ok(_) => print!("{} contains:\n{}", display, toml_string),
+    }
+
+    let conf = toml::Parser::new(&toml_string).parse().unwrap();
+    let dbc = digits_benchmark::DigitsBenchConfig {
+      num_users: conf.get("users")
+        .unwrap_or(&toml::Value::Integer(100)).as_integer().unwrap() as usize,
+      num_train_examples: conf.get("train_examples")
+        .unwrap_or(&toml::Value::Integer(30)).as_integer().unwrap() as usize,
+      num_test_examples: conf.get("test_examples")
+        .unwrap_or(&toml::Value::Integer(50)).as_integer().unwrap() as usize,
+      mnist_path: conf.get("mnist_path")
+        .unwrap().as_str().unwrap().to_string(),
+      num_events: conf.get("num_events")
+        .unwrap_or(&toml::Value::Integer(100000)).as_integer().unwrap() as usize,
+      num_workers: conf.get("worker_threads")
+        .unwrap_or(&toml::Value::Integer(2)).as_integer().unwrap() as usize,
+      target_qps: conf.get("target_qps")
+        .unwrap_or(&toml::Value::Integer(5000)).as_integer().unwrap() as usize,
+      query_batch_size: conf.get("query_batch_size")
+        .unwrap_or(&toml::Value::Integer(200)).as_integer().unwrap() as usize,
+      max_features: conf.get("max_features")
+        .unwrap_or(&toml::Value::Integer(10)).as_integer().unwrap() as usize,
+      salt_hash: conf.get("salt_hash")
+        .unwrap_or(&toml::Value::Boolean(true)).as_bool().unwrap(),
+      feature_batch_size: conf.get("feature_batch_size")
+        .unwrap_or(&toml::Value::Integer(100)).as_integer().unwrap() as usize,
+
+    };
+    // let fs = features.get("features").unwrap()
+    //                  .as_table().unwrap().iter()
+    //                  .map(|(k, v)| (k.clone(), features::get_addr(v.as_str().unwrap().to_string())))
+    //                  .collect::<Vec<_>>();
+    // println!("{:?}", fs);
+    dbc
+
 }
 
 

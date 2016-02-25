@@ -96,7 +96,8 @@ impl TaskModel for DummyTaskModel {
 }
 
 // Because we don't have a good concurrent hash map, assume we know how many
-// users there will be ahead of time. Then we can have a vec of RwLock.
+// users there will be ahead of time. Then we can have a vec of RwLock
+// and have row-level locking (because no inserts or deletes).
 fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
                       input: &Vec<f64>,
                       task_model: &T,
@@ -281,7 +282,7 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     //                                                     .map(|(a, n)| create_feature_worker(a, n))
     //                                                     .unzip();
     let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
-                              .map(|(n, a)| features::create_feature_worker(n, a))
+                              .map(|(n, a)| features::create_feature_worker(n, a, 100))
                               .unzip();
 
 
