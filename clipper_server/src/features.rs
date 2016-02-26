@@ -225,7 +225,7 @@ fn feature_worker(name: String,
         let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap() as f64 / 1000.0;
         bench_latencies.push(loop_latency);
         epoch_count += batch.len();
-        if epoch_count >= 50000 {
+        if epoch_count >= 10000 {
             let epoch_end = time::PreciseTime::now();
             let epoch_time = epoch_start.to(epoch_end).num_microseconds().unwrap();
             // let xs = vec![Arc::new(bench_latencies.clone())];
