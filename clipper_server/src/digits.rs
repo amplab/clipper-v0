@@ -185,7 +185,7 @@ pub fn create_online_dataset(
 
     for i in 0..num_tasks {
         if i % 50 == 0 {
-            println!("Making task {}", i);
+            // println!("Making task {}", i);
         }
         let pref_digit: f64 = (rng.gen_range(0, NUM_DIGITS) + 1) as f64;
         let (train_x, train_y) = select_datapoints(pref_digit, total_train_size, training_data);

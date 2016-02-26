@@ -19,7 +19,8 @@ import numpy
 
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.regression import LabeledPoint
-from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+# from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+from pyspark.mllib.classification import SVMModel, SVMWithSGD
 from pyspark.mllib.tree import RandomForest
 
 
@@ -57,7 +58,7 @@ def train_logistic_regression(pos_label):
 
     print 'Fitting model'
 
-    lrm = LogisticRegressionWithSGD.train(trainRDD, iterations=10)
+    lrm = LogisticRegressionWithSGD.train(trainRDD, iterations=100)
 
     path = 'spark_models/lg_predict_%d' % pos_label
     lrm.save(sc, path)
@@ -88,6 +89,25 @@ def train_logistic_regression(pos_label):
     # clean up
     sc.stop()
 
+def train_svm(pos_label):
+    conf = SparkConf() \
+        .setAppName("crankshaw-pyspark") \
+        .set("spark.executor.memory", "2g") \
+        .set("spark.kryoserializer.buffer.mb", "128") \
+        .set("master", "local")
+    sc = SparkContext(conf=conf, batchSize=10)
+    print 'Parsing data'
+    trainRDD = sc.textFile("/crankshaw-local/mnist/data/train_norm.data").map(lambda line: parseData(line, objective, pos_label)).cache()
+    # testRDD = sc.textFile("/crankshaw-local/mnist/data/test.data").map(lambda line: parseData(line, objective)).cache()
+
+    print 'Fitting model'
+
+    svm = SVMWithSGD.train(trainRDD)
+
+    path = 'spark_models/svm_predict_%d' % pos_label
+    svm.save(sc, path)
+    sc.stop()
+
 def train_random_forest(num_trees):
     conf = SparkConf() \
         .setAppName("crankshaw-pyspark") \
@@ -114,7 +134,7 @@ if __name__ == "__main__":
 
     for i in range(10):
         print "training model to predict %d" % (i + 1)
-        train_logistic_regression(i + 1)
+        train_svm(i + 1)
     # train_random_forest(50)
     # train_random_forest(100)
     # train_random_forest(500)

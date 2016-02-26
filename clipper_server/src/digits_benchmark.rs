@@ -17,6 +17,7 @@ use linear_models::{linalg, linear};
 use server::TaskModel;
 // use quickersort;
 
+#[derive(Debug)]
 pub struct DigitsBenchConfig {
   pub num_users: usize,
   pub num_train_examples: usize,
@@ -36,8 +37,11 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
            dc: DigitsBenchConfig) {
 
     println!("starting digits");
+    println!("Config: {:?}", dc);
+
     let all_test_data = digits::load_mnist_dense(&dc.mnist_path).unwrap();
-    let norm_test_data = digits::normalize(&all_test_data);
+    // let norm_test_data = digits::normalize(&all_test_data);
+    let norm_test_data = all_test_data;
 
     println!("Test data loaded: {} points", norm_test_data.ys.len());
 
@@ -69,18 +73,24 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     let correct_counter = Arc::new(AtomicUsize::new(0));
     let total_counter = Arc::new(AtomicUsize::new(0));
     let processed_counter = Arc::new(AtomicUsize::new(0));
+    let cum_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
+    let max_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
     let mut dispatcher = server::Dispatcher::new(num_workers,
                                          server::SLA,
                                          features.clone(),
                                          trained_tasks.clone(),
                                          correct_counter.clone(),
                                          total_counter.clone(),
-                                         processed_counter.clone());
+                                         processed_counter.clone(),
+                                         cum_latency_tracker_micros.clone(),
+                                         max_latency_tracker_micros.clone());
 
     thread::sleep(::std::time::Duration::new(3, 0));
     let mon_thread_join_handle = launch_monitor_thread(correct_counter.clone(),
                                                        total_counter.clone(),
                                                        processed_counter.clone(),
+                                                       cum_latency_tracker_micros.clone(),
+                                                       max_latency_tracker_micros.clone(),
                                                        num_events as i32);
 
     let mut rng = thread_rng();
@@ -135,9 +145,9 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
         // println!("{}, {:?}", fh.name, cur_lats);
     }
 
-    for h in handles {
-        h.join().unwrap();
-    }
+    // for h in handles {
+    //     h.join().unwrap();
+    // }
     // handle.join().unwrap();
     println!("done");
 }
@@ -145,6 +155,8 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
 fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
                          total_counter: Arc<AtomicUsize>,
                          processed_counter: Arc<AtomicUsize>,
+                         cum_latency_tracker_micros: Arc<AtomicUsize>,
+                         max_latency_tracker_micros: Arc<AtomicUsize>,
                          num_events: i32) -> ::std::thread::JoinHandle<()> {
 
     // let counter = counter.clone();
@@ -152,28 +164,57 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
         let bench_start = time::PreciseTime::now();
         let mut last_count = 0;
         let mut last_time = bench_start;
+        let mut last_cum_latency = 0;
+        let mut last_correct = 0;
+        let mut last_total = 0;
         // let mut total_count = 0;
+        let mut loop_count = 0;
         loop {
             thread::sleep(::std::time::Duration::new(3, 0));
             let cur_time = time::PreciseTime::now();
             let elapsed_time = last_time.to(cur_time).num_milliseconds() as f64 / 1000.0;
             // let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
             let cur_count = processed_counter.load(Ordering::Relaxed);
-            println!("processed {} events in {} seconds: {} preds/sec",
-                     cur_count - last_count,
-                     elapsed_time,
-                     ((cur_count - last_count) as f64 / elapsed_time));
+            let cur_cum_latency = cum_latency_tracker_micros.load(Ordering::Relaxed);
+            let elapsed_count = cur_count - last_count;
+            let avg_latency = (cur_cum_latency - last_cum_latency) as f64 / elapsed_count as f64;
+            // reset max latency after reading it
+            let cur_max_latency = max_latency_tracker_micros.swap(0, Ordering::Relaxed);
+
             let cur_correct = correct_counter.load(Ordering::Relaxed);
             let cur_total = total_counter.load(Ordering::Relaxed);
-            println!("current accuracy: {} out of {} correct, ({}%)",
-                     cur_correct, cur_total, (cur_correct as f64/cur_total as f64)*100.0);
-            if cur_count >= num_events as usize {
-                println!("BENCHMARK FINISHED");
-                break;
-            }
+            let elapsed_correct = cur_correct - last_correct;
+            let elapsed_total = cur_total - last_total;
+            let acc = elapsed_correct as f64 / elapsed_total as f64;
+            let thru = elapsed_count as f64 / elapsed_time;
+
+            println!("ACC: {:.3}, THRU: {:.3}, MEAN_LAT: {:.3}, MAX_LAT: {:.3}",
+                    acc, thru,
+                    avg_latency / 1000.0, cur_max_latency as f64 / 1000.0); // latencies are measured in microseconds
+            
+            // println!("processed {} events in {} seconds: {} preds/sec",
+            //          cur_count - last_count,
+            //          elapsed_time,
+            //          ((cur_count - last_count) as f64 / elapsed_time));
+                     
+
+            // println!("current accuracy: {} out of {} correct, ({}%)",
+            //          cur_correct, cur_total, (cur_correct as f64/cur_total as f64)*100.0);
+            // if cur_count >= num_events as usize {
+            //     println!("BENCHMARK FINISHED");
+            //     break;
+            // }
+
             last_count = cur_count;
             last_time = cur_time;
-            println!("sleeping...");
+            last_cum_latency = cur_cum_latency;
+            last_correct = cur_correct;
+            last_total = cur_total;
+            // println!("sleeping...");
+            loop_count += 1;
+            if loop_count > 10 {
+              break;
+            }
         }
     })
 }
@@ -204,8 +245,8 @@ impl TrainedTask {
                  test_x: Vec<Arc<Vec<f64>>>,
                  test_y: Vec<f64>) -> TrainedTask {
         let params = linear::Struct_parameter {
-            // solver_type: linear::L2R_LR,
-            solver_type: linear::L1R_LR,
+            solver_type: linear::L2R_LR,
+            // solver_type: linear::L1R_LR,
             eps: 0.0001,
             C: 1.0f64,
             nr_weight: 0,
@@ -217,6 +258,14 @@ impl TrainedTask {
         let prob = linear::Problem::from_training_data(xs, ys);
         let model = linear::train_logistic_regression(prob, params);
         let (anytime_estimators, _) = linalg::mean_and_var(xs);
+        // let mut nnz = 0;
+        // for wi in model.w.iter() {
+        //   if *wi != 0.0 {
+        //     nnz += 1;
+        //   }
+        // }
+        //
+        // println!("nnz: {}", nnz);
 
         TrainedTask {
             task_id: tid,
@@ -293,10 +342,10 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
                                  None);
         }
     }
-    println!("requesting all training features");
+    // println!("requesting all training features");
     loop {
         let sleep_secs = 10;
-        println!("Sleeping {} seconds...", sleep_secs);
+        // println!("Sleeping {} seconds...", sleep_secs);
         thread::sleep(::std::time::Duration::new(sleep_secs, 0));
         let mut done = true;
         for t in tasks.iter() {
@@ -317,7 +366,7 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
         // if we reach the end and done is still true, we have all features
         if done == true { break; }
     }
-    println!("all features have been cached");
+    // println!("all features have been cached");
     thread::sleep(::std::time::Duration::new(10, 0));
 }
 
@@ -325,7 +374,7 @@ fn pretrain_task_models(tasks: Vec<digits::DigitsTask>,
                         feature_handles: &Vec<features::FeatureHandle<features::SimpleHasher>>) 
     -> Arc<Vec<RwLock<TrainedTask>>> {
 
-    println!("pretraining task models");
+    // println!("pretraining task models");
     get_all_train_features(&tasks, feature_handles);
     let mut trained_tasks = Vec::new();
     let mut cur_tid = 0;

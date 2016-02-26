@@ -44,20 +44,44 @@ class TestFeature:
     def hash_input(self, x):
         return hash(x.data.tobytes())
 
-if __name__=='__main__':
+
+def norm_digits_save():
     digits_loc = "/crankshaw-local/mnist/data"
-    
-    start = int(sys.argv[1])
-    end = int(sys.argv[2])
-    for label in range(start,end + 1):
-        f_name = "predict_%d_svm" % label
-        try:
-            os.mkdir('sklearn_models/%s' % f_name)
-        except OSError:
-            print("directory already exists. Might overwrite existing file")
-        print "training label %d" % label
-        f = TestFeature(digits_loc, label)
-        joblib.dump(f, 'sklearn_models/%s/%s.pkl' % (f_name, f_name)) 
+    digits_filename = "train.data"
+    out_filename = "train_norm.data"
+    digits_path = digits_loc + "/" + digits_filename
+    print "Source file:", digits_path
+    df = pd.read_csv(digits_path, sep=",", header=None)
+    data = df.values
+    print "Number of image files:", len(data)
+    y = data[:,0]
+    X = data[:,1:]
+    mu = np.mean(X,0)
+    sigma = np.var(X,0)
+    Z = (X - mu) / np.array([np.sqrt(z) if z > 0 else 1. for z in sigma])
+    with open(digits_loc + "/" + out_filename, "w") as of:
+        for i in range(len(y)):
+            z_str = [str(j) for j in Z[i].tolist()]
+            line = str(y[i]) + "," + ",".join(z_str) + "\n"
+            of.write(line)
+
+
+
+if __name__=='__main__':
+    norm_digits_save()
+    # digits_loc = "/crankshaw-local/mnist/data"
+    #
+    # start = int(sys.argv[1])
+    # end = int(sys.argv[2])
+    # for label in range(start,end + 1):
+    #     f_name = "predict_%d_svm" % label
+    #     try:
+    #         os.mkdir('sklearn_models/%s' % f_name)
+    #     except OSError:
+    #         print("directory already exists. Might overwrite existing file")
+    #     print "training label %d" % label
+    #     f = TestFeature(digits_loc, label)
+    #     joblib.dump(f, 'sklearn_models/%s/%s.pkl' % (f_name, f_name)) 
     # f = joblib.load('test_model/predict_1_svm.pkl') 
     # print "model trained"
     # test_x, test_y = load_digits(digits_loc, digits_filename="test-mnist-dense-with-labels.data")

@@ -128,7 +128,7 @@ fn feature_worker(name: String,
                   latencies: Arc<RwLock<Vec<i64>>>,
                   batch_size: usize) {
 
-    println!("starting worker: {}", name);
+    // println!("starting worker: {}", name);
     let mut stream: TcpStream = TcpStream::connect(address).unwrap();
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();

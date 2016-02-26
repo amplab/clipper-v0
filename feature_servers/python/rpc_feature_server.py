@@ -15,6 +15,7 @@ import pyspark
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+from pyspark.mllib.classification import SVMModel, SVMWithSGD
 from pyspark.mllib.tree import RandomForestModel
 from numpy.random import exponential as expn
 from sklearn.externals import joblib
@@ -98,6 +99,30 @@ class SparkLRServer:
         assert preds.dtype == np.dtype('float64')
         return np.array(preds)
 
+class SparkSVMServer:
+    def __init__(self, path):
+        conf = SparkConf() \
+            .setAppName("crankshaw-pyspark") \
+            .set("spark.executor.memory", "2g") \
+            .set("spark.kryoserializer.buffer.mb", "128") \
+            .set("master", "local")
+        sc = SparkContext(conf=conf, batchSize=10)
+        self.model = SVMModel.load(sc, path)
+        self.path = path
+        print("started spark")
+
+    def compute_features(self, inputs):
+        start = datetime.datetime.now()
+        preds = []
+        for i in inputs:
+            # TODO is making an RDD faster? probably not
+            preds.append(float(self.model.predict(i)))
+        end = datetime.datetime.now()
+        print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
+        preds = np.array(preds)
+        assert preds.dtype == np.dtype('float64')
+        return np.array(preds)
+
 class SparkRFServer:
     def __init__(self, path):
         conf = SparkConf() \
@@ -166,6 +191,8 @@ if __name__=='__main__':
         model = SparkRFServer(model_path)
     elif args.framework == "sparklr":
         model = SparkLRServer(model_path)
+    elif args.framework == "sparksvm":
+        model = SparkSVMServer(model_path)
     elif args.framework == "sklearn":
         model = SklearnServer(model_path)
     else:

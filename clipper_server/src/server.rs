@@ -21,7 +21,7 @@ use digits;
 use features;
 use features::FeatureHash;
 
-pub const SLA: i64 = 20;
+pub const SLA: i64 = 100;
 
 
 
@@ -133,8 +133,10 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                            feature_handles: Vec<features::FeatureHandle<H>>,
                            user_models: Arc<Vec<RwLock<T>>>,
                            correct_counter: Arc<AtomicUsize>,
-                           total_counter: Arc<AtomicUsize>,
-                           processed_counter: Arc<AtomicUsize>
+                           total_counter: Arc<AtomicUsize>, // tracks total number of requests WITH LABELS processed
+                           processed_counter: Arc<AtomicUsize>, // tracks total number of requests processed
+                           cum_latency_tracker_micros: Arc<AtomicUsize>, // find mean by doing cum_latency_tracker/processed_counter
+                           max_latency_tracker_micros: Arc<AtomicUsize>,
                            ) -> mpsc::Sender<Request> 
                            where T: TaskModel + Send + Sync + 'static,
                                  H: features::FeatureHash + Send + Sync + 'static {
@@ -162,7 +164,13 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             let task_model: &T = &lock.read().unwrap();
             let pred = make_prediction(&feature_handles, &req.input, task_model, req.req_number);
             let end_time = time::PreciseTime::now();
-            let latency = req.start_time.to(end_time).num_milliseconds();
+            let latency = req.start_time.to(end_time).num_microseconds().unwrap();
+            // This isn't consistent (max latency can change between the two calls,
+            // but it doesn't if max_latency is totally consistent
+            if latency > max_latency_tracker_micros.load(Ordering::Relaxed) as i64 {
+                max_latency_tracker_micros.store(latency as usize, Ordering::Relaxed);
+            }
+            cum_latency_tracker_micros.fetch_add(latency as usize, Ordering::Relaxed);
             // println!("prediction latency: {} ms", latency);
             processed_counter.fetch_add(1, Ordering::Relaxed);
             if req.true_label.is_some() {
@@ -198,7 +206,9 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
            user_models: Arc<Vec<RwLock<T>>>,
            correct_counter: Arc<AtomicUsize>,
            total_counter: Arc<AtomicUsize>,
-           processed_counter: Arc<AtomicUsize>
+           processed_counter: Arc<AtomicUsize>,
+           cum_latency_tracker_micros: Arc<AtomicUsize>, // find mean by doing cum_latency_tracker/processed_counter
+           max_latency_tracker_micros: Arc<AtomicUsize>,
            ) -> Dispatcher<T> {
         println!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
@@ -209,7 +219,9 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
                                                  user_models.clone(),
                                                  correct_counter.clone(),
                                                  total_counter.clone(),
-                                                 processed_counter.clone());
+                                                 processed_counter.clone(),
+                                                 cum_latency_tracker_micros.clone(),
+                                                 max_latency_tracker_micros.clone());
             worker_threads.push(worker);
         }
         Dispatcher {
@@ -292,13 +304,18 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     let num_events = 100;
     // let num_workers = num_cpus::get();
     let num_workers = 1;
+    let cum_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
+    let max_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
     let mut dispatcher = Dispatcher::new(num_workers,
                                          SLA,
                                          features.clone(),
                                          init_user_models(num_users, num_features),
                                          correct_counter.clone(),
                                          total_counter.clone(),
-                                         processed_counter.clone());
+                                         processed_counter.clone(),
+                                         cum_latency_tracker_micros.clone(),
+                                         max_latency_tracker_micros.clone()
+                                         );
 
     // create monitoring thread to check incremental thruput
     thread::sleep(::std::time::Duration::new(3, 0));

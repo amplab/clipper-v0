@@ -49,15 +49,15 @@ const USAGE: &'static str = "
 Clipper Server
 
 Usage:
-  clipper digits --feature_conf=</path/to/features.toml> --bench_conf=<digits.conf>
-  clipper featurelats --conf=</path/to/features.toml>
-  clipper start --conf=</path/to/features.toml>
+  clipper digits --feature-conf=</path/to/features.toml> --bench-conf=<digits.conf>
+  clipper featurelats --feature-conf=</path/to/features.toml>
+  clipper start --feature-conf=</path/to/features.toml>
   clipper -h
 
 Options:
   -h --help                              Show this screen.
-  --conf=</path/to/features>             Path to features config file.
-  --bench_conf=</path/to/digits.conf>    Path to mnist data file
+  --feature-conf=</path/to/features>             Path to features config file.
+  --bench-conf=</path/to/digits.conf>    Path to mnist data file
   
 ";
 

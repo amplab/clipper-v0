@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+killall python
+sleep 10
+
 for i in {0..9}
 do
   echo "starting sklearn server $i"
