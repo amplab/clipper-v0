@@ -50,7 +50,7 @@ Clipper Server
 
 Usage:
   clipper digits --feature-conf=</path/to/features.toml> --bench-conf=<digits.conf>
-  clipper featurelats --feature-conf=</path/to/features.toml>
+  clipper featurelats <b>
   clipper start --feature-conf=</path/to/features.toml>
   clipper -h
 
@@ -58,6 +58,7 @@ Options:
   -h --help                              Show this screen.
   --feature-conf=</path/to/features>             Path to features config file.
   --bench-conf=</path/to/digits.conf>    Path to mnist data file
+  // --batch-size=<bs>                     Size of feature batch 
   
 ";
 
@@ -67,6 +68,7 @@ struct Args {
     // flag_drifting: bool,
     flag_bench_conf: Option<String>,
     flag_feature_conf: String,
+    arg_b: Option<usize>,
     cmd_digits: bool,
     cmd_featurelats: bool,
     cmd_start: bool,
@@ -80,16 +82,16 @@ pub fn main() {
 
     println!("{:?}", args);
 
-    let features = parse_feature_config(&args.flag_feature_conf);
     // let features = parse_feature_config(&"features.toml".to_string());
     if args.cmd_digits {
+      let features = parse_feature_config(&args.flag_feature_conf);
       let digits_conf = parse_digits_config(&args.flag_bench_conf.unwrap());
-
       digits_benchmark::run(features, digits_conf);
     } else if args.cmd_featurelats {
-        // features::feature_lats_main(features);
-        println!("unimplemented");
+        features::feature_batch_latency(args.arg_b.unwrap());
+        // println!("unimplemented");
     } else if args.cmd_start {
+        let features = parse_feature_config(&args.flag_feature_conf);
         server::main(features);
     }
 

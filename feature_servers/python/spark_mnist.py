@@ -19,7 +19,7 @@ import numpy
 
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.regression import LabeledPoint
-# from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
 from pyspark.mllib.classification import SVMModel, SVMWithSGD
 from pyspark.mllib.tree import RandomForest
 
@@ -53,7 +53,7 @@ def train_logistic_regression(pos_label):
         .set("master", "local")
     sc = SparkContext(conf=conf, batchSize=10)
     print 'Parsing data'
-    trainRDD = sc.textFile("/crankshaw-local/mnist/data/train.data").map(lambda line: parseData(line, objective, pos_label)).cache()
+    trainRDD = sc.textFile("/crankshaw-local/mnist/data/train_norm.data").map(lambda line: parseData(line, objective, pos_label)).cache()
     # testRDD = sc.textFile("/crankshaw-local/mnist/data/test.data").map(lambda line: parseData(line, objective)).cache()
 
     print 'Fitting model'
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     for i in range(10):
         print "training model to predict %d" % (i + 1)
-        train_svm(i + 1)
+        train_logistic_regression(i + 1)
     # train_random_forest(50)
     # train_random_forest(100)
     # train_random_forest(500)

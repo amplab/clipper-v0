@@ -40,8 +40,8 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     println!("Config: {:?}", dc);
 
     let all_test_data = digits::load_mnist_dense(&dc.mnist_path).unwrap();
-    // let norm_test_data = digits::normalize(&all_test_data);
-    let norm_test_data = all_test_data;
+    let norm_test_data = digits::normalize(&all_test_data);
+    // let norm_test_data = all_test_data;
 
     println!("Test data loaded: {} points", norm_test_data.ys.len());
 
@@ -245,8 +245,8 @@ impl TrainedTask {
                  test_x: Vec<Arc<Vec<f64>>>,
                  test_y: Vec<f64>) -> TrainedTask {
         let params = linear::Struct_parameter {
-            solver_type: linear::L2R_LR,
-            // solver_type: linear::L1R_LR,
+            // solver_type: linear::L2R_LR,
+            solver_type: linear::L1R_LR,
             eps: 0.0001,
             C: 1.0f64,
             nr_weight: 0,
@@ -258,14 +258,21 @@ impl TrainedTask {
         let prob = linear::Problem::from_training_data(xs, ys);
         let model = linear::train_logistic_regression(prob, params);
         let (anytime_estimators, _) = linalg::mean_and_var(xs);
-        // let mut nnz = 0;
-        // for wi in model.w.iter() {
-        //   if *wi != 0.0 {
-        //     nnz += 1;
-        //   }
-        // }
-        //
-        // println!("nnz: {}", nnz);
+        let mut nnz = 0;
+        let mut biggest: f64 = 0.0;
+        let mut sec_biggest: f64 = 0.0;
+        for wi in model.w.iter() {
+          if (*wi).abs() > sec_biggest.abs() {
+            if (*wi).abs() > biggest.abs() {
+              biggest = (*wi);
+            } else {
+              sec_biggest = (*wi);
+            }
+          }
+        }
+
+
+        println!("biggest: {}, sec_biggest: {}", biggest, sec_biggest);
 
         TrainedTask {
             task_id: tid,
