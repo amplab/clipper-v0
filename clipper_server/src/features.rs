@@ -161,10 +161,10 @@ fn feature_worker(name: String,
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();
     let max_batch_size = batch_size;
-    let mut bench_latencies = Vec::new();
-    let mut loop_counter = 0;
-    let mut epoch_start = time::PreciseTime::now();
-    let mut epoch_count = 0;
+    // let mut bench_latencies = Vec::new();
+    // let mut loop_counter = 0;
+    // let mut epoch_start = time::PreciseTime::now();
+    // let mut epoch_count = 0;
 
     loop {
         let mut batch: Vec<FeatureReq> = Vec::new();
@@ -221,35 +221,35 @@ fn feature_worker(name: String,
                 // }
             }
         }
-        let loop_end_time = time::PreciseTime::now();
-        let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap() as f64 / 1000.0;
-        bench_latencies.push(loop_latency);
-        epoch_count += batch.len();
-        if epoch_count >= 10000 {
-            let epoch_end = time::PreciseTime::now();
-            let epoch_time = epoch_start.to(epoch_end).num_microseconds().unwrap();
-            // let xs = vec![Arc::new(bench_latencies.clone())];
-            let xs = bench_latencies.clone().into_iter().map(|x| {
-                Arc::new(vec![x])
-            }).collect::<Vec<Arc<Vec<f64>>>>();
-            let (mut mean, mut var) = linalg::mean_and_var(&xs);
-            // println!("mean: {:?}, var: {:?}", mean, var);
-            assert!(mean.len() == 1 && var.len() == 1);
-            let max_lat = bench_latencies.iter().fold(0.0, |m, &x| {
-                if x > m {
-                    x
-                } else {
-                    m
-                }
-            });
-            println!("batch_size: {}, thru: {:.3} (qps), mean_lat (ms): {}, var_lat (ms): {}, max_lat (ms): {}",
-                     batch_size,
-                     epoch_count as f64 / epoch_time as f64 * 1000.0 * 1000.0,
-                     mean.pop().unwrap(), var.pop().unwrap(), max_lat);
-            epoch_start = time::PreciseTime::now();
-            epoch_count = 0;
-            bench_latencies.clear();
-        }
+        // let loop_end_time = time::PreciseTime::now();
+        // let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap() as f64 / 1000.0;
+        // bench_latencies.push(loop_latency);
+        // epoch_count += batch.len();
+        // if epoch_count >= 10000 {
+        //     let epoch_end = time::PreciseTime::now();
+        //     let epoch_time = epoch_start.to(epoch_end).num_microseconds().unwrap();
+        //     // let xs = vec![Arc::new(bench_latencies.clone())];
+        //     let xs = bench_latencies.clone().into_iter().map(|x| {
+        //         Arc::new(vec![x])
+        //     }).collect::<Vec<Arc<Vec<f64>>>>();
+        //     let (mut mean, mut var) = linalg::mean_and_var(&xs);
+        //     // println!("mean: {:?}, var: {:?}", mean, var);
+        //     assert!(mean.len() == 1 && var.len() == 1);
+        //     let max_lat = bench_latencies.iter().fold(0.0, |m, &x| {
+        //         if x > m {
+        //             x
+        //         } else {
+        //             m
+        //         }
+        //     });
+        //     println!("batch_size: {}, thru: {:.3} (qps), mean_lat (ms): {}, var_lat (ms): {}, max_lat (ms): {}",
+        //              batch_size,
+        //              epoch_count as f64 / epoch_time as f64 * 1000.0 * 1000.0,
+        //              mean.pop().unwrap(), var.pop().unwrap(), max_lat);
+        //     epoch_start = time::PreciseTime::now();
+        //     epoch_count = 0;
+        //     bench_latencies.clear();
+        // }
         // loop_counter += 1;
         
         // println!("feature: {}, batch_size: {}, latency: {}, max_req_latency: {}, min_req_latency {}, loop_latency: {}",

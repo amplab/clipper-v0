@@ -118,9 +118,9 @@ class SparkSVMServer:
             # TODO is making an RDD faster? probably not
             preds.append(float(self.model.predict(i)))
         end = datetime.datetime.now()
-        print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
+        # print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
         preds = np.array(preds)
-        assert preds.dtype == np.dtype('float64')
+        # assert preds.dtype == np.dtype('float64')
         return np.array(preds)
 
 class SparkRFServer:
@@ -180,9 +180,20 @@ def parse_args():
     parser.add_argument("modelpath", help="full path to pickled model file")
     return parser.parse_args()
 
+def start_server(model, ip, port):
+    print("Starting server")
+    server = SocketServer.TCPServer((ip, port), FeatureTCPHandler)
+    # This works, but hard to clean up from
+    # server = SocketServer.ForkingTCPServer((args.ip, args.port), FeatureTCPHandler)
+    server.model = model
+    server.serve_forever()
 
-if __name__=='__main__':
+def start_svm_from_mp(mp, ip, port):
+    model = SparkSVMServer(mp)
+    start_server(model, ip, port)
 
+
+def main():
     args = parse_args()
     model_path = args.modelpath
     # print(model_path)
@@ -198,11 +209,10 @@ if __name__=='__main__':
     else:
         print("%s is unsupported framework" % args.framework)
         sys.exit(1)
-    print("Starting server")
-    server = SocketServer.TCPServer((args.ip, args.port), FeatureTCPHandler)
-    # This works, but hard to clean up from
-    # server = SocketServer.ForkingTCPServer((args.ip, args.port), FeatureTCPHandler)
-    server.model = model
-    server.serve_forever()
+    start_server(model, args.ip, args.port)
+
+if __name__=='__main__':
+    main()
+
 
 

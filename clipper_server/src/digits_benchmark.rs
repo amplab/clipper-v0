@@ -258,21 +258,21 @@ impl TrainedTask {
         let prob = linear::Problem::from_training_data(xs, ys);
         let model = linear::train_logistic_regression(prob, params);
         let (anytime_estimators, _) = linalg::mean_and_var(xs);
-        let mut nnz = 0;
-        let mut biggest: f64 = 0.0;
-        let mut sec_biggest: f64 = 0.0;
-        for wi in model.w.iter() {
-          if (*wi).abs() > sec_biggest.abs() {
-            if (*wi).abs() > biggest.abs() {
-              biggest = (*wi);
-            } else {
-              sec_biggest = (*wi);
-            }
-          }
-        }
+        // let mut nnz = 0;
+        // let mut biggest: f64 = 0.0;
+        // let mut sec_biggest: f64 = 0.0;
+        // for wi in model.w.iter() {
+        //   if (*wi).abs() > sec_biggest.abs() {
+        //     if (*wi).abs() > biggest.abs() {
+        //       biggest = (*wi);
+        //     } else {
+        //       sec_biggest = (*wi);
+        //     }
+        //   }
+        // }
 
 
-        println!("biggest: {}, sec_biggest: {}", biggest, sec_biggest);
+        // println!("biggest: {}, sec_biggest: {}", biggest, sec_biggest);
 
         TrainedTask {
             task_id: tid,
