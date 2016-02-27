@@ -49,8 +49,22 @@ mnist_path="/crankshaw-local/mnist/data/test.data"
 num_events=1000000
 worker_threads=2
 target_qps=%(qps)d
-query_batch_size=800
+query_batch_size=100000
 max_features=7
+salt_hash=true
+feature_batch_size=100
+"""
+
+toml_str_no_features = """
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=%(qps)d
+query_batch_size=5000
+max_features=0
 salt_hash=true
 feature_batch_size=100
 """
@@ -161,16 +175,25 @@ if __name__=="__main__":
     #
     # print("FINISHED BATCHING EXPERIMENTS")
 
-    out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/end_to_end_THRUPUT/max_features.txt")
+    # out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/end_to_end_THRUPUT/max_features.txt")
+    # with open(out_file, "a") as results_file:
+    #     for q in [64000, 80000]: #, 68000, 72000, 76000, 80000]:
+    #         print("\n\nEXPERIMENT RUN QPS: %d" % q)
+    #         print("\n\nEXPERIMENT RUN QPS: %d" % q, file=results_file)
+    #         out = run_exp(toml_str_max_features, q)
+    #         print(out)
+    #         print(out, file=results_file)
+    #         results_file.flush()
+    
+    out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/end_to_end_THRUPUT/no_features.txt")
     with open(out_file, "a") as results_file:
-        for q in [64000, 68000, 72000, 76000, 80000]:
+        for q in [20000, 30000, 40000, 50000]: #, 68000, 72000, 76000, 80000]:
             print("\n\nEXPERIMENT RUN QPS: %d" % q)
             print("\n\nEXPERIMENT RUN QPS: %d" % q, file=results_file)
-            out = run_exp(toml_str_max_features, q)
+            out = run_exp(toml_str_no_features, q)
             print(out)
             print(out, file=results_file)
             results_file.flush()
-    
 
 
 
