@@ -40,8 +40,8 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     println!("Config: {:?}", dc);
 
     let all_test_data = digits::load_mnist_dense(&dc.mnist_path).unwrap();
-    let norm_test_data = digits::normalize(&all_test_data);
-    // let norm_test_data = all_test_data;
+    // let norm_test_data = digits::normalize(&all_test_data);
+    let norm_test_data = all_test_data;
 
     println!("Test data loaded: {} points", norm_test_data.ys.len());
 
@@ -178,7 +178,7 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
         // let mut total_count = 0;
         let mut loop_count = 0;
         loop {
-            thread::sleep(::std::time::Duration::new(3, 0));
+            thread::sleep(::std::time::Duration::new(8, 0));
             let cur_time = time::PreciseTime::now();
             let elapsed_time = last_time.to(cur_time).num_milliseconds() as f64 / 1000.0;
             // let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
@@ -206,7 +206,9 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
 
             all_cur_lats.sort();
             let num_observations: usize = all_cur_lats.len();
-            let p99 = if (num_observations % 100) == 0 {
+            let p99 = if num_observations < 100 {
+              all_cur_lats[(num_observations - 1) as usize] as f64
+            } else if (num_observations % 100) == 0 {
               let p99_index: usize = num_observations * 99 / 100;
               all_cur_lats[p99_index as usize] as f64
             } else {
@@ -244,9 +246,9 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
             last_total = cur_total;
             // println!("sleeping...");
             loop_count += 1;
-            if loop_count > 10 {
-              break;
-            }
+            // if loop_count > 10 {
+            //   break;
+            // }
         }
     })
 }
@@ -281,7 +283,7 @@ impl TrainedTask {
             solver_type: linear::L1R_LR,
             eps: 0.0001,
             // C: 1.0f64,
-            C: 0.5f64,
+            C: 10.0f64,
             nr_weight: 0,
             weight_label: ptr::null_mut(),
             weight: ptr::null_mut(),

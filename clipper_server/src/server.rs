@@ -21,7 +21,7 @@ use digits;
 use features;
 use features::FeatureHash;
 
-pub const SLA: i64 = 20;
+pub const SLA: i64 = 100;
 
 
 
