@@ -40,8 +40,8 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     println!("Config: {:?}", dc);
 
     let all_test_data = digits::load_mnist_dense(&dc.mnist_path).unwrap();
-    // let norm_test_data = digits::normalize(&all_test_data);
-    let norm_test_data = all_test_data;
+    let norm_test_data = digits::normalize(&all_test_data);
+    // let norm_test_data = all_test_data;
 
     println!("Test data loaded: {} points", norm_test_data.ys.len());
 
@@ -107,17 +107,27 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     let batches_per_sec = target_qps / query_batch_size + 1;
     let ms_per_sec = 1000; // just labeling my magic number
     let sleep_time_ms = ms_per_sec / batches_per_sec as u64;
+    let mut cur_user: usize = 0;
+    let mut cur_index: usize = 0;
     while events_fired < num_events {
         for _ in 0..query_batch_size {
-            let user: usize = rng.gen_range(0, dc.num_users as usize);
-            let example_idx: usize = rng.gen_range(0, dc.num_test_examples);
-            let input = (*(&trained_tasks)[user].read().unwrap().test_x[example_idx]).clone();
-            let true_label = (&trained_tasks)[user].read().unwrap().test_y[example_idx];
+            // let user: usize = rng.gen_range(0, dc.num_users as usize);
+            // let example_idx: usize = rng.gen_range(0, dc.num_test_examples);
+            let input = (*(&trained_tasks)[cur_user].read().unwrap().test_x[cur_index]).clone();
+            let true_label = (&trained_tasks)[cur_user].read().unwrap().test_y[cur_index];
             // let max_features = features.len();
             let max_features = dc.max_features;
-            let r = server::Request::new_with_label(user as u32, input, true_label, events_fired as i32);
+            let r = server::Request::new_with_label(cur_user as u32, input, true_label, events_fired as i32);
             // dispatcher.dispatch(r, features.len());
             dispatcher.dispatch(r, max_features);
+            cur_index += 1;
+            if cur_index == dc.num_test_examples {
+                cur_index = 0;
+                cur_user = (cur_user + 1) % dc.num_users;
+                if cur_user == 0 {
+                  println!("restarting test");
+                }
+            }
             events_fired += 1;
         }
         thread::sleep(::std::time::Duration::from_millis(sleep_time_ms));
@@ -283,7 +293,7 @@ impl TrainedTask {
             solver_type: linear::L1R_LR,
             eps: 0.0001,
             // C: 1.0f64,
-            C: 10.0f64,
+            C: 100.0f64,
             nr_weight: 0,
             weight_label: ptr::null_mut(),
             weight: ptr::null_mut(),
