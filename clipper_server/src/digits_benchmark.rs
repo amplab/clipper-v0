@@ -75,6 +75,11 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     let processed_counter = Arc::new(AtomicUsize::new(0));
     let cum_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
     let max_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
+
+    let mut all_latencies_trackers: Vec<Arc<RwLock<Vec<i64>>>> = Vec::new();
+    for i in 0..num_workers {
+      all_latencies_trackers.push(Arc::new(RwLock::new(Vec::new())));
+    }
     let mut dispatcher = server::Dispatcher::new(num_workers,
                                          server::SLA,
                                          features.clone(),
@@ -83,7 +88,8 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
                                          total_counter.clone(),
                                          processed_counter.clone(),
                                          cum_latency_tracker_micros.clone(),
-                                         max_latency_tracker_micros.clone());
+                                         max_latency_tracker_micros.clone(),
+                                         all_latencies_trackers.clone());
 
     thread::sleep(::std::time::Duration::new(3, 0));
     let mon_thread_join_handle = launch_monitor_thread(correct_counter.clone(),
@@ -91,6 +97,7 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
                                                        processed_counter.clone(),
                                                        cum_latency_tracker_micros.clone(),
                                                        max_latency_tracker_micros.clone(),
+                                                       all_latencies_trackers.clone(),
                                                        num_events as i32);
 
     let mut rng = thread_rng();
@@ -157,6 +164,7 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
                          processed_counter: Arc<AtomicUsize>,
                          cum_latency_tracker_micros: Arc<AtomicUsize>,
                          max_latency_tracker_micros: Arc<AtomicUsize>,
+                         all_latencies_trackers: Vec<Arc<RwLock<Vec<i64>>>>,
                          num_events: i32) -> ::std::thread::JoinHandle<()> {
 
     // let counter = counter.clone();
@@ -188,9 +196,33 @@ fn launch_monitor_thread(correct_counter: Arc<AtomicUsize>,
             let acc = elapsed_correct as f64 / elapsed_total as f64;
             let thru = elapsed_count as f64 / elapsed_time;
 
-            println!("ACC: {:.3}, THRU: {:.3}, MEAN_LAT: {:.3}, MAX_LAT: {:.3}",
-                    acc, thru,
-                    avg_latency / 1000.0, cur_max_latency as f64 / 1000.0); // latencies are measured in microseconds
+            let mut all_cur_lats = Vec::new();
+            for t in all_latencies_trackers.iter() {
+              let mut lock = t.write().unwrap();
+              // copy into our tracker then clear
+              all_cur_lats.extend_from_slice(&lock[..]);
+              lock.clear();
+            }
+
+            all_cur_lats.sort();
+            let num_observations: usize = all_cur_lats.len();
+            let p99 = if (num_observations % 100) == 0 {
+              let p99_index: usize = num_observations * 99 / 100;
+              all_cur_lats[p99_index as usize] as f64
+            } else {
+              let p99_index: f64 = (num_observations as f64) * 0.99;
+              // let p95_index = (num_observations as f64) * 0.95;
+              let p99_below = p99_index.floor() as usize;
+              let p99_above = p99_index.ceil() as usize;
+              (all_cur_lats[p99_below] as f64 + all_cur_lats[p99_above] as f64)  / 2.0_f64
+            };
+              
+
+            println!("{acc:.4}, {thru:.4}, {mean:.4}, {p99:.4}, {max:.4}",
+                    acc=acc, thru=thru,
+                    mean=(avg_latency / 1000.0),
+                    p99=(p99 as f64 / 1000.0),
+                    max=(cur_max_latency as f64 / 1000.0)); // latencies are measured in microseconds
             
             // println!("processed {} events in {} seconds: {} preds/sec",
             //          cur_count - last_count,
@@ -248,7 +280,8 @@ impl TrainedTask {
             // solver_type: linear::L2R_LR,
             solver_type: linear::L1R_LR,
             eps: 0.0001,
-            C: 1.0f64,
+            // C: 1.0f64,
+            C: 0.5f64,
             nr_weight: 0,
             weight_label: ptr::null_mut(),
             weight: ptr::null_mut(),

@@ -1,0 +1,530 @@
+
+
+EXPERIMENT RUN QPS: 50000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=50000
+query_batch_size=100000
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 50000, query_batch_size: 100000, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 0 with 20 ms SLA
+starting response worker 1 with 20 ms SLA
+ACC: 0.500, THRU: 44647.000, MEAN_LAT: 1059.717, MAX_LAT: 2137.894
+waiting for features to finish
+ACC: 0.500, THRU: 40648.333, MEAN_LAT: 3235.220, MAX_LAT: 4404.887
+ACC: 0.501, THRU: 55103.667, MEAN_LAT: 5534.621, MAX_LAT: 6627.230
+ACC: 0.499, THRU: 53680.333, MEAN_LAT: 7566.049, MAX_LAT: 8868.092
+ACC: 0.499, THRU: 50982.333, MEAN_LAT: 9884.694, MAX_LAT: 11129.128
+ACC: 0.501, THRU: 45516.333, MEAN_LAT: 12136.125, MAX_LAT: 13530.957
+ACC: 0.501, THRU: 38480.000, MEAN_LAT: 14398.287, MAX_LAT: 15801.357
+ACC: 0.506, THRU: 4275.333, MEAN_LAT: 15963.411, MAX_LAT: 16125.538
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+done
+
+
+
+EXPERIMENT RUN QPS: 100000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=100000
+query_batch_size=100000
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 100000, query_batch_size: 100000, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 0 with 20 ms SLA
+starting response worker 1 with 20 ms SLA
+ACC: 0.500, THRU: 43599.000, MEAN_LAT: 989.236, MAX_LAT: 2148.977
+waiting for features to finish
+ACC: 0.498, THRU: 38916.000, MEAN_LAT: 3389.111, MAX_LAT: 4582.358
+ACC: 0.499, THRU: 55564.667, MEAN_LAT: 5843.987, MAX_LAT: 6845.736
+ACC: 0.502, THRU: 56671.333, MEAN_LAT: 7813.703, MAX_LAT: 8983.975
+ACC: 0.502, THRU: 46747.667, MEAN_LAT: 10118.818, MAX_LAT: 11268.631
+ACC: 0.499, THRU: 50422.000, MEAN_LAT: 12206.252, MAX_LAT: 13503.456
+ACC: 0.500, THRU: 41412.667, MEAN_LAT: 14454.280, MAX_LAT: 15681.007
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+done
+
+
+
+EXPERIMENT RUN QPS: 20000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=20000
+query_batch_size=5000
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 20000, query_batch_size: 5000, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 1 with 20 ms SLA
+starting response worker 0 with 20 ms SLA
+ACC: 0.500, THRU: 20605.000, MEAN_LAT: 70.237, MAX_LAT: 146.737
+ACC: 0.500, THRU: 21061.667, MEAN_LAT: 77.320, MAX_LAT: 147.629
+ACC: 0.501, THRU: 20903.333, MEAN_LAT: 76.019, MAX_LAT: 137.054
+ACC: 0.506, THRU: 20763.333, MEAN_LAT: 77.148, MAX_LAT: 145.137
+ACC: 0.501, THRU: 21309.333, MEAN_LAT: 75.446, MAX_LAT: 138.354
+ACC: 0.499, THRU: 20571.667, MEAN_LAT: 78.042, MAX_LAT: 151.596
+ACC: 0.502, THRU: 21406.667, MEAN_LAT: 76.907, MAX_LAT: 138.769
+ACC: 0.502, THRU: 20604.000, MEAN_LAT: 75.195, MAX_LAT: 147.891
+ACC: 0.498, THRU: 21108.333, MEAN_LAT: 77.338, MAX_LAT: 144.660
+ACC: 0.502, THRU: 21011.667, MEAN_LAT: 75.576, MAX_LAT: 146.698
+ACC: 0.501, THRU: 20655.000, MEAN_LAT: 77.935, MAX_LAT: 141.354
+waiting for features to finish
+done
+
+
+
+EXPERIMENT RUN QPS: 30000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=30000
+query_batch_size=5000
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 30000, query_batch_size: 5000, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 1 with 20 ms SLA
+starting response worker 0 with 20 ms SLA
+ACC: 0.502, THRU: 27912.000, MEAN_LAT: 74.734, MAX_LAT: 151.594
+ACC: 0.499, THRU: 27850.667, MEAN_LAT: 75.698, MAX_LAT: 134.215
+ACC: 0.501, THRU: 27930.000, MEAN_LAT: 77.210, MAX_LAT: 144.909
+ACC: 0.501, THRU: 28156.667, MEAN_LAT: 76.067, MAX_LAT: 147.738
+ACC: 0.498, THRU: 27937.000, MEAN_LAT: 73.791, MAX_LAT: 146.012
+ACC: 0.501, THRU: 28001.667, MEAN_LAT: 76.666, MAX_LAT: 133.671
+ACC: 0.500, THRU: 27960.000, MEAN_LAT: 75.849, MAX_LAT: 142.509
+ACC: 0.500, THRU: 28064.000, MEAN_LAT: 76.933, MAX_LAT: 153.396
+ACC: 0.499, THRU: 28082.667, MEAN_LAT: 75.786, MAX_LAT: 149.164
+ACC: 0.500, THRU: 28105.333, MEAN_LAT: 76.241, MAX_LAT: 151.106
+ACC: 0.502, THRU: 28333.333, MEAN_LAT: 75.493, MAX_LAT: 133.174
+waiting for features to finish
+done
+
+
+
+EXPERIMENT RUN QPS: 40000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=40000
+query_batch_size=5000
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 40000, query_batch_size: 5000, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 0 with 20 ms SLA
+starting response worker 1 with 20 ms SLA
+ACC: 0.498, THRU: 33962.000, MEAN_LAT: 67.850, MAX_LAT: 150.405
+ACC: 0.498, THRU: 34578.000, MEAN_LAT: 66.581, MAX_LAT: 129.069
+ACC: 0.500, THRU: 34683.000, MEAN_LAT: 65.950, MAX_LAT: 133.866
+ACC: 0.499, THRU: 34880.333, MEAN_LAT: 65.050, MAX_LAT: 130.993
+ACC: 0.499, THRU: 34035.333, MEAN_LAT: 65.769, MAX_LAT: 131.648
+ACC: 0.500, THRU: 34463.333, MEAN_LAT: 66.618, MAX_LAT: 142.325
+ACC: 0.499, THRU: 33848.667, MEAN_LAT: 65.690, MAX_LAT: 131.698
+ACC: 0.502, THRU: 34549.333, MEAN_LAT: 67.621, MAX_LAT: 142.512
+ACC: 0.503, THRU: 34707.667, MEAN_LAT: 67.241, MAX_LAT: 145.127
+waiting for features to finish
+ACC: 0.497, THRU: 23625.667, MEAN_LAT: 66.784, MAX_LAT: 130.117
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+done
+
+
+
+EXPERIMENT RUN QPS: 50000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=50000
+query_batch_size=5000
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 50000, query_batch_size: 5000, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 0 with 20 ms SLA
+starting response worker 1 with 20 ms SLA
+ACC: 0.501, THRU: 39937.333, MEAN_LAT: 69.746, MAX_LAT: 151.119
+ACC: 0.502, THRU: 40585.333, MEAN_LAT: 61.877, MAX_LAT: 144.574
+ACC: 0.500, THRU: 40712.000, MEAN_LAT: 57.921, MAX_LAT: 125.700
+ACC: 0.499, THRU: 40559.333, MEAN_LAT: 56.393, MAX_LAT: 128.224
+ACC: 0.500, THRU: 40781.333, MEAN_LAT: 65.003, MAX_LAT: 166.565
+ACC: 0.501, THRU: 40744.333, MEAN_LAT: 65.107, MAX_LAT: 146.259
+ACC: 0.500, THRU: 40734.667, MEAN_LAT: 55.238, MAX_LAT: 126.319
+ACC: 0.502, THRU: 40945.667, MEAN_LAT: 62.336, MAX_LAT: 145.851
+waiting for features to finish
+ACC: 0.495, THRU: 8333.333, MEAN_LAT: 54.530, MAX_LAT: 109.710
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+done
+
+
+
+EXPERIMENT RUN QPS: 20000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=20000
+query_batch_size=200
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 20000, query_batch_size: 200, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 0 with 20 ms SLA
+starting response worker 1 with 20 ms SLA
+ACC: 0.502, THRU: 19266.667, MEAN_LAT: 21.891, MAX_LAT: 26.931
+ACC: 0.500, THRU: 19371.667, MEAN_LAT: 21.843, MAX_LAT: 26.873
+ACC: 0.499, THRU: 19386.333, MEAN_LAT: 21.795, MAX_LAT: 24.051
+ACC: 0.500, THRU: 19379.667, MEAN_LAT: 21.795, MAX_LAT: 23.913
+ACC: 0.500, THRU: 19395.667, MEAN_LAT: 21.860, MAX_LAT: 26.831
+ACC: 0.501, THRU: 19436.000, MEAN_LAT: 21.811, MAX_LAT: 24.129
+ACC: 0.502, THRU: 19430.667, MEAN_LAT: 21.788, MAX_LAT: 23.907
+ACC: 0.497, THRU: 19466.667, MEAN_LAT: 21.801, MAX_LAT: 27.039
+ACC: 0.503, THRU: 19466.667, MEAN_LAT: 21.834, MAX_LAT: 24.857
+ACC: 0.497, THRU: 19429.667, MEAN_LAT: 21.949, MAX_LAT: 27.586
+ACC: 0.502, THRU: 19451.667, MEAN_LAT: 21.885, MAX_LAT: 26.616
+waiting for features to finish
+done
+
+
+
+EXPERIMENT RUN QPS: 30000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=30000
+query_batch_size=200
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 30000, query_batch_size: 200, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 1 with 20 ms SLA
+starting response worker 0 with 20 ms SLA
+ACC: 0.500, THRU: 27317.333, MEAN_LAT: 20.548, MAX_LAT: 28.051
+ACC: 0.501, THRU: 27882.667, MEAN_LAT: 20.353, MAX_LAT: 24.068
+ACC: 0.499, THRU: 27980.667, MEAN_LAT: 20.363, MAX_LAT: 23.699
+ACC: 0.504, THRU: 27956.667, MEAN_LAT: 20.358, MAX_LAT: 26.878
+ACC: 0.498, THRU: 27911.667, MEAN_LAT: 20.360, MAX_LAT: 27.572
+ACC: 0.499, THRU: 27765.333, MEAN_LAT: 20.360, MAX_LAT: 27.718
+ACC: 0.499, THRU: 27841.333, MEAN_LAT: 20.399, MAX_LAT: 27.541
+ACC: 0.500, THRU: 28057.000, MEAN_LAT: 20.383, MAX_LAT: 24.159
+ACC: 0.498, THRU: 28083.333, MEAN_LAT: 20.514, MAX_LAT: 27.835
+ACC: 0.498, THRU: 28495.667, MEAN_LAT: 20.207, MAX_LAT: 23.531
+ACC: 0.499, THRU: 28507.667, MEAN_LAT: 20.254, MAX_LAT: 27.507
+waiting for features to finish
+done
+
+
+
+EXPERIMENT RUN QPS: 40000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=40000
+query_batch_size=200
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 40000, query_batch_size: 200, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 1 with 20 ms SLA
+starting response worker 0 with 20 ms SLA
+ACC: 0.499, THRU: 38400.667, MEAN_LAT: 21.513, MAX_LAT: 40.968
+ACC: 0.503, THRU: 39171.000, MEAN_LAT: 19.905, MAX_LAT: 23.671
+ACC: 0.502, THRU: 39053.667, MEAN_LAT: 19.836, MAX_LAT: 23.898
+ACC: 0.500, THRU: 39088.333, MEAN_LAT: 21.188, MAX_LAT: 44.042
+ACC: 0.500, THRU: 38995.000, MEAN_LAT: 20.699, MAX_LAT: 39.943
+ACC: 0.498, THRU: 39037.333, MEAN_LAT: 24.321, MAX_LAT: 51.916
+ACC: 0.500, THRU: 39162.667, MEAN_LAT: 20.622, MAX_LAT: 39.697
+ACC: 0.502, THRU: 39155.333, MEAN_LAT: 20.717, MAX_LAT: 43.110
+waiting for features to finish
+ACC: 0.499, THRU: 21269.333, MEAN_LAT: 19.937, MAX_LAT: 24.901
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+done
+
+
+
+EXPERIMENT RUN QPS: 50000
+Args { flag_bench_conf: Some("anytime.toml"), flag_feature_conf: "features.toml", arg_b: None, cmd_digits: true, cmd_featurelats: false, cmd_start: false }
+features.toml contains:
+[features]
+# pred0 = "127.0.0.1:6000"
+pred1 = "127.0.0.1:6001"
+pred2 = "127.0.0.1:6002"
+pred3 = "127.0.0.1:6003"
+pred4 = "127.0.0.1:6004"
+pred5 = "127.0.0.1:6005"
+pred6 = "127.0.0.1:6006"
+pred7 = "127.0.0.1:6007"
+pred8 = "127.0.0.1:6008"
+pred9 = "127.0.0.1:6009"
+pred10 = "127.0.0.1:6010"
+[("pred1", V4(127.0.0.1:6001)), ("pred10", V4(127.0.0.1:6010)), ("pred2", V4(127.0.0.1:6002)), ("pred3", V4(127.0.0.1:6003)), ("pred4", V4(127.0.0.1:6004)), ("pred5", V4(127.0.0.1:6005)), ("pred6", V4(127.0.0.1:6006)), ("pred7", V4(127.0.0.1:6007)), ("pred8", V4(127.0.0.1:6008)), ("pred9", V4(127.0.0.1:6009))]
+anytime.toml contains:
+
+users=1000
+train_examples=50
+test_examples=100
+mnist_path="/crankshaw-local/mnist/data/test.data"
+num_events=1000000
+worker_threads=2
+target_qps=50000
+query_batch_size=200
+max_features=0
+salt_hash=true
+feature_batch_size=100
+
+starting digits
+Config: DigitsBenchConfig { num_users: 1000, num_train_examples: 50, num_test_examples: 100, mnist_path: "/crankshaw-local/mnist/data/test.data", num_events: 1000000, num_workers: 2, target_qps: 50000, query_batch_size: 200, max_features: 0, salt_hash: true, feature_batch_size: 100 }
+Test data loaded: 10000 points
+clearing caches
+creating dispatcher with 2 workers
+starting response worker 0 with 20 ms SLA
+starting response worker 1 with 20 ms SLA
+ACC: 0.500, THRU: 46593.333, MEAN_LAT: 46.171, MAX_LAT: 104.758
+ACC: 0.499, THRU: 48504.000, MEAN_LAT: 26.339, MAX_LAT: 88.878
+ACC: 0.500, THRU: 48614.667, MEAN_LAT: 46.015, MAX_LAT: 101.821
+ACC: 0.499, THRU: 48065.333, MEAN_LAT: 73.356, MAX_LAT: 195.290
+ACC: 0.499, THRU: 44765.000, MEAN_LAT: 94.732, MAX_LAT: 221.888
+ACC: 0.498, THRU: 48318.000, MEAN_LAT: 129.374, MAX_LAT: 211.816
+waiting for features to finish
+ACC: 0.500, THRU: 48473.000, MEAN_LAT: 105.289, MAX_LAT: 211.833
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+ACC: NaN, THRU: 0.000, MEAN_LAT: NaN, MAX_LAT: 0.000
+done
+

@@ -137,6 +137,7 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                            processed_counter: Arc<AtomicUsize>, // tracks total number of requests processed
                            cum_latency_tracker_micros: Arc<AtomicUsize>, // find mean by doing cum_latency_tracker/processed_counter
                            max_latency_tracker_micros: Arc<AtomicUsize>,
+                           all_latencies_tracker: Arc<RwLock<Vec<i64>>>,
                            ) -> mpsc::Sender<Request> 
                            where T: TaskModel + Send + Sync + 'static,
                                  H: features::FeatureHash + Send + Sync + 'static {
@@ -171,6 +172,8 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                 max_latency_tracker_micros.store(latency as usize, Ordering::Relaxed);
             }
             cum_latency_tracker_micros.fetch_add(latency as usize, Ordering::Relaxed);
+            let mut lock = (&all_latencies_tracker).write().unwrap();
+            lock.push(latency);
             // println!("prediction latency: {} ms", latency);
             processed_counter.fetch_add(1, Ordering::Relaxed);
             if req.true_label.is_some() {
@@ -209,9 +212,11 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
            processed_counter: Arc<AtomicUsize>,
            cum_latency_tracker_micros: Arc<AtomicUsize>, // find mean by doing cum_latency_tracker/processed_counter
            max_latency_tracker_micros: Arc<AtomicUsize>,
+           all_latencies_trackers: Vec<Arc<RwLock<Vec<i64>>>>,
            ) -> Dispatcher<T> {
         println!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
+        assert!(all_latencies_trackers.len() == num_workers);
         for i in 0..num_workers {
             let worker = start_prediction_worker(i as i32,
                                                  sla_millis,
@@ -221,7 +226,8 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
                                                  total_counter.clone(),
                                                  processed_counter.clone(),
                                                  cum_latency_tracker_micros.clone(),
-                                                 max_latency_tracker_micros.clone());
+                                                 max_latency_tracker_micros.clone(),
+                                                 all_latencies_trackers[i].clone());
             worker_threads.push(worker);
         }
         Dispatcher {
@@ -306,6 +312,10 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     let num_workers = 1;
     let cum_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
     let max_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
+    let mut all_latencies_trackers: Vec<Arc<RwLock<Vec<i64>>>> = Vec::new();
+    for i in 0..num_workers {
+      all_latencies_trackers.push(Arc::new(RwLock::new(Vec::new())));
+    }
     let mut dispatcher = Dispatcher::new(num_workers,
                                          SLA,
                                          features.clone(),
@@ -314,7 +324,8 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
                                          total_counter.clone(),
                                          processed_counter.clone(),
                                          cum_latency_tracker_micros.clone(),
-                                         max_latency_tracker_micros.clone()
+                                         max_latency_tracker_micros.clone(),
+                                         all_latencies_trackers
                                          );
 
     // create monitoring thread to check incremental thruput
