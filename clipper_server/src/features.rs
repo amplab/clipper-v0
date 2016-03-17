@@ -111,7 +111,6 @@ pub fn feature_batch_latency(batch_size: usize) {
             req_start_time: time::PreciseTime::now(),
         };
         feat.queue.send(req).unwrap();
-
     }
     hand.join().unwrap();
 }
@@ -148,6 +147,16 @@ pub fn get_addr(a: String) -> SocketAddr {
 }
 
 
+fn update_batch_size(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
+    let batch_increment = 2;
+    if cur_time_micros < (max_time_micros - 3000) {
+        cur_batch + batch_increment
+    } else if cur_time_micros < max_time_micros {
+        cur_batch
+    } else {
+        cur_batch / 2
+    }
+}
 
 fn feature_worker(name: String,
                   rx: mpsc::Receiver<FeatureReq>,
@@ -161,6 +170,7 @@ fn feature_worker(name: String,
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();
     let max_batch_size = batch_size;
+    let mut cur_batch_size = 1;
     // let mut bench_latencies = Vec::new();
     // let mut loop_counter = 0;
     // let mut epoch_start = time::PreciseTime::now();
@@ -172,6 +182,7 @@ fn feature_worker(name: String,
         let first_req = rx.recv().unwrap();
         batch.push(first_req);
         let start_time = time::PreciseTime::now();
+        // while batch.len() < cur_batch_size {
         while batch.len() < max_batch_size {
             if let Ok(req) = rx.try_recv() {
                 // let req_latency = req.req_start_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
@@ -202,6 +213,14 @@ fn feature_worker(name: String,
         let latency = start_time.to(end_time).num_microseconds().unwrap();
         let max_req_latency = batch.first().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
         let min_req_latency = batch.last().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
+        if latency > 20*1000 {
+            println!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
+        }
+        // only try to increase the batch size if we actually sent a batch of maximum size
+        if batch.len() == cur_batch_size {
+            cur_batch_size = update_batch_size(cur_batch_size, latency as u64, 20*1000);
+            println!("{} updated batch size to {}", name, cur_batch_size);
+        }
 
         let mut l = latencies.write().unwrap();
         l.push(latency);
@@ -382,9 +401,6 @@ pub fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();
     rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
 }
-
-
-
 
 
 
