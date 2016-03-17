@@ -118,7 +118,7 @@ class SparkSVMServer:
             # TODO is making an RDD faster? probably not
             preds.append(float(self.model.predict(i)))
         end = datetime.datetime.now()
-        # print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
+        print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
         preds = np.array(preds)
         # assert preds.dtype == np.dtype('float64')
         return np.array(preds)
