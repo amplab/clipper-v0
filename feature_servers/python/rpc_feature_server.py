@@ -171,6 +171,24 @@ class SklearnServer:
         assert preds.dtype == np.dtype('float64')
         return preds
 
+class NoopServer:
+    def __init__(self):
+        print("started noop\n")
+
+    def compute_features(self, inputs):
+        # start = datetime.datetime.now()
+        # pred = self.model.predict(np.array(inputs).reshape(1, -1))[0]
+        # if len(inputs) == 1:
+        #     self.model.predict(np.array(inputs).reshape(1, -1))
+        # else:
+        # preds = self.model.predict(np.array(inputs))
+        # end = datetime.datetime.now()
+        # print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
+
+        preds = np.ones(len(inputs))
+        # assert preds.dtype == np.dtype('float64')
+        return preds
+
 
 def parse_args():
     parser = argparse.ArgumentParser(usage='''Runs the server''')
@@ -192,6 +210,10 @@ def start_svm_from_mp(mp, ip, port):
     model = SparkSVMServer(mp)
     start_server(model, ip, port)
 
+def start_noop_from_mp(ip, port):
+    model = NoopServer()
+    start_server(model, ip, port)
+
 
 def main():
     args = parse_args()
@@ -206,6 +228,8 @@ def main():
         model = SparkSVMServer(model_path)
     elif args.framework == "sklearn":
         model = SklearnServer(model_path)
+    elif args.framework == "noop":
+        model = NoopServer()
     else:
         print("%s is unsupported framework" % args.framework)
         sys.exit(1)
