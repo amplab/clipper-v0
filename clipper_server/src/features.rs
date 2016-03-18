@@ -101,7 +101,8 @@ pub fn feature_batch_latency(batch_size: usize) {
     let hand = handles.pop().unwrap();
 
     let mut rng = thread_rng();
-    let num_reqs = 1000000;
+    let num_trials = 10000;
+    let num_reqs = num_trials * batch_size;
     for i in 0..num_reqs {
         let example_idx: usize = rng.gen_range(0, all_test_data.xs.len());
         let input = (*all_test_data.xs[example_idx]).clone();
@@ -112,6 +113,22 @@ pub fn feature_batch_latency(batch_size: usize) {
         };
         feat.queue.send(req).unwrap();
     }
+
+    thread::sleep(::std::time::Duration::new(20, 0));
+
+    let l = feat.latencies.read().unwrap();
+    let mut avg_t: f64 = 0.0;
+    let mut avg_l: f64 = 0.0;
+    for i in l.iter() {
+        avg_t += (batch_size as f64) / (*i as f64) * 1000.0 * 1000.0;
+        avg_l += *i as f64 / 1000.0;
+    }
+    println!("batch size: {}, trials: {}, average thruput (pred/s): {}, average lat (ms): {}",
+            batch_size,
+             l.len(),
+             avg_t / (l.len() as f64),
+             avg_l / (l.len() as f64));
+
     hand.join().unwrap();
 }
 
