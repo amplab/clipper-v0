@@ -16,6 +16,7 @@ use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
+use toml;
 use linear_models::linalg;
 use digits;
 use std::hash::{Hash, SipHasher, Hasher};
@@ -36,15 +37,17 @@ pub struct FeatureReq {
 pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
     // addr: SocketAddr,
     pub name: String,
-    pub queue: mpsc::Sender<FeatureReq>,
     // TODO: need a better concurrent hashmap: preferable lock free wait free
     // This should actually be reasonably simple, because we don't need to resize
     // (fixed size cache) and things never get evicted. Neither of these is strictly
     // true but it's a good approximation for now.
     pub cache: Arc<RwLock<HashMap<HashKey, f64>>>,
     pub hasher: Arc<H>,
-    pub latencies: Arc<RwLock<Vec<i64>>>
+    pub latencies: Arc<RwLock<Vec<i64>>>,
+    queues: Vec<mpsc::Sender<FeatureReq>>,
+    next_instance: Arc<AtomicUsize>,
     // thread_handle: ::std::thread::JoinHandle<()>,
+
 }
 
 
@@ -93,7 +96,7 @@ pub fn feature_batch_latency(batch_size: usize) {
     let names = vec!["pyspark-svm".to_string()];
     let (mut features, mut handles): (Vec<_>, Vec<_>) = addr_vec.into_iter().map(|a| get_addr(a))
                     .zip(names.into_iter())
-                    .map(|(a, n)| create_feature_worker(n, a, batch_size))
+                    .map(|(a, n)| create_feature_worker(n, vec![a], batch_size))
                     .unzip();
 
     assert!(features.len() == 1);
@@ -111,7 +114,7 @@ pub fn feature_batch_latency(batch_size: usize) {
             input: input,
             req_start_time: time::PreciseTime::now(),
         };
-        feat.queue.send(req).unwrap();
+        feat.request_feature(req);
     }
 
     thread::sleep(::std::time::Duration::new(20, 0));
@@ -129,38 +132,62 @@ pub fn feature_batch_latency(batch_size: usize) {
              avg_t / (l.len() as f64),
              avg_l / (l.len() as f64));
 
-    hand.join().unwrap();
+    for h in hand.into_iter() {
+        h.join().unwrap();
+    }
+    // hand.pop().unwrap().join().unwrap();
 }
 
+impl<H: FeatureHash + Send + Sync> FeatureHandle<H> {
+    pub fn request_feature(&self, req: FeatureReq) {
+        let inst = self.next_instance.fetch_add(1, Ordering::Relaxed) % self.queues.len();
+        self.queues[inst].send(req).unwrap();
+    }
+}
 
-pub fn create_feature_worker(name: String, addr: SocketAddr,
+pub fn create_feature_worker(name: String, addrs: Vec<SocketAddr>,
                              batch_size: usize)
-    -> (FeatureHandle<SimpleHasher>, ::std::thread::JoinHandle<()>) {
+    -> (FeatureHandle<SimpleHasher>, Vec<::std::thread::JoinHandle<()>>) {
 
-    let (tx, rx) = mpsc::channel();
 
     let feature_cache: Arc<RwLock<HashMap<HashKey, f64>>> = Arc::new(RwLock::new(HashMap::new()));
     let latencies: Arc<RwLock<Vec<i64>>> = Arc::new(RwLock::new(Vec::new()));
-    let handle = {
-        let thread_cache = feature_cache.clone();
-        let latencies = latencies.clone();
-        let name = name.clone();
-        thread::spawn(move || {
-            feature_worker(name, rx, thread_cache, addr, latencies, batch_size);
-        })
-    };
+    let mut handles = Vec::new();
+    let mut queues = Vec::new();
+    for a in addrs.iter() {
+        let (tx, rx) = mpsc::channel();
+        queues.push(tx);
+        let handle = {
+            // cache is shared
+            let thread_cache = feature_cache.clone();
+            // latency tracking is shared
+            let latencies = latencies.clone();
+            let name = name.clone();
+            let addr = a.clone();
+            thread::spawn(move || {
+                feature_worker(name, rx, thread_cache, addr, latencies, batch_size);
+            })
+        };
+        handles.push(handle);
+    }
     (FeatureHandle {
         name: name.clone(),
-        queue: tx,
+        queues: queues,
         cache: feature_cache,
         hasher: Arc::new(SimpleHasher),
-        latencies: latencies
+        latencies: latencies,
+        next_instance: Arc::new(AtomicUsize::new(0)),
         // thread_handle: handle,
-    }, handle)
+    }, handles)
 }
 
 pub fn get_addr(a: String) -> SocketAddr {
     a.to_socket_addrs().unwrap().next().unwrap()
+}
+
+pub fn get_addrs(addrs: Vec<toml::Value>) -> Vec<SocketAddr> {
+    addrs.into_iter().map(|a| get_addr(a.as_str().unwrap().to_string())).collect::<Vec<_>>()
+    // a.to_socket_addrs().unwrap().next().unwrap()
 }
 
 

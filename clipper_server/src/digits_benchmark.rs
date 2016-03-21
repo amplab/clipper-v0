@@ -33,7 +33,7 @@ pub struct DigitsBenchConfig {
 }
 
 
-pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
+pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
            dc: DigitsBenchConfig) {
 
     println!("starting digits");
@@ -66,7 +66,6 @@ pub fn run(feature_addrs: Vec<(String, SocketAddr)>,
     for f in features.iter() {
         let mut w = f.cache.write().unwrap();
         w.clear();
-
     }
 
     let num_workers = dc.num_workers;

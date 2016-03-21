@@ -281,7 +281,7 @@ fn init_user_models(num_users: usize, num_features: usize)
 
 
 
-pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
+pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
     // let addr_vec = vec!["127.0.0.1:6001".to_string()];
     // let names = vec!["sklearn".to_string()];
     // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
@@ -343,7 +343,9 @@ pub fn main(feature_addrs: Vec<(String, SocketAddr)>) {
     println!("waiting for features to finish");
     mon_thread_join_handle.join().unwrap();
     for h in handles {
-        h.join().unwrap();
+        for th in h {
+            th.join().unwrap();
+        }
     }
     // handle.join().unwrap();
     println!("done");
@@ -367,12 +369,8 @@ pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
             input: input.clone(),
             req_start_time: req_start.clone()
         };
-        f.queue.send(req).unwrap();
+        f.request_feature(req);
     }
-    // for f in fs {
-    //     let h = f.hasher.hash(&input);
-    //     f.queue.send((h, input.clone())).unwrap();
-    // }
 }
 
 fn launch_monitor_thread(counter: Arc<AtomicUsize>,
