@@ -113,7 +113,7 @@ pub fn main() {
     // println!("usage: {} [client | server] ADDRESS", args[0]);
 }
 
-fn parse_feature_config(fname: &String) -> Vec<(String, SocketAddr)> {
+fn parse_feature_config(fname: &String) -> Vec<(String, Vec<SocketAddr>)> {
     
     let path = Path::new(fname);
     let display = path.display();
@@ -136,7 +136,7 @@ fn parse_feature_config(fname: &String) -> Vec<(String, SocketAddr)> {
     let features = toml::Parser::new(&toml_string).parse().unwrap();
     let fs = features.get("features").unwrap()
                      .as_table().unwrap().iter()
-                     .map(|(k, v)| (k.clone(), features::get_addr(v.as_str().unwrap().to_string())))
+                     .map(|(k, v)| (k.clone(), features::get_addrs(v.as_slice().unwrap().to_vec())))
                      .collect::<Vec<_>>();
     println!("{:?}", fs);
     fs
