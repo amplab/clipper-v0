@@ -91,12 +91,14 @@ impl FeatureHash for SimpleHasher {
 pub fn feature_batch_latency(batch_size: usize) {
     let mnist_path = "/crankshaw-local/mnist/data/test.data".to_string();
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
-
-    let addr_vec = vec!["127.0.0.1:6001".to_string()];
+    let addr_vec = vec![vec!["127.0.0.1:6001".to_string(),
+                             // "127.0.0.1:7001".to_string(),
+                             // "127.0.0.1:8001".to_string(),
+                                 ]];
     let names = vec!["pyspark-svm".to_string()];
-    let (mut features, mut handles): (Vec<_>, Vec<_>) = addr_vec.into_iter().map(|a| get_addr(a))
+    let (mut features, mut handles): (Vec<_>, Vec<_>) = addr_vec.into_iter().map(|a| get_addrs_str(a))
                     .zip(names.into_iter())
-                    .map(|(a, n)| create_feature_worker(n, vec![a], batch_size))
+                    .map(|(a, n)| create_feature_worker(n, a, batch_size))
                     .unzip();
 
     assert!(features.len() == 1);
@@ -126,7 +128,8 @@ pub fn feature_batch_latency(batch_size: usize) {
         avg_t += (batch_size as f64) / (*i as f64) * 1000.0 * 1000.0;
         avg_l += *i as f64 / 1000.0;
     }
-    println!("batch size: {}, trials: {}, average thruput (pred/s): {}, average lat (ms): {}",
+    println!("replicas: {}, batch size: {}, trials: {}, average thruput (pred/s): {}, average lat (ms): {}",
+            hand.len(),
             batch_size,
              l.len(),
              avg_t / (l.len() as f64),
@@ -140,7 +143,8 @@ pub fn feature_batch_latency(batch_size: usize) {
 
 impl<H: FeatureHash + Send + Sync> FeatureHandle<H> {
     pub fn request_feature(&self, req: FeatureReq) {
-        let inst = self.next_instance.fetch_add(1, Ordering::Relaxed) % self.queues.len();
+        // let inst = self.next_instance.fetch_add(1, Ordering::Relaxed) % self.queues.len();
+        let inst = req.hash_key as usize % self.queues.len();
         self.queues[inst].send(req).unwrap();
     }
 }
@@ -170,6 +174,7 @@ pub fn create_feature_worker(name: String, addrs: Vec<SocketAddr>,
         };
         handles.push(handle);
     }
+    println!("Creating feature worker with {} replicas", queues.len());
     (FeatureHandle {
         name: name.clone(),
         queues: queues,
@@ -187,6 +192,11 @@ pub fn get_addr(a: String) -> SocketAddr {
 
 pub fn get_addrs(addrs: Vec<toml::Value>) -> Vec<SocketAddr> {
     addrs.into_iter().map(|a| get_addr(a.as_str().unwrap().to_string())).collect::<Vec<_>>()
+    // a.to_socket_addrs().unwrap().next().unwrap()
+}
+
+pub fn get_addrs_str(addrs: Vec<String>) -> Vec<SocketAddr> {
+    addrs.into_iter().map(|a| get_addr(a)).collect::<Vec<_>>()
     // a.to_socket_addrs().unwrap().next().unwrap()
 }
 

@@ -77,10 +77,13 @@ def start_feature(mp, ip, port):
 
 def start_features():
     procs = []
-    for i in range(1,11):
+    # for i in range(1,11):
+    for i in range(1,3):
         mp = ("/crankshaw-local/clipper/feature_servers/"
               "python/spark_models/svm_predict_%d" % i)
         procs.append(start_feature(mp, "127.0.0.1", (6000 + i)))
+        procs.append(start_feature(mp, "127.0.0.1", (7000 + i)))
+        procs.append(start_feature(mp, "127.0.0.1", (8000 + i)))
     done = False
     time.sleep(10)
     # make sure they all started. Sometimes a socket is still bound, so
@@ -122,7 +125,7 @@ def run_exp(toml, qps):
         # (output, err) = clipper_proc.communicate(timeout=100)
                                               # timeout=100)
 
-        clipper_out, clipper_err = clipper_proc.communicate(timeout=200)
+        clipper_out, clipper_err = clipper_proc.communicate(timeout=150)
     except subprocess.TimeoutExpired:
         clipper_proc.kill()
         clipper_out, clipper_err = clipper_proc.communicate()
@@ -150,6 +153,14 @@ def run_exp(toml, qps):
 
     
 if __name__=="__main__":
+
+    q = 10000
+    print("\n\nEXPERIMENT RUN QPS: %d" % q)
+    out = run_exp(toml_str_baseline, q)
+    print(out)
+    exit(0)
+    
+
 
     # first do baseline experiments
     out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/end_to_end_THRUPUT/baseline.txt")

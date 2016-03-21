@@ -8,8 +8,8 @@ import datetime
 import sys
 import os
 import findspark
-# findspark.init('/crankshaw-local/spark-1.6.0-bin-hadoop2.4')
-findspark.init()
+findspark.init('/crankshaw-local/spark-1.6.0-bin-hadoop2.4')
+# findspark.init()
 
 import pyspark
 from pyspark import SparkConf, SparkContext
@@ -118,7 +118,7 @@ class SparkSVMServer:
             # TODO is making an RDD faster? probably not
             preds.append(float(self.model.predict(i)))
         end = datetime.datetime.now()
-        print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
+        # print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
         preds = np.array(preds)
         # assert preds.dtype == np.dtype('float64')
         return np.array(preds)
@@ -167,7 +167,7 @@ class SklearnServer:
         # else:
         preds = self.model.predict(np.array(inputs))
         end = datetime.datetime.now()
-        print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
+        # print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
         assert preds.dtype == np.dtype('float64')
         return preds
 
@@ -210,7 +210,11 @@ def start_svm_from_mp(mp, ip, port):
     model = SparkSVMServer(mp)
     start_server(model, ip, port)
 
-def start_noop_from_mp(ip, port):
+def start_sksvm_from_mp(mp, ip, port):
+    model = SklearnServer(mp)
+    start_server(model, ip, port)
+
+def start_noop(ip, port):
     model = NoopServer()
     start_server(model, ip, port)
 
