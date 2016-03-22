@@ -31,6 +31,9 @@ use std::io::{BufReader, BufWriter};
 // use getopts::Options;
 use std::env;
 use std::net::{ToSocketAddrs, SocketAddr};
+#[macro_use]
+extern crate log;
+extern crate env_logger;
 
 // pub mod feature_capnp {
 //   include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));
@@ -42,7 +45,10 @@ pub mod digits;
 // pub mod bench;
 pub mod features;
 pub mod digits_benchmark;
+pub mod faas_benchmark;
+pub mod metrics;
 // pub mod rpc;
+
 
 
 const USAGE: &'static str = "
@@ -76,20 +82,21 @@ struct Args {
 
 pub fn main() {
 
+  env_logger::init().unwrap();
+
     let args: Args = Docopt::new(USAGE)
                             .and_then(|d| d.decode())
                             .unwrap_or_else(|e| e.exit());
 
-    println!("{:?}", args);
+    info!("{:?}", args);
 
     // let features = parse_feature_config(&"features.toml".to_string());
     if args.cmd_digits {
-      let features = parse_feature_config(&args.flag_feature_conf);
-      let digits_conf = parse_digits_config(&args.flag_bench_conf.unwrap());
-      digits_benchmark::run(features, digits_conf);
+        let features = parse_feature_config(&args.flag_feature_conf);
+        let digits_conf = parse_digits_config(&args.flag_bench_conf.unwrap());
+        digits_benchmark::run(features, digits_conf);
     } else if args.cmd_featurelats {
-        features::feature_batch_latency(args.arg_b.unwrap());
-        // println!("unimplemented");
+        faas_benchmark::feature_batch_latency(args.arg_b.unwrap());
     } else if args.cmd_start {
         let features = parse_feature_config(&args.flag_feature_conf);
         server::main(features);
@@ -138,7 +145,7 @@ fn parse_feature_config(fname: &String) -> Vec<(String, Vec<SocketAddr>)> {
                      .as_table().unwrap().iter()
                      .map(|(k, v)| (k.clone(), features::get_addrs(v.as_slice().unwrap().to_vec())))
                      .collect::<Vec<_>>();
-    println!("{:?}", fs);
+    info!("{:?}", fs);
     fs
 }
 

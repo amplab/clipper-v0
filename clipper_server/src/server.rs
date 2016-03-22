@@ -1,15 +1,10 @@
-#![allow(unused_variables)]
-// #![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unused_mut)]
+// #![allow(unused_variables)]
+// #![allow(dead_code)]
+// #![allow(unused_mut)]
 
-// use gj;
-// use gj::{EventLoop, Promise};
-// use capnp;
 use time;
-// use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
+use log;
 use std::net::{ToSocketAddrs, SocketAddr};
-// use feature_capnp::feature;
 use std::thread;
 use std::sync::{mpsc, RwLock, Arc};
 use std::collections::HashMap;
@@ -19,20 +14,10 @@ use num_cpus;
 use linear_models::linalg;
 use digits;
 use features;
+use metrics;
 use features::FeatureHash;
 
 pub const SLA: i64 = 20;
-
-
-
-// fn anytime_features(features: &Vec<features::FeatureHandle>, input: &Vec<f64>) -> Vec<f64> {
-//     // TODO check caches
-//     // for f in features {
-//     //     f.cache.read()
-//     // }
-//     vec![-3.2, 5.1]
-// }
-
 
 pub struct Request {
     start_time: time::PreciseTime,
@@ -132,15 +117,12 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                            sla_millis: i64,
                            feature_handles: Vec<features::FeatureHandle<H>>,
                            user_models: Arc<Vec<RwLock<T>>>,
-                           correct_counter: Arc<AtomicUsize>,
-                           total_counter: Arc<AtomicUsize>, // tracks total number of requests WITH LABELS processed
-                           processed_counter: Arc<AtomicUsize>, // tracks total number of requests processed
-                           cum_latency_tracker_micros: Arc<AtomicUsize>, // find mean by doing cum_latency_tracker/processed_counter
-                           max_latency_tracker_micros: Arc<AtomicUsize>,
-                           all_latencies_tracker: Arc<RwLock<Vec<i64>>>,
+                           pred_metrics: PredictionMetrics
                            ) -> mpsc::Sender<Request> 
                            where T: TaskModel + Send + Sync + 'static,
                                  H: features::FeatureHash + Send + Sync + 'static {
+
+
 
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(sla_millis / 5);
@@ -154,11 +136,10 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             if elapsed_time < sla - epsilon {
                 let sleep_time = ::std::time::Duration::new(
                     0, (sla - elapsed_time).num_nanoseconds().unwrap() as u32);
-                // println!("sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+                info!("prediciton worker sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
                 thread::sleep(sleep_time);
             }
-            // TODO: actually compute prediction
-            // return result
+            // TODO: actually do something with the result
             let pred_loop_start = time::PreciseTime::now();
             debug_assert!(req.user < user_models.len() as u32);
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
@@ -166,28 +147,18 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             let pred = make_prediction(&feature_handles, &req.input, task_model, req.req_number);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_microseconds().unwrap();
-            // This isn't consistent (max latency can change between the two calls,
-            // but it doesn't if max_latency is totally consistent
-            if latency > max_latency_tracker_micros.load(Ordering::Relaxed) as i64 {
-                max_latency_tracker_micros.store(latency as usize, Ordering::Relaxed);
-            }
-            cum_latency_tracker_micros.fetch_add(latency as usize, Ordering::Relaxed);
-            let mut lock = (&all_latencies_tracker).write().unwrap();
-            lock.push(latency);
-            // println!("prediction latency: {} ms", latency);
-            processed_counter.fetch_add(1, Ordering::Relaxed);
+            pred_metrics.latency_hist.insert(latency);
+            pred_metrics.thruput_metric.mark(1);
+            pred_metrics.pred_counter.incr(1);
             if req.true_label.is_some() {
-                total_counter.fetch_add(1, Ordering::Relaxed);
                 if req.true_label.unwrap() == pred {
-                    correct_counter.fetch_add(1, Ordering::Relaxed);
+                    pred_metrics.accuracy_counter.incr(1, 1);
+                } else {
+                    pred_metrics.accuracy_counter.incr(0, 1);
                 }
             }
-            let pred_loop_end = time::PreciseTime::now();
-            let pred_loop_latency = pred_loop_start.to(pred_loop_end).num_microseconds().unwrap() as f64;
-            // println!("pred LOOP latency: {} (ms)", pred_loop_latency / 1000.0);
         }
     });
-    // (join_guard, sender)
     sender
 }
 
@@ -200,6 +171,47 @@ pub struct Dispatcher<T: TaskModel + Send + Sync + 'static> {
     user_models: Arc<Vec<RwLock<T>>>,
 }
 
+struct PredictionMetrics {
+    latency_hist: Arc<metrics::Histogram>,
+    pred_counter: Arc<metrics::Counter>,
+    thruput_meter: Arc<metrics::Meter>,
+    accuracy_counter: Arc<metrics::RatioCounter>
+}
+
+impl PredictionMetrics {
+
+    pub fn new(metrics_register: Arc<RwLock<metrics::Registry>>) -> PredictionMetrics {
+
+        let accuracy_counter = {
+            let acc_counter_name = format!("prediction accuracy ratio");
+            metrics_register.write().unwrap().create_ratio_counter(acc_counter_name)
+        };
+        
+        let pred_counter = {
+            let counter_name = format!("prediction_counter");
+            metrics_register.write().unwrap().create_counter(counter_name)
+        };
+
+        let latency_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("prediction_latency", name);
+            metric_register.write().unwrap().create_histogram(metric_name, 2056)
+        };
+
+        let thruput_meter: Arc<metrics::Meter> = {
+            let metric_name = format!("prediction_thruput", name);
+            metric_register.write().unwrap().create_histogram(metric_name)
+        };
+
+        PredictionMetrics {
+            latency_hist: latency_hist,
+            pred_counter: pred_counter,
+            thruput_meter: thruput_meter,
+            accuracy_counter: accuracy_counter
+        }
+    }
+
+}
+
 impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
 
     // pub fn new<T: TaskModel + Send + Sync + 'static>(num_workers: usize,
@@ -207,27 +219,19 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
            sla_millis: i64,
            feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
            user_models: Arc<Vec<RwLock<T>>>,
-           correct_counter: Arc<AtomicUsize>,
-           total_counter: Arc<AtomicUsize>,
-           processed_counter: Arc<AtomicUsize>,
-           cum_latency_tracker_micros: Arc<AtomicUsize>, // find mean by doing cum_latency_tracker/processed_counter
-           max_latency_tracker_micros: Arc<AtomicUsize>,
-           all_latencies_trackers: Vec<Arc<RwLock<Vec<i64>>>>,
+           metrics_register: Arc<RwLock<metrics::Registry>>
            ) -> Dispatcher<T> {
         println!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
         assert!(all_latencies_trackers.len() == num_workers);
+        let pred_metrics = PredictionMetrics::new(metrics_register.clone());
+
         for i in 0..num_workers {
             let worker = start_prediction_worker(i as i32,
                                                  sla_millis,
                                                  feature_handles.clone(),
                                                  user_models.clone(),
-                                                 correct_counter.clone(),
-                                                 total_counter.clone(),
-                                                 processed_counter.clone(),
-                                                 cum_latency_tracker_micros.clone(),
-                                                 max_latency_tracker_micros.clone(),
-                                                 all_latencies_trackers[i].clone());
+                                                 pred_metrics.clone());
             worker_threads.push(worker);
         }
         Dispatcher {
@@ -282,12 +286,9 @@ fn init_user_models(num_users: usize, num_features: usize)
 
 
 pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
-    // let addr_vec = vec!["127.0.0.1:6001".to_string()];
-    // let names = vec!["sklearn".to_string()];
-    // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
-    // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
     let num_features = feature_addrs.len();
     let num_users = 500;
+    let mut metrics_register = Arc::new(RwLock::new(metrics::Registry::new("server main")));
     // let test_data_path = "/crankshaw-local/mnist/data/test.data";
     // let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
     // let norm_test_data = digits::normalize(&all_test_data);
@@ -300,8 +301,8 @@ pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
     //                                                     .map(|(a, n)| create_feature_worker(a, n))
     //                                                     .unzip();
     let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
-                              .map(|(n, a)| features::create_feature_worker(n, a, 100))
-                              .unzip();
+                              .map(|(n, a)| features::create_feature_worker(
+                                      n, a, 100, metrics_register.clone())).unzip();
 
 
     let correct_counter = Arc::new(AtomicUsize::new(0));
@@ -320,17 +321,11 @@ pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
                                          SLA,
                                          features.clone(),
                                          init_user_models(num_users, num_features),
-                                         correct_counter.clone(),
-                                         total_counter.clone(),
-                                         processed_counter.clone(),
-                                         cum_latency_tracker_micros.clone(),
-                                         max_latency_tracker_micros.clone(),
-                                         all_latencies_trackers
-                                         );
+                                         metrics_register.clone());
 
     // create monitoring thread to check incremental thruput
     thread::sleep(::std::time::Duration::new(3, 0));
-    let mon_thread_join_handle = launch_monitor_thread(processed_counter.clone(), num_events);
+    let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone());
 
     let num_features = features.len();
     println!("sending batch with no delays");
@@ -373,8 +368,8 @@ pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
     }
 }
 
-fn launch_monitor_thread(counter: Arc<AtomicUsize>,
-                             num_events: i32) -> ::std::thread::JoinHandle<()> {
+fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>)
+    -> ::std::thread::JoinHandle<()> {
 
     // let counter = counter.clone();
     thread::spawn(move || {
@@ -383,12 +378,7 @@ fn launch_monitor_thread(counter: Arc<AtomicUsize>,
         let mut last_time = bench_start;
         loop {
             thread::sleep(::std::time::Duration::new(3, 0));
-            let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
-            let cur_count = counter.load(Ordering::Relaxed);
-            println!("processed {} events in {} seconds: {} preds/sec",
-                     cur_count - last_count,
-                     cur_time,
-                     ((cur_count - last_count) as f64 / cur_time));
+            info!(metrics_register.read().unwrap().report());
 
             if cur_count >= num_events as usize {
                 println!("BENCHMARK FINISHED");

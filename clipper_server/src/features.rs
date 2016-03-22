@@ -1,14 +1,6 @@
 
-// use gj;
-// use gj::{EventLoop, Promise};
-// use gj::io;
-// use capnp;
-// use std::time::{Duration, PreciseTime};
 use time;
-// use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
 use std::net::{ToSocketAddrs, SocketAddr, TcpStream};
-// use feature_capnp::feature;
-// use capnp::{primitive_list, message};
 use std::{thread, mem, slice};
 use std::sync::{RwLock, Arc};
 use std::sync::mpsc;
@@ -17,6 +9,7 @@ use rand::{thread_rng, Rng};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
 use toml;
+use server;
 use linear_models::linalg;
 use digits;
 use std::hash::{Hash, SipHasher, Hasher};
@@ -24,6 +17,7 @@ use std::io::{Read, Write};
 // use std::net::{self};
 use net2::{TcpBuilder, TcpStreamExt};
 use byteorder::{LittleEndian, WriteBytesExt};
+use metrics;
 
 pub type HashKey = u64;
 
@@ -43,7 +37,7 @@ pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
     // true but it's a good approximation for now.
     pub cache: Arc<RwLock<HashMap<HashKey, f64>>>,
     pub hasher: Arc<H>,
-    pub latencies: Arc<RwLock<Vec<i64>>>,
+    // pub latencies: Arc<RwLock<Vec<i64>>>,
     queues: Vec<mpsc::Sender<FeatureReq>>,
     next_instance: Arc<AtomicUsize>,
     // thread_handle: ::std::thread::JoinHandle<()>,
@@ -88,58 +82,6 @@ impl FeatureHash for SimpleHasher {
 // }
 
 
-pub fn feature_batch_latency(batch_size: usize) {
-    let mnist_path = "/crankshaw-local/mnist/data/test.data".to_string();
-    let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
-    let addr_vec = vec![vec!["127.0.0.1:6001".to_string(),
-                             // "127.0.0.1:7001".to_string(),
-                             // "127.0.0.1:8001".to_string(),
-                                 ]];
-    let names = vec!["pyspark-svm".to_string()];
-    let (mut features, mut handles): (Vec<_>, Vec<_>) = addr_vec.into_iter().map(|a| get_addrs_str(a))
-                    .zip(names.into_iter())
-                    .map(|(a, n)| create_feature_worker(n, a, batch_size))
-                    .unzip();
-
-    assert!(features.len() == 1);
-    let feat = features.pop().unwrap();
-    let hand = handles.pop().unwrap();
-
-    let mut rng = thread_rng();
-    let num_trials = 10000;
-    let num_reqs = num_trials * batch_size;
-    for i in 0..num_reqs {
-        let example_idx: usize = rng.gen_range(0, all_test_data.xs.len());
-        let input = (*all_test_data.xs[example_idx]).clone();
-        let req = FeatureReq {
-            hash_key: 11,
-            input: input,
-            req_start_time: time::PreciseTime::now(),
-        };
-        feat.request_feature(req);
-    }
-
-    thread::sleep(::std::time::Duration::new(20, 0));
-
-    let l = feat.latencies.read().unwrap();
-    let mut avg_t: f64 = 0.0;
-    let mut avg_l: f64 = 0.0;
-    for i in l.iter() {
-        avg_t += (batch_size as f64) / (*i as f64) * 1000.0 * 1000.0;
-        avg_l += *i as f64 / 1000.0;
-    }
-    println!("replicas: {}, batch size: {}, trials: {}, average thruput (pred/s): {}, average lat (ms): {}",
-            hand.len(),
-            batch_size,
-             l.len(),
-             avg_t / (l.len() as f64),
-             avg_l / (l.len() as f64));
-
-    for h in hand.into_iter() {
-        h.join().unwrap();
-    }
-    // hand.pop().unwrap().join().unwrap();
-}
 
 impl<H: FeatureHash + Send + Sync> FeatureHandle<H> {
     pub fn request_feature(&self, req: FeatureReq) {
@@ -149,13 +91,24 @@ impl<H: FeatureHash + Send + Sync> FeatureHandle<H> {
     }
 }
 
-pub fn create_feature_worker(name: String, addrs: Vec<SocketAddr>,
-                             batch_size: usize)
+pub fn create_feature_worker(name: String,
+                             addrs: Vec<SocketAddr>,
+                             batch_size: usize,
+                             metric_register: Arc<RwLock<metrics::MetricsRegister>>)
     -> (FeatureHandle<SimpleHasher>, Vec<::std::thread::JoinHandle<()>>) {
 
+    let latency_hist: Arc<metrics::Histogram> = {
+        let metric_name = format!("{}_faas_latency", name);
+        metric_register.write().unwrap().create_histogram(metric_name, 2056)
+    };
+
+    let thruput_metric: Arc<metrics::Meter> = {
+        let metric_name = format!("{}_faas_thruput", name);
+        metric_register.write().unwrap().create_histogram(metric_name)
+    };
 
     let feature_cache: Arc<RwLock<HashMap<HashKey, f64>>> = Arc::new(RwLock::new(HashMap::new()));
-    let latencies: Arc<RwLock<Vec<i64>>> = Arc::new(RwLock::new(Vec::new()));
+    // let latencies: Arc<RwLock<Vec<i64>>> = Arc::new(RwLock::new(Vec::new()));
     let mut handles = Vec::new();
     let mut queues = Vec::new();
     for a in addrs.iter() {
@@ -216,7 +169,8 @@ fn feature_worker(name: String,
                   rx: mpsc::Receiver<FeatureReq>,
                   cache: Arc<RwLock<HashMap<HashKey, f64>>>,
                   address: SocketAddr,
-                  latencies: Arc<RwLock<Vec<i64>>>,
+                  latency_metric: Arc<metrics::Histogram>,
+                  thruput_metric: Arc<metrics::Meter>,
                   batch_size: usize) {
 
     // println!("starting worker: {}", name);
@@ -265,10 +219,10 @@ fn feature_worker(name: String,
         let response_floats = bytes_to_floats(&response_buffer);
         let end_time = time::PreciseTime::now();
         let latency = start_time.to(end_time).num_microseconds().unwrap();
-        let max_req_latency = batch.first().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
-        let min_req_latency = batch.last().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
-        if latency > 20*1000 {
-            println!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
+        latency_hist.insert(latency);
+        thruput_metric.mark(batch.len());
+        if latency > server::SLA*1000 {
+            info!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
         }
         // only try to increase the batch size if we actually sent a batch of maximum size
         if batch.len() == cur_batch_size {
@@ -276,8 +230,8 @@ fn feature_worker(name: String,
             println!("{} updated batch size to {}", name, cur_batch_size);
         }
 
-        let mut l = latencies.write().unwrap();
-        l.push(latency);
+        // let mut l = latencies.write().unwrap();
+        // l.push(latency);
         let mut w = cache.write().unwrap();
         for r in 0..batch.len() {
             let hash = batch[r].hash_key;
@@ -294,6 +248,9 @@ fn feature_worker(name: String,
                 // }
             }
         }
+
+        // let max_req_latency = batch.first().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
+        // let min_req_latency = batch.last().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
         // let loop_end_time = time::PreciseTime::now();
         // let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap() as f64 / 1000.0;
         // bench_latencies.push(loop_latency);
@@ -346,15 +303,6 @@ fn floats_to_bytes<'a>(v: Vec<f64>) -> &'a [u8] {
     byte_arr
 }
 
-// fn ints_to_bytes<'a>(v: Vec<u32>) -> &'a [u8] {
-//     let byte_arr: &[u8] = unsafe {
-//         let int_ptr: *const u32 = v[..].as_ptr();
-//         let num_elems = v.len()*mem::size_of::<u32>();
-//         slice::from_raw_parts(int_ptr as *const u8, num_elems)
-//     };
-//     byte_arr
-// }
-
 fn bytes_to_floats(bytes: &[u8]) -> &[f64] {
     let float_arr: &[f64] = unsafe {
         let byte_ptr: *const u8 = bytes.as_ptr();
@@ -364,92 +312,6 @@ fn bytes_to_floats(bytes: &[u8]) -> &[f64] {
     float_arr
 }
 
-
-
-
-
-// pub fn feature_lats_main(feature_addrs: Vec<(String, SocketAddr)>) {
-//
-//     // let addr_vec = vec!["127.0.0.1:6001".to_string(), "127.0.0.1:6002".to_string(), "127.0.0.1:6003".to_string()];
-//     // let names = vec!["TEN_rf".to_string(), "HUNDRED_rf".to_string(), "FIVE_HUNDO_rf".to_string()];
-//     // let addr_vec = (1..11).map(|i| format!("127.0.0.1:600{}", i)).collect::<Vec<String>>();
-//     // let names = (1..11).map(|i| format!("Spark_predictor_{}", i)).collect::<Vec<String>>();
-//     // let addr_vec = vec!["169.229.49.167:6001".to_string()];
-//     // let names = vec!["CAFFE on c67 with GPU".to_string()];
-//     let num_features = feature_addrs.len();
-//     let handles: Vec<::std::thread::JoinHandle<()>> =
-//             feature_addrs.into_iter().map(|(n, a)| create_blocking_features(n, a)).collect();
-//
-//     for h in handles {
-//         h.join().unwrap();
-//     }
-//     // handle.join().unwrap();
-//     println!("done");
-// }
-//
-// fn create_blocking_features(name: String, address: SocketAddr)
-//                             -> ::std::thread::JoinHandle<()> {
-//     // let name = name.clone();
-//     println!("{}", name);
-//     thread::spawn(move || {
-//         blocking_feature_requests(name, address);
-//     })
-// }
-//
-// fn blocking_feature_requests(name: String, address: SocketAddr) {
-//
-//     let num_events = 5000;
-//     EventLoop::top_level(move |wait_scope| {
-//         let (reader, writer) = try!(::gj::io::tcp::Stream::connect(address).wait(wait_scope))
-//             .split();
-//         let network = Box::new(twoparty::VatNetwork::new(reader,
-//                                                          writer,
-//                                                          rpc_twoparty_capnp::Side::Client,
-//                                                          Default::default()));
-//         let mut rpc_system = RpcSystem::new(network, None);
-//         let feature_rpc: feature::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
-//         println!("rpc connection established");
-//         // feature_send_loop(name, feature_rpc, rx).lift()
-//
-//         for _ in 0..num_events {
-//
-//             let start_time = time::PreciseTime::now();
-//             let feature_vec = random_features(784);
-//
-//             // println!("sending {} reqs", new_features.len());
-//             // println!("sending request");
-//
-//             let mut request = feature_rpc.compute_feature_request();
-//             {
-//                 let mut builder = request.get();
-//                 let mut inp_entries = builder.init_inp(feature_vec.len() as u32);
-//                 for i in 0..feature_vec.len() {
-//                     inp_entries.set(i as u32, feature_vec[i]);
-//                 }
-//             }
-//
-//             // request.get().set_inp(message.get_root::<primitive_list::Builder>().as_reader());
-//             
-//             let name = name.clone();
-//             try!(request.send().promise.then(move |response| {
-//                 let res = pry!(response.get()).get_result();
-//                 // let result = response.get().unwrap().get_result();
-//                 let end_time = time::PreciseTime::now();
-//                 let latency = start_time.to(end_time).num_milliseconds();
-//                 println!("got response: {} from {} in {} ms, putting in cache",
-//                          res,
-//                          name,
-//                          latency);
-//                 // feature_send_loop(name, feature_rpc, rx)
-//                 Promise::ok(())
-//             }).wait(wait_scope));
-//             // thread::sleep(::std::time::Duration::new(1, 0));
-//         }
-//         println!("done with requests");
-//         Ok(())
-//     })
-//     .expect("top level error");
-// }
 
 pub fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();
