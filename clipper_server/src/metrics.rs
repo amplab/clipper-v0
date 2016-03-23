@@ -3,8 +3,10 @@ use time;
 use log;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
+use std::sync::{RwLock, Arc};
+use std::mem;
 
-const NUM_MICROS_PER_SEC: usize = 1_000_000;
+const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
 trait Reportable {
 
@@ -30,11 +32,11 @@ impl Counter {
     }
 
     pub fn incr(&self, increment: isize) {
-        self.count.fetch_add(increment);
+        self.count.fetch_add(increment, Ordering::Relaxed);
     }
 
     pub fn decr(&self, decrement: isize) {
-        self.count.fetch_sub(decrement);
+        self.count.fetch_sub(decrement, Ordering::Relaxed);
     }
 
     pub fn clear(&self) {
@@ -63,11 +65,11 @@ pub struct RatioCounter {
 
 impl RatioCounter {
 
-    pub fn new(name: String, n: usize, d: usize) -> Ratio {
-        Ratio {
+    pub fn new(name: String, n: usize, d: usize) -> RatioCounter {
+        RatioCounter {
             name: name,
-            numerator: n,
-            denominator: d
+            numerator: AtomicUsize::new(n),
+            denominator: AtomicUsize::new(d)
         }
     }
 
@@ -81,7 +83,7 @@ impl RatioCounter {
         let d = self.denominator.load(Ordering::Relaxed);
         if d == 0 {
             warn!("{} ratio denominator is 0", self.name);
-            f64::NAN
+            ::std::f64::NAN
         } else {
             n as f64 / d as f64
         }
@@ -126,31 +128,31 @@ impl Meter {
     fn get_rate_micros(&self) -> f64 {
         let cur_time = time::PreciseTime::now();
         let count = self.count.load(Ordering::SeqCst);
-        let dur = (cur_time - self.start_time.read().unwrap());
-        let whole_secs = Duration::seconds(dur.num_seconds());
+        let dur: time::Duration = self.start_time.read().unwrap().to(cur_time);
+        let whole_secs = time::Duration::seconds(dur.num_seconds());
         let sub_sec_micros = (dur - whole_secs).num_microseconds().unwrap();
         assert!(sub_sec_micros <= NUM_MICROS_PER_SEC);
-        let total_micros = whole_secs*NUM_MICROS_PER_SEC + sub_sec_micros;
-        let rate = (count as f64 / total_micros as f64);
+        let total_micros = whole_secs.num_seconds()*NUM_MICROS_PER_SEC + sub_sec_micros;
+        let rate = count as f64 / total_micros as f64;
         rate
     }
 
     /// Returns the rate of this meter in
     /// events per second.
     pub fn get_rate_secs(&self) -> f64 {
-        self.get_rate_micros() / NUM_MICROS_PER_SEC
+        self.get_rate_micros() / NUM_MICROS_PER_SEC as f64
     }
 
     pub fn clear(&self) {
-        let mut t = self.start_time.write().unwrap();
-        t = time::PreciseTime::now();
+        let mut t  = self.start_time.write().unwrap();
+        *t = time::PreciseTime::now();
         self.count.store(0, Ordering::SeqCst);
     }
 }
 
 pub struct HistStats {
-    min: f64,
-    max: f64,
+    min: i64,
+    max: i64,
     mean: f64,
     std: f64,
     p95: f64,
@@ -173,29 +175,29 @@ impl Histogram {
         }
     }
 
-    pub fn insert(&self, item: f64) {
+    pub fn insert(&self, item: i64) {
         let mut res = self.sample.write().unwrap();
         res.sample(item);
     }
 
     pub fn stats(&self) -> HistStats {
-        let mut snapshot = {
-            self.sample.read().unwrap().clone();
+        let mut snapshot: Vec<i64> = {
+            self.sample.read().unwrap().snapshot()
         };
         let sample_size = snapshot.len();
         assert!(sample_size > 0, "cannot compute stats of empty histogram");
         snapshot.sort();
-        let min = snapshot.first();
-        let max = snapshot.last();
+        let min = snapshot.first().unwrap();
+        let max = snapshot.last().unwrap();
         let p99 = Histogram::percentile(&snapshot, 99);
         let p95 = Histogram::percentile(&snapshot, 95);
         let p50 = Histogram::percentile(&snapshot, 50);
-        let mean = snapshot.iter().sum() / snapshot.len() as f64;
-        let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x - mean).powi(2));
+        let mean = snapshot.iter().fold(0, |acc, &x| acc + x) as f64 / snapshot.len() as f64;
+        let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
         var = var / (sample_size - 1) as f64;
         HistStats {
-            min: min,
-            max: max,
+            min: *min,
+            max: *max,
             mean: mean,
             std: var.sqrt(),
             p95: p95,
@@ -204,8 +206,9 @@ impl Histogram {
         }
     }
 
-    fn percentile(snapshot: &Vec<f64>, p: usize) -> f64 {
+    fn percentile(snapshot: &Vec<i64>, p: usize) -> f64 {
         assert!(p >= 0 && p <= 100, "must supply a percentile between 0 and 100");
+        let sample_size = snapshot.len();
         let per = if sample_size < 100 {
             warn!("computing p{} of sample size smaller than 100", p); 
             snapshot[(sample_size - 1 - (100 - p)) as usize] as f64
@@ -218,6 +221,7 @@ impl Histogram {
           let per_above = per_index.ceil() as usize;
           (snapshot[per_below] as f64 + snapshot[per_above] as f64)  / 2.0_f64
         };
+        per
     }
 
     pub fn clear(&self) {
@@ -228,9 +232,8 @@ impl Histogram {
 
 
 
-
 struct ReservoirSampler {
-    reservoir: Vec<f64>,
+    reservoir: Vec<i64>,
     sample_size: usize,
     n: usize,
 }
@@ -245,7 +248,7 @@ impl ReservoirSampler {
         }
     }
 
-    pub fn sample(&mut self, value: f64) {
+    pub fn sample(&mut self, value: i64) {
         if self.n < self.sample_size {
             self.reservoir.push(value);
         } else {
@@ -263,6 +266,10 @@ impl ReservoirSampler {
         self.reservoir.clear();
         self.n = 0;
     }
+
+    pub fn snapshot(&self) -> Vec<i64> {
+        self.reservoir.clone()
+    }
 }
 
 
@@ -272,15 +279,18 @@ pub struct Registry {
     // sum_counters: Vec<SumCounter>,
     ratio_counters: Vec<Arc<RatioCounter>>,
     histograms: Vec<Arc<Histogram>>,
-    meters: Vec<Arc<Meters>>
+    meters: Vec<Arc<Meter>>
 }
 
 impl Registry {
 
-    pub fn new(name: String) -> Registry<R> {
+    pub fn new(name: String) -> Registry {
         Registry {
             name: name,
-            reporters: Vec::new()
+            counters: Vec::new(),
+            ratio_counters: Vec::new(),
+            histograms: Vec::new(),
+            meters: Vec::new(),
         }
     }
 
@@ -310,7 +320,7 @@ impl Registry {
 
     pub fn report(&self) -> String {
         warn!("metrics reporting is unimplemented");
-        "report placeholder".to_string();
+        "report placeholder".to_string()
     }
 
     // pub fn report_and_reset(&self) -> String {
@@ -318,21 +328,23 @@ impl Registry {
     // }
 
     pub fn reset(&self) {
-        for x in counters.iter() {
+        for x in self.counters.iter() {
             x.clear();
         }
-        for x in ratio_counters.iter() {
-            x.clear();
-        }
-
-        for x in histograms.iter() {
+        for x in self.ratio_counters.iter() {
             x.clear();
         }
 
-        for x in meters.iter() {
+        for x in self.histograms.iter() {
+            x.clear();
+        }
+
+        for x in self.meters.iter() {
             x.clear();
         }
     }
 }
+
+
 
 

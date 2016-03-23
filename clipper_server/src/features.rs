@@ -94,7 +94,7 @@ impl<H: FeatureHash + Send + Sync> FeatureHandle<H> {
 pub fn create_feature_worker(name: String,
                              addrs: Vec<SocketAddr>,
                              batch_size: usize,
-                             metric_register: Arc<RwLock<metrics::MetricsRegister>>)
+                             metric_register: Arc<RwLock<metrics::Registry>>)
     -> (FeatureHandle<SimpleHasher>, Vec<::std::thread::JoinHandle<()>>) {
 
     let latency_hist: Arc<metrics::Histogram> = {
@@ -102,9 +102,9 @@ pub fn create_feature_worker(name: String,
         metric_register.write().unwrap().create_histogram(metric_name, 2056)
     };
 
-    let thruput_metric: Arc<metrics::Meter> = {
+    let thruput_meter: Arc<metrics::Meter> = {
         let metric_name = format!("{}_faas_thruput", name);
-        metric_register.write().unwrap().create_histogram(metric_name)
+        metric_register.write().unwrap().create_meter(metric_name)
     };
 
     let feature_cache: Arc<RwLock<HashMap<HashKey, f64>>> = Arc::new(RwLock::new(HashMap::new()));
@@ -118,22 +118,23 @@ pub fn create_feature_worker(name: String,
             // cache is shared
             let thread_cache = feature_cache.clone();
             // latency tracking is shared
-            let latencies = latencies.clone();
+            // let latencies = latencies.clone();
             let name = name.clone();
             let addr = a.clone();
+            let latency_hist = latency_hist.clone();
+            let thruput_meter = thruput_meter.clone();
             thread::spawn(move || {
-                feature_worker(name, rx, thread_cache, addr, latencies, batch_size);
+                feature_worker(name, rx, thread_cache, addr, latency_hist, thruput_meter, batch_size);
             })
         };
         handles.push(handle);
     }
-    println!("Creating feature worker with {} replicas", queues.len());
+    info!("Creating feature worker with {} replicas", queues.len());
     (FeatureHandle {
         name: name.clone(),
         queues: queues,
         cache: feature_cache,
         hasher: Arc::new(SimpleHasher),
-        latencies: latencies,
         next_instance: Arc::new(AtomicUsize::new(0)),
         // thread_handle: handle,
     }, handles)
@@ -169,8 +170,8 @@ fn feature_worker(name: String,
                   rx: mpsc::Receiver<FeatureReq>,
                   cache: Arc<RwLock<HashMap<HashKey, f64>>>,
                   address: SocketAddr,
-                  latency_metric: Arc<metrics::Histogram>,
-                  thruput_metric: Arc<metrics::Meter>,
+                  latency_hist: Arc<metrics::Histogram>,
+                  thruput_meter: Arc<metrics::Meter>,
                   batch_size: usize) {
 
     // println!("starting worker: {}", name);
@@ -220,7 +221,7 @@ fn feature_worker(name: String,
         let end_time = time::PreciseTime::now();
         let latency = start_time.to(end_time).num_microseconds().unwrap();
         latency_hist.insert(latency);
-        thruput_metric.mark(batch.len());
+        thruput_meter.mark(batch.len());
         if latency > server::SLA*1000 {
             info!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
         }

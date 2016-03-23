@@ -40,7 +40,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
     println!("Config: {:?}", dc);
 
     let mut metrics_register = 
-      Arc::new(RwLock::new(metrics::Registry::new("digits_bench")));
+      Arc::new(RwLock::new(metrics::Registry::new("digits_bench".to_string())));
 
     let all_test_data = digits::load_mnist_dense(&dc.mnist_path).unwrap();
     let norm_test_data = digits::normalize(&all_test_data);
@@ -128,10 +128,10 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
     mon_thread_join_handle.join().unwrap();
 
     // TODO: do something with latencies
-    for fh in &features {
-        let cur_lats: &Vec<i64> = &fh.latencies.read().unwrap();
+    // for fh in &features {
+    //     let cur_lats: &Vec<i64> = &fh.latencies.read().unwrap();
         // println!("{}, {:?}", fh.name, cur_lats);
-    }
+    // }
 
     // for h in handles {
     //     h.join().unwrap();
@@ -141,7 +141,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
 }
 
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
-                         report_interval_secs: usize,
+                         report_interval_secs: u64,
                          num_events: i32) -> ::std::thread::JoinHandle<()> {
 
     // let counter = counter.clone();
@@ -151,7 +151,7 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
         let mut loop_count = 0;
         loop {
             thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
-            info!(metrics_register.read().unwrap().report());
+            info!("{}", metrics_register.read().unwrap().report());
 
             // let cur_time = time::PreciseTime::now();
             // let elapsed_time = last_time.to(cur_time).num_milliseconds() as f64 / 1000.0;

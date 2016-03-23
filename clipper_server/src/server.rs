@@ -148,7 +148,7 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_microseconds().unwrap();
             pred_metrics.latency_hist.insert(latency);
-            pred_metrics.thruput_metric.mark(1);
+            pred_metrics.thruput_meter.mark(1);
             pred_metrics.pred_counter.incr(1);
             if req.true_label.is_some() {
                 if req.true_label.unwrap() == pred {
@@ -171,6 +171,7 @@ pub struct Dispatcher<T: TaskModel + Send + Sync + 'static> {
     user_models: Arc<Vec<RwLock<T>>>,
 }
 
+#[derive(Clone)]
 struct PredictionMetrics {
     latency_hist: Arc<metrics::Histogram>,
     pred_counter: Arc<metrics::Counter>,
@@ -193,13 +194,13 @@ impl PredictionMetrics {
         };
 
         let latency_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("prediction_latency", name);
-            metric_register.write().unwrap().create_histogram(metric_name, 2056)
+            let metric_name = format!("prediction_latency");
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056)
         };
 
         let thruput_meter: Arc<metrics::Meter> = {
-            let metric_name = format!("prediction_thruput", name);
-            metric_register.write().unwrap().create_histogram(metric_name)
+            let metric_name = format!("prediction_thruput");
+            metrics_register.write().unwrap().create_meter(metric_name)
         };
 
         PredictionMetrics {
@@ -223,7 +224,7 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
            ) -> Dispatcher<T> {
         println!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
-        assert!(all_latencies_trackers.len() == num_workers);
+        // assert!(all_latencies_trackers.len() == num_workers);
         let pred_metrics = PredictionMetrics::new(metrics_register.clone());
 
         for i in 0..num_workers {
@@ -288,7 +289,7 @@ fn init_user_models(num_users: usize, num_features: usize)
 pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
     let num_features = feature_addrs.len();
     let num_users = 500;
-    let mut metrics_register = Arc::new(RwLock::new(metrics::Registry::new("server main")));
+    let mut metrics_register = Arc::new(RwLock::new(metrics::Registry::new("server main".to_string())));
     // let test_data_path = "/crankshaw-local/mnist/data/test.data";
     // let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
     // let norm_test_data = digits::normalize(&all_test_data);
@@ -325,25 +326,25 @@ pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
 
     // create monitoring thread to check incremental thruput
     thread::sleep(::std::time::Duration::new(3, 0));
-    let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone());
+    // let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone());
 
     let num_features = features.len();
-    println!("sending batch with no delays");
+    info!("sending batch with no delays");
     let mut rng = thread_rng();
     for i in 0..num_events {
         dispatcher.dispatch(Request::new(rng.gen_range(0, num_users as u32),
                             features::random_features(784), i), num_features);
     }
 
-    println!("waiting for features to finish");
-    mon_thread_join_handle.join().unwrap();
+    info!("waiting for features to finish");
+    // mon_thread_join_handle.join().unwrap();
     for h in handles {
         for th in h {
             th.join().unwrap();
         }
     }
     // handle.join().unwrap();
-    println!("done");
+    info!("done");
 }
 
 // TODO this is a lot of unnecessary copies of the input
@@ -368,27 +369,27 @@ pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
     }
 }
 
-fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>)
-    -> ::std::thread::JoinHandle<()> {
-
-    // let counter = counter.clone();
-    thread::spawn(move || {
-        let bench_start = time::PreciseTime::now();
-        let mut last_count = 0;
-        let mut last_time = bench_start;
-        loop {
-            thread::sleep(::std::time::Duration::new(3, 0));
-            info!(metrics_register.read().unwrap().report());
-
-            if cur_count >= num_events as usize {
-                println!("BENCHMARK FINISHED");
-                break;
-            }
-            println!("sleeping...");
-        }
-    })
-}
-
+// fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>)
+//     -> ::std::thread::JoinHandle<()> {
+//
+//     // let counter = counter.clone();
+//     thread::spawn(move || {
+//         let bench_start = time::PreciseTime::now();
+//         let mut last_count = 0;
+//         let mut last_time = bench_start;
+//         loop {
+//             thread::sleep(::std::time::Duration::new(3, 0));
+//             info!("{}", metrics_register.read().unwrap().report());
+//
+//             if cur_count >= num_events as usize {
+//                 println!("BENCHMARK FINISHED");
+//                 break;
+//             }
+//             println!("sleeping...");
+//         }
+//     })
+// }
+//
 
 
 
