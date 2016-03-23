@@ -6,16 +6,13 @@ use std::sync::{RwLock, Arc};
 use std::sync::mpsc;
 use std::collections::HashMap;
 use rand::{thread_rng, Rng};
-use std::sync::atomic::{AtomicUsize, Ordering};
-use num_cpus;
+use std::sync::atomic::AtomicUsize;
 use toml;
 use server;
-use linear_models::linalg;
-use digits;
 use std::hash::{Hash, SipHasher, Hasher};
 use std::io::{Read, Write};
 // use std::net::{self};
-use net2::{TcpBuilder, TcpStreamExt};
+use net2::TcpStreamExt;
 use byteorder::{LittleEndian, WriteBytesExt};
 use metrics;
 
@@ -209,7 +206,8 @@ fn feature_worker(name: String,
         for r in batch.iter() {
             stream.write_all(floats_to_bytes(r.input.clone())).unwrap();
         }
-        stream.flush();
+
+        stream.flush().unwrap();
 
         // read response: assumes 1 f64 for each entry in batch
         let num_response_bytes = batch.len()*mem::size_of::<f64>();
@@ -249,46 +247,6 @@ fn feature_worker(name: String,
                 // }
             }
         }
-
-        // let max_req_latency = batch.first().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
-        // let min_req_latency = batch.last().unwrap().req_start_time.to(end_time).num_microseconds().unwrap();
-        // let loop_end_time = time::PreciseTime::now();
-        // let loop_latency = start_time.to(loop_end_time).num_microseconds().unwrap() as f64 / 1000.0;
-        // bench_latencies.push(loop_latency);
-        // epoch_count += batch.len();
-        // if epoch_count >= 10000 {
-        //     let epoch_end = time::PreciseTime::now();
-        //     let epoch_time = epoch_start.to(epoch_end).num_microseconds().unwrap();
-        //     // let xs = vec![Arc::new(bench_latencies.clone())];
-        //     let xs = bench_latencies.clone().into_iter().map(|x| {
-        //         Arc::new(vec![x])
-        //     }).collect::<Vec<Arc<Vec<f64>>>>();
-        //     let (mut mean, mut var) = linalg::mean_and_var(&xs);
-        //     // println!("mean: {:?}, var: {:?}", mean, var);
-        //     assert!(mean.len() == 1 && var.len() == 1);
-        //     let max_lat = bench_latencies.iter().fold(0.0, |m, &x| {
-        //         if x > m {
-        //             x
-        //         } else {
-        //             m
-        //         }
-        //     });
-        //     println!("batch_size: {}, thru: {:.3} (qps), mean_lat (ms): {}, var_lat (ms): {}, max_lat (ms): {}",
-        //              batch_size,
-        //              epoch_count as f64 / epoch_time as f64 * 1000.0 * 1000.0,
-        //              mean.pop().unwrap(), var.pop().unwrap(), max_lat);
-        //     epoch_start = time::PreciseTime::now();
-        //     epoch_count = 0;
-        //     bench_latencies.clear();
-        // }
-        // loop_counter += 1;
-        
-        // println!("feature: {}, batch_size: {}, latency: {}, max_req_latency: {}, min_req_latency {}, loop_latency: {}",
-        //          name, batch.len(), (latency as f64 / 1000.0),
-        //         (max_req_latency as f64 / 1000.0),
-        //         (min_req_latency as f64 / 1000.0),
-        //         (loop_latency as f64 / 1000.0)
-        //         );
     }
 }
 

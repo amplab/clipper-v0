@@ -1,5 +1,4 @@
 use features;
-use log;
 use metrics;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -9,10 +8,9 @@ use rand::{thread_rng, Rng};
 
 
 
-
 pub fn feature_batch_latency(batch_size: usize) {
 
-    let mut metrics_register = Arc::new(RwLock::new(metrics::Registry::new("faas".to_string())));
+    let metrics_register = Arc::new(RwLock::new(metrics::Registry::new("faas".to_string())));
 
 
     let mnist_path = "/crankshaw-local/mnist/data/test.data".to_string();
@@ -46,7 +44,7 @@ pub fn feature_batch_latency(batch_size: usize) {
     let mut rng = thread_rng();
     let num_trials = 10000;
     let num_reqs = num_trials * batch_size;
-    for i in 0..num_reqs {
+    for _ in 0..num_reqs {
         let example_idx: usize = rng.gen_range(0, all_test_data.xs.len());
         let input = (*all_test_data.xs[example_idx]).clone();
         let req = features::FeatureReq {
@@ -58,8 +56,7 @@ pub fn feature_batch_latency(batch_size: usize) {
     }
 
     let report_interval_secs = 4;
-    let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone(),
-                                                       report_interval_secs);
+    launch_monitor_thread(metrics_register.clone(), report_interval_secs);
     thread::sleep(::std::time::Duration::new(20, 0));
 
     // let l = feat.latencies.read().unwrap();

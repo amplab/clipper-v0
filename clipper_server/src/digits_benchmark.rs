@@ -2,16 +2,11 @@ use time;
 use std::ptr;
 use std::thread;
 use std::sync::{RwLock, Arc};
-use std::sync::mpsc;
-use std::collections::HashMap;
-use rand::{thread_rng, Rng};
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::net::{ToSocketAddrs, SocketAddr};
+use std::net::SocketAddr;
 use server;
 use digits;
 use features;
 use metrics;
-use log;
 use features::FeatureHash;
 use linear_models::{linalg, linear};
 use server::TaskModel;
@@ -39,7 +34,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
     println!("starting digits");
     println!("Config: {:?}", dc);
 
-    let mut metrics_register = 
+    let metrics_register = 
       Arc::new(RwLock::new(metrics::Registry::new("digits_bench".to_string())));
 
     let all_test_data = digits::load_mnist_dense(&dc.mnist_path).unwrap();
@@ -56,7 +51,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
                                               dc.num_users as usize);
 
 
-    let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
+    let (features, _): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
                               .map(|(n, a)| features::create_feature_worker(
                                   n, a, dc.feature_batch_size, metrics_register.clone()))
                               .unzip();
@@ -88,10 +83,8 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
     thread::sleep(::std::time::Duration::new(3, 0));
     let report_interval_secs = 4;
     let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone(),
-                                                       report_interval_secs,
-                                                       num_events as i32);
+                                                       report_interval_secs);
 
-    let mut rng = thread_rng();
     let target_qps = dc.target_qps;
     let query_batch_size = dc.query_batch_size;
     let mut events_fired = 0;
@@ -126,103 +119,16 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
 
     info!("waiting for features to finish");
     mon_thread_join_handle.join().unwrap();
-
-    // TODO: do something with latencies
-    // for fh in &features {
-    //     let cur_lats: &Vec<i64> = &fh.latencies.read().unwrap();
-        // println!("{}, {:?}", fh.name, cur_lats);
-    // }
-
-    // for h in handles {
-    //     h.join().unwrap();
-    // }
-    // handle.join().unwrap();
     println!("done");
 }
 
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
-                         report_interval_secs: u64,
-                         num_events: i32) -> ::std::thread::JoinHandle<()> {
+                         report_interval_secs: u64) -> ::std::thread::JoinHandle<()> {
 
-    // let counter = counter.clone();
     thread::spawn(move || {
-        let bench_start = time::PreciseTime::now();
-        // let mut total_count = 0;
-        let mut loop_count = 0;
         loop {
             thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
             info!("{}", metrics_register.read().unwrap().report());
-
-            // let cur_time = time::PreciseTime::now();
-            // let elapsed_time = last_time.to(cur_time).num_milliseconds() as f64 / 1000.0;
-            // // let cur_time = last_time.to(time::PreciseTime::now()).num_milliseconds() as f64 / 1000.0;
-            // let cur_count = processed_counter.load(Ordering::Relaxed);
-            // let cur_cum_latency = cum_latency_tracker_micros.load(Ordering::Relaxed);
-            // let elapsed_count = cur_count - last_count;
-            // let avg_latency = (cur_cum_latency - last_cum_latency) as f64 / elapsed_count as f64;
-            // // reset max latency after reading it
-            // let cur_max_latency = max_latency_tracker_micros.swap(0, Ordering::Relaxed);
-            //
-            // let cur_correct = correct_counter.load(Ordering::Relaxed);
-            // let cur_total = total_counter.load(Ordering::Relaxed);
-            // let elapsed_correct = cur_correct - last_correct;
-            // let elapsed_total = cur_total - last_total;
-            // let acc = elapsed_correct as f64 / elapsed_total as f64;
-            // let thru = elapsed_count as f64 / elapsed_time;
-            //
-            // let mut all_cur_lats = Vec::new();
-            // for t in all_latencies_trackers.iter() {
-            //   let mut lock = t.write().unwrap();
-            //   // copy into our tracker then clear
-            //   all_cur_lats.extend_from_slice(&lock[..]);
-            //   lock.clear();
-            // }
-            //
-            // all_cur_lats.sort();
-            // let num_observations: usize = all_cur_lats.len();
-            // let p99 = if num_observations < 100 {
-            //   all_cur_lats[(num_observations - 1) as usize] as f64
-            // } else if (num_observations % 100) == 0 {
-            //   let p99_index: usize = num_observations * 99 / 100;
-            //   all_cur_lats[p99_index as usize] as f64
-            // } else {
-            //   let p99_index: f64 = (num_observations as f64) * 0.99;
-            //   // let p95_index = (num_observations as f64) * 0.95;
-            //   let p99_below = p99_index.floor() as usize;
-            //   let p99_above = p99_index.ceil() as usize;
-            //   (all_cur_lats[p99_below] as f64 + all_cur_lats[p99_above] as f64)  / 2.0_f64
-            // };
-            //   
-            //
-            // println!("{acc:.4}, {thru:.4}, {mean:.4}, {p99:.4}, {max:.4}",
-            //         acc=acc, thru=thru,
-            //         mean=(avg_latency / 1000.0),
-            //         p99=(p99 as f64 / 1000.0),
-            //         max=(cur_max_latency as f64 / 1000.0)); // latencies are measured in microseconds
-            //
-            // // println!("processed {} events in {} seconds: {} preds/sec",
-            // //          cur_count - last_count,
-            // //          elapsed_time,
-            // //          ((cur_count - last_count) as f64 / elapsed_time));
-            //          
-            //
-            // // println!("current accuracy: {} out of {} correct, ({}%)",
-            // //          cur_correct, cur_total, (cur_correct as f64/cur_total as f64)*100.0);
-            // // if cur_count >= num_events as usize {
-            // //     println!("BENCHMARK FINISHED");
-            // //     break;
-            // // }
-            //
-            // last_count = cur_count;
-            // last_time = cur_time;
-            // last_cum_latency = cur_cum_latency;
-            // last_correct = cur_correct;
-            // last_total = cur_total;
-            // // println!("sleeping...");
-            loop_count += 1;
-            // if loop_count > 10 {
-            //   break;
-            // }
         }
     })
 }
@@ -300,6 +206,7 @@ impl TrainedTask {
 
 
 impl TaskModel for TrainedTask {
+    #[allow(unused_variables)]
     fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
         // if missing_fs.len() > 5 {
         //     println!("{}: missing {} features", debug_str, missing_fs.len());
@@ -368,7 +275,7 @@ fn get_all_train_features(tasks: &Vec<digits::DigitsTask>,
             for x in t.offline_train_x.iter() {
                 for fh in feature_handles {
                     let hash = fh.hasher.hash(&x, None);
-                    let mut cache_reader = fh.cache.read().unwrap();
+                    let cache_reader = fh.cache.read().unwrap();
                     let cache_entry = cache_reader.get(&hash);
                     if cache_entry.is_none() {
                         done = false;
@@ -400,7 +307,7 @@ fn pretrain_task_models(tasks: Vec<digits::DigitsTask>,
             let mut x_features: Vec<f64> = Vec::new();
             for fh in feature_handles {
                 let hash = fh.hasher.hash(&x, None);
-                let mut cache_reader = fh.cache.read().unwrap();
+                let cache_reader = fh.cache.read().unwrap();
                 x_features.push(*cache_reader.get(&hash).unwrap());
             }
             training_data.push(Arc::new(x_features));

@@ -1,6 +1,8 @@
 #![crate_name="clipper"]
 #![crate_type="bin"]
 
+// #![deny(missing_docs)]
+#![deny(warnings)]
 
 // extern crate capnp;
 // extern crate capnp_rpc;
@@ -22,15 +24,15 @@ extern crate byteorder;
 
 use docopt::Docopt;
 use std::error::Error;
-use std::result::Result;
-use std::fs::{File, OpenOptions};
+// use std::result::Result;
+use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use std::io::{BufReader, BufWriter};
+use std::io::BufReader;
 
 // use getopts::Options;
-use std::env;
-use std::net::{ToSocketAddrs, SocketAddr};
+// use std::env;
+use std::net::SocketAddr;
 #[macro_use]
 extern crate log;
 extern crate env_logger;

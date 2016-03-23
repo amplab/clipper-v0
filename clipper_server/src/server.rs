@@ -3,16 +3,12 @@
 // #![allow(unused_mut)]
 
 use time;
-use log;
-use std::net::{ToSocketAddrs, SocketAddr};
+// use log;
+use std::net::SocketAddr;
 use std::thread;
 use std::sync::{mpsc, RwLock, Arc};
-use std::collections::HashMap;
 use rand::{thread_rng, Rng};
-use std::sync::atomic::{AtomicUsize, Ordering};
 use num_cpus;
-use linear_models::linalg;
-use digits;
 use features;
 use metrics;
 use features::FeatureHash;
@@ -45,6 +41,7 @@ impl Request {
 
 }
 
+#[allow(dead_code)]
 struct Update {
     start_time: time::PreciseTime, // just for monitoring purposes
     user: u32,
@@ -68,15 +65,18 @@ pub trait TaskModel {
     // fn train(&mut self,
 }
 
-struct DummyTaskModel;
+struct DummyTaskModel {
+    num_features: usize
+}
 
 impl TaskModel for DummyTaskModel {
+    #[allow(unused_variables)]
     fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
         0.3
     }
 
     fn rank_features(&self) -> Vec<usize> {
-        return (0..10).into_iter().collect::<Vec<usize>>()
+        return (0..self.num_features).into_iter().collect::<Vec<usize>>()
     }
 }
 
@@ -96,8 +96,7 @@ fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
     let mut i = 0;
     for fh in feature_handles {
         let hash = fh.hasher.hash(input, Some(req_id));
-        // println!("hash in prediction: {}", hash);
-        let mut cache_reader = fh.cache.read().unwrap();
+        let cache_reader = fh.cache.read().unwrap();
         let cache_entry = cache_reader.get(&hash);
         match cache_entry {
             Some(v) => features.push(*v),
@@ -127,8 +126,8 @@ fn start_prediction_worker<T, H>(worker_id: i32,
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(sla_millis / 5);
     let (sender, receiver) = mpsc::channel::<Request>();
-    let join_guard = thread::spawn(move || {
-        println!("starting response worker {} with {} ms SLA", worker_id, sla_millis);
+    thread::spawn(move || {
+        info!("starting response worker {} with {} ms SLA", worker_id, sla_millis);
         loop {
             let req = receiver.recv().unwrap();
             // if elapsed_time is less than SLA (+- epsilon wiggle room) then wait
@@ -140,7 +139,6 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                 thread::sleep(sleep_time);
             }
             // TODO: actually do something with the result
-            let pred_loop_start = time::PreciseTime::now();
             debug_assert!(req.user < user_models.len() as u32);
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
             let task_model: &T = &lock.read().unwrap();
@@ -222,9 +220,8 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
            user_models: Arc<Vec<RwLock<T>>>,
            metrics_register: Arc<RwLock<metrics::Registry>>
            ) -> Dispatcher<T> {
-        println!("creating dispatcher with {} workers", num_workers);
+        info!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
-        // assert!(all_latencies_trackers.len() == num_workers);
         let pred_metrics = PredictionMetrics::new(metrics_register.clone());
 
         for i in 0..num_workers {
@@ -274,10 +271,10 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
 
 fn init_user_models(num_users: usize, num_features: usize)
     -> Arc<Vec<RwLock<DummyTaskModel>>> {
-    let mut rng = thread_rng();
+    // let mut rng = thread_rng();
     let mut models = Vec::with_capacity(num_users);
-    for i in 0..num_users {
-        let model = RwLock::new(DummyTaskModel);
+    for _ in 0..num_users {
+        let model = RwLock::new(DummyTaskModel { num_features: num_features });
         models.push(model);
     }
     Arc::new(models)
@@ -289,12 +286,12 @@ fn init_user_models(num_users: usize, num_features: usize)
 pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
     let num_features = feature_addrs.len();
     let num_users = 500;
-    let mut metrics_register = Arc::new(RwLock::new(metrics::Registry::new("server main".to_string())));
+    let metrics_register = Arc::new(RwLock::new(metrics::Registry::new("server main".to_string())));
     // let test_data_path = "/crankshaw-local/mnist/data/test.data";
     // let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
     // let norm_test_data = digits::normalize(&all_test_data);
 
-    // println!("Test data loaded: {} points", norm_test_data.ys.len());
+    // info!("Test data loaded: {} points", norm_test_data.ys.len());
 
     // let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
     //                                                     .map(|a| features::get_addr(a))
@@ -306,18 +303,9 @@ pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
                                       n, a, 100, metrics_register.clone())).unzip();
 
 
-    let correct_counter = Arc::new(AtomicUsize::new(0));
-    let total_counter = Arc::new(AtomicUsize::new(0));
-    let processed_counter = Arc::new(AtomicUsize::new(0));
     let num_events = 100;
-    // let num_workers = num_cpus::get();
-    let num_workers = 1;
-    let cum_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
-    let max_latency_tracker_micros = Arc::new(AtomicUsize::new(0));
-    let mut all_latencies_trackers: Vec<Arc<RwLock<Vec<i64>>>> = Vec::new();
-    for i in 0..num_workers {
-      all_latencies_trackers.push(Arc::new(RwLock::new(Vec::new())));
-    }
+    let num_workers = num_cpus::get();
+    // let num_workers = 1;
     let mut dispatcher = Dispatcher::new(num_workers,
                                          SLA,
                                          features.clone(),
@@ -368,28 +356,5 @@ pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
         f.request_feature(req);
     }
 }
-
-// fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>)
-//     -> ::std::thread::JoinHandle<()> {
-//
-//     // let counter = counter.clone();
-//     thread::spawn(move || {
-//         let bench_start = time::PreciseTime::now();
-//         let mut last_count = 0;
-//         let mut last_time = bench_start;
-//         loop {
-//             thread::sleep(::std::time::Duration::new(3, 0));
-//             info!("{}", metrics_register.read().unwrap().report());
-//
-//             if cur_count >= num_events as usize {
-//                 println!("BENCHMARK FINISHED");
-//                 break;
-//             }
-//             println!("sleeping...");
-//         }
-//     })
-// }
-//
-
 
 

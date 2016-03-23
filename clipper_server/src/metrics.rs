@@ -1,10 +1,8 @@
 
 use time;
-use log;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
-use std::mem;
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
@@ -151,13 +149,13 @@ impl Meter {
 }
 
 pub struct HistStats {
-    min: i64,
-    max: i64,
-    mean: f64,
-    std: f64,
-    p95: f64,
-    p99: f64,
-    p50: f64
+    pub min: i64,
+    pub max: i64,
+    pub mean: f64,
+    pub std: f64,
+    pub p95: f64,
+    pub p99: f64,
+    pub p50: f64
 }
 
 // This gives me latency distribution, min, mean, max, etc.
@@ -207,7 +205,7 @@ impl Histogram {
     }
 
     fn percentile(snapshot: &Vec<i64>, p: usize) -> f64 {
-        assert!(p >= 0 && p <= 100, "must supply a percentile between 0 and 100");
+        assert!(p <= 100, "must supply a percentile between 0 and 100");
         let sample_size = snapshot.len();
         let per = if sample_size < 100 {
             warn!("computing p{} of sample size smaller than 100", p); 
