@@ -6,11 +6,12 @@ use std::sync::{RwLock, Arc};
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
-trait Reportable {
+trait Metric {
 
     fn report(&self) -> String;
 
-    fn clear(&mut self);
+    // Must have way to atomically clear state
+    fn clear(&self);
 
 }
 
@@ -19,6 +20,27 @@ trait Reportable {
 pub struct Counter {
     pub name: String,
     count: AtomicIsize
+}
+
+#[derive(Debug)]
+struct CounterStats {
+    name: String,
+    count: isize
+}
+
+impl Metric for Counter {
+
+    fn clear(&self) {
+        self.count.store(0, Ordering::SeqCst);
+    }
+
+    fn report(&self) -> String {
+        let stats = CounterStats {
+            name: self.name.clone(),
+            count: self.count.load(Ordering::SeqCst)
+        };
+        format!("{:?}", stats)
+    }
 }
 
 impl Counter {
@@ -37,28 +59,36 @@ impl Counter {
         self.count.fetch_sub(decrement, Ordering::Relaxed);
     }
 
-    pub fn clear(&self) {
-        self.count.store(0, Ordering::SeqCst);
-    }
 }
-
-// impl Reportable for Counter {
-//
-// }
-
-
-// /// Returns the sum of several
-// /// simple `Counter` objects.
-// pub struct SumCounter {
-//     pub name: String,
-//     counters: Vec<Arc<Counter>>
-// }
-
 
 pub struct RatioCounter {
     pub name: String,
     numerator: AtomicUsize,
     denominator: AtomicUsize,
+}
+
+#[derive(Debug)]
+struct RatioStats {
+    name: String,
+    ratio: f64,
+}
+
+impl Metric for RatioCounter {
+
+    // TODO: This has a race condition. 
+    fn clear(&self) {
+        self.denominator.store(0, Ordering::SeqCst);
+        self.numerator.store(0, Ordering::SeqCst);
+    }
+
+    fn report(&self) -> String {
+        let ratio = self.numerator.load(Ordering::SeqCst) as f64 / self.denominator.load(Ordering::SeqCst) as f64;
+        let stats = RatioStats {
+            name: self.name.clone(),
+            ratio: ratio
+        };
+        format!("{:?}", stats)
+    }
 }
 
 impl RatioCounter {
@@ -87,11 +117,6 @@ impl RatioCounter {
         }
     }
 
-    // TODO: This has a race condition. 
-    pub fn clear(&self) {
-        self.denominator.store(0, Ordering::SeqCst);
-        self.numerator.store(0, Ordering::SeqCst);
-    }
 
 }
 
@@ -141,13 +166,35 @@ impl Meter {
         self.get_rate_micros() / NUM_MICROS_PER_SEC as f64
     }
 
-    pub fn clear(&self) {
+}
+
+#[derive(Debug)]
+struct MeterStats {
+    name: String,
+    rate: f64,
+    unit: String
+}
+
+impl Metric for Meter {
+
+    fn clear(&self) {
         let mut t  = self.start_time.write().unwrap();
         *t = time::PreciseTime::now();
         self.count.store(0, Ordering::SeqCst);
     }
+
+    fn report(&self) -> String {
+        
+        let stats = MeterStats {
+            name: self.name.clone(),
+            rate: self.get_rate_secs(),
+            unit: "events per second".to_string()
+        };
+        format!("{:?}", stats)
+    }
 }
 
+#[derive(Debug)]
 pub struct HistStats {
     pub min: i64,
     pub max: i64,
@@ -222,10 +269,19 @@ impl Histogram {
         per
     }
 
-    pub fn clear(&self) {
+}
+
+impl Metric for Histogram {
+
+    fn clear(&self) {
         let mut res = self.sample.write().unwrap();
         res.clear();
     }
+
+    fn report(&self) -> String {
+        format!("{:?}", self.stats())
+    }
+
 }
 
 
@@ -317,8 +373,30 @@ impl Registry {
     }
 
     pub fn report(&self) -> String {
-        warn!("metrics reporting is unimplemented");
-        "report placeholder".to_string()
+        let mut report_string = String::new();
+        report_string.push_str(&format!("{} Metrics", self.name));
+
+        report_string.push_str("Counters:\n");
+        for x in self.counters.iter() {
+            report_string.push_str(&format!("\t{}\n", x.report()));
+        }
+
+        report_string.push_str("Ratios:\n");
+        for x in self.ratio_counters.iter() {
+            report_string.push_str(&format!("\t{}\n", x.report()));
+        }
+
+        report_string.push_str("Histograms:\n");
+        for x in self.histograms.iter() {
+            report_string.push_str(&format!("\t{}\n", x.report()));
+        }
+
+        report_string.push_str("Meters:\n");
+        for x in self.meters.iter() {
+            report_string.push_str(&format!("\t{}\n", x.report()));
+        }
+        debug!("{}", report_string);
+        report_string
     }
 
     // pub fn report_and_reset(&self) -> String {
