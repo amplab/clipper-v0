@@ -163,7 +163,7 @@ impl Meter {
     /// Returns the rate of this meter in
     /// events per second.
     pub fn get_rate_secs(&self) -> f64 {
-        self.get_rate_micros() / NUM_MICROS_PER_SEC as f64
+        self.get_rate_micros() * NUM_MICROS_PER_SEC as f64
     }
 
 }
@@ -196,13 +196,14 @@ impl Metric for Meter {
 
 #[derive(Debug)]
 pub struct HistStats {
+    pub name: String,
     pub min: i64,
     pub max: i64,
     pub mean: f64,
     pub std: f64,
     pub p95: f64,
     pub p99: f64,
-    pub p50: f64
+    pub p50: f64,
 }
 
 // This gives me latency distribution, min, mean, max, etc.
@@ -241,13 +242,14 @@ impl Histogram {
         let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
         var = var / (sample_size - 1) as f64;
         HistStats {
+            name: self.name.clone(),
             min: *min,
             max: *max,
             mean: mean,
             std: var.sqrt(),
             p95: p95,
             p99: p99,
-            p50: p50
+            p50: p50,
         }
     }
 
@@ -374,27 +376,37 @@ impl Registry {
 
     pub fn report(&self) -> String {
         let mut report_string = String::new();
-        report_string.push_str(&format!("{} Metrics", self.name));
+        report_string.push_str(&format!("\n{} Metrics\n", self.name));
 
-        report_string.push_str("Counters:\n");
-        for x in self.counters.iter() {
-            report_string.push_str(&format!("\t{}\n", x.report()));
+        if self.counters.len() > 0 {
+            report_string.push_str("\tCounters:\n");
+            for x in self.counters.iter() {
+                report_string.push_str(&format!("\t\t{}\n", x.report()));
+            }
         }
 
-        report_string.push_str("Ratios:\n");
-        for x in self.ratio_counters.iter() {
-            report_string.push_str(&format!("\t{}\n", x.report()));
+        if self.ratio_counters.len() > 0 {
+            report_string.push_str("\tRatios:\n");
+            for x in self.ratio_counters.iter() {
+                report_string.push_str(&format!("\t\t{}\n", x.report()));
+            }
         }
 
-        report_string.push_str("Histograms:\n");
-        for x in self.histograms.iter() {
-            report_string.push_str(&format!("\t{}\n", x.report()));
+        if self.histograms.len() > 0 {
+            report_string.push_str("\tHistograms:\n");
+            for x in self.histograms.iter() {
+                report_string.push_str(&format!("\t\t{}\n", x.report()));
+            }
         }
 
-        report_string.push_str("Meters:\n");
-        for x in self.meters.iter() {
-            report_string.push_str(&format!("\t{}\n", x.report()));
+        if self.meters.len() > 0 {
+            report_string.push_str("\tMeters:\n");
+            for x in self.meters.iter() {
+                report_string.push_str(&format!("\t\t{}\n", x.report()));
+            }
         }
+
+
         debug!("{}", report_string);
         report_string
     }

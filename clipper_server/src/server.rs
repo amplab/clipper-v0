@@ -135,7 +135,7 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             if elapsed_time < sla - epsilon {
                 let sleep_time = ::std::time::Duration::new(
                     0, (sla - elapsed_time).num_nanoseconds().unwrap() as u32);
-                info!("prediciton worker sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+                info!("prediction worker sleeping for {:?} ms",  sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
                 thread::sleep(sleep_time);
             }
             // TODO: actually do something with the result

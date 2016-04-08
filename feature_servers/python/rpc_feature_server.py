@@ -94,7 +94,7 @@ class SparkLRServer:
             # TODO is making an RDD faster? probably not
             preds.append(float(self.model.predict(i)))
         end = datetime.datetime.now()
-        print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
+        # print("%s: %f ms\n" % (self.path, (end-start).total_seconds() * 1000))
         preds = np.array(preds)
         assert preds.dtype == np.dtype('float64')
         return np.array(preds)
@@ -142,7 +142,7 @@ class SparkRFServer:
             # TODO is making an RDD faster? probably not
             preds.append(self.model.predict(i))
         end = datetime.datetime.now()
-        print("%s: %f ms\n" % (os.path.basename(self.path), (end-start).total_seconds() * 1000))
+        # print("%s: %f ms\n" % (os.path.basename(self.path), (end-start).total_seconds() * 1000))
         preds = np.array(preds)
         assert preds.dtype == np.dtype('float64')
         return np.array(preds)
@@ -206,8 +206,16 @@ def start_server(model, ip, port):
     server.model = model
     server.serve_forever()
 
-def start_svm_from_mp(mp, ip, port):
+def start_sparksvm_from_mp(mp, ip, port):
     model = SparkSVMServer(mp)
+    start_server(model, ip, port)
+
+def start_sparklr_from_mp(mp, ip, port):
+    model = SparkLRServer(mp)
+    start_server(model, ip, port)
+
+def start_sparkrf_from_mp(mp, ip, port):
+    model = SparkRFServer(mp)
     start_server(model, ip, port)
 
 def start_sksvm_from_mp(mp, ip, port):

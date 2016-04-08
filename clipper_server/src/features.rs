@@ -104,6 +104,11 @@ pub fn create_feature_worker(name: String,
         metric_register.write().unwrap().create_meter(metric_name)
     };
 
+    let predictions_counter: Arc<metrics::Counter> = {
+        let metric_name = format!("{}_prediction_counter", name);
+        metric_register.write().unwrap().create_counter(metric_name)
+    };
+
     let feature_cache: Arc<RwLock<HashMap<HashKey, f64>>> = Arc::new(RwLock::new(HashMap::new()));
     // let latencies: Arc<RwLock<Vec<i64>>> = Arc::new(RwLock::new(Vec::new()));
     let mut handles = Vec::new();
@@ -120,8 +125,16 @@ pub fn create_feature_worker(name: String,
             let addr = a.clone();
             let latency_hist = latency_hist.clone();
             let thruput_meter = thruput_meter.clone();
+            let predictions_counter = predictions_counter.clone();
             thread::spawn(move || {
-                feature_worker(name, rx, thread_cache, addr, latency_hist, thruput_meter, batch_size);
+                feature_worker(name,
+                               rx,
+                               thread_cache,
+                               addr,
+                               latency_hist,
+                               thruput_meter,
+                               predictions_counter,
+                               batch_size);
             })
         };
         handles.push(handle);
@@ -169,6 +182,7 @@ fn feature_worker(name: String,
                   address: SocketAddr,
                   latency_hist: Arc<metrics::Histogram>,
                   thruput_meter: Arc<metrics::Meter>,
+                  predictions_counter: Arc<metrics::Counter>,
                   batch_size: usize) {
 
     // println!("starting worker: {}", name);
@@ -218,15 +232,18 @@ fn feature_worker(name: String,
         let response_floats = bytes_to_floats(&response_buffer);
         let end_time = time::PreciseTime::now();
         let latency = start_time.to(end_time).num_microseconds().unwrap();
-        latency_hist.insert(latency);
+        for _ in 0..batch.len() {
+            latency_hist.insert(latency);
+        }
         thruput_meter.mark(batch.len());
+        predictions_counter.incr(batch.len() as isize);
         if latency > server::SLA*1000 {
-            info!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
+            debug!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
         }
         // only try to increase the batch size if we actually sent a batch of maximum size
         if batch.len() == cur_batch_size {
             cur_batch_size = update_batch_size(cur_batch_size, latency as u64, 20*1000);
-            println!("{} updated batch size to {}", name, cur_batch_size);
+            debug!("{} updated batch size to {}", name, cur_batch_size);
         }
 
         // let mut l = latencies.write().unwrap();

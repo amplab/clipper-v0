@@ -19,7 +19,7 @@ pub fn feature_batch_latency(batch_size: usize) {
                              // "127.0.0.1:7001".to_string(),
                              // "127.0.0.1:8001".to_string(),
                                  ]];
-    let names = vec!["pyspark-svm".to_string()];
+    let names = vec!["pyspark_rf".to_string()];
 
     let replicas_counter = {
         metrics_register.write().unwrap().create_counter("feature replicas counter".to_string())
@@ -42,22 +42,23 @@ pub fn feature_batch_latency(batch_size: usize) {
     let hand = handles.pop().unwrap();
     
     let mut rng = thread_rng();
-    let num_trials = 10000;
-    let num_reqs = num_trials * batch_size;
-    for _ in 0..num_reqs {
+    // let num_trials = 10000;
+    let num_reqs = 2000000;
+    info!("making {} requests", num_reqs);
+    for i in 0..num_reqs {
         let example_idx: usize = rng.gen_range(0, all_test_data.xs.len());
         let input = (*all_test_data.xs[example_idx]).clone();
         let req = features::FeatureReq {
-            hash_key: 11,
+            hash_key: i as u64,
             input: input,
             req_start_time: time::PreciseTime::now(),
         };
         feat.request_feature(req);
     }
 
-    let report_interval_secs = 4;
+    let report_interval_secs = 15;
     launch_monitor_thread(metrics_register.clone(), report_interval_secs);
-    thread::sleep(::std::time::Duration::new(20, 0));
+    thread::sleep(::std::time::Duration::new(40, 0));
 
     // let l = feat.latencies.read().unwrap();
     // let mut avg_t: f64 = 0.0;
@@ -86,8 +87,11 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
     // let counter = counter.clone();
     thread::spawn(move || {
         loop {
+            let m = metrics_register.read().unwrap();
             thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
-            info!("{}", metrics_register.read().unwrap().report());
+            info!("{}", m.report());
+            m.reset();
+            // metrics_register.write().unwrap().reset();
         }
     })
 }

@@ -17,10 +17,10 @@ CLIPPER_SERVER_BASE = "/crankshaw-local/clipper/clipper_server"
 
 
 def start_feature(ip, port):
-    # mp = "spark_models/svm_predict_1"
-    mp = "sklearn_models/predict_1_svm/predict_1_svm.pkl"
-    # model = rpc.SparkSVMServer(mp)
-    p = Process(target=rpc.start_sksvm_from_mp, args=(mp, ip,port))
+    # mp = "sklearn_models/predict_1_svm/predict_1_svm.pkl"
+    # p = Process(target=rpc.start_sksvm_from_mp, args=(mp, ip,port))
+    mp = "spark_models/lg_predict_1"
+    p = Process(target=rpc.start_sparklr_from_mp, args=(mp, ip,port))
     p.start()
     return p # to kill: p.terminate()
 
@@ -57,15 +57,16 @@ def run_exp(batch_size):
 
     clipper_out = None
     clipper_err = None
+    my_env = os.environ.copy()
+    my_env["RUST_LOG"] = "info"
+    my_env["RUST_BACKTRACE"] = "1"
     clipper_proc = subprocess.Popen(clipper_cmd_seq,
                                           cwd=CLIPPER_SERVER_BASE,
                                           stdout=subprocess.PIPE,
-                                          stderr=subprocess.PIPE)
+                                          stderr=subprocess.PIPE,
+                                          env=my_env)
     try:
-        # (output, err) = clipper_proc.communicate(timeout=100)
-                                              # timeout=100)
-
-        clipper_out, clipper_err = clipper_proc.communicate(timeout=100)
+        clipper_out, clipper_err = clipper_proc.communicate(timeout=150)
     except subprocess.TimeoutExpired:
         clipper_proc.kill()
         clipper_out, clipper_err = clipper_proc.communicate()
@@ -85,8 +86,10 @@ def run_exp(batch_size):
         feature_procs[i].terminate()
 
     time.sleep(10)
-    # print(clipper_out)
-    return clipper_out
+    print(clipper_out)
+    print("STDERR:")
+    print(clipper_err)
+    return clipper_err
 
     # (output, err) = proc.communicate()
 
@@ -94,22 +97,22 @@ def run_exp(batch_size):
     
 if __name__=="__main__":
 
-    batch = 10
-    out = run_exp(batch)
-    print(out)
-    exit(0)
+    # batch = 1
+    # out = run_exp(batch)
+    # print(out)
+    # exit(0)
 
     # first do baseline experiments
-    # out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/feature_lats/noop.txt")
-    # with open(out_file, "a") as results_file:
-    #     for batch in [1] + range(10,101,10) + range(150, 1001, 50):
-    #     # for batch in range(550, 1001, 50):
-    #         print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch)
-    #         print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch, file=results_file)
-    #         out = run_exp(batch)
-    #         print(out)
-    #         print(out, file=results_file)
-    #         results_file.flush()
-    #
-    # print("FINISHED NOOP EXPERIMENTS")
+    out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/faas_benchmarks/spark_lr.txt")
+    with open(out_file, "a") as results_file:
+        for batch in [1, 5, 10, 25, 50, 100, 150, 200, 250, 300, 350, 400]:
+        # for batch in range(550, 1001, 50):
+            print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch)
+            print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch, file=results_file)
+            out = run_exp(batch)
+            print(out)
+            print(out, file=results_file)
+            results_file.flush()
+
+    print("FINISHED")
     #
