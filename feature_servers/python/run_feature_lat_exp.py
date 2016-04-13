@@ -17,10 +17,15 @@ CLIPPER_SERVER_BASE = "/crankshaw-local/clipper/clipper_server"
 
 
 def start_feature(ip, port):
-    # mp = "sklearn_models/predict_1_svm/predict_1_svm.pkl"
-    # p = Process(target=rpc.start_sksvm_from_mp, args=(mp, ip,port))
-    mp = "spark_models/lg_predict_1"
-    p = Process(target=rpc.start_sparklr_from_mp, args=(mp, ip,port))
+    mp = "sklearn_models/predict_1_svm/predict_1_svm.pkl"
+    p = Process(target=rpc.start_sksvm_from_mp, args=(mp, ip,port))
+    # mp = "spark_models/lg_predict_1"
+    # p = Process(target=rpc.start_sparklr_from_mp, args=(mp, ip,port))
+    # mp = "spark_models/10rf_pred_1"
+    # p = Process(target=rpc.start_sparkrf_from_mp, args=(mp, ip, port))
+    # mp = "spark_models/10rf_pred_1"
+    # p = Process(target=rpc.start_sparkrf_from_mp, args=(mp, ip, port))
+
     p.start()
     return p # to kill: p.terminate()
 
@@ -103,16 +108,17 @@ if __name__=="__main__":
     # exit(0)
 
     # first do baseline experiments
-    out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/faas_benchmarks/spark_lr.txt")
+    out_file = os.path.join(CLIPPER_SERVER_BASE, "experiments_RAW/faas_benchmarks/sklearn_svm_dynamic_batch.txt")
     with open(out_file, "a") as results_file:
-        for batch in [1, 5, 10, 25, 50, 100, 150, 200, 250, 300, 350, 400]:
+        # for batch in [1, 5, 10, 25, 50, 100, 150, 200, 250, 300, 350, 400]:
         # for batch in range(550, 1001, 50):
-            print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch)
-            print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch, file=results_file)
-            out = run_exp(batch)
-            print(out)
-            print(out, file=results_file)
-            results_file.flush()
+        batch = 0
+        print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch)
+        print("\n\nEXPERIMENT RUN BATCH SIZE: %d" % batch, file=results_file)
+        out = run_exp(batch)
+        print(out)
+        print(out, file=results_file)
+        results_file.flush()
 
     print("FINISHED")
     #

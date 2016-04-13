@@ -5,6 +5,7 @@ use std::{thread, mem, slice};
 use std::sync::{RwLock, Arc};
 use std::sync::mpsc;
 use std::collections::HashMap;
+use std::cmp;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::AtomicUsize;
 use toml;
@@ -17,6 +18,7 @@ use byteorder::{LittleEndian, WriteBytesExt};
 use metrics;
 
 pub type HashKey = u64;
+
 
 pub struct FeatureReq {
     pub hash_key: HashKey,
@@ -167,12 +169,19 @@ pub fn get_addrs_str(addrs: Vec<String>) -> Vec<SocketAddr> {
 
 fn update_batch_size(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
     let batch_increment = 2;
-    if cur_time_micros < (max_time_micros - 3000) {
-        cur_batch + batch_increment
+    let backoff = 0.9;
+    let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;
+    if cur_time_micros < (max_time_micros - epsilon) {
+        let new_batch = cur_batch + batch_increment;
+        debug!("increasing batch to {}", new_batch);
+        new_batch as usize
     } else if cur_time_micros < max_time_micros {
         cur_batch
     } else {
-        cur_batch / 2
+        // don't try to set the batch size below 1
+        let new_batch = cmp::max((cur_batch as f64 * backoff).floor() as u64, 1);
+        debug!("decreasing batch to {}", new_batch);
+        new_batch as usize
     }
 }
 
@@ -185,11 +194,15 @@ fn feature_worker(name: String,
                   predictions_counter: Arc<metrics::Counter>,
                   batch_size: usize) {
 
+    // if the batch_size is less than 1 (these are unsigned
+    // integers, so that means batch size == 0), we assume dynamic batching
+    let dynamic_batching = batch_size < 1;
+    info!("using dynamic batch size for {}", name);
     // println!("starting worker: {}", name);
     let mut stream: TcpStream = TcpStream::connect(address).unwrap();
     stream.set_nodelay(true).unwrap();
     stream.set_read_timeout(None).unwrap();
-    let max_batch_size = batch_size;
+    // let max_batch_size = batch_size;
     let mut cur_batch_size = 1;
     // let mut bench_latencies = Vec::new();
     // let mut loop_counter = 0;
@@ -202,6 +215,12 @@ fn feature_worker(name: String,
         let first_req = rx.recv().unwrap();
         batch.push(first_req);
         let start_time = time::PreciseTime::now();
+        let max_batch_size = if dynamic_batching {
+            cur_batch_size
+        } else {
+            batch_size
+        };
+        assert!(max_batch_size >= 1);
         // while batch.len() < cur_batch_size {
         while batch.len() < max_batch_size {
             if let Ok(req) = rx.try_recv() {
@@ -240,10 +259,12 @@ fn feature_worker(name: String,
         if latency > server::SLA*1000 {
             debug!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
         }
-        // only try to increase the batch size if we actually sent a batch of maximum size
-        if batch.len() == cur_batch_size {
-            cur_batch_size = update_batch_size(cur_batch_size, latency as u64, 20*1000);
-            debug!("{} updated batch size to {}", name, cur_batch_size);
+        if dynamic_batching {
+            // only try to increase the batch size if we actually sent a batch of maximum size
+            if batch.len() == cur_batch_size {
+                cur_batch_size = update_batch_size(cur_batch_size, latency as u64, server::SLA as u64*1000 as u64);
+                // debug!("{} updated batch size to {}", name, cur_batch_size);
+            }
         }
 
         // let mut l = latencies.write().unwrap();

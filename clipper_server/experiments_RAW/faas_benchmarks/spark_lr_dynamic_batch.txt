@@ -1,0 +1,142 @@
+
+
+EXPERIMENT RUN BATCH SIZE: 0
+INFO:clipper: Args { flag_bench_conf: None, flag_feature_conf: "", arg_b: Some(0), cmd_digits: false, cmd_featurelats: true, cmd_start: false }
+INFO:clipper::features: Creating feature worker with 1 replicas
+INFO:clipper::faas_benchmark: making 5000000 requests
+INFO:clipper::features: using dynamic batch size for pyspark_rf
+thread '<unnamed>' panicked at 'assertion failed: batch_size >= 1', src/features.rs:223
+stack backtrace:
+   1:     0x55bb5631c580 - sys::backtrace::tracing::imp::write::haa19c02b4de52f3bG0t
+   2:     0x55bb5631ea05 - panicking::log_panic::_<closure>::closure.41218
+   3:     0x55bb5631e480 - panicking::log_panic::h527fe484e9de8fe1W7x
+   4:     0x55bb5630f503 - sys_common::unwind::begin_unwind_inner::h51f64b1a34c60827fTs
+   5:     0x55bb56239244 - sys_common::unwind::begin_unwind::begin_unwind::h9362044258214899684
+                        at ../src/libstd/sys/common/unwind/mod.rs:237
+   6:     0x55bb5626e4f6 - features::feature_worker::hebcc30f189128fa9Iob
+                        at /crankshaw-local/clipper/clipper_server/<std macros>:3
+   7:     0x55bb56269e50 - sys_common::unwind::try::try_fn::try_fn::h7110354382004172053
+                        at src/features.rs:132
+                        at ../src/libstd/thread/mod.rs:274
+                        at ../src/libstd/sys/common/unwind/mod.rs:163
+   8:     0x55bb5631ba28 - __rust_try
+   9:     0x55bb5631861b - sys_common::unwind::try::inner_try::h771fec597ec8f35cNPs
+  10:     0x55bb5626a920 - boxed::_<impl>::call_box::call_box::h9292528593994176028
+                        at ../src/libstd/sys/common/unwind/mod.rs:133
+                        at ../src/libstd/thread/mod.rs:274
+                        at ../src/liballoc/boxed.rs:541
+  11:     0x55bb5631d553 - sys::thread::_<impl>::new::thread_start::haf749b76474da6b089w
+  12:     0x7f0c3b6a7181 - start_thread
+  13:     0x7f0c3bec147c - __clone
+  14:                0x0 - <unknown>
+thread '<main>' panicked at 'called `Result::unwrap()` on an `Err` value: "SendError(..)"', ../src/libcore/result.rs:741
+stack backtrace:
+   1:     0x55bb5631c580 - sys::backtrace::tracing::imp::write::haa19c02b4de52f3bG0t
+   2:     0x55bb5631ea05 - panicking::log_panic::_<closure>::closure.41218
+   3:     0x55bb5631e480 - panicking::log_panic::h527fe484e9de8fe1W7x
+   4:     0x55bb5630f503 - sys_common::unwind::begin_unwind_inner::h51f64b1a34c60827fTs
+   5:     0x55bb5630fb78 - sys_common::unwind::begin_unwind_fmt::h0845853a1913f45blSs
+   6:     0x55bb5631bbe1 - rust_begin_unwind
+   7:     0x55bb5634b63f - panicking::panic_fmt::h3967afc085fe8067LFK
+   8:     0x55bb5626317c - features::_<impl>::request_feature::h10488994277719573812
+                        at ../src/libcore/macros.rs:29
+                        at src/features.rs:89
+   9:     0x55bb56245be7 - faas_benchmark::feature_batch_latency::h6bdd83362b24a013HUb
+                        at src/faas_benchmark.rs:57
+  10:     0x55bb56236ff7 - main::h80d11dbf6e6863c2qCc
+                        at src/main.rs:101
+  11:     0x55bb5631e224 - sys_common::unwind::try::try_fn::h11901883998771707766
+  12:     0x55bb5631ba28 - __rust_try
+  13:     0x55bb5631dec6 - rt::lang_start::hc150f651dd2af18b44x
+  14:     0x7f0c3bde8ec4 - __libc_start_main
+  15:     0x55bb56235198 - <unknown>
+  16:                0x0 - <unknown>
+
+
+
+EXPERIMENT RUN BATCH SIZE: 0
+INFO:clipper: Args { flag_bench_conf: None, flag_feature_conf: "", arg_b: Some(0), cmd_digits: false, cmd_featurelats: true, cmd_start: false }
+INFO:clipper::features: Creating feature worker with 1 replicas
+INFO:clipper::faas_benchmark: making 5000000 requests
+INFO:clipper::features: using dynamic batch size for pyspark_rf
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 1 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 343945 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 5742, max: 33970, mean: 18252.910992217898, std: 1855.126405634276, p95: 19307.5, p99: 22199.5, p50: 18575 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11458.544502159066, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 179168 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 12779, max: 37407, mean: 18564.910019455252, std: 1430.5075798255975, p95: 19171, p99: 20269, p50: 18702 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11944.129621752118, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 175836 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 13908, max: 39325, mean: 18344.658560311284, std: 2013.5452834299585, p95: 19106, p99: 27593, p50: 18408 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11721.990511798122, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 177387 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 10998, max: 39803, mean: 18445.543774319067, std: 2502.4907745913856, p95: 19391.5, p99: 30965, p50: 18676 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11825.404243137997, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 173517 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 14105, max: 37676, mean: 18540.34046692607, std: 1705.9467543844153, p95: 19287, p99: 25315, p50: 18615 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11567.375862885026, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 174583 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 12070, max: 39706, mean: 18517.25, std: 2295.9420073192696, p95: 19389, p99: 26995.5, p50: 18733 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11638.46009646063, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 174412 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 12668, max: 34712, mean: 18455.506322957197, std: 2084.639486989119, p95: 19592, p99: 32731, p50: 18399 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11627.047317826737, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "pyspark_rf_prediction_counter", count: 174775 }
+	Histograms:
+		HistStats { name: "pyspark_rf_faas_latency", min: 15591, max: 36315, mean: 18731.71887159533, std: 2095.705640850788, p95: 19727, p99: 32384.5, p50: 18663 }
+	Meters:
+		MeterStats { name: "pyspark_rf_faas_thruput", rate: 11651.212269388161, unit: "events per second" }
+
+

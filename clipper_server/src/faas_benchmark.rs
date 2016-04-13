@@ -15,6 +15,7 @@ pub fn feature_batch_latency(batch_size: usize) {
 
     let mnist_path = "/crankshaw-local/mnist/data/test.data".to_string();
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
+    // let addr_vec = vec![vec!["169.229.49.167:6001".to_string(),
     let addr_vec = vec![vec!["127.0.0.1:6001".to_string(),
                              // "127.0.0.1:7001".to_string(),
                              // "127.0.0.1:8001".to_string(),
@@ -43,7 +44,7 @@ pub fn feature_batch_latency(batch_size: usize) {
     
     let mut rng = thread_rng();
     // let num_trials = 10000;
-    let num_reqs = 2000000;
+    let num_reqs = 5000000;
     info!("making {} requests", num_reqs);
     for i in 0..num_reqs {
         let example_idx: usize = rng.gen_range(0, all_test_data.xs.len());
