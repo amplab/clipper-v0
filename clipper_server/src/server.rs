@@ -13,7 +13,7 @@ use features;
 use metrics;
 use features::FeatureHash;
 
-pub const SLA: i64 = 20;
+pub const SLA: i64 = 10;
 
 pub struct Request {
     start_time: time::PreciseTime,
