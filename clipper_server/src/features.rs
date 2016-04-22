@@ -197,7 +197,9 @@ fn feature_worker(name: String,
     // if the batch_size is less than 1 (these are unsigned
     // integers, so that means batch size == 0), we assume dynamic batching
     let dynamic_batching = batch_size < 1;
-    info!("using dynamic batch size for {}", name);
+    if dynamic_batching {
+        info!("using dynamic batch size for {}", name);
+    }
     // println!("starting worker: {}", name);
     let mut stream: TcpStream = TcpStream::connect(address).unwrap();
     stream.set_nodelay(true).unwrap();

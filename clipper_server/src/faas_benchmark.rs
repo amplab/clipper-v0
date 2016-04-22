@@ -20,7 +20,7 @@ pub fn feature_batch_latency(batch_size: usize) {
                              // "127.0.0.1:7001".to_string(),
                              // "127.0.0.1:8001".to_string(),
                                  ]];
-    let names = vec!["pyspark_rf".to_string()];
+    let names = vec!["tensorflow_conv".to_string()];
 
     let replicas_counter = {
         metrics_register.write().unwrap().create_counter("feature replicas counter".to_string())

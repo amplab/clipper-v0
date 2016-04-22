@@ -1,0 +1,54 @@
+INFO:clipper: Args { flag_bench_conf: None, flag_feature_conf: "", arg_b: Some(0), cmd_digits: false, cmd_featurelats: true, cmd_start: false }
+INFO:clipper::features: Creating feature worker with 1 replicas
+INFO:clipper::faas_benchmark: making 5000000 requests
+INFO:clipper::features: using dynamic batch size for tensorflow_conv
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 1 }
+		CounterStats { name: "tensorflow_conv_prediction_counter", count: 173166 }
+	Histograms:
+		HistStats { name: "tensorflow_conv_faas_latency", min: 9752, max: 27124, mean: 18555.804961089496, std: 1321.172404726904, p95: 19842, p99: 24095, p50: 18482 }
+	Meters:
+		MeterStats { name: "tensorflow_conv_faas_thruput", rate: 5531.779107191693, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "tensorflow_conv_prediction_counter", count: 65455 }
+	Histograms:
+		HistStats { name: "tensorflow_conv_faas_latency", min: 12225, max: 26917, mean: 17932.159046692606, std: 2186.509839080307, p95: 21140, p99: 23297, p50: 18191 }
+	Meters:
+		MeterStats { name: "tensorflow_conv_faas_thruput", rate: 4363.532560765965, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "tensorflow_conv_prediction_counter", count: 66402 }
+	Histograms:
+		HistStats { name: "tensorflow_conv_faas_latency", min: 11658, max: 28123, mean: 18167.030642023346, std: 2062.890691339076, p95: 21383, p99: 24688, p50: 18188 }
+	Meters:
+		MeterStats { name: "tensorflow_conv_faas_thruput", rate: 4426.669855906237, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "tensorflow_conv_prediction_counter", count: 70485 }
+	Histograms:
+		HistStats { name: "tensorflow_conv_faas_latency", min: 12380, max: 34496, mean: 18300.4046692607, std: 2113.0351027969596, p95: 20817, p99: 25193.5, p50: 18318 }
+	Meters:
+		MeterStats { name: "tensorflow_conv_faas_thruput", rate: 4698.848070579052, unit: "events per second" }
+
+INFO:clipper::faas_benchmark: 
+faas Metrics
+	Counters:
+		CounterStats { name: "feature replicas counter", count: 0 }
+		CounterStats { name: "tensorflow_conv_prediction_counter", count: 61236 }
+	Histograms:
+		HistStats { name: "tensorflow_conv_faas_latency", min: 11348, max: 26566, mean: 17666.383754863815, std: 2491.0723045273435, p95: 20775.5, p99: 23343, p50: 18247 }
+	Meters:
+		MeterStats { name: "tensorflow_conv_faas_thruput", rate: 4082.2753545258415, unit: "events per second" }
+
