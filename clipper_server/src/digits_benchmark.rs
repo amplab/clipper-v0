@@ -31,8 +31,8 @@ pub struct DigitsBenchConfig {
 pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
            dc: DigitsBenchConfig) {
 
-    println!("starting digits");
-    println!("Config: {:?}", dc);
+    info!("starting digits");
+    info!("Config: {:?}", dc);
 
     let metrics_register = 
       Arc::new(RwLock::new(metrics::Registry::new("digits_bench".to_string())));
@@ -41,7 +41,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
     let norm_test_data = digits::normalize(&all_test_data);
     // let norm_test_data = all_test_data;
 
-    println!("Test data loaded: {} points", norm_test_data.ys.len());
+    info!("Test data loaded: {} points", norm_test_data.ys.len());
 
     let tasks = digits::create_online_dataset(&norm_test_data,
                                               &norm_test_data,
@@ -66,7 +66,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
     {
       metrics_register.read().unwrap().reset();
     }
-    debug!("clearing caches");
+    info!("clearing caches");
     for f in features.iter() {
         let mut w = f.cache.write().unwrap();
         w.clear();
@@ -81,10 +81,11 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
                                          metrics_register.clone());
 
     thread::sleep(::std::time::Duration::new(3, 0));
-    let report_interval_secs = 4;
+    let report_interval_secs = 15;
     let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone(),
                                                        report_interval_secs);
 
+    info!("Starting test");
     let target_qps = dc.target_qps;
     let query_batch_size = dc.query_batch_size;
     let mut events_fired = 0;
@@ -109,7 +110,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
                 cur_index = 0;
                 cur_user = (cur_user + 1) % dc.num_users;
                 if cur_user == 0 {
-                  println!("restarting test");
+                  debug!("restarting test");
                 }
             }
             events_fired += 1;
@@ -128,7 +129,11 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
     thread::spawn(move || {
         loop {
             thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
-            info!("{}", metrics_register.read().unwrap().report());
+            let m = metrics_register.read().unwrap();
+            info!("{}", m.report());
+            m.reset();
+            // thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
+            // info!("{}", metrics_register.read().unwrap().report());
         }
     })
 }

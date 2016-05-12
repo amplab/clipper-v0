@@ -88,8 +88,8 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
     // let counter = counter.clone();
     thread::spawn(move || {
         loop {
-            let m = metrics_register.read().unwrap();
             thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
+            let m = metrics_register.read().unwrap();
             info!("{}", m.report());
             m.reset();
             // metrics_register.write().unwrap().reset();
