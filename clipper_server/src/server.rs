@@ -15,30 +15,40 @@ use features::FeatureHash;
 
 pub const SLA: i64 = 10;
 
-pub struct Request {
+pub struct PredictRequest<F> {
     start_time: time::PreciseTime,
     user: u32, // TODO: remove this because each feature has it's own hash
     input: Vec<f64>,
     true_label: Option<f64>, // used to evaluate accuracy,
-    req_number: i32
+    req_number: i32,
+    on_predict: F
 }
 
-impl Request {
+fn noop(_: f64) -> () { }
 
-    pub fn new(user: u32, input: Vec<f64>, req_num: i32) -> Request {
-        Request { start_time: time::PreciseTime::now(), user: user, input: input, true_label: None, req_number: req_num}
+impl<F: FnOnce(f64) -> ()>  PredictRequest<F> {
+
+    pub fn new(user: u32, input: Vec<f64>, req_num: i32, on_predict: F) -> PredictRequest<F> {
+        PredictRequest {
+            start_time: time::PreciseTime::now(),
+            user: user,
+            input: input,
+            true_label: None,
+            req_number: req_num,
+            on_predict: on_predict,
+        }
     }
 
-    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64, req_num: i32) -> Request {
-        Request {
+    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64, req_num: i32) -> PredictRequest<F> {
+        PredictRequest {
             start_time: time::PreciseTime::now(),
             user: user,
             input: input,
             true_label: Some(label),
-            req_number: req_num
+            req_number: req_num,
+            on_predict: noop,
         }
     }
-
 }
 
 #[allow(dead_code)]
@@ -112,20 +122,21 @@ fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
     task_model.predict(features, missing_feature_indexes, &debug_str)
 }
 
-fn start_prediction_worker<T, H>(worker_id: i32,
+fn start_prediction_worker<T, H, F>(worker_id: i32,
                            sla_millis: i64,
                            feature_handles: Vec<features::FeatureHandle<H>>,
                            user_models: Arc<Vec<RwLock<T>>>,
                            pred_metrics: PredictionMetrics
-                           ) -> mpsc::Sender<Request> 
+                           ) -> mpsc::Sender<PredictRequest<F>> 
                            where T: TaskModel + Send + Sync + 'static,
-                                 H: features::FeatureHash + Send + Sync + 'static {
+                                 H: features::FeatureHash + Send + Sync + 'static,
+                                 F: FnOnce(f64) -> () {
 
 
 
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(sla_millis / 5);
-    let (sender, receiver) = mpsc::channel::<Request>();
+    let (sender, receiver) = mpsc::channel::<PredictRequest<F>>();
     thread::spawn(move || {
         info!("starting response worker {} with {} ms SLA", worker_id, sla_millis);
         loop {
@@ -143,6 +154,7 @@ fn start_prediction_worker<T, H>(worker_id: i32,
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
             let task_model: &T = &lock.read().unwrap();
             let pred = make_prediction(&feature_handles, &req.input, task_model, req.req_number);
+            req.on_predict(pred);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_microseconds().unwrap();
             pred_metrics.latency_hist.insert(latency);
@@ -162,12 +174,6 @@ fn start_prediction_worker<T, H>(worker_id: i32,
 
 
 
-pub struct Dispatcher<T: TaskModel + Send + Sync + 'static> {
-    workers: Vec<mpsc::Sender<Request>>,
-    next_worker: usize,
-    feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
-    user_models: Arc<Vec<RwLock<T>>>,
-}
 
 #[derive(Clone)]
 struct PredictionMetrics {
@@ -208,10 +214,16 @@ impl PredictionMetrics {
             accuracy_counter: accuracy_counter
         }
     }
-
 }
 
-impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
+pub struct Dispatcher<T: TaskModel + Send + Sync + 'static, F> {
+    workers: Vec<mpsc::Sender<PredictRequest<F>>>,
+    next_worker: usize,
+    feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
+    user_models: Arc<Vec<RwLock<T>>>,
+}
+
+impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Dispatcher<T,F> {
 
     // pub fn new<T: TaskModel + Send + Sync + 'static>(num_workers: usize,
     pub fn new(num_workers: usize,
@@ -219,7 +231,7 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
            feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
            user_models: Arc<Vec<RwLock<T>>>,
            metrics_register: Arc<RwLock<metrics::Registry>>
-           ) -> Dispatcher<T> {
+           ) -> Dispatcher<T,F> {
         info!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
         let pred_metrics = PredictionMetrics::new(metrics_register.clone());
@@ -243,7 +255,8 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
     /// Dispatch a request.
     ///
     /// Requires self to be mutable so that we can increment `next_worker`
-    pub fn dispatch(&mut self, req: Request, max_features: usize) {
+    /// TODO(replace worker vec with spmc (http://seanmonstar.github.io/spmc/spmc/index.html)
+    pub fn dispatch(&self, req: PredictRequest<F>, max_features: usize) {
 
         let mut features_indexes: Vec<usize> = (0..self.feature_handles.len()).into_iter().collect();
         if max_features < self.feature_handles.len() {
@@ -258,14 +271,17 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
                      features_indexes,
                      req.start_time.clone(),
                      Some(req.req_number));
-        self.workers[self.next_worker].send(req).unwrap();
-        self.increment_worker();
+        let mut rng = thread_rng();
+        // randomly pick a worker
+        let w = rng.gen_range(0, self.workers.len());
+        self.workers[w].send(req).unwrap();
+        // self.increment_worker();
     }
 
     // for now do round robin scheduling
-    fn increment_worker(&mut self) {
-        self.next_worker = (self.next_worker + 1) % self.workers.len();
-    }
+    // fn increment_worker(&self) {
+    //     self.next_worker = (self.next_worker + 1) % self.workers.len();
+    // }
 }
 
 
@@ -282,61 +298,8 @@ fn init_user_models(num_users: usize, num_features: usize)
 
 
 
-
-pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
-    let num_features = feature_addrs.len();
-    let num_users = 500;
-    let metrics_register = Arc::new(RwLock::new(metrics::Registry::new("server main".to_string())));
-    // let test_data_path = "/crankshaw-local/mnist/data/test.data";
-    // let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
-    // let norm_test_data = digits::normalize(&all_test_data);
-
-    // info!("Test data loaded: {} points", norm_test_data.ys.len());
-
-    // let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
-    //                                                     .map(|a| features::get_addr(a))
-    //                                                     .zip(names.into_iter())
-    //                                                     .map(|(a, n)| create_feature_worker(a, n))
-    //                                                     .unzip();
-    let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
-                              .map(|(n, a)| features::create_feature_worker(
-                                      n, a, 100, metrics_register.clone())).unzip();
-
-
-    let num_events = 100;
-    let num_workers = num_cpus::get();
-    // let num_workers = 1;
-    let mut dispatcher = Dispatcher::new(num_workers,
-                                         SLA,
-                                         features.clone(),
-                                         init_user_models(num_users, num_features),
-                                         metrics_register.clone());
-
-    // create monitoring thread to check incremental thruput
-    thread::sleep(::std::time::Duration::new(3, 0));
-    // let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone());
-
-    let num_features = features.len();
-    info!("sending batch with no delays");
-    let mut rng = thread_rng();
-    for i in 0..num_events {
-        dispatcher.dispatch(Request::new(rng.gen_range(0, num_users as u32),
-                            features::random_features(784), i), num_features);
-    }
-
-    info!("waiting for features to finish");
-    // mon_thread_join_handle.join().unwrap();
-    for h in handles {
-        for th in h {
-            th.join().unwrap();
-        }
-    }
-    // handle.join().unwrap();
-    info!("done");
-}
-
 // TODO this is a lot of unnecessary copies of the input
-/// Request the features for `input` from the feature servers indicated
+/// PredictRequest the features for `input` from the feature servers indicated
 /// by `feature_indexes`. This allows a prediction worker to request
 /// only a subset of features to reduce the load on feature servers when
 /// the system is under heavy load.
@@ -357,4 +320,59 @@ pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
     }
 }
 
+
+
+
+
+// pub fn main(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
+//     let num_features = feature_addrs.len();
+//     let num_users = 500;
+//     let metrics_register = Arc::new(RwLock::new(metrics::Registry::new("server main".to_string())));
+//     // let test_data_path = "/crankshaw-local/mnist/data/test.data";
+//     // let all_test_data = digits::load_mnist_dense(test_data_path).unwrap();
+//     // let norm_test_data = digits::normalize(&all_test_data);
+//
+//     // info!("Test data loaded: {} points", norm_test_data.ys.len());
+//
+//     // let (features, handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
+//     //                                                     .map(|a| features::get_addr(a))
+//     //                                                     .zip(names.into_iter())
+//     //                                                     .map(|(a, n)| create_feature_worker(a, n))
+//     //                                                     .unzip();
+//     let (features, handles): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
+//                               .map(|(n, a)| features::create_feature_worker(
+//                                       n, a, 100, metrics_register.clone())).unzip();
+//
+//
+//     let num_events = 100;
+//     let num_workers = num_cpus::get();
+//     // let num_workers = 1;
+//     let mut dispatcher = Dispatcher::new(num_workers,
+//                                          SLA,
+//                                          features.clone(),
+//                                          init_user_models(num_users, num_features),
+//                                          metrics_register.clone());
+//
+//     // create monitoring thread to check incremental thruput
+//     thread::sleep(::std::time::Duration::new(3, 0));
+//     // let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone());
+//
+//     let num_features = features.len();
+//     info!("sending batch with no delays");
+//     let mut rng = thread_rng();
+//     for i in 0..num_events {
+//         dispatcher.dispatch(PredictRequest::new(rng.gen_range(0, num_users as u32),
+//                             features::random_features(784), i), num_features);
+//     }
+//
+//     info!("waiting for features to finish");
+//     // mon_thread_join_handle.join().unwrap();
+//     for h in handles {
+//         for th in h {
+//             th.join().unwrap();
+//         }
+//     }
+//     // handle.join().unwrap();
+//     info!("done");
+// }
 

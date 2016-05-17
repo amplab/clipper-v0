@@ -8,8 +8,8 @@ authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
 name = "clipper"
 path = "src/main.rs"
 
-[profile.release]
-debug = true
+# [profile.release]
+# debug = true
 
 # [build-dependencies]
 # capnpc = "*"
@@ -17,7 +17,6 @@ debug = true
 # git = "https://github.com/dcrankshaw/capnpc-rust"
 
 [dependencies]
-hyper = "0.7"
 rand = "0.3"
 time = "0.1"
 # mio = "0.5"
@@ -29,6 +28,7 @@ net2 = "0.2.21"
 byteorder = "0.4"
 log = "0.3"
 env_logger = "0.3"
+spmc = "0.2"
 # quickersort = "1.0.1"
 # getopts = "0.2"
 # capnp = "0.6.1"
@@ -51,3 +51,7 @@ env_logger = "0.3"
 git = "https://github.com/dcrankshaw/rust-linear-models"
 # path = "/crankshaw-local/rust-linear-models"
 
+
+[dependencies.hyper]
+git = "https://github.com/hyperium/hyper"
+# branch = "mio"

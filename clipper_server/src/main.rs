@@ -8,6 +8,7 @@
 // extern crate capnp_rpc;
 extern crate rand;
 extern crate time;
+extern crate hyper;
 // #[macro_use]
 // extern crate gj;
 // extern crate eventual;
@@ -49,6 +50,7 @@ pub mod features;
 pub mod digits_benchmark;
 pub mod faas_benchmark;
 pub mod metrics;
+pub mod rest;
 // pub mod rpc;
 
 
@@ -101,7 +103,7 @@ pub fn main() {
         faas_benchmark::feature_batch_latency(args.arg_b.unwrap());
     } else if args.cmd_start {
         let features = parse_feature_config(&args.flag_feature_conf);
-        server::main(features);
+        rest::start_listening(features);
     }
 
 

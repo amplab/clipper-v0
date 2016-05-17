@@ -1,7 +1,7 @@
 use time;
 use std::ptr;
-use std::thread;
 use std::sync::{RwLock, Arc};
+use std::thread;
 use std::net::SocketAddr;
 use server;
 use digits;
@@ -102,8 +102,9 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
             let true_label = (&trained_tasks)[cur_user].read().unwrap().test_y[cur_index];
             // let max_features = features.len();
             let max_features = dc.max_features;
-            let r = server::Request::new_with_label(cur_user as u32, input, true_label, events_fired as i32);
+            let r = server::PredictRequest::new_with_label(cur_user as u32, input, true_label, events_fired as i32);
             // dispatcher.dispatch(r, features.len());
+            // NOOP callback
             dispatcher.dispatch(r, max_features);
             cur_index += 1;
             if cur_index == dc.num_test_examples {
