@@ -20,37 +20,39 @@ const PREDICT: &'static str = "/predict";
 // const UPDATE: &'static str = "/update";
 
 
-struct RequestHandler<T>
+struct PredictHandler<T>
 where T: TaskModel + Send + Sync + 'static {
     dispatcher: Arc<server::Dispatcher<T>>,
     result_string: String,
     result_channel: Option<mpsc::Receiver<String>>,
     num_features: usize,
     ctrl: Control,
+    uid: u32,
 }
 
-impl<T> RequestHandler<T>
+impl<T> PredictHandler<T>
 where T: TaskModel + Send + Sync + 'static {
     fn new(dispatcher: Arc<server::Dispatcher<T>>,
-           num_features: usize, ctrl: Control) -> RequestHandler<T> {
-        RequestHandler {
+           num_features: usize, ctrl: Control) -> PredictHandler<T> {
+        PredictHandler {
             dispatcher: dispatcher,
             result_string: "NO RESULT YET".to_string(),
             result_channel: None,
             num_features: num_features,
-            ctrl: ctrl
+            ctrl: ctrl,
+            uid: 0,
         }
     }
 }
 
 
-impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for RequestHandler<T> {
+impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for PredictHandler<T> {
     fn on_request(&mut self, req: Request) -> Next {
         match *req.uri() {
             RequestUri::AbsolutePath(ref path) => match (req.method(), &path[0..PREDICT.len()]) {
-                (&Get, PREDICT) => {
+                (&Post, PREDICT) => {
                     let query_str: Vec<&str> = path.split("?").collect();
-                    let uid = if query_str.len() > 1 {
+                    self.uid = if query_str.len() > 1 {
                         let q = query_str[1];
                         let sp: Vec<&str> = q.split("=").collect();
                         assert!(sp.len() == 2 && sp[0] == "uid");
@@ -60,25 +62,9 @@ impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for RequestHandle
                     } else {
                         0
                     };
-                    info!("UID: {}", uid);
-                    let ctrl = self.ctrl.clone();
-                    let (tx, rx) = mpsc::channel::<String>();
-                    self.result_channel = Some(rx);
-    // let (q_tx, q_rx) = mpsc::channel::<(time::PreciseTime, Control)>();
-                    let on_pred = Box::new(move |y| {
-                        tx.send(format!("predict: {}", y).to_string()).unwrap();
-                        ctrl.ready(Next::write()).unwrap();
-                    });
-                    let r = server::PredictRequest::new(uid,
-                                                        features::random_features(784),
-                                                        0_i32,
-                                                        on_pred,
-                                                        );
+                    info!("UID: {}", self.uid);
+                    Next::read()
 
-                    self.dispatcher.dispatch(r, self.num_features);
-                    // self.ctrl.ready(Next::write());
-                    // self.queue.send((self.start_time.clone(), ctrl)).unwrap();
-                    Next::wait()
                 }
                 _ => Next::write()
             },
@@ -86,8 +72,27 @@ impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for RequestHandle
         }
     }
 
-    fn on_request_readable(&mut self, _: &mut Decoder<HttpStream>) -> Next {
-        Next::write()
+    fn on_request_readable(&mut self, transport: &mut Decoder<HttpStream>) -> Next {
+        let mut request_str = String::new();
+        transport.read_to_string(&mut request_str).unwrap();
+        info!("REQUEST STRING: {}", request_str);
+        // TODO: parse request_str to json
+        
+        let ctrl = self.ctrl.clone();
+        let (tx, rx) = mpsc::channel::<String>();
+        self.result_channel = Some(rx);
+// let (q_tx, q_rx) = mpsc::channel::<(time::PreciseTime, Control)>();
+        let on_pred = Box::new(move |y| {
+            tx.send(format!("predict: {}", y).to_string()).unwrap();
+            ctrl.ready(Next::write()).unwrap();
+        });
+        let r = server::PredictRequest::new(self.uid,
+                                            features::random_features(784),
+                                            0_i32,
+                                            on_pred,
+                                            );
+        self.dispatcher.dispatch(r, self.num_features);
+        Next::wait()
     }
 
 
@@ -153,7 +158,7 @@ pub fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
 
     // let (q_tx, q_rx) = mpsc::channel::<(time::PreciseTime, Control)>();
     let (listening, server) = server.handle(|ctrl| 
-        RequestHandler::new(dispatcher.clone(), num_features, ctrl)).unwrap();
+        PredictHandler::new(dispatcher.clone(), num_features, ctrl)).unwrap();
     println!("Listening on http://{}", listening);
     // thread::spawn(move || {
     //     let sla_millis = 2000;

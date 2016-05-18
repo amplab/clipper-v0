@@ -15,7 +15,7 @@ use metrics;
 use features::FeatureHash;
 use std::boxed::Box;
 
-pub const SLA: i64 = 10;
+pub const SLA: i64 = 20;
 
 pub type OnPredict = Fn(f64) -> () + Send;
 
