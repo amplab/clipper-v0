@@ -1,10 +1,12 @@
 
-use std::io::{self, Read, Write};
+use std::io::{Read, Write};
 use std::thread;
 use std::sync::{mpsc, RwLock, Arc};
-// use std::clone::Clone;
 use std::net::SocketAddr;
+use std::boxed::Box;
+// use std::cell::Cell;
 
+#[allow(unused_imports)]
 use hyper::{Get, Post, StatusCode, RequestUri, Decoder, Encoder, Next, Control};
 use hyper::header::ContentLength;
 use hyper::net::HttpStream;
@@ -15,28 +17,34 @@ use features;
 use metrics;
 
 const PREDICT: &'static str = "/predict";
-const UPDATE: &'static str = "/update";
+// const UPDATE: &'static str = "/update";
 
-// use server::PredictRequest;
 
-struct RequestHandler<T: TaskModel + Send + Sync + 'static, F> {
-    dispatcher: Arc<server::Dispatcher<T,F>>,
+struct RequestHandler<T>
+where T: TaskModel + Send + Sync + 'static {
+    dispatcher: Arc<server::Dispatcher<T>>,
     result_string: String,
-    num_features: u32,
+    result_channel: Option<mpsc::Receiver<String>>,
+    num_features: usize,
+    ctrl: Control,
 }
 
-impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> RequestHandler<T,F> {
-    fn new(dispatcher: Arc<server::Dispatcher<T,F>>, num_features: u32) -> RequestHandler<T,F> {
+impl<T> RequestHandler<T>
+where T: TaskModel + Send + Sync + 'static {
+    fn new(dispatcher: Arc<server::Dispatcher<T>>,
+           num_features: usize, ctrl: Control) -> RequestHandler<T> {
         RequestHandler {
             dispatcher: dispatcher,
             result_string: "NO RESULT YET".to_string(),
+            result_channel: None,
             num_features: num_features,
+            ctrl: ctrl
         }
     }
 }
 
 
-impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Handler<HttpStream> for RequestHandler<T,F> {
+impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for RequestHandler<T> {
     fn on_request(&mut self, req: Request) -> Next {
         match *req.uri() {
             RequestUri::AbsolutePath(ref path) => match (req.method(), &path[0..PREDICT.len()]) {
@@ -54,13 +62,18 @@ impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Handler<HttpStr
                     };
                     info!("UID: {}", uid);
                     let ctrl = self.ctrl.clone();
+                    let (tx, rx) = mpsc::channel::<String>();
+                    self.result_channel = Some(rx);
+    // let (q_tx, q_rx) = mpsc::channel::<(time::PreciseTime, Control)>();
+                    let on_pred = Box::new(move |y| {
+                        tx.send(format!("predict: {}", y).to_string()).unwrap();
+                        ctrl.ready(Next::write()).unwrap();
+                    });
                     let r = server::PredictRequest::new(uid,
                                                         features::random_features(784),
                                                         0_i32,
-                                                        |y| {
-                                                            self.result_string = format!("predict: {}", y);
-                                                            ctrl.ready(Next::write());
-                                                        });
+                                                        on_pred,
+                                                        );
 
                     self.dispatcher.dispatch(r, self.num_features);
                     // self.ctrl.ready(Next::write());
@@ -73,19 +86,24 @@ impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Handler<HttpStr
         }
     }
 
-    fn on_request_readable(&mut self, transport: &mut Decoder<HttpStream>) -> Next {
+    fn on_request_readable(&mut self, _: &mut Decoder<HttpStream>) -> Next {
         Next::write()
     }
 
 
 
     fn on_response(&mut self, res: &mut Response) -> Next {
-        res.headers_mut().set(ContentLength(self.result_string.len() as u64));
+        self.result_string = match self.result_channel {
+            Some(ref c) => c.recv().unwrap(),
+            None => panic!("no channel"),
+        };
+        // self.result_string = self.result_channel.recv().unwrap();
+        res.headers_mut().set(ContentLength(self.result_string.as_bytes().len() as u64));
         Next::write()
     }
 
     fn on_response_writable(&mut self, transport: &mut Encoder<HttpStream>) -> Next {
-        transport.write(self.result_string).unwrap();
+        transport.write(self.result_string.as_bytes()).unwrap();
         info!("{}", self.result_string);
         // info!("{} in {}", self.result_string, self.start_time.to(time::PreciseTime::now()).num_milliseconds());
         Next::end()
@@ -95,7 +113,6 @@ impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Handler<HttpStr
 
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
                          report_interval_secs: u64) -> ::std::thread::JoinHandle<()> {
-
     thread::spawn(move || {
         loop {
             thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
@@ -108,7 +125,8 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
     })
 }
 
-fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
+
+pub fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
     let server = Server::http(&"127.0.0.1:1337".parse().unwrap()).unwrap();
 
     let metrics_register = 
@@ -124,18 +142,18 @@ fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
     let num_users = 100;
     let report_interval_secs = 15;
 
-    let mut dispatcher = Arc::new(server::Dispatcher::new(num_workers,
+    let dispatcher = Arc::new(server::Dispatcher::new(num_workers,
                                          server::SLA,
                                          features.clone(),
                                          server::init_user_models(num_users, num_features),
                                          metrics_register.clone()));
 
-    let mon_thread_join_handle = launch_monitor_thread(metrics_register.clone(),
+    let _ = launch_monitor_thread(metrics_register.clone(),
                                                        report_interval_secs);
 
     // let (q_tx, q_rx) = mpsc::channel::<(time::PreciseTime, Control)>();
-    let (listening, server) = server.handle(
-        RequestHandler::new(dispatcher.clone(), num_features)).unwrap();
+    let (listening, server) = server.handle(|ctrl| 
+        RequestHandler::new(dispatcher.clone(), num_features, ctrl)).unwrap();
     println!("Listening on http://{}", listening);
     // thread::spawn(move || {
     //     let sla_millis = 2000;
@@ -156,3 +174,4 @@ fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>) {
     // });
     server.run();
 }
+

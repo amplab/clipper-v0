@@ -74,7 +74,7 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
 
     let num_workers = dc.num_workers;
 
-    let mut dispatcher = server::Dispatcher::new(num_workers,
+    let dispatcher = server::Dispatcher::new(num_workers,
                                          server::SLA,
                                          features.clone(),
                                          trained_tasks.clone(),

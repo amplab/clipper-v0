@@ -4,31 +4,34 @@
 
 use time;
 // use log;
-use std::net::SocketAddr;
+// use std::net::SocketAddr;
 use std::thread;
 use std::sync::{mpsc, RwLock, Arc};
 use rand::{thread_rng, Rng};
+#[allow(unused_imports)]
 use num_cpus;
 use features;
 use metrics;
 use features::FeatureHash;
+use std::boxed::Box;
 
 pub const SLA: i64 = 10;
 
-pub struct PredictRequest<F> {
+pub type OnPredict = Fn(f64) -> () + Send;
+
+pub struct PredictRequest {
     start_time: time::PreciseTime,
     user: u32, // TODO: remove this because each feature has it's own hash
     input: Vec<f64>,
     true_label: Option<f64>, // used to evaluate accuracy,
     req_number: i32,
-    on_predict: F
+    on_predict: Box<OnPredict>
 }
 
-fn noop(_: f64) -> () { }
 
-impl<F: FnOnce(f64) -> ()>  PredictRequest<F> {
+impl PredictRequest {
 
-    pub fn new(user: u32, input: Vec<f64>, req_num: i32, on_predict: F) -> PredictRequest<F> {
+    pub fn new(user: u32, input: Vec<f64>, req_num: i32, on_predict: Box<OnPredict>) -> PredictRequest {
         PredictRequest {
             start_time: time::PreciseTime::now(),
             user: user,
@@ -39,14 +42,14 @@ impl<F: FnOnce(f64) -> ()>  PredictRequest<F> {
         }
     }
 
-    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64, req_num: i32) -> PredictRequest<F> {
+    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64, req_num: i32) -> PredictRequest {
         PredictRequest {
             start_time: time::PreciseTime::now(),
             user: user,
             input: input,
             true_label: Some(label),
             req_number: req_num,
-            on_predict: noop,
+            on_predict: Box::new(|_| { }),
         }
     }
 }
@@ -75,7 +78,7 @@ pub trait TaskModel {
     // fn train(&mut self,
 }
 
-struct DummyTaskModel {
+pub struct DummyTaskModel {
     num_features: usize
 }
 
@@ -122,21 +125,20 @@ fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
     task_model.predict(features, missing_feature_indexes, &debug_str)
 }
 
-fn start_prediction_worker<T, H, F>(worker_id: i32,
+fn start_prediction_worker<T, H>(worker_id: i32,
                            sla_millis: i64,
                            feature_handles: Vec<features::FeatureHandle<H>>,
                            user_models: Arc<Vec<RwLock<T>>>,
                            pred_metrics: PredictionMetrics
-                           ) -> mpsc::Sender<PredictRequest<F>> 
+                           ) -> mpsc::Sender<PredictRequest> 
                            where T: TaskModel + Send + Sync + 'static,
-                                 H: features::FeatureHash + Send + Sync + 'static,
-                                 F: FnOnce(f64) -> () {
+                                 H: features::FeatureHash + Send + Sync + 'static {
 
 
 
     let sla = time::Duration::milliseconds(sla_millis);
     let epsilon = time::Duration::milliseconds(sla_millis / 5);
-    let (sender, receiver) = mpsc::channel::<PredictRequest<F>>();
+    let (sender, receiver) = mpsc::channel::<PredictRequest>();
     thread::spawn(move || {
         info!("starting response worker {} with {} ms SLA", worker_id, sla_millis);
         loop {
@@ -154,7 +156,7 @@ fn start_prediction_worker<T, H, F>(worker_id: i32,
             let lock = (&user_models).get(*(&req.user) as usize).unwrap();
             let task_model: &T = &lock.read().unwrap();
             let pred = make_prediction(&feature_handles, &req.input, task_model, req.req_number);
-            req.on_predict(pred);
+            (req.on_predict)(pred);
             let end_time = time::PreciseTime::now();
             let latency = req.start_time.to(end_time).num_microseconds().unwrap();
             pred_metrics.latency_hist.insert(latency);
@@ -216,14 +218,15 @@ impl PredictionMetrics {
     }
 }
 
-pub struct Dispatcher<T: TaskModel + Send + Sync + 'static, F> {
-    workers: Vec<mpsc::Sender<PredictRequest<F>>>,
-    next_worker: usize,
+pub struct Dispatcher<T>
+where T: TaskModel + Send + Sync + 'static {
+    workers: Vec<mpsc::Sender<PredictRequest>>,
+    // next_worker: usize,
     feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
     user_models: Arc<Vec<RwLock<T>>>,
 }
 
-impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Dispatcher<T,F> {
+impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
 
     // pub fn new<T: TaskModel + Send + Sync + 'static>(num_workers: usize,
     pub fn new(num_workers: usize,
@@ -231,7 +234,7 @@ impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Dispatcher<T,F>
            feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
            user_models: Arc<Vec<RwLock<T>>>,
            metrics_register: Arc<RwLock<metrics::Registry>>
-           ) -> Dispatcher<T,F> {
+           ) -> Dispatcher<T> {
         info!("creating dispatcher with {} workers", num_workers);
         let mut worker_threads = Vec::new();
         let pred_metrics = PredictionMetrics::new(metrics_register.clone());
@@ -246,7 +249,7 @@ impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Dispatcher<T,F>
         }
         Dispatcher {
             workers: worker_threads,
-            next_worker: 0,
+            // next_worker: 0,
             feature_handles: feature_handles,
             user_models: user_models
         }
@@ -256,7 +259,7 @@ impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Dispatcher<T,F>
     ///
     /// Requires self to be mutable so that we can increment `next_worker`
     /// TODO(replace worker vec with spmc (http://seanmonstar.github.io/spmc/spmc/index.html)
-    pub fn dispatch(&self, req: PredictRequest<F>, max_features: usize) {
+    pub fn dispatch(&self, req: PredictRequest, max_features: usize) {
 
         let mut features_indexes: Vec<usize> = (0..self.feature_handles.len()).into_iter().collect();
         if max_features < self.feature_handles.len() {
@@ -285,7 +288,7 @@ impl<T: TaskModel + Send + Sync + 'static, F: FnOnce(f64) -> ()> Dispatcher<T,F>
 }
 
 
-fn init_user_models(num_users: usize, num_features: usize)
+pub fn init_user_models(num_users: usize, num_features: usize)
     -> Arc<Vec<RwLock<DummyTaskModel>>> {
     // let mut rng = thread_rng();
     let mut models = Vec::with_capacity(num_users);
