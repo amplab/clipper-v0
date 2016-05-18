@@ -85,7 +85,7 @@ pub struct DummyTaskModel {
 impl TaskModel for DummyTaskModel {
     #[allow(unused_variables)]
     fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
-        0.3
+        fs.into_iter().fold(0.0, |acc, c| acc + c)
     }
 
     fn rank_features(&self) -> Vec<usize> {

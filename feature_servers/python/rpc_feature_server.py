@@ -8,8 +8,8 @@ import datetime
 import sys
 import os
 import findspark
-findspark.init('/crankshaw-local/spark-1.6.0-bin-hadoop2.4')
-# findspark.init()
+# findspark.init('/crankshaw-local/spark-1.6.0-bin-hadoop2.4')
+findspark.init()
 
 import pyspark
 from pyspark import SparkConf, SparkContext
