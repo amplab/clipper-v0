@@ -12,17 +12,31 @@ use rand::{thread_rng, Rng};
 use num_cpus;
 use features;
 use metrics;
-use features::FeatureHash;
+use hashing::{FeatureHash, SimpleHasher};
 use std::boxed::Box;
+// use std::hash::{Hash, SipHasher, Hasher};
 
 pub const SLA: i64 = 20;
 
 pub type OnPredict = Fn(f64) -> () + Send;
 
+pub type Output = Vec<f64>;
+
+// #[derive(Hash, Clone, Debug)]
+#[derive(Clone,Debug)]
+pub enum Input {
+    Str {s: String},
+    Bytes {b: Vec<u8>, length: i32},
+    Ints {i: Vec<i32>, length: i32},
+    Floats {f: Vec<f32>, length: i32},
+}
+
+
+
 pub struct PredictRequest {
     start_time: time::PreciseTime,
     user: u32, // TODO: remove this because each feature has it's own hash
-    input: Vec<f64>,
+    input: Input,
     true_label: Option<f64>, // used to evaluate accuracy,
     req_number: i32,
     on_predict: Box<OnPredict>
@@ -31,7 +45,7 @@ pub struct PredictRequest {
 
 impl PredictRequest {
 
-    pub fn new(user: u32, input: Vec<f64>, req_num: i32, on_predict: Box<OnPredict>) -> PredictRequest {
+    pub fn new(user: u32, input: Input, req_num: i32, on_predict: Box<OnPredict>) -> PredictRequest {
         PredictRequest {
             start_time: time::PreciseTime::now(),
             user: user,
@@ -42,7 +56,7 @@ impl PredictRequest {
         }
     }
 
-    pub fn new_with_label(user: u32, input: Vec<f64>, label: f64, req_num: i32) -> PredictRequest {
+    pub fn new_with_label(user: u32, input: Input, label: f64, req_num: i32) -> PredictRequest {
         PredictRequest {
             start_time: time::PreciseTime::now(),
             user: user,
@@ -58,7 +72,7 @@ impl PredictRequest {
 struct Update {
     start_time: time::PreciseTime, // just for monitoring purposes
     user: u32,
-    input: Vec<f64>,
+    input: Input,
     label: f32,
 }
 
@@ -68,7 +82,7 @@ struct Update {
 
 pub trait TaskModel {
     /// Make a prediction with the available features
-    fn predict(&self, mut fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64;
+    fn predict(&self, mut fs: Output, missing_fs: Vec<usize>, debug_str: &String) -> f64;
 
     fn rank_features(&self) -> Vec<usize>;
 
@@ -84,7 +98,7 @@ pub struct DummyTaskModel {
 
 impl TaskModel for DummyTaskModel {
     #[allow(unused_variables)]
-    fn predict(&self, fs: Vec<f64>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
+    fn predict(&self, fs: Output, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
         fs.into_iter().fold(0.0, |acc, c| acc + c)
     }
 
@@ -97,15 +111,15 @@ impl TaskModel for DummyTaskModel {
 // users there will be ahead of time. Then we can have a vec of RwLock
 // and have row-level locking (because no inserts or deletes).
 fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
-                      input: &Vec<f64>,
+                      input: &Input,
                       task_model: &T,
                       req_id: i32) -> f64
                       where T: TaskModel,
-                            H: features::FeatureHash + Send + Sync {
+                            H: FeatureHash + Send + Sync {
 
     
     let mut missing_feature_indexes: Vec<usize> = Vec::new();
-    let mut features: Vec<f64> = Vec::new();
+    let mut features: Output = Vec::new();
     let mut i = 0;
     for fh in feature_handles {
         let hash = fh.hasher.hash(input, Some(req_id));
@@ -132,7 +146,7 @@ fn start_prediction_worker<T, H>(worker_id: i32,
                            pred_metrics: PredictionMetrics
                            ) -> mpsc::Sender<PredictRequest> 
                            where T: TaskModel + Send + Sync + 'static,
-                                 H: features::FeatureHash + Send + Sync + 'static {
+                                 H: FeatureHash + Send + Sync + 'static {
 
 
 
@@ -222,7 +236,7 @@ pub struct Dispatcher<T>
 where T: TaskModel + Send + Sync + 'static {
     workers: Vec<mpsc::Sender<PredictRequest>>,
     // next_worker: usize,
-    feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
+    feature_handles: Vec<features::FeatureHandle<SimpleHasher>>,
     user_models: Arc<Vec<RwLock<T>>>,
 }
 
@@ -231,7 +245,7 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
     // pub fn new<T: TaskModel + Send + Sync + 'static>(num_workers: usize,
     pub fn new(num_workers: usize,
            sla_millis: i64,
-           feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>,
+           feature_handles: Vec<features::FeatureHandle<SimpleHasher>>,
            user_models: Arc<Vec<RwLock<T>>>,
            metrics_register: Arc<RwLock<metrics::Registry>>
            ) -> Dispatcher<T> {
@@ -276,7 +290,12 @@ impl<T: TaskModel + Send + Sync + 'static> Dispatcher<T> {
                      Some(req.req_number));
         let mut rng = thread_rng();
         // randomly pick a worker
-        let w = rng.gen_range(0, self.workers.len());
+        
+        let w: usize = if self.workers.len() > 1 {
+            rng.gen_range::<usize>(0, self.workers.len())
+        } else {
+            0
+        };
         self.workers[w].send(req).unwrap();
         // self.increment_worker();
     }
@@ -306,8 +325,8 @@ pub fn init_user_models(num_users: usize, num_features: usize)
 /// by `feature_indexes`. This allows a prediction worker to request
 /// only a subset of features to reduce the load on feature servers when
 /// the system is under heavy load.
-pub fn get_features(fs: &Vec<features::FeatureHandle<features::SimpleHasher>>,
-                    input: Vec<f64>,
+pub fn get_features(fs: &Vec<features::FeatureHandle<SimpleHasher>>,
+                    input: Input,
                     feature_indexes: Vec<usize>,
                     req_start: time::PreciseTime,
                     salt: Option<i32>) {

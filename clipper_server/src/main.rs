@@ -51,6 +51,7 @@ pub mod digits_benchmark;
 pub mod faas_benchmark;
 pub mod metrics;
 pub mod rest;
+pub mod hashing;
 // pub mod rpc;
 
 
@@ -84,6 +85,7 @@ struct Args {
     cmd_start: bool,
 }
 
+
 pub fn main() {
 
   env_logger::init().unwrap();
@@ -103,7 +105,7 @@ pub fn main() {
         faas_benchmark::feature_batch_latency(args.arg_b.unwrap());
     } else if args.cmd_start {
         let features = parse_feature_config(&args.flag_feature_conf);
-        rest::start_listening(features);
+        rest::start_listening(features, rest::InputType::Float(784));
     }
 
 

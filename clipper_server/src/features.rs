@@ -1,4 +1,3 @@
-
 use time;
 use std::net::{ToSocketAddrs, SocketAddr, TcpStream};
 use std::{thread, mem, slice};
@@ -10,19 +9,18 @@ use rand::{thread_rng, Rng};
 use std::sync::atomic::AtomicUsize;
 use toml;
 use server;
-use std::hash::{Hash, SipHasher, Hasher};
+// use std::hash::{Hash, SipHasher, Hasher};
 use std::io::{Read, Write};
 // use std::net::{self};
 use net2::TcpStreamExt;
 use byteorder::{LittleEndian, WriteBytesExt};
 use metrics;
-
-pub type HashKey = u64;
+use hashing::{FeatureHash, SimpleHasher};
 
 
 pub struct FeatureReq {
     pub hash_key: HashKey,
-    pub input: Vec<f64>,
+    pub input: server::Input,
     pub req_start_time: time::PreciseTime,
 }
 
@@ -43,42 +41,6 @@ pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
 
 }
 
-
-pub trait FeatureHash {
-    fn hash(&self, input: &Vec<f64>, salt: Option<i32>) -> HashKey;
-}
-
-#[derive(Clone)]
-pub struct SimpleHasher;
-
-impl FeatureHash for SimpleHasher {
-    fn hash(&self, input: &Vec<f64>, salt: Option<i32>) -> HashKey {
-        // lame way to get around rust's lack of floating point equality. Basically,
-        // we need a better hash function.
-        let mut int_vec: Vec<i32> = Vec::new();
-        for i in input {
-            let iv = (i * 10000000.0) as i32;
-            int_vec.push(iv);
-        }
-        if salt.is_some() {
-            int_vec.push(salt.unwrap());
-        }
-        let mut s = SipHasher::new();
-        int_vec.hash(&mut s);
-        s.finish()
-    }
-}
-
-
-// pub struct LocalitySensitiveHash {
-//     hash_size: i32
-// }
-//
-// impl FeatureHash for LocalitySensitiveHash {
-//     fn hash(&self, input: &Vec<f64>) -> u64 {
-//         
-//     }
-// }
 
 
 
@@ -239,11 +201,13 @@ fn feature_worker(name: String,
         header_wtr.write_u16::<LittleEndian>(batch.len() as u16).unwrap();
         stream.write_all(&header_wtr).unwrap();
         for r in batch.iter() {
-            stream.write_all(floats_to_bytes(r.input.clone())).unwrap();
+            match r.input {
+                server::Input::Floats { f: ref f, length: _ } => 
+                    stream.write_all(floats_to_bytes(r.input.clone())).unwrap(),
+                _ => panic!("unimplemented input type")
+            }
         }
-
         stream.flush().unwrap();
-
         // read response: assumes 1 f64 for each entry in batch
         let num_response_bytes = batch.len()*mem::size_of::<f64>();
         let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
