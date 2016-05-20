@@ -114,6 +114,10 @@ pub struct DummyTaskModel {
 impl TaskModel for DummyTaskModel {
     #[allow(unused_variables)]
     fn predict(&self, fs: Output, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
+        if missing_fs.len() > 0 {
+            info!("missing fs: {:?}", missing_fs);
+        }
+        info!("Features: {:?}", fs);
         fs.into_iter().fold(0.0, |acc, c| acc + c)
     }
 

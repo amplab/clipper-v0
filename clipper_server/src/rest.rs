@@ -149,7 +149,7 @@ impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for PredictHandle
         };
         match input {
             Ok(i) => {
-                info!("query input: {:?}", i);
+                // info!("query input: {:?}", i);
                 let ctrl = self.ctrl.clone();
                 let (tx, rx) = mpsc::channel::<String>();
                 self.result_channel = Some(rx);
