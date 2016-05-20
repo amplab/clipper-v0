@@ -15,7 +15,7 @@ use std::io::{Read, Write};
 use net2::TcpStreamExt;
 use byteorder::{LittleEndian, WriteBytesExt};
 use metrics;
-use hashing::{FeatureHash, SimpleHasher};
+use hashing::{FeatureHash, SimpleHasher, HashKey};
 
 
 pub struct FeatureReq {
@@ -26,7 +26,6 @@ pub struct FeatureReq {
 
 #[derive(Clone)]
 pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
-    // addr: SocketAddr,
     pub name: String,
     // TODO: need a better concurrent hashmap: preferable lock free wait free
     // This should actually be reasonably simple, because we don't need to resize
@@ -34,11 +33,8 @@ pub struct FeatureHandle<H: FeatureHash + Send + Sync> {
     // true but it's a good approximation for now.
     pub cache: Arc<RwLock<HashMap<HashKey, f64>>>,
     pub hasher: Arc<H>,
-    // pub latencies: Arc<RwLock<Vec<i64>>>,
     queues: Vec<mpsc::Sender<FeatureReq>>,
     next_instance: Arc<AtomicUsize>,
-    // thread_handle: ::std::thread::JoinHandle<()>,
-
 }
 
 
@@ -56,7 +52,8 @@ pub fn create_feature_worker(name: String,
                              addrs: Vec<SocketAddr>,
                              batch_size: usize,
                              metric_register: Arc<RwLock<metrics::Registry>>)
-    -> (FeatureHandle<SimpleHasher>, Vec<::std::thread::JoinHandle<()>>) {
+                             -> (FeatureHandle<SimpleHasher>,
+                                 Vec<::std::thread::JoinHandle<()>>) {
 
     let latency_hist: Arc<metrics::Histogram> = {
         let metric_name = format!("{}_faas_latency", name);
@@ -109,9 +106,9 @@ pub fn create_feature_worker(name: String,
         queues: queues,
         cache: feature_cache,
         hasher: Arc::new(SimpleHasher),
-        next_instance: Arc::new(AtomicUsize::new(0)),
-        // thread_handle: handle,
-    }, handles)
+        next_instance: Arc::new(AtomicUsize::new(0)), // thread_handle: handle,
+    },
+     handles)
 }
 
 pub fn get_addr(a: String) -> SocketAddr {
@@ -202,14 +199,15 @@ fn feature_worker(name: String,
         stream.write_all(&header_wtr).unwrap();
         for r in batch.iter() {
             match r.input {
-                server::Input::Floats { f: ref f, length: _ } => 
-                    stream.write_all(floats_to_bytes(r.input.clone())).unwrap(),
-                _ => panic!("unimplemented input type")
+                server::Input::Floats { ref f, length: _ } => {
+                    stream.write_all(floats_to_bytes(f.clone())).unwrap()
+                }
+                _ => panic!("unimplemented input type"),
             }
         }
         stream.flush().unwrap();
         // read response: assumes 1 f64 for each entry in batch
-        let num_response_bytes = batch.len()*mem::size_of::<f64>();
+        let num_response_bytes = batch.len() * mem::size_of::<f64>();
         let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
         stream.read_exact(&mut response_buffer).unwrap();
         // make immutable
@@ -222,13 +220,17 @@ fn feature_worker(name: String,
         }
         thruput_meter.mark(batch.len());
         predictions_counter.incr(batch.len() as isize);
-        if latency > server::SLA*1000 {
-            debug!("latency: {}, batch size: {}", (latency as f64 / 1000.0), batch.len());
+        if latency > server::SLA * 1000 {
+            debug!("latency: {}, batch size: {}",
+                   (latency as f64 / 1000.0),
+                   batch.len());
         }
         if dynamic_batching {
             // only try to increase the batch size if we actually sent a batch of maximum size
             if batch.len() == cur_batch_size {
-                cur_batch_size = update_batch_size(cur_batch_size, latency as u64, server::SLA as u64*1000 as u64);
+                cur_batch_size = update_batch_size(cur_batch_size,
+                                                   latency as u64,
+                                                   server::SLA as u64 * 1000 as u64);
                 // debug!("{} updated batch size to {}", name, cur_batch_size);
             }
         }
@@ -237,9 +239,9 @@ fn feature_worker(name: String,
         // l.push(latency);
         let mut w = cache.write().unwrap();
         for r in 0..batch.len() {
-            let hash = batch[r].hash_key;
-            if !w.contains_key(&hash) {
-                w.insert(hash, response_floats[r]);
+            let hashed_query = batch[r].hash_key;
+            if !w.contains_key(&hashed_query) {
+                w.insert(hashed_query, response_floats[r]);
             } else {
                 // println!("CACHE HIT");
                 // let existing_res = w.get(&hash).unwrap();
@@ -256,11 +258,11 @@ fn feature_worker(name: String,
 
 
 // TODO: this is super broken, and for some reason the
-// 
+//
 fn floats_to_bytes<'a>(v: Vec<f64>) -> &'a [u8] {
     let byte_arr: &[u8] = unsafe {
         let float_ptr: *const f64 = v[..].as_ptr();
-        let num_elems = v.len()*mem::size_of::<f64>();
+        let num_elems = v.len() * mem::size_of::<f64>();
         slice::from_raw_parts(float_ptr as *const u8, num_elems)
     };
     byte_arr
@@ -280,6 +282,3 @@ pub fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();
     rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
 }
-
-
-

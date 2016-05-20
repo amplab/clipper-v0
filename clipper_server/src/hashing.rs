@@ -1,5 +1,4 @@
-use std::cmp;
-use rand::{thread_rng, Rng};
+// use rand::{thread_rng, Rng};
 use server;
 use std::hash::{Hash, SipHasher, Hasher};
 
@@ -16,7 +15,7 @@ impl FeatureHash for SimpleHasher {
     fn query_hash(&self, input: &server::Input, salt: Option<i32>) -> HashKey {
         let mut hasher = SipHasher::new();
         match input {
-            &server::Input::Floats {f: ref f, length: _ } => {
+            &server::Input::Floats {ref f, length: _ } => {
                 // lame way to get around rust's lack of floating point equality. Basically,
                 // we need a better hash function.
                 let mut int_vec: Vec<i32> = Vec::new();
@@ -29,23 +28,23 @@ impl FeatureHash for SimpleHasher {
                     s.hash(&mut hasher);
                 }
                 hasher.finish()
-            },
-            &server::Input::Ints {i: ref i, length: _ } => {
+            }
+            &server::Input::Ints {ref i, length: _ } => {
                 i.hash(&mut hasher);
                 if let Some(s) = salt {
                     s.hash(&mut hasher);
                 }
                 hasher.finish()
-            },
-            &server::Input::Str {s: ref s} => {
+            }
+            &server::Input::Str {ref s} => {
                 s.hash(&mut hasher);
                 if let Some(sa) = salt {
                     sa.hash(&mut hasher);
                 }
                 hasher.finish()
-            },
-            &server::Input::Bytes {b: ref b, length: _} => {
-                s.hash(&mut hasher);
+            }
+            &server::Input::Bytes {ref b, length: _} => {
+                b.hash(&mut hasher);
                 if let Some(sa) = salt {
                     sa.hash(&mut hasher);
                 }
@@ -62,6 +61,6 @@ impl FeatureHash for SimpleHasher {
 //
 // impl FeatureHash for LocalitySensitiveHash {
 //     fn hash(&self, input: &Vec<f64>) -> u64 {
-//         
+//
 //     }
 // }

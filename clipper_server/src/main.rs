@@ -55,7 +55,7 @@ pub mod hashing;
 // pub mod rpc;
 
 
-
+#[cfg_attr(rustfmt, rustfmt_skip)]
 const USAGE: &'static str = "
 Clipper Server
 
@@ -88,15 +88,14 @@ struct Args {
 
 pub fn main() {
 
-  env_logger::init().unwrap();
+    env_logger::init().unwrap();
 
     let args: Args = Docopt::new(USAGE)
-                            .and_then(|d| d.decode())
-                            .unwrap_or_else(|e| e.exit());
+                         .and_then(|d| d.decode())
+                         .unwrap_or_else(|e| e.exit());
 
     info!("{:?}", args);
 
-    // let features = parse_feature_config(&"features.toml".to_string());
     if args.cmd_digits {
         let features = parse_feature_config(&args.flag_feature_conf);
         let digits_conf = parse_digits_config(&args.flag_bench_conf.unwrap());
@@ -107,49 +106,40 @@ pub fn main() {
         let features = parse_feature_config(&args.flag_feature_conf);
         rest::start_listening(features, rest::InputType::Float(784));
     }
-
-
-
-    // let args : Vec<String> = ::std::env::args().collect();
-    // if args.len() >= 2 {
-    //     match &args[1][..] {
-    //         "start" => return server::main(),
-    //         "feature_lats" => return features::feature_lats_main(),
-    //         "gj_timers" => return bench::gj_timers(args[2].parse::<u32>().unwrap()),
-    //         // "ev_timers" => return bench::eventual_timers(args[2].parse::<u32>().unwrap()),
-    //         "mio_timers" => return bench::mio_timers(args[2].parse::<u32>().unwrap()),
-    //         "clipper_timers" => return bench::clipper_timers(args[2].parse::<u32>().unwrap(), args[3].parse::<usize>().unwrap()),
-    //         _ => ()
-    //     }
-    // }
-    //
-    // println!("usage: {} [client | server] ADDRESS", args[0]);
 }
 
 fn parse_feature_config(fname: &String) -> Vec<(String, Vec<SocketAddr>)> {
-    
+
     let path = Path::new(fname);
     let display = path.display();
 
     let mut file = match File::open(&path) {
         // The `description` method of `io::Error` returns a string that
         // describes the error
-        Err(why) => panic!(format!("couldn't open {}: REASON: {}", display,
-                                                   Error::description(&why))),
+        Err(why) => {
+            panic!(format!("couldn't open {}: REASON: {}",
+                           display,
+                           Error::description(&why)))
+        }
         Ok(file) => BufReader::new(file),
     };
 
     let mut toml_string = String::new();
     match file.read_to_string(&mut toml_string) {
-      Err(why) => panic!("couldn't read {}: {}", display,
-                         Error::description(&why)),
-                         Ok(_) => print!("{} contains:\n{}", display, toml_string),
+        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
+        Ok(_) => print!("{} contains:\n{}", display, toml_string),
     }
 
     let features = toml::Parser::new(&toml_string).parse().unwrap();
-    let fs = features.get("features").unwrap()
-                     .as_table().unwrap().iter()
-                     .map(|(k, v)| (k.clone(), features::get_addrs(v.as_slice().unwrap().to_vec())))
+    let fs = features.get("features")
+                     .unwrap()
+                     .as_table()
+                     .unwrap()
+                     .iter()
+                     .map(|(k, v)| {
+                         (k.clone(),
+                          features::get_addrs(v.as_slice().unwrap().to_vec()))
+                     })
                      .collect::<Vec<_>>();
     info!("{:?}", fs);
     fs
@@ -163,43 +153,67 @@ fn parse_digits_config(fname: &String) -> digits_benchmark::DigitsBenchConfig {
     let mut file = match File::open(&path) {
         // The `description` method of `io::Error` returns a string that
         // describes the error
-        Err(why) => panic!(format!("couldn't open {}: REASON: {}", display,
-                                                   Error::description(&why))),
+        Err(why) => {
+            panic!(format!("couldn't open {}: REASON: {}",
+                           display,
+                           Error::description(&why)))
+        }
         Ok(file) => BufReader::new(file),
     };
 
     let mut toml_string = String::new();
     match file.read_to_string(&mut toml_string) {
-      Err(why) => panic!("couldn't read {}: {}", display,
-                         Error::description(&why)),
-                         Ok(_) => print!("{} contains:\n{}", display, toml_string),
+        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
+        Ok(_) => print!("{} contains:\n{}", display, toml_string),
     }
 
     let conf = toml::Parser::new(&toml_string).parse().unwrap();
     let dbc = digits_benchmark::DigitsBenchConfig {
-      num_users: conf.get("users")
-        .unwrap_or(&toml::Value::Integer(100)).as_integer().unwrap() as usize,
-      num_train_examples: conf.get("train_examples")
-        .unwrap_or(&toml::Value::Integer(30)).as_integer().unwrap() as usize,
-      num_test_examples: conf.get("test_examples")
-        .unwrap_or(&toml::Value::Integer(50)).as_integer().unwrap() as usize,
-      mnist_path: conf.get("mnist_path")
-        .unwrap().as_str().unwrap().to_string(),
-      num_events: conf.get("num_events")
-        .unwrap_or(&toml::Value::Integer(100000)).as_integer().unwrap() as usize,
-      num_workers: conf.get("worker_threads")
-        .unwrap_or(&toml::Value::Integer(2)).as_integer().unwrap() as usize,
-      target_qps: conf.get("target_qps")
-        .unwrap_or(&toml::Value::Integer(5000)).as_integer().unwrap() as usize,
-      query_batch_size: conf.get("query_batch_size")
-        .unwrap_or(&toml::Value::Integer(200)).as_integer().unwrap() as usize,
-      max_features: conf.get("max_features")
-        .unwrap_or(&toml::Value::Integer(10)).as_integer().unwrap() as usize,
-      salt_hash: conf.get("salt_hash")
-        .unwrap_or(&toml::Value::Boolean(true)).as_bool().unwrap(),
-      feature_batch_size: conf.get("feature_batch_size")
-        .unwrap_or(&toml::Value::Integer(100)).as_integer().unwrap() as usize,
-
+        num_users: conf.get("users")
+                       .unwrap_or(&toml::Value::Integer(100))
+                       .as_integer()
+                       .unwrap() as usize,
+        num_train_examples: conf.get("train_examples")
+                                .unwrap_or(&toml::Value::Integer(30))
+                                .as_integer()
+                                .unwrap() as usize,
+        num_test_examples: conf.get("test_examples")
+                               .unwrap_or(&toml::Value::Integer(50))
+                               .as_integer()
+                               .unwrap() as usize,
+        mnist_path: conf.get("mnist_path")
+                        .unwrap()
+                        .as_str()
+                        .unwrap()
+                        .to_string(),
+        num_events: conf.get("num_events")
+                        .unwrap_or(&toml::Value::Integer(100000))
+                        .as_integer()
+                        .unwrap() as usize,
+        num_workers: conf.get("worker_threads")
+                         .unwrap_or(&toml::Value::Integer(2))
+                         .as_integer()
+                         .unwrap() as usize,
+        target_qps: conf.get("target_qps")
+                        .unwrap_or(&toml::Value::Integer(5000))
+                        .as_integer()
+                        .unwrap() as usize,
+        query_batch_size: conf.get("query_batch_size")
+                              .unwrap_or(&toml::Value::Integer(200))
+                              .as_integer()
+                              .unwrap() as usize,
+        max_features: conf.get("max_features")
+                          .unwrap_or(&toml::Value::Integer(10))
+                          .as_integer()
+                          .unwrap() as usize,
+        salt_hash: conf.get("salt_hash")
+                       .unwrap_or(&toml::Value::Boolean(true))
+                       .as_bool()
+                       .unwrap(),
+        feature_batch_size: conf.get("feature_batch_size")
+                                .unwrap_or(&toml::Value::Integer(100))
+                                .as_integer()
+                                .unwrap() as usize,
     };
     // let fs = features.get("features").unwrap()
     //                  .as_table().unwrap().iter()
@@ -209,10 +223,3 @@ fn parse_digits_config(fname: &String) -> digits_benchmark::DigitsBenchConfig {
     dbc
 
 }
-
-
-
-
-
-
-

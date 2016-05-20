@@ -10,7 +10,7 @@ trait Metric {
 
     fn report(&self) -> String;
 
-    // Must have way to atomically clear state
+    /// Must have way to atomically clear state
     fn clear(&self);
 
 }
@@ -19,17 +19,16 @@ trait Metric {
 /// Counts a value
 pub struct Counter {
     pub name: String,
-    count: AtomicIsize
+    count: AtomicIsize,
 }
 
 #[derive(Debug)]
 struct CounterStats {
     name: String,
-    count: isize
+    count: isize,
 }
 
 impl Metric for Counter {
-
     fn clear(&self) {
         self.count.store(0, Ordering::SeqCst);
     }
@@ -37,7 +36,7 @@ impl Metric for Counter {
     fn report(&self) -> String {
         let stats = CounterStats {
             name: self.name.clone(),
-            count: self.count.load(Ordering::SeqCst)
+            count: self.count.load(Ordering::SeqCst),
         };
         format!("{:?}", stats)
     }
@@ -47,7 +46,7 @@ impl Counter {
     pub fn new(name: String, start_count: isize) -> Counter {
         Counter {
             name: name,
-            count: AtomicIsize::new(start_count)
+            count: AtomicIsize::new(start_count),
         }
     }
 
@@ -58,7 +57,6 @@ impl Counter {
     pub fn decr(&self, decrement: isize) {
         self.count.fetch_sub(decrement, Ordering::Relaxed);
     }
-
 }
 
 pub struct RatioCounter {
@@ -74,30 +72,29 @@ struct RatioStats {
 }
 
 impl Metric for RatioCounter {
-
-    // TODO: This has a race condition. 
+    // TODO: This has a race condition.
     fn clear(&self) {
         self.denominator.store(0, Ordering::SeqCst);
         self.numerator.store(0, Ordering::SeqCst);
     }
 
     fn report(&self) -> String {
-        let ratio = self.numerator.load(Ordering::SeqCst) as f64 / self.denominator.load(Ordering::SeqCst) as f64;
+        let ratio = self.numerator.load(Ordering::SeqCst) as f64 /
+                    self.denominator.load(Ordering::SeqCst) as f64;
         let stats = RatioStats {
             name: self.name.clone(),
-            ratio: ratio
+            ratio: ratio,
         };
         format!("{:?}", stats)
     }
 }
 
 impl RatioCounter {
-
     pub fn new(name: String, n: usize, d: usize) -> RatioCounter {
         RatioCounter {
             name: name,
             numerator: AtomicUsize::new(n),
-            denominator: AtomicUsize::new(d)
+            denominator: AtomicUsize::new(d),
         }
     }
 
@@ -116,8 +113,6 @@ impl RatioCounter {
             n as f64 / d as f64
         }
     }
-
-
 }
 
 
@@ -132,7 +127,7 @@ impl RatioCounter {
 pub struct Meter {
     pub name: String,
     start_time: RwLock<time::PreciseTime>,
-    count: AtomicUsize
+    count: AtomicUsize,
 }
 
 impl Meter {
@@ -140,7 +135,7 @@ impl Meter {
         Meter {
             name: name,
             start_time: RwLock::new(time::PreciseTime::now()),
-            count: AtomicUsize::new(0)
+            count: AtomicUsize::new(0),
         }
     }
 
@@ -155,7 +150,7 @@ impl Meter {
         let whole_secs = time::Duration::seconds(dur.num_seconds());
         let sub_sec_micros = (dur - whole_secs).num_microseconds().unwrap();
         assert!(sub_sec_micros <= NUM_MICROS_PER_SEC);
-        let total_micros = whole_secs.num_seconds()*NUM_MICROS_PER_SEC + sub_sec_micros;
+        let total_micros = whole_secs.num_seconds() * NUM_MICROS_PER_SEC + sub_sec_micros;
         let rate = count as f64 / total_micros as f64;
         rate
     }
@@ -165,30 +160,28 @@ impl Meter {
     pub fn get_rate_secs(&self) -> f64 {
         self.get_rate_micros() * NUM_MICROS_PER_SEC as f64
     }
-
 }
 
 #[derive(Debug)]
 struct MeterStats {
     name: String,
     rate: f64,
-    unit: String
+    unit: String,
 }
 
 impl Metric for Meter {
-
     fn clear(&self) {
-        let mut t  = self.start_time.write().unwrap();
+        let mut t = self.start_time.write().unwrap();
         *t = time::PreciseTime::now();
         self.count.store(0, Ordering::SeqCst);
     }
 
     fn report(&self) -> String {
-        
+
         let stats = MeterStats {
             name: self.name.clone(),
             rate: self.get_rate_secs(),
-            unit: "events per second".to_string()
+            unit: "events per second".to_string(),
         };
         format!("{:?}", stats)
     }
@@ -209,15 +202,14 @@ pub struct HistStats {
 // This gives me latency distribution, min, mean, max, etc.
 pub struct Histogram {
     pub name: String,
-    sample: RwLock<ReservoirSampler>
+    sample: RwLock<ReservoirSampler>,
 }
 
 impl Histogram {
-
     pub fn new(name: String, sample_size: usize) -> Histogram {
         Histogram {
             name: name,
-            sample: RwLock::new(ReservoirSampler::new(sample_size))
+            sample: RwLock::new(ReservoirSampler::new(sample_size)),
         }
     }
 
@@ -257,24 +249,22 @@ impl Histogram {
         assert!(p <= 100, "must supply a percentile between 0 and 100");
         let sample_size = snapshot.len();
         let per = if sample_size < 100 {
-            warn!("computing p{} of sample size smaller than 100", p); 
+            warn!("computing p{} of sample size smaller than 100", p);
             snapshot[(sample_size - 1 - (100 - p)) as usize] as f64
         } else if (sample_size % 100) == 0 {
-          let per_index: usize = sample_size * p / 100;
-          snapshot[per_index as usize] as f64
+            let per_index: usize = sample_size * p / 100;
+            snapshot[per_index as usize] as f64
         } else {
-          let per_index: f64 = (sample_size as f64) * (p as f64 / 100.0);
-          let per_below = per_index.floor() as usize;
-          let per_above = per_index.ceil() as usize;
-          (snapshot[per_below] as f64 + snapshot[per_above] as f64)  / 2.0_f64
+            let per_index: f64 = (sample_size as f64) * (p as f64 / 100.0);
+            let per_below = per_index.floor() as usize;
+            let per_above = per_index.ceil() as usize;
+            (snapshot[per_below] as f64 + snapshot[per_above] as f64) / 2.0_f64
         };
         per
     }
-
 }
 
 impl Metric for Histogram {
-
     fn clear(&self) {
         let mut res = self.sample.write().unwrap();
         res.clear();
@@ -283,7 +273,6 @@ impl Metric for Histogram {
     fn report(&self) -> String {
         format!("{:?}", self.stats())
     }
-
 }
 
 
@@ -295,12 +284,11 @@ struct ReservoirSampler {
 }
 
 impl ReservoirSampler {
-    
     pub fn new(sample_size: usize) -> ReservoirSampler {
         ReservoirSampler {
             reservoir: Vec::with_capacity(sample_size),
             sample_size: sample_size,
-            n: 0
+            n: 0,
         }
     }
 
@@ -335,11 +323,10 @@ pub struct Registry {
     // sum_counters: Vec<SumCounter>,
     ratio_counters: Vec<Arc<RatioCounter>>,
     histograms: Vec<Arc<Histogram>>,
-    meters: Vec<Arc<Meter>>
+    meters: Vec<Arc<Meter>>,
 }
 
 impl Registry {
-
     pub fn new(name: String) -> Registry {
         Registry {
             name: name,
@@ -432,7 +419,3 @@ impl Registry {
         }
     }
 }
-
-
-
-

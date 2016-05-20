@@ -20,7 +20,7 @@ pub const NUM_DIGITS: usize = 10;
 
 pub struct TrainingData {
     pub xs: Vec<Arc<Vec<f64>>>,
-    pub ys: Arc<Vec<f64>>
+    pub ys: Arc<Vec<f64>>,
 }
 
 pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
@@ -30,8 +30,11 @@ pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
     let file = match File::open(&path) {
         // The `description` method of `io::Error` returns a string that
         // describes the error
-        Err(why) => return Err(format!("couldn't open {}: REASON: {}", display,
-                                                   Error::description(&why))),
+        Err(why) => {
+            return Err(format!("couldn't open {}: REASON: {}",
+                               display,
+                               Error::description(&why)))
+        }
         Ok(file) => BufReader::new(file),
     };
 
@@ -42,11 +45,13 @@ pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
         let mut split = line.split(",").collect::<Vec<&str>>();
         // println!("{:?}", split);
         let label = match split.first() {
-            Some(l) => match l.trim().parse::<f64>() {
-                Ok(n) => n,
-                Err(why) => return Err(format!("couldn't parse {}", Error::description(&why)))
-            },
-            None => return Err("malformed label".to_string())
+            Some(l) => {
+                match l.trim().parse::<f64>() {
+                    Ok(n) => n,
+                    Err(why) => return Err(format!("couldn't parse {}", Error::description(&why))),
+                }
+            }
+            None => return Err("malformed label".to_string()),
         };
         let mut features: Vec<f64> = Vec::new();
         split.remove(0); // remove the label, only features remaining
@@ -56,19 +61,25 @@ pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
         xs.push(Arc::new(features));
         ys.push(label);
     }
-    Ok(TrainingData{xs: xs, ys: Arc::new(ys)})
+    Ok(TrainingData {
+        xs: xs,
+        ys: Arc::new(ys),
+    })
 }
 
 pub fn normalize(training_data: &TrainingData) -> TrainingData {
     let zs = normalize_matrix(&training_data.xs);
-    TrainingData{xs: zs, ys: training_data.ys.clone()}
+    TrainingData {
+        xs: zs,
+        ys: training_data.ys.clone(),
+    }
 }
 
 pub fn normalize_matrix(xs: &Vec<Arc<Vec<f64>>>) -> Vec<Arc<Vec<f64>>> {
 
     let (means, vars) = linalg::mean_and_var(&xs);
 
-    let mut zs: Vec<Arc<Vec<f64>>> =  Vec::with_capacity(xs.len());
+    let mut zs: Vec<Arc<Vec<f64>>> = Vec::with_capacity(xs.len());
     for point in xs {
         let mut idx = 0;
         let mut new_x: Vec<f64> = vec![0.0; point.len()];
@@ -95,8 +106,7 @@ pub struct DigitsTask {
     pub offline_train_y: Vec<f64>,
     pub online_train_y: Vec<f64>,
     pub test_x: Vec<Arc<Vec<f64>>>,
-    pub test_y: Vec<f64>,
-    // pub model: Option<mtl::LogisticRegression>
+    pub test_y: Vec<f64>, // pub model: Option<mtl::LogisticRegression>
 }
 
 
@@ -111,21 +121,21 @@ impl DigitsTask {
         let pref_str = format!("{}, {}\n", id, self.pref);
         for i in 0..self.offline_train_y.len() {
             train_str.push_str(&format!("{}, {}, {}\n",
-                              id,
-                              self.offline_train_y[i],
-                              vec_to_csv(&self.offline_train_x[i])));
+                                        id,
+                                        self.offline_train_y[i],
+                                        vec_to_csv(&self.offline_train_x[i])));
         }
         for i in 0..self.online_train_y.len() {
             train_str.push_str(&format!("{}, {}, {}\n",
-                              id,
-                              self.online_train_y[i],
-                              vec_to_csv(&self.online_train_x[i])));
+                                        id,
+                                        self.online_train_y[i],
+                                        vec_to_csv(&self.online_train_x[i])));
         }
         for i in 0..self.test_y.len() {
             test_str.push_str(&format!("{}, {}, {}\n",
-                              id,
-                              self.test_y[i],
-                              vec_to_csv(&self.test_x[i])));
+                                       id,
+                                       self.test_y[i],
+                                       vec_to_csv(&self.test_x[i])));
         }
         (pref_str, train_str, test_str)
     }
@@ -133,12 +143,12 @@ impl DigitsTask {
 
 pub fn vec_to_csv(v: &Vec<f64>) -> String {
     let mut vec_str = String::new();
-        for i in 0..v.len() {
-            vec_str.push_str(&format!("{}", v[i]));
-            if i < v.len() - 1 {
-                vec_str.push_str(", ");
-            }
+    for i in 0..v.len() {
+        vec_str.push_str(&format!("{}", v[i]));
+        if i < v.len() - 1 {
+            vec_str.push_str(", ");
         }
+    }
     vec_str
 }
 
@@ -151,8 +161,7 @@ impl Clone for DigitsTask {
             offline_train_y: self.offline_train_y.clone(),
             online_train_y: self.online_train_y.clone(),
             test_x: self.test_x.clone(),
-            test_y: self.test_y.clone(),
-            // model: None
+            test_y: self.test_y.clone(), // model: None
         }
     }
 }
@@ -171,13 +180,13 @@ impl Clone for DigitsTask {
 // }
 
 
-pub fn create_online_dataset(
-    training_data: &TrainingData,
-    test_data: &TrainingData,
-    offline_task_size: usize,
-    online_task_size: usize,
-    test_size: usize,
-    num_tasks: usize) -> Vec<DigitsTask> {
+pub fn create_online_dataset(training_data: &TrainingData,
+                             test_data: &TrainingData,
+                             offline_task_size: usize,
+                             online_task_size: usize,
+                             test_size: usize,
+                             num_tasks: usize)
+                             -> Vec<DigitsTask> {
 
     let mut rng = rand::thread_rng();
     let mut tasks: Vec<DigitsTask> = Vec::with_capacity(num_tasks as usize);
@@ -195,7 +204,7 @@ pub fn create_online_dataset(
         let (offline_train_y, online_train_y) = train_y.split_at(offline_task_size);
 
         // cloning okay because these are all just refs anyway
-        // all_train_xs.extend(train_x.clone()); 
+        // all_train_xs.extend(train_x.clone());
         // all_train_ys.extend(train_y.clone());
         // all_test_xs.extend(test_x.clone());
         // all_test_ys.extend(test_y.clone());
@@ -208,8 +217,7 @@ pub fn create_online_dataset(
             offline_train_y: offline_train_y.to_vec(),
             online_train_y: online_train_y.to_vec(),
             test_x: test_x,
-            test_y: test_y,
-            // model: None
+            test_y: test_y, // model: None
         });
     }
     tasks
@@ -217,27 +225,25 @@ pub fn create_online_dataset(
 
 
 
-pub fn create_mtl_datasets(
-    training_data: &TrainingData,
-    test_data: &TrainingData,
-    task_size: usize,
-    test_size: usize,
-    num_tasks: usize) -> (
-        Vec<DigitsTask>, // list of tasks
-        Vec<Arc<Vec<f64>>>, // train_xs
-        Vec<f64>, // train_ys
-        Vec<usize>, //train_ts
-        Vec<Arc<Vec<f64>>>, // test_xs
-        Vec<f64> // test_ys
-        ) {
+pub fn create_mtl_datasets(training_data: &TrainingData,
+                           test_data: &TrainingData,
+                           task_size: usize,
+                           test_size: usize,
+                           num_tasks: usize)
+                           -> (Vec<DigitsTask>, // list of tasks
+                               Vec<Arc<Vec<f64>>>, // train_xs
+                               Vec<f64>, // train_ys
+                               Vec<usize>, // train_ts
+                               Vec<Arc<Vec<f64>>>, // test_xs
+                               Vec<f64> /* test_ys */) {
 
     let mut rng = rand::thread_rng();
     let mut tasks: Vec<DigitsTask> = Vec::with_capacity(num_tasks as usize);
-    let mut all_train_xs: Vec<Arc<Vec<f64>>> = Vec::with_capacity(num_tasks*task_size as usize);
-    let mut all_train_ys: Vec<f64> = Vec::with_capacity(num_tasks*task_size as usize);
-    let mut all_train_ts: Vec<usize> = Vec::with_capacity(num_tasks*task_size as usize);
-    let mut all_test_xs: Vec<Arc<Vec<f64>>> = Vec::with_capacity(num_tasks*test_size as usize);
-    let mut all_test_ys: Vec<f64> = Vec::with_capacity(num_tasks*test_size as usize);
+    let mut all_train_xs: Vec<Arc<Vec<f64>>> = Vec::with_capacity(num_tasks * task_size as usize);
+    let mut all_train_ys: Vec<f64> = Vec::with_capacity(num_tasks * task_size as usize);
+    let mut all_train_ts: Vec<usize> = Vec::with_capacity(num_tasks * task_size as usize);
+    let mut all_test_xs: Vec<Arc<Vec<f64>>> = Vec::with_capacity(num_tasks * test_size as usize);
+    let mut all_test_ys: Vec<f64> = Vec::with_capacity(num_tasks * test_size as usize);
 
     for i in 0..num_tasks {
         if i % 50 == 0 {
@@ -248,7 +254,7 @@ pub fn create_mtl_datasets(
         let (test_x, test_y) = select_datapoints(pref_digit, test_size, test_data);
 
         // cloning okay because these are all just refs anyway
-        all_train_xs.extend(train_x.clone()); 
+        all_train_xs.extend(train_x.clone());
         all_train_ys.extend(train_y.clone());
         all_test_xs.extend(test_x.clone());
         all_test_ys.extend(test_y.clone());
@@ -261,18 +267,25 @@ pub fn create_mtl_datasets(
             offline_train_y: train_y,
             online_train_y: Vec::new(),
             test_x: test_x,
-            test_y: test_y,
-            // model: None
+            test_y: test_y, // model: None
         });
     }
-    (tasks, all_train_xs, all_train_ys, all_train_ts, all_test_xs, all_test_ys)
+    (tasks,
+     all_train_xs,
+     all_train_ys,
+     all_train_ts,
+     all_test_xs,
+     all_test_ys)
 }
 
-fn select_datapoints(pref_digit: f64, num_points: usize, data: &TrainingData) -> (Vec<Arc<Vec<f64>>>, Vec<f64>) {
+fn select_datapoints(pref_digit: f64,
+                     num_points: usize,
+                     data: &TrainingData)
+                     -> (Vec<Arc<Vec<f64>>>, Vec<f64>) {
     let mut rng = rand::thread_rng();
     let num_false = (num_points / 2) as usize;
     // handle odd numbers by picking one more true example than false
-    let num_true = if num_false*2 < num_points {
+    let num_true = if num_false * 2 < num_points {
         num_false + 1
     } else {
         num_false
@@ -328,24 +341,21 @@ pub fn save_tasks(tasks: &Vec<DigitsTask>, fname: &str) {
     let mut pref_file = match options.open(&pref_path) {
         // The `description` method of `io::Error` returns a string that
         // describes the error
-        Err(why) => panic!(format!("couldn't open. REASON: {}",
-                                                   Error::description(&why))),
+        Err(why) => panic!(format!("couldn't open. REASON: {}", Error::description(&why))),
         Ok(file) => BufWriter::new(file),
     };
 
     let mut train_file = match options.open(&train_path) {
         // The `description` method of `io::Error` returns a string that
         // describes the error
-        Err(why) => panic!(format!("couldn't open. REASON: {}",
-                                                   Error::description(&why))),
+        Err(why) => panic!(format!("couldn't open. REASON: {}", Error::description(&why))),
         Ok(file) => BufWriter::new(file),
     };
 
     let mut test_file = match options.open(&test_path) {
         // The `description` method of `io::Error` returns a string that
         // describes the error
-        Err(why) => panic!(format!("couldn't open. REASON: {}",
-                                                   Error::description(&why))),
+        Err(why) => panic!(format!("couldn't open. REASON: {}", Error::description(&why))),
         Ok(file) => BufWriter::new(file),
     };
 
@@ -440,15 +450,17 @@ fn parse_prefs(r: BufReader<File>) -> Vec<f64> {
     for line in r.lines().filter_map(|result| result.ok()) {
         let split = line.split(",").collect::<Vec<&str>>();
         let tid = match split.first() {
-            Some(l) => match l.trim().parse::<i32>() {
-                Ok(n) => n,
-                Err(why) => panic!(format!("couldn't parse {}", Error::description(&why)))
-            },
-            None => panic!("malformed label".to_string())
+            Some(l) => {
+                match l.trim().parse::<i32>() {
+                    Ok(n) => n,
+                    Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
+                }
+            }
+            None => panic!("malformed label".to_string()),
         };
         let pref = match split[1].trim().parse::<i32>() {
             Ok(n) => n,
-            Err(why) => panic!(format!("couldn't parse {}", Error::description(&why)))
+            Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
         };
         assert!(idx == tid);
         assert!(allowable_prefs.contains(&pref));
@@ -458,10 +470,11 @@ fn parse_prefs(r: BufReader<File>) -> Vec<f64> {
     prefs
 }
 
-pub fn parse_data_file(r: BufReader<File>) -> (
-    Vec<usize>, // task ids
-    Vec<Arc<Vec<f64>>>, // xs
-    Vec<f64>) { // ys
+pub fn parse_data_file(r: BufReader<File>)
+                       -> (Vec<usize>, // task ids
+                           Vec<Arc<Vec<f64>>>, // xs
+                           Vec<f64>) {
+    // ys
 
     let mut xs: Vec<Arc<Vec<f64>>> = Vec::new();
     let mut ys: Vec<f64> = Vec::new();
@@ -470,19 +483,23 @@ pub fn parse_data_file(r: BufReader<File>) -> (
         let mut split = line.split(",").collect::<Vec<&str>>();
         // println!("{:?}", split);
         let tid = match split.first() {
-            Some(l) => match l.trim().parse::<usize>() {
-                Ok(n) => n,
-                Err(why) => panic!(format!("couldn't parse {}", Error::description(&why)))
-            },
-            None => panic!("malformed label".to_string())
+            Some(l) => {
+                match l.trim().parse::<usize>() {
+                    Ok(n) => n,
+                    Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
+                }
+            }
+            None => panic!("malformed label".to_string()),
         };
         split.remove(0); // remove the tid, only features remaining
         let label = match split.first() {
-            Some(l) => match l.trim().parse::<f64>() {
-                Ok(n) => n,
-                Err(why) => panic!(format!("couldn't parse {}", Error::description(&why)))
-            },
-            None => panic!("malformed label".to_string())
+            Some(l) => {
+                match l.trim().parse::<f64>() {
+                    Ok(n) => n,
+                    Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
+                }
+            }
+            None => panic!("malformed label".to_string()),
         };
         split.remove(0); // remove the label, only features remaining
         let mut features: Vec<f64> = Vec::new();

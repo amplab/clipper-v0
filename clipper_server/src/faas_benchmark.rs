@@ -4,6 +4,7 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use digits;
 use time;
+use server;
 use rand::{thread_rng, Rng};
 
 
@@ -32,23 +33,30 @@ pub fn feature_batch_latency(batch_size: usize) {
 
 
     let (mut features, mut handles): (Vec<_>, Vec<_>) = addr_vec.into_iter()
-                    .map(|a| features::get_addrs_str(a))
-                    .zip(names.into_iter())
-                    .map(|(a, n)| features::create_feature_worker(
-                            n, a, batch_size, metrics_register.clone()))
-                    .unzip();
+                                                                .map(|a| {
+                                                                    features::get_addrs_str(a)
+                                                                })
+                                                                .zip(names.into_iter())
+                                                                .map(|(a, n)| {
+                                                                    features::create_feature_worker(
+                            n, a, batch_size, metrics_register.clone())
+                                                                })
+                                                                .unzip();
 
     assert!(features.len() == 1);
     let feat = features.pop().unwrap();
     let hand = handles.pop().unwrap();
-    
+
     let mut rng = thread_rng();
     // let num_trials = 10000;
     let num_reqs = 5000000;
     info!("making {} requests", num_reqs);
     for i in 0..num_reqs {
         let example_idx: usize = rng.gen_range(0, all_test_data.xs.len());
-        let input = (*all_test_data.xs[example_idx]).clone();
+        let input = server::Input::Floats {
+            f: (*all_test_data.xs[example_idx]).clone(),
+            length: 784,
+        };
         let req = features::FeatureReq {
             hash_key: i as u64,
             input: input,
@@ -83,7 +91,8 @@ pub fn feature_batch_latency(batch_size: usize) {
 
 
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
-                         report_interval_secs: u64) -> ::std::thread::JoinHandle<()> {
+                         report_interval_secs: u64)
+                         -> ::std::thread::JoinHandle<()> {
 
     // let counter = counter.clone();
     thread::spawn(move || {
@@ -96,5 +105,3 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
         }
     })
 }
-
-
