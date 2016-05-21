@@ -93,7 +93,7 @@ pub fn send_batch(stream: &mut TcpStream,
     responses
 }
 
-fn encode_var_ints(inputs: &Vec<FeatureReq>) -> Vec<u8> {
+pub fn encode_var_ints(inputs: &Vec<FeatureReq>) -> Vec<u8> {
     // let mut message_len = 5; // 1 byte type + 4 bytes num inputs
     let mut message = Vec::new();
     message.push(VARINT_CODE);
@@ -116,7 +116,24 @@ fn encode_var_ints(inputs: &Vec<FeatureReq>) -> Vec<u8> {
     message
 }
 
-fn encode_fixed_ints(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
+pub fn decode_var_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
+    let mut cursor = Cursor::new(bytes);
+    assert_eq!(VARINT_CODE, cursor.read_u8().unwrap());
+    let num_inputs = cursor.read_u32::<LittleEndian>().unwrap();
+    // let inp_len = cursor.read_u32::<LittleEndian>().unwrap();
+    let mut responses = Vec::with_capacity(num_inputs as usize);
+    for _ in 0..num_inputs {
+        let inp_len = cursor.read_u32::<LittleEndian>().unwrap();
+        let mut cur_response = Vec::with_capacity(inp_len as usize);
+        for _ in 0..inp_len {
+            cur_response.push(cursor.read_i32::<LittleEndian>().unwrap());
+        }
+        responses.push(cur_response);
+    }
+    responses
+}
+
+pub fn encode_fixed_ints(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
     // let mut message_len = 5; // 1 byte type + 4 bytes num inputs
     let mut message = Vec::new();
     message.push(FIXEDINT_CODE);
@@ -138,6 +155,22 @@ fn encode_fixed_ints(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
     message
 }
 
+pub fn decode_fixed_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
+    let mut cursor = Cursor::new(bytes);
+    assert_eq!(FIXEDINT_CODE, cursor.read_u8().unwrap());
+    let num_inputs = cursor.read_u32::<LittleEndian>().unwrap();
+    let inp_len = cursor.read_u32::<LittleEndian>().unwrap();
+    let mut responses = Vec::with_capacity(num_inputs as usize);
+    for _ in 0..num_inputs {
+        let mut cur_response = Vec::with_capacity(inp_len as usize);
+        for _ in 0..inp_len {
+            cur_response.push(cursor.read_i32::<LittleEndian>().unwrap());
+        }
+        responses.push(cur_response);
+    }
+    responses
+}
+
 fn encode_fixed_floats(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
     unreachable!()
 }
@@ -156,4 +189,80 @@ fn encode_var_bytes(inputs: &Vec<FeatureReq>) -> Vec<u8> {
 
 fn encode_strs(inputs: &Vec<FeatureReq>) -> Vec<u8> {
     unreachable!()
+}
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
+    use std::io::Read;
+    // use std::mem;
+    use server::Input;
+    use features::FeatureReq;
+    use rand::{thread_rng, Rng};
+    use time;
+
+    fn random_ints(d: usize) -> Vec<i32> {
+        let mut rng = thread_rng();
+        rng.gen_iter::<i32>().take(d).collect::<Vec<i32>>()
+    }
+
+
+
+    #[test]
+    fn fixed_ints() {
+        // let inp_length = 4;
+        let mut rng = thread_rng();
+        let inp_length = rng.gen_range::<usize>(0, 3000);
+        let mut reqs: Vec<FeatureReq> = Vec::new();
+        let mut orig_inputs = Vec::new();
+        for _ in 0..7 {
+            let v = random_ints(inp_length);
+            orig_inputs.push(v.clone());
+            let r = FeatureReq {
+                hash_key: 0_u64,
+                input: Input::Ints {
+                    i: v,
+                    length: inp_length as i32,
+                },
+                req_start_time: time::PreciseTime::now(),
+            };
+            reqs.push(r);
+        }
+        let mut encoded_ints = encode_fixed_ints(&reqs, inp_length as i32);
+        let decoded_vecs = decode_fixed_ints(&mut encoded_ints);
+        assert_eq!(decoded_vecs.len(), 7);
+        for i in 0..decoded_vecs.len() {
+            assert_eq!(&decoded_vecs[i][..], &orig_inputs[i][..]);
+        }
+    }
+
+    #[test]
+    fn var_ints() {
+        // let inp_length = 4;
+        let mut reqs: Vec<FeatureReq> = Vec::new();
+        let mut orig_inputs = Vec::new();
+        let mut rng = thread_rng();
+        for _ in 0..7 {
+            let inp_length = rng.gen_range::<usize>(0, 3000);
+            let v = random_ints(inp_length);
+            orig_inputs.push(v.clone());
+            let r = FeatureReq {
+                hash_key: 0_u64,
+                input: Input::Ints { i: v, length: -1 },
+                req_start_time: time::PreciseTime::now(),
+            };
+            reqs.push(r);
+        }
+        let mut encoded_ints = encode_var_ints(&reqs);
+        let decoded_vecs = decode_var_ints(&mut encoded_ints);
+        assert_eq!(decoded_vecs.len(), 7);
+        for i in 0..decoded_vecs.len() {
+            assert_eq!(&decoded_vecs[i][..], &orig_inputs[i][..]);
+        }
+    }
+
 }
