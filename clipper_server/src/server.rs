@@ -20,7 +20,7 @@ pub const SLA: i64 = 20;
 
 pub type OnPredict = Fn(f64) -> () + Send;
 
-pub type Output = Vec<f64>;
+pub type Output = f64;
 
 // #[derive(Hash, Clone, Debug)]
 #[derive(Clone,Debug)]
@@ -97,7 +97,7 @@ struct Update {
 
 pub trait TaskModel {
     /// Make a prediction with the available features
-    fn predict(&self, mut fs: Output, missing_fs: Vec<usize>, debug_str: &String) -> f64;
+    fn predict(&self, mut fs: Vec<Output>, missing_fs: Vec<usize>, debug_str: &String) -> f64;
 
     fn rank_features(&self) -> Vec<usize>;
 
@@ -113,7 +113,7 @@ pub struct DummyTaskModel {
 
 impl TaskModel for DummyTaskModel {
     #[allow(unused_variables)]
-    fn predict(&self, fs: Output, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
+    fn predict(&self, fs: Vec<Output>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
         if missing_fs.len() > 0 {
             info!("missing fs: {:?}", missing_fs);
         }
@@ -140,7 +140,7 @@ fn make_prediction<T, H>(feature_handles: &Vec<features::FeatureHandle<H>>,
 
 
     let mut missing_feature_indexes: Vec<usize> = Vec::new();
-    let mut features: Output = Vec::new();
+    let mut features: Vec<Output> = Vec::new();
     let mut i = 0;
     for fh in feature_handles {
         let hashed_input = fh.hasher.query_hash(input, Some(req_id));

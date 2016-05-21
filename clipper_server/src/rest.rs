@@ -26,7 +26,7 @@ pub enum InputType {
     Integer(i32),
     Float(i32),
     Str,
-    Bytes(i32),
+    Byte(i32),
 }
 
 
@@ -144,7 +144,7 @@ impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for PredictHandle
         let input = match self.input_type {
             InputType::Integer(length) => parse_to_ints(transport, length),
             InputType::Float(length) => parse_to_floats(transport, length),
-            InputType::Bytes(_) => panic!("unsupported input type"),
+            InputType::Byte(_) => panic!("unsupported input type"),
             InputType::Str => parse_to_string(transport),
         };
         match input {

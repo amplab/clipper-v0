@@ -1,20 +1,19 @@
 use time;
 use std::net::{ToSocketAddrs, SocketAddr, TcpStream};
-use std::{thread, mem, slice};
-use std::sync::{RwLock, Arc};
-use std::sync::mpsc;
+use std::thread;
+use std::sync::{RwLock, Arc, mpsc};
 use std::collections::HashMap;
 use std::cmp;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::AtomicUsize;
+use net2::TcpStreamExt;
+// use byteorder::{LittleEndian, WriteBytesExt};
 use toml;
 use server;
-// use std::hash::{Hash, SipHasher, Hasher};
 use std::io::{Read, Write};
-// use std::net::{self};
-use net2::TcpStreamExt;
-use byteorder::{LittleEndian, WriteBytesExt};
 use metrics;
+use rpc;
+use rest;
 use hashing::{FeatureHash, SimpleHasher, HashKey};
 
 
@@ -153,6 +152,7 @@ fn feature_worker(name: String,
                   predictions_counter: Arc<metrics::Counter>,
                   batch_size: usize) {
 
+    let input_type = rest::InputType::Float(784);
     // if the batch_size is less than 1 (these are unsigned
     // integers, so that means batch size == 0), we assume dynamic batching
     let dynamic_batching = batch_size < 1;
@@ -194,25 +194,26 @@ fn feature_worker(name: String,
         }
         assert!(batch.len() > 0);
         // send batch
-        let mut header_wtr: Vec<u8> = vec![];
-        header_wtr.write_u16::<LittleEndian>(batch.len() as u16).unwrap();
-        stream.write_all(&header_wtr).unwrap();
-        for r in batch.iter() {
-            match r.input {
-                server::Input::Floats { ref f, length: _ } => {
-                    stream.write_all(floats_to_bytes(f.clone())).unwrap()
-                }
-                _ => panic!("unimplemented input type"),
-            }
-        }
-        stream.flush().unwrap();
+        // let mut header_wtr: Vec<u8> = vec![];
+        // header_wtr.write_u16::<LittleEndian>(batch.len() as u16).unwrap();
+        // stream.write_all(&header_wtr).unwrap();
+        // for r in batch.iter() {
+        //     match r.input {
+        //         server::Input::Floats { ref f, length: _ } => {
+        //             stream.write_all(floats_to_bytes(f.clone())).unwrap()
+        //         }
+        //         _ => panic!("unimplemented input type"),
+        //     }
+        // }
+        // stream.flush().unwrap();
         // read response: assumes 1 f64 for each entry in batch
-        let num_response_bytes = batch.len() * mem::size_of::<f64>();
-        let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
-        stream.read_exact(&mut response_buffer).unwrap();
-        // make immutable
-        let response_buffer = response_buffer;
-        let response_floats = bytes_to_floats(&response_buffer);
+        // let num_response_bytes = batch.len() * mem::size_of::<f64>();
+        // let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
+        // stream.read_exact(&mut response_buffer).unwrap();
+        // // make immutable
+        // let response_buffer = response_buffer;
+        // let response_floats = bytes_to_floats(&response_buffer);
+        let response_floats: Vec<f64> = rpc::send_batch(&mut stream, &batch, &input_type);
         let end_time = time::PreciseTime::now();
         let latency = start_time.to(end_time).num_microseconds().unwrap();
         for _ in 0..batch.len() {
@@ -259,23 +260,23 @@ fn feature_worker(name: String,
 
 // TODO: this is super broken, and for some reason the
 //
-fn floats_to_bytes<'a>(v: Vec<f64>) -> &'a [u8] {
-    let byte_arr: &[u8] = unsafe {
-        let float_ptr: *const f64 = v[..].as_ptr();
-        let num_elems = v.len() * mem::size_of::<f64>();
-        slice::from_raw_parts(float_ptr as *const u8, num_elems)
-    };
-    byte_arr
-}
-
-fn bytes_to_floats(bytes: &[u8]) -> &[f64] {
-    let float_arr: &[f64] = unsafe {
-        let byte_ptr: *const u8 = bytes.as_ptr();
-        let num_elems = bytes.len() / mem::size_of::<f64>();
-        slice::from_raw_parts(byte_ptr as *const f64, num_elems)
-    };
-    float_arr
-}
+// fn floats_to_bytes<'a>(v: Vec<f64>) -> &'a [u8] {
+//     let byte_arr: &[u8] = unsafe {
+//         let float_ptr: *const f64 = v[..].as_ptr();
+//         let num_elems = v.len() * mem::size_of::<f64>();
+//         slice::from_raw_parts(float_ptr as *const u8, num_elems)
+//     };
+//     byte_arr
+// }
+//
+// fn bytes_to_floats(bytes: &[u8]) -> &[f64] {
+//     let float_arr: &[f64] = unsafe {
+//         let byte_ptr: *const u8 = bytes.as_ptr();
+//         let num_elems = bytes.len() / mem::size_of::<f64>();
+//         slice::from_raw_parts(byte_ptr as *const f64, num_elems)
+//     };
+//     float_arr
+// }
 
 
 pub fn random_features(d: usize) -> Vec<f64> {

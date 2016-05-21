@@ -52,6 +52,7 @@ pub mod faas_benchmark;
 pub mod metrics;
 pub mod rest;
 pub mod hashing;
+pub mod rpc;
 // pub mod rpc;
 
 
