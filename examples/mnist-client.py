@@ -30,7 +30,8 @@ def normalize_digits(X):
 def mnist_prediction(x, uid):
     url = "http://127.0.0.1:1337/predict?uid=%(uid)s" % {'uid': uid}
     headers = {}
-    x_str = ", ".join(["%.3f" % a for a in x])
+    # x_str = ", ".join(["%.3f" % a for a in x])
+    x_str = ", ".join(["%d" % a for a in x])
     # print(x_str)
     start = datetime.now()
     r = requests.post(url, data=x_str, headers=headers)

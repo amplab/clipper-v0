@@ -34,11 +34,13 @@ use features::FeatureReq;
 /// The input contents sequentially
 ///
 /// Variable length numeric inputs:
+/// _4 bytes_: number of content bytes (so we know how much to recieve)
 /// Each input has the format
 /// <4 bytes for the input length, followed by the input>
 ///
 /// Strings:
-/// A list of 4 byte i32s indicating the length of each string,
+/// _4 bytes_: number of content bytes (so we know how much to recieve)
+/// A list of 4 byte i32s indicating the length of each individual string when uncompressed,
 /// followed by all of the strings concatenated together and compressed
 /// with LZ4
 

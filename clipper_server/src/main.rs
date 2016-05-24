@@ -105,7 +105,7 @@ pub fn main() {
         faas_benchmark::feature_batch_latency(args.arg_b.unwrap());
     } else if args.cmd_start {
         let features = parse_feature_config(&args.flag_feature_conf);
-        rest::start_listening(features, rest::InputType::Float(784));
+        rest::start_listening(features, rest::InputType::Integer(784));
     }
 }
 

@@ -72,7 +72,7 @@ fn parse_to_floats(transport: &mut Decoder<HttpStream>,
     let mut request_str = String::new();
     transport.read_to_string(&mut request_str).unwrap();
     let parsed_floats: Vec<f64> = request_str.split(", ")
-                                             .map(|x| x.parse::<f64>().unwrap())
+                                             .map(|x| x.trim().parse::<f64>().unwrap())
                                              .collect();
     if length >= 0 && parsed_floats.len() as i32 != length {
         Err(format!("input wrong length: expected {}, found {}",
@@ -90,9 +90,13 @@ fn parse_to_ints(transport: &mut Decoder<HttpStream>,
                  length: i32)
                  -> Result<server::Input, String> {
     let mut request_str = String::new();
+    info!("AAA");
     transport.read_to_string(&mut request_str).unwrap();
+    info!("BBB");
+    let splits = request_str.split(", ").collect::<Vec<&str>>();
+    info!("{:?}", splits);
     let parsed_ints: Vec<i32> = request_str.split(", ")
-                                           .map(|x| x.parse::<i32>().unwrap())
+                                           .map(|x| x.trim().parse::<i32>().unwrap())
                                            .collect();
     if length >= 0 && parsed_ints.len() as i32 != length {
         Err(format!("input wrong length: expected {}, found {}",
