@@ -1,11 +1,11 @@
 #![allow(dead_code, unused_variables)]
-use rest::InputType;
 use std::net::TcpStream;
 use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
 use std::io::{Read, Write, Cursor};
 use std::mem;
-use server::{Input, Output};
+use server::{Input, Output, InputType};
 use features::FeatureReq;
+
 
 
 

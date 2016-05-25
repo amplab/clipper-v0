@@ -1,12 +1,8 @@
-use features;
-use metrics;
 use std::sync::{Arc, RwLock};
 use std::thread;
-use digits;
 use time;
-use server;
 use rand::{thread_rng, Rng};
-
+use clipper::{features, metrics, digits, server};
 
 
 pub fn feature_batch_latency(batch_size: usize) {

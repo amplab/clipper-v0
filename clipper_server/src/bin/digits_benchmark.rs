@@ -3,13 +3,10 @@ use std::ptr;
 use std::sync::{RwLock, Arc};
 use std::thread;
 use std::net::SocketAddr;
-use server;
-use digits;
-use features;
-use metrics;
-use hashing::{FeatureHash, SimpleHasher};
 use linear_models::{linalg, linear};
-use server::TaskModel;
+use clipper::{digits, features, metrics};
+use clipper::hashing::{FeatureHash, SimpleHasher};
+use clipper::server::{self, TaskModel};
 // use quickersort;
 
 #[derive(Debug)]

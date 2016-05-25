@@ -9,11 +9,10 @@ use std::sync::atomic::AtomicUsize;
 use net2::TcpStreamExt;
 // use byteorder::{LittleEndian, WriteBytesExt};
 use toml;
-use server;
+use server::{self, InputType};
 use std::io::{Read, Write};
 use metrics;
 use rpc;
-use rest;
 use hashing::{FeatureHash, SimpleHasher, HashKey};
 
 
@@ -152,7 +151,7 @@ fn feature_worker(name: String,
                   predictions_counter: Arc<metrics::Counter>,
                   batch_size: usize) {
 
-    let input_type = rest::InputType::Integer(784);
+    let input_type = InputType::Integer(784);
     // if the batch_size is less than 1 (these are unsigned
     // integers, so that means batch size == 0), we assume dynamic batching
     let dynamic_batching = batch_size < 1;

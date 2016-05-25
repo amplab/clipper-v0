@@ -22,6 +22,17 @@ pub type OnPredict = Fn(f64) -> () + Send;
 
 pub type Output = f64;
 
+/// Specifies the input type and expected length. A negative length indicates
+/// a variable length input. `Str` does not have a length because Strings
+/// are assumed to be always be variable length.
+#[derive(Clone)]
+pub enum InputType {
+    Integer(i32),
+    Float(i32),
+    Str,
+    Byte(i32),
+}
+
 // #[derive(Hash, Clone, Debug)]
 #[derive(Clone,Debug)]
 pub enum Input {

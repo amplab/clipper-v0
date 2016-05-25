@@ -1,59 +1,33 @@
-#![crate_name="clipper"]
-#![crate_type="bin"]
-
 // #![deny(missing_docs)]
 #![deny(warnings)]
 
-// extern crate capnp;
-// extern crate capnp_rpc;
-extern crate rand;
-extern crate time;
-extern crate hyper;
-// #[macro_use]
-// extern crate gj;
-// extern crate eventual;
-// extern crate mio;
-extern crate num_cpus;
-extern crate linear_models;
-extern crate toml;
-// extern crate getopts;
-extern crate rustc_serialize;
 extern crate docopt;
-extern crate net2;
-extern crate byteorder;
-// extern crate quickersort;
-
-use docopt::Docopt;
-use std::error::Error;
-// use std::result::Result;
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
-use std::io::BufReader;
-
-// use getopts::Options;
-// use std::env;
-use std::net::SocketAddr;
+extern crate clipper;
+extern crate toml;
+extern crate rustc_serialize;
+extern crate linear_models;
+extern crate rand;
+extern crate hyper;
+extern crate time;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
 
-// pub mod feature_capnp {
-//   include!(concat!(env!("OUT_DIR"), "/feature_capnp.rs"));
-// }
+use docopt::Docopt;
+use std::error::Error;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+use std::io::BufReader;
+use std::net::SocketAddr;
 
-// pub mod linalg;
-pub mod server;
-pub mod digits;
-// pub mod bench;
-pub mod features;
+use clipper::server::InputType;
+use clipper::features;
+
 pub mod digits_benchmark;
 pub mod faas_benchmark;
-pub mod metrics;
 pub mod rest;
-pub mod hashing;
-pub mod rpc;
-// pub mod rpc;
+
 
 
 #[cfg_attr(rustfmt, rustfmt_skip)]
@@ -105,7 +79,7 @@ pub fn main() {
         faas_benchmark::feature_batch_latency(args.arg_b.unwrap());
     } else if args.cmd_start {
         let features = parse_feature_config(&args.flag_feature_conf);
-        rest::start_listening(features, rest::InputType::Integer(784));
+        rest::start_listening(features, InputType::Integer(784));
     }
 }
 

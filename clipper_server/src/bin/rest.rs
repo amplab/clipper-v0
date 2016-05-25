@@ -11,23 +11,12 @@ use hyper::header::ContentLength;
 use hyper::net::HttpStream;
 use hyper::server::{Server, Handler, Request, Response};
 
-use server::{self, TaskModel};
-use features;
-use metrics;
+use clipper::server::{self, TaskModel, InputType};
+use clipper::{features, metrics};
 
 
 
 
-/// Specifies the input type and expected length. A negative length indicates
-/// a variable length input. `Str` does not have a length because Strings
-/// are assumed to be always be variable length.
-#[derive(Clone)]
-pub enum InputType {
-    Integer(i32),
-    Float(i32),
-    Str,
-    Byte(i32),
-}
 
 
 const PREDICT: &'static str = "/predict";
