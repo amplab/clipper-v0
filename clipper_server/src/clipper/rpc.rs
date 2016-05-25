@@ -100,9 +100,19 @@ pub fn encode_var_ints(inputs: &Vec<FeatureReq>) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(VARINT_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
-    assert!(message.len() == 5);
-
-    let intsize = mem::size_of::<i32>;
+    let intsize = mem::size_of::<i32>();
+    // number of bytes used to encode the content
+    let mut content_len = 0;
+    for x in inputs.iter() {
+        match x.input {
+            // for each input: 4 bytes length + len*sizeof(int)
+            Input::Ints {i: ref f, length: _} => content_len += f.len() * intsize,
+            _ => unreachable!(),
+        }
+    }
+    content_len += mem::size_of::<u32>() * inputs.len();
+    message.write_u32::<LittleEndian>(content_len as u32).unwrap();
+    assert!(message.len() == 9);
     for x in inputs.iter() {
         match x.input {
             // for each input: 4 bytes length + len*sizeof(int)
@@ -122,6 +132,7 @@ pub fn decode_var_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
     let mut cursor = Cursor::new(bytes);
     assert_eq!(VARINT_CODE, cursor.read_u8().unwrap());
     let num_inputs = cursor.read_u32::<LittleEndian>().unwrap();
+    let content_len = cursor.read_u32::<LittleEndian>().unwrap();
     // let inp_len = cursor.read_u32::<LittleEndian>().unwrap();
     let mut responses = Vec::with_capacity(num_inputs as usize);
     for _ in 0..num_inputs {
@@ -142,7 +153,7 @@ pub fn encode_fixed_ints(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
     message.write_u32::<LittleEndian>(length as u32).unwrap();
     assert!(message.len() == 9);
-    let intsize = mem::size_of::<i32>;
+    // let intsize = mem::size_of::<i32>;
     for x in inputs.iter() {
         match x.input {
             // for each input: 4 bytes length + len*sizeof(int)
@@ -174,11 +185,52 @@ pub fn decode_fixed_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
 }
 
 fn encode_fixed_floats(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
-    unreachable!()
+    let mut message = Vec::new();
+    message.push(FIXEDFLOAT_CODE);
+    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
+    message.write_u32::<LittleEndian>(length as u32).unwrap();
+    assert!(message.len() == 9);
+    // let floatsize = mem::size_of::<f64>;
+    for x in inputs.iter() {
+        match x.input {
+            Input::Floats {ref f, length: _} => {
+                for xi in f.iter() {
+                    message.write_f64::<LittleEndian>(*xi).unwrap();
+                }
+            }
+            _ => unreachable!(),
+        }
+    }
+    message
 }
 
 fn encode_var_floats(inputs: &Vec<FeatureReq>) -> Vec<u8> {
-    unreachable!()
+    let mut message = Vec::new();
+    message.push(VARFLOAT_CODE);
+    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
+    let floatsize = mem::size_of::<f64>();
+    let mut content_len = 0;
+    for x in inputs.iter() {
+        match x.input {
+            Input::Floats {ref f, length: _} => content_len += f.len() * floatsize,
+            _ => unreachable!(),
+        }
+    }
+    content_len += mem::size_of::<u32>() * inputs.len();
+    message.write_u32::<LittleEndian>(content_len as u32).unwrap();
+    assert!(message.len() == 9);
+    for x in inputs.iter() {
+        match x.input {
+            Input::Floats {ref f, length: _} => {
+                message.write_u32::<LittleEndian>(f.len() as u32).unwrap();
+                for xi in f.iter() {
+                    message.write_f64::<LittleEndian>(*xi).unwrap();
+                }
+            }
+            _ => unreachable!(),
+        }
+    }
+    message
 }
 
 fn encode_fixed_bytes(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {

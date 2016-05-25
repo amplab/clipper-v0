@@ -151,7 +151,7 @@ fn feature_worker(name: String,
                   predictions_counter: Arc<metrics::Counter>,
                   batch_size: usize) {
 
-    let input_type = InputType::Integer(784);
+    let input_type = InputType::Float(7);
     // if the batch_size is less than 1 (these are unsigned
     // integers, so that means batch size == 0), we assume dynamic batching
     let dynamic_batching = batch_size < 1;
