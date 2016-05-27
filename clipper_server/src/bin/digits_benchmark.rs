@@ -6,7 +6,7 @@ use std::net::SocketAddr;
 use linear_models::{linalg, linear};
 use clipper::{digits, features, metrics};
 use clipper::hashing::{FeatureHash, SimpleHasher};
-use clipper::server::{self, TaskModel};
+use clipper::server::{self, TaskModel, InputType};
 // use quickersort;
 
 #[derive(Debug)]
@@ -47,12 +47,14 @@ pub fn run(feature_addrs: Vec<(String, Vec<SocketAddr>)>, dc: DigitsBenchConfig)
                                               dc.num_users as usize);
 
 
+    let input_type = InputType::Integer(784);
     let (features, _): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
                                                        .map(|(n, a)| {
                                                            features::create_feature_worker(n,
                                                          a,
                                                          dc.feature_batch_size,
-                                                         metrics_register.clone())
+                                                         metrics_register.clone(),
+                                                         input_type.clone())
                                                        })
                                                        .unzip();
     let trained_tasks = pretrain_task_models(tasks, &features);

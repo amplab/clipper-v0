@@ -10,6 +10,7 @@ pub fn feature_batch_latency(batch_size: usize) {
     let metrics_register = Arc::new(RwLock::new(metrics::Registry::new("faas".to_string())));
 
 
+    let input_type = server::InputType::Integer(784);
     let mnist_path = "/crankshaw-local/mnist/data/test.data".to_string();
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
     // let addr_vec = vec![vec!["169.229.49.167:6001".to_string(),
@@ -35,7 +36,8 @@ pub fn feature_batch_latency(batch_size: usize) {
                                                                 .zip(names.into_iter())
                                                                 .map(|(a, n)| {
                                                                     features::create_feature_worker(
-                            n, a, batch_size, metrics_register.clone())
+                            n, a, batch_size, metrics_register.clone(),
+                            input_type.clone())
                                                                 })
                                                                 .unzip();
 

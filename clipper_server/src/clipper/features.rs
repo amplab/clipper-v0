@@ -49,7 +49,8 @@ impl<H: FeatureHash + Send + Sync> FeatureHandle<H> {
 pub fn create_feature_worker(name: String,
                              addrs: Vec<SocketAddr>,
                              batch_size: usize,
-                             metric_register: Arc<RwLock<metrics::Registry>>)
+                             metric_register: Arc<RwLock<metrics::Registry>>,
+                             input_type: InputType)
                              -> (FeatureHandle<SimpleHasher>,
                                  Vec<::std::thread::JoinHandle<()>>) {
 
@@ -85,6 +86,7 @@ pub fn create_feature_worker(name: String,
             let latency_hist = latency_hist.clone();
             let thruput_meter = thruput_meter.clone();
             let predictions_counter = predictions_counter.clone();
+            let input_type = input_type.clone();
             thread::spawn(move || {
                 feature_worker(name,
                                rx,
@@ -93,7 +95,8 @@ pub fn create_feature_worker(name: String,
                                latency_hist,
                                thruput_meter,
                                predictions_counter,
-                               batch_size);
+                               batch_size,
+                               input_type);
             })
         };
         handles.push(handle);
@@ -149,9 +152,10 @@ fn feature_worker(name: String,
                   latency_hist: Arc<metrics::Histogram>,
                   thruput_meter: Arc<metrics::Meter>,
                   predictions_counter: Arc<metrics::Counter>,
-                  batch_size: usize) {
+                  batch_size: usize,
+                  input_type: InputType) {
 
-    let input_type = InputType::Float(7);
+    // let input_type = InputType::Float(7);
     // if the batch_size is less than 1 (these are unsigned
     // integers, so that means batch size == 0), we assume dynamic batching
     let dynamic_batching = batch_size < 1;

@@ -208,7 +208,7 @@ pub fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>, input_type
     let (features, _): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
                                                        .map(|(n, a)| {
                                                            features::create_feature_worker(
-                                  n, a, 0, metrics_register.clone())
+                                  n, a, 0, metrics_register.clone(), input_type.clone())
                                                        })
                                                        .unzip();
 
