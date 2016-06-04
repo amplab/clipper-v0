@@ -19,7 +19,7 @@ lib_path = os.path.join(dll_path, prefix + "pyclipper" + extension)
 # sys.exit(0)
 lib = ctypes.cdll.LoadLibrary(lib_path)
 
-lib.init_clipper.argtypes = (c_char_p, )
+lib.init_clipper.argtypes = (c_char_p, c_uint32, c_uint32)
 lib.init_clipper.restype = POINTER(PyClipperS)
 
 lib.pyclipper_free.argtypes = (POINTER(PyClipperS), )
@@ -29,8 +29,8 @@ lib.pyclipper_predict.restype = c_double
 
 
 class PyClipper:
-    def __init__(self, config):
-        self.obj = lib.init_clipper(config)
+    def __init__(self, config, num_workers, num_users):
+        self.obj = lib.init_clipper(config, num_workers, num_users)
 
     def __enter__(self):
         return self
@@ -44,7 +44,7 @@ class PyClipper:
         x_p = x.ctypes.data_as(POINTER(c_double))
         return lib.pyclipper_predict(self.obj, x_p, c_uint32(len(x)))
 
-with PyClipper("../features.toml") as clipper:
+with PyClipper("../features.toml", 1, 2) as clipper:
     print(clipper.predict(np.ones(7)*2.2))
     time.sleep(10)
     print(clipper.predict(np.ones(7)*-1.3))

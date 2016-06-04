@@ -36,8 +36,17 @@ pub struct PyClipper {
     input_type: InputType,
 }
 
+
+/// ###TODO:###
+///
+/// - configuration
+
 impl PyClipper {
-    pub fn new(feature_addrs: Vec<(String, Vec<SocketAddr>)>, input_type: InputType) -> PyClipper {
+    pub fn new(feature_addrs: Vec<(String, Vec<SocketAddr>)>,
+               input_type: InputType,
+               num_workers: usize,
+               num_users: usize)
+               -> PyClipper {
         let metrics_register = Arc::new(RwLock::new(metrics::Registry::new("PyClipper"
                                                                                .to_string())));
 
@@ -48,9 +57,9 @@ impl PyClipper {
                                                            })
                                                            .unzip();
 
-        let num_workers = 2;
+        // let num_workers = 2;
         let num_features = features.len();
-        let num_users = 100;
+        // let num_users = 100;
 
         let dispatcher = Arc::new(server::Dispatcher::new(num_workers,
                                                           server::SLA,
@@ -84,14 +93,21 @@ impl PyClipper {
 }
 
 #[no_mangle]
-pub extern "C" fn init_clipper(config: *const c_char) -> *mut PyClipper {
+pub extern "C" fn init_clipper(config: *const c_char,
+                               num_workers: uint32_t,
+                               num_users: uint32_t)
+                               -> *mut PyClipper {
     let config_loc = unsafe {
         assert!(!config.is_null());
         CStr::from_ptr(config)
     };
     let config_str = str::from_utf8(config_loc.to_bytes()).unwrap().to_string();
     let model_wrappers = parse_feature_config(&config_str);
-    Box::into_raw(Box::new(PyClipper::new(model_wrappers, InputType::Float(7))))
+    // TODO(crankshaw): hardcoded input type
+    Box::into_raw(Box::new(PyClipper::new(model_wrappers,
+                                          InputType::Float(7),
+                                          num_workers as usize,
+                                          num_users as usize)))
 }
 
 #[no_mangle]
@@ -117,6 +133,7 @@ pub extern "C" fn pyclipper_predict(ptr: *mut PyClipper, input: *const f64, len:
         v[..].clone_from_slice(slice);
         v
     };
+    // TODO(crankshaw): hardcoded uid
     clipper.predict(0_u32,
                     server::Input::Floats {
                         f: x,
