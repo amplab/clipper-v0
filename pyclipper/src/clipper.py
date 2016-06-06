@@ -29,7 +29,13 @@ lib.pyclipper_predict.restype = c_double
 
 
 class PyClipper:
+
     def __init__(self, config, num_workers, num_users):
+        """
+        config(str):        Path to model wrapper configuration file
+        num_workers(int):   Number of worker threads to launch. This should probably be 1.
+        num_users(int):     Number of different users to make personalized predictions about.
+        """
         self.obj = lib.init_clipper(config, num_workers, num_users)
 
     def __enter__(self):
