@@ -1,0 +1,16 @@
+[package]
+name = "pyclipper"
+version = "0.1.0"
+authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
+
+[lib]
+name = "pyclipper"
+crate-type = ["dylib"]
+
+[dependencies]
+log = "0.3"
+libc = "0.2"
+toml = "0.1"
+
+[dependencies.clipper]
+path = "../clipper_server"

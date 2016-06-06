@@ -2,22 +2,18 @@
 name = "clipper"
 version = "0.1.0"
 authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
-# build = "build.rs"
+
+[lib]
+name = "clipper"
+path = "src/clipper/lib.rs"
+# crate-types = ["rlib", "dylib", "bin"]
 
 [[bin]]
-name = "clipper"
-path = "src/main.rs"
+name = "clipper-rest"
+path = "src/bin/clipper-rest.rs"
 
-[profile.release]
-debug = true
-
-# [build-dependencies]
-# capnpc = "*"
-# [build-dependencies.capnpc]
-# git = "https://github.com/dcrankshaw/capnpc-rust"
 
 [dependencies]
-hyper = "0.7"
 rand = "0.3"
 time = "0.1"
 # mio = "0.5"
@@ -29,25 +25,12 @@ net2 = "0.2.21"
 byteorder = "0.4"
 log = "0.3"
 env_logger = "0.3"
-# quickersort = "1.0.1"
-# getopts = "0.2"
-# capnp = "0.6.1"
-# gj = "0.1.1"
-# capnp-rpc = "0.6.1"
-
-# [dependencies.capnp]
-# git = "https://github.com/dcrankshaw/capnproto-rust"
-#
-# [dependencies.gj]
-# git = "https://github.com/dcrankshaw/gj"
-#
-# [dependencies.capnp-rpc]
-# git = "https://github.com/dcrankshaw/capnp-rpc-rust"
-#
-# [dependencies.eventual]
-# git = "https://github.com/carllerche/eventual"
+spmc = "0.2"
+libc = "0.2"
 
 [dependencies.linear-models]
 git = "https://github.com/dcrankshaw/rust-linear-models"
-# path = "/crankshaw-local/rust-linear-models"
 
+
+[dependencies.hyper]
+git = "https://github.com/hyperium/hyper"
