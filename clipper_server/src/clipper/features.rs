@@ -1,5 +1,5 @@
 use time;
-use std::net::{ToSocketAddrs, SocketAddr, TcpStream};
+use std::net::{ToSocketAddrs, SocketAddr, TcpStream, Shutdown};
 use std::thread;
 use std::sync::{RwLock, Arc, mpsc};
 use std::collections::HashMap;
