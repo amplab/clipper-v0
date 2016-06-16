@@ -1,21 +1,11 @@
-// #![crate_name="clipper"]
-// #![deny(missing_docs)]
-#![deny(warnings)]
-extern crate rand;
-extern crate time;
-extern crate libc;
-extern crate toml;
-extern crate num_cpus;
-extern crate linear_models;
-extern crate rustc_serialize;
-extern crate net2;
-extern crate byteorder;
-#[macro_use]
-extern crate log;
+#![cfg_attr(feature = "serde_macros", feature(custom_derive, plugin))]
+#![cfg_attr(feature = "serde_macros", plugin(serde_macros))]
 
-pub mod server;
-pub mod digits;
-pub mod features;
-pub mod metrics;
-pub mod hashing;
-pub mod rpc;
+extern crate serde;
+extern crate bincode;
+
+#[cfg(feature = "serde_macros")]
+include!("lib.rs.in");
+
+#[cfg(not(feature = "serde_macros"))]
+include!(concat!(env!("OUT_DIR"), "/lib.rs"));

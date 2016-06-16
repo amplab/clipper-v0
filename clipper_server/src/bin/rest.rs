@@ -20,7 +20,7 @@ use clipper::{features, metrics};
 
 
 const PREDICT: &'static str = "/predict";
-// const UPDATE: &'static str = "/update";
+const UPDATE: &'static str = "/update";
 
 
 struct PredictHandler<T>
@@ -29,6 +29,16 @@ struct PredictHandler<T>
     dispatcher: Arc<server::Dispatcher<T>>,
     result_string: String,
     result_channel: Option<mpsc::Receiver<String>>,
+    num_features: usize,
+    ctrl: Control,
+    uid: u32,
+    input_type: InputType,
+}
+
+struct UpdateHandler<T>
+    where T: TaskModel + Send + Sync + 'static
+{
+    dispatcher: Arc<server::Dispatcher<T>>,
     num_features: usize,
     ctrl: Control,
     uid: u32,
