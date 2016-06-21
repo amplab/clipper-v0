@@ -17,136 +17,136 @@ use std::boxed::Box;
 use cmt::{CorrectionModelTable, RedisCMT};
 // use std::hash::{Hash, SipHasher, Hasher};
 
-pub const SLA: i64 = 20;
-
-pub type OnPredict = Fn(f64) -> () + Send;
-
-pub type Output = f64;
-
-/// Specifies the input type and expected length. A negative length indicates
-/// a variable length input. `Str` does not have a length because Strings
-/// are assumed to be always be variable length.
-#[derive(Clone)]
-pub enum InputType {
-    Integer(i32),
-    Float(i32),
-    Str,
-    Byte(i32),
-}
-
-// #[derive(Hash, Clone, Debug)]
-#[derive(Clone,Debug)]
-pub enum Input {
-    Str {
-        s: String,
-    },
-    Bytes {
-        b: Vec<u8>,
-        length: i32,
-    },
-    Ints {
-        i: Vec<i32>,
-        length: i32,
-    },
-    Floats {
-        f: Vec<f64>,
-        length: i32,
-    },
-}
-
-
-
-pub struct PredictRequest {
-    start_time: time::PreciseTime,
-    user: u32, // TODO: remove this because each feature has it's own hash
-    input: Input,
-    true_label: Option<Output>, // used to evaluate accuracy,
-    req_number: i32,
-    on_predict: Box<OnPredict>,
-}
-
-pub struct UpdateRequest {
-    start_time: time::PreciseTime,
-    user: u32, // TODO: remove this because each feature has it's own hash
-    input: Input,
-    label: Output, // used to evaluate accuracy,
-    req_number: i32,
-}
-
-
-impl PredictRequest {
-    pub fn new(user: u32,
-               input: Input,
-               req_num: i32,
-               on_predict: Box<OnPredict>)
-               -> PredictRequest {
-        PredictRequest {
-            start_time: time::PreciseTime::now(),
-            user: user,
-            input: input,
-            true_label: None,
-            req_number: req_num,
-            on_predict: on_predict,
-        }
-    }
-
-    pub fn new_with_label(user: u32, input: Input, label: f64, req_num: i32) -> PredictRequest {
-        PredictRequest {
-            start_time: time::PreciseTime::now(),
-            user: user,
-            input: input,
-            true_label: Some(label),
-            req_number: req_num,
-            on_predict: Box::new(|_| {
-            }),
-        }
-    }
-}
-
-#[allow(dead_code)]
-struct Update {
-    start_time: time::PreciseTime, // just for monitoring purposes
-    user: u32,
-    input: Input,
-    label: f32,
-}
-
-// fn start_update_worker(feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>) -> mpsc::Sender<Update> {
-//     panic!("unimplemented method");
+// pub const SLA: i64 = 20;
+//
+// pub type OnPredict = Fn(f64) -> () + Send;
+//
+// pub type Output = f64;
+//
+// /// Specifies the input type and expected length. A negative length indicates
+// /// a variable length input. `Str` does not have a length because Strings
+// /// are assumed to be always be variable length.
+// #[derive(Clone)]
+// pub enum InputType {
+//     Integer(i32),
+//     Float(i32),
+//     Str,
+//     Byte(i32),
+// }
+//
+// // #[derive(Hash, Clone, Debug)]
+// #[derive(Clone,Debug)]
+// pub enum Input {
+//     Str {
+//         s: String,
+//     },
+//     Bytes {
+//         b: Vec<u8>,
+//         length: i32,
+//     },
+//     Ints {
+//         i: Vec<i32>,
+//         length: i32,
+//     },
+//     Floats {
+//         f: Vec<f64>,
+//         length: i32,
+//     },
 // }
 
-/// Correction policies are stateless, any required state is tracked separately
-/// and stored in the `CorrectionModelTable`
-pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
 
-    fn new() -> S;
 
-    fn predict(state: &S, ys: Vec<Output>, missing_ys: Vec<usize>, debug_str: &String) -> Output;
+// pub struct PredictRequest {
+//     start_time: time::PreciseTime,
+//     user: u32, // TODO: remove this because each feature has it's own hash
+//     input: Input,
+//     true_label: Option<Output>, // used to evaluate accuracy,
+//     req_number: i32,
+//     on_predict: Box<OnPredict>,
+// }
 
-    fn rank_models(state: &S) -> Vec<usize>;
+// pub struct UpdateRequest {
+//     start_time: time::PreciseTime,
+//     user: u32, // TODO: remove this because each feature has it's own hash
+//     input: Input,
+//     label: Output, // used to evaluate accuracy,
+//     req_number: i32,
+// }
 
-    fn train(state: &S) -> S;
 
-}
+// impl PredictRequest {
+//     pub fn new(user: u32,
+//                input: Input,
+//                req_num: i32,
+//                on_predict: Box<OnPredict>)
+//                -> PredictRequest {
+//         PredictRequest {
+//             start_time: time::PreciseTime::now(),
+//             user: user,
+//             input: input,
+//             true_label: None,
+//             req_number: req_num,
+//             on_predict: on_predict,
+//         }
+//     }
+//
+//     pub fn new_with_label(user: u32, input: Input, label: f64, req_num: i32) -> PredictRequest {
+//         PredictRequest {
+//             start_time: time::PreciseTime::now(),
+//             user: user,
+//             input: input,
+//             true_label: Some(label),
+//             req_number: req_num,
+//             on_predict: Box::new(|_| {
+//             }),
+//         }
+//     }
+// }
+//
+// #[allow(dead_code)]
+// struct Update {
+//     start_time: time::PreciseTime, // just for monitoring purposes
+//     user: u32,
+//     input: Input,
+//     label: f32,
+// }
+//
+// // fn start_update_worker(feature_handles: Vec<features::FeatureHandle<features::SimpleHasher>>) -> mpsc::Sender<Update> {
+// //     panic!("unimplemented method");
+// // }
+//
+// /// Correction policies are stateless, any required state is tracked separately
+// /// and stored in the `CorrectionModelTable`
+// pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
+//
+//     fn new() -> S;
+//
+//     fn predict(state: &S, ys: Vec<Output>, missing_ys: Vec<usize>, debug_str: &String) -> Output;
+//
+//     fn rank_models(state: &S) -> Vec<usize>;
+//
+//     fn train(state: &S) -> S;
+//
+// }
 
-pub struct DummyTaskModel {
-    num_features: usize,
-}
-
-impl TaskModel for DummyTaskModel {
-    #[allow(unused_variables)]
-    fn predict(&self, fs: Vec<Output>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
-        if missing_fs.len() > 0 {
-            info!("missing fs: {:?}", missing_fs);
-        }
-        info!("Features: {:?}", fs);
-        fs.into_iter().fold(0.0, |acc, c| acc + c)
-    }
-
-    fn rank_features(&self) -> Vec<usize> {
-        return (0..self.num_features).into_iter().collect::<Vec<usize>>();
-    }
-}
+// pub struct DummyTaskModel {
+//     num_features: usize,
+// }
+//
+// impl TaskModel for DummyTaskModel {
+//     #[allow(unused_variables)]
+//     fn predict(&self, fs: Vec<Output>, missing_fs: Vec<usize>, debug_str: &String) -> f64 {
+//         if missing_fs.len() > 0 {
+//             info!("missing fs: {:?}", missing_fs);
+//         }
+//         info!("Features: {:?}", fs);
+//         fs.into_iter().fold(0.0, |acc, c| acc + c)
+//     }
+//
+//     fn rank_features(&self) -> Vec<usize> {
+//         return (0..self.num_features).into_iter().collect::<Vec<usize>>();
+//     }
+// }
 
 // Because we don't have a good concurrent hash map, assume we know how many
 // users there will be ahead of time. Then we can have a vec of RwLock

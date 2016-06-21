@@ -12,9 +12,8 @@ use serde::ser::Serialize;
 use serde::de::Deserialize;
 use bincode;
 use redis::{self, Commands};
+use std::marker::PhantomData;
 
-
-// TODO: Trait bounds on S? Serialize and Deserialize?
 trait CorrectionModelTable<S> where S: Serialize + Deserialize {
 
     // fn new() -> Self;
@@ -29,27 +28,36 @@ trait CorrectionModelTable<S> where S: Serialize + Deserialize {
 }
 
 
-//
-struct RedisCMT {
+pub struct RedisCMT<S>
+    where S: Serialize + Deserialize
+{
     connection: redis::Connection,
+    _correction_state_marker: PhantomData<S>,
 }
 
-impl RedisCMT {
-    pub fn new_socket() -> RedisCMT {
+impl<S> RedisCMT<S> where S: Serialize + Deserialize
+{
+    pub fn new_socket_connection() -> RedisCMT {
         let client = redis::Client::open("unix:///tmp/redis.sock?db=1").unwrap();
         let con = client.get_connection().unwrap();
-        RedisCMT { connection: con }
+        RedisCMT {
+            connection: con,
+            _correction_state_marker: PhantomData,
+        }
     }
 
-    pub fn new_tcp() -> RedisCMT {
+    pub fn new_tcp_connection() -> RedisCMT {
         let client = redis::Client::open("redis://127.0.0.1/").unwrap();
         let con = client.get_connection().unwrap();
-        RedisCMT { connection: con }
+        RedisCMT {
+            connection: con,
+            _correction_state_marker: PhantomData,
+        }
     }
 }
 
 
-impl CorrectionModelTable<S> for RedisCMT where S: Serialize + Deserialize
+impl CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
 {
     fn put(&mut self, uid: u32, state: &S) -> Result<(), String> {
         let bytes = try!(bincode::serde::serialize(state, bincode::SizeLimit::Infinite));
