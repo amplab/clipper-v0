@@ -166,6 +166,68 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
 
 
 
+
+pub fn get_addr(a: String) -> SocketAddr {
+    a.to_socket_addrs().unwrap().next().unwrap()
+}
+
+pub fn get_addrs(addrs: Vec<toml::Value>) -> Vec<SocketAddr> {
+    addrs.into_iter().map(|a| get_addr(a.as_str().unwrap().to_string())).collect::<Vec<_>>()
+    // a.to_socket_addrs().unwrap().next().unwrap()
+}
+
+pub fn get_addrs_str(addrs: Vec<String>) -> Vec<SocketAddr> {
+    addrs.into_iter().map(|a| get_addr(a)).collect::<Vec<_>>()
+    // a.to_socket_addrs().unwrap().next().unwrap()
+}
+
+
+fn update_batch_size(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
+    let batch_increment = 2;
+    let backoff = 0.9;
+    let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;
+    if cur_time_micros < (max_time_micros - epsilon) {
+        let new_batch = cur_batch + batch_increment;
+        debug!("increasing batch to {}", new_batch);
+        new_batch as usize
+    } else if cur_time_micros < max_time_micros {
+        cur_batch
+    } else {
+        // don't try to set the batch size below 1
+        let new_batch = cmp::max((cur_batch as f64 * backoff).floor() as u64, 1);
+        debug!("decreasing batch to {}", new_batch);
+        new_batch as usize
+    }
+}
+
+pub fn random_features(d: usize) -> Vec<f64> {
+    let mut rng = thread_rng();
+    rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
+}
+
+
+#[cfg(test)]
+#[cfg_attr(rustfmt, rustfmt_skip)]
+mod tests {
+// use io::ErrorKind;
+// use io::prelude::*;
+    use super::*;
+// use net::*;
+// use net::test::{next_test_ip4, next_test_ip6};
+    use sync::mpsc::channel;
+// use sys_common::AsInner;
+// use time;
+    use thread;
+    use cache::PredictionCache;
+
+    struct TestPredictionCache {}
+
+    impl<i32> PredictionCache<i32> for TestPredictionCache {}
+
+
+
+}
+
 // pub struct FeatureReq {
 //     pub hash_key: HashKey,
 //     pub input: server::Input,
@@ -259,39 +321,6 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
 //     },
 //      handles)
 // }
-
-pub fn get_addr(a: String) -> SocketAddr {
-    a.to_socket_addrs().unwrap().next().unwrap()
-}
-
-pub fn get_addrs(addrs: Vec<toml::Value>) -> Vec<SocketAddr> {
-    addrs.into_iter().map(|a| get_addr(a.as_str().unwrap().to_string())).collect::<Vec<_>>()
-    // a.to_socket_addrs().unwrap().next().unwrap()
-}
-
-pub fn get_addrs_str(addrs: Vec<String>) -> Vec<SocketAddr> {
-    addrs.into_iter().map(|a| get_addr(a)).collect::<Vec<_>>()
-    // a.to_socket_addrs().unwrap().next().unwrap()
-}
-
-
-fn update_batch_size(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
-    let batch_increment = 2;
-    let backoff = 0.9;
-    let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;
-    if cur_time_micros < (max_time_micros - epsilon) {
-        let new_batch = cur_batch + batch_increment;
-        debug!("increasing batch to {}", new_batch);
-        new_batch as usize
-    } else if cur_time_micros < max_time_micros {
-        cur_batch
-    } else {
-        // don't try to set the batch size below 1
-        let new_batch = cmp::max((cur_batch as f64 * backoff).floor() as u64, 1);
-        debug!("decreasing batch to {}", new_batch);
-        new_batch as usize
-    }
-}
 
 // fn feature_worker(name: String,
 //                   rx: mpsc::Receiver<FeatureReq>,
@@ -407,8 +436,3 @@ fn update_batch_size(cur_batch: usize, cur_time_micros: u64, max_time_micros: u6
 //         }
 //     }
 // }
-
-pub fn random_features(d: usize) -> Vec<f64> {
-    let mut rng = thread_rng();
-    rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
-}

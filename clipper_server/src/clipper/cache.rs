@@ -1,9 +1,3 @@
-//! There are two components to the prediction cache: the hashing, covered in
-//! the [hashing](hashing.rs) module, and the cache internals, described here.
-//!
-//!
-//!
-
 use std::hash::{Hash, SipHasher, Hasher};
 use std::collections::HashMap;
 use hashing::{HashKey, HashStrategy, EqualityHasher};
@@ -180,9 +174,114 @@ impl<V> PredictionCache<V> for SimplePredictionCache<V> {
 
 
 #[cfg(test)]
+#[cfg_attr(rustfmt, rustfmt_skip)]
 mod tests {
     use super::*;
+    use hashing::{HashStrategy, HashKey};
+    use server::Input;
+    use configuration::ModelConf;
+
+    struct IdentityHasher {}
+
+    impl HashStrategy for IdentityHasher {
+        pub fn new() -> IdentityHasher {
+            IdentityHasher {}
+        }
+
+        pub fn hash(&self, input: &Input, salt: Option<i32>) -> HashKey {
+            match input {
+                &server::Input::Ints { ref i, length: l } => {
+                    assert!(l == 1);
+                    i[0] as u64
+                }
+                _ => panic!("wrong input type")
+            }
+
+        }
+    }
+
+    fn create_cache(size: usize) -> SimplePredictionCache<i32, IdentityHasher> {
+        let m1 = ModelConf { name: "m1".to_string(), addresses: Vec::new(), num_outputs: 1 };
+        let m2 = ModelConf { name: "m2".to_string(), addresses: Vec::new(), num_outputs: 1 };
+        let model_conf = vec![m1, m2];
+        let cache: SimplePredictionCache<i32, IdentityHasher> =
+            SimplePredictionCache::new(model_conf, size);
+        cache
+    }
+
+    #[test]
+    fn fetch_existing_key() {
+        let cache = create_cache(100);
+        let input = Input::Ints { i: vec![3], l: 1 };
+        cache.put("m1".to_string(), input, 33);
+        let result = cache.fetch("m1".to_string(), input);
+        assert_eq!(result.unwrap(), 33);
+        let res2 = cache.fetch("m2".to_string(), input);
+        assert!(res2.is_none());
+    }
+
+    #[test]
+    fn fetch_missing_key() {
+        let cache = create_cache(100);
+        let input = Input::Ints { i: vec![3], l: 1 };
+        let other_input = Input::Ints { i: vec![7], l: 1 };
+        cache.put("m1".to_string(), input, 33);
+        let result = cache.fetch("m1".to_string(), other_input);
+        assert!(result.is_none());
+    }
+
+    #[test]
+    #[should_panic]
+    fn fetch_nonexistent_model() {
+        let cache = create_cache(100);
+        let input = Input::Ints { i: vec![3], l: 1 };
+        cache.put("m7".to_string(), input, 33);
+    }
 
 
+// Listener tests
+    #[test]
+    fn fire_listener_immediately() {
+        let cache = create_cache(100);
+        let input = Input::Ints { i: vec![3], l: 1 };
+        let mut listener_fired = false;
+        cache.put("m1".to_string(), input, 33);
+        cache.add_listener("m1".to_string(), input, move |x| {
+            assert_eq!(x, 33);
+            listener_fired = true;
+        });
+        assert!(listener_fired);
+    }
 
+    #[test]
+    fn fire_listener_later() {
+        let cache = create_cache(100);
+        let input = Input::Ints { i: vec![3], l: 1 };
+        let mut listener_fired = false;
+        cache.add_listener("m1".to_string(), input, move |x| {
+            assert_eq!(x, 33);
+            listener_fired = true;
+        });
+        assert!(!listener_fired);
+        cache.put("m1".to_string(), input, 33);
+        assert!(listener_fired);
+    }
+
+    #[test]
+    fn dont_fire_listener_on_cache_collision() {
+        let cache = create_cache(10);
+        let input = Input::Ints { i: vec![3], l: 1 };
+        let mut listener_fired = false;
+        cache.add_listener("m1".to_string(), input, move |x| {
+            assert_eq!(x, 33);
+            listener_fired = true;
+        });
+        assert!(!listener_fired);
+        for j in 5..5000 {
+            cache.put("m1".to_string(), Input::Ints { i: vec![j], l: 1 }, 66);
+        }
+        assert!(!listener_fired);
+        cache.put("m1".to_string(), input, 33);
+        assert!(listener_fired);
+    }
 }

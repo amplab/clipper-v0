@@ -1,4 +1,6 @@
 use std::net::{ToSocketAddrs, SocketAddr, TcpStream, Shutdown};
+use toml::{Parser, Array, Table, Value};
+use metrics;
 
 
 pub struct ClipperConf {
@@ -9,11 +11,14 @@ pub struct ClipperConf {
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
     pub input_type: InputType,
-
+    pub training_data_file: Option<String>,
+    // TODO configurable output type
+    //
+    //
     // Internal system settings
     pub num_predict_workers: u32,
     pub num_observe_workers: u32,
-    pub metrics: metrics::Registry,
+    pub metrics: Arc<RwLock<metrics::Registry>>,
 }
 
 impl ClipperConf {
@@ -37,11 +42,87 @@ impl ClipperConf {
             Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
             Ok(_) => print!("{} contains:\n{}", display, toml_string),
         }
+        ClipperConf::parse_toml_string(toml_string)
+    }
 
-        let conf = toml::Parser::new(&toml_string).parse().unwrap();
-        unimplemented!();
+    fn parse_toml_string(toml_string: &String) -> ClipperConf {
+
+        let pc = Parser::new(&toml_string).parse().unwrap();
+        let conf = ClipperConf {
+            name: pc.get("name")
+                    .unwrap()
+                    .as_str()
+                    .unwrap()
+                    .to_string(),
+            slo_micros: pc.get("slo_micros")
+                          .unwrap_or(&Value::Integer(20000))
+                          .as_integer()
+                          .unwrap() as u32,
+            policy_name: pc.get("correction_policy")
+                           .unwrap()
+                           .as_str()
+                           .unwrap()
+                           .to_string(),
+            models: ClipperConf::parse_model_confs(pc.get("models")
+                                                     .unwrap()
+                                                     .as_slice()
+                                                     .unwrap()),
+            use_lsh: pc.get("use_lsh")
+                       .unwrap_or(&Value::Boolean(false))
+                       .as_bool()
+                       .unwrap(),
+            input_type: match pc.get("input_type").unwrap().as_str().unwrap() {
+                "int" | "ints" | "integer" | "integers" | "i32" => {
+                    let length = pc.get("input_length")
+                                   .unwrap_or(&Value::Integer(-1))
+                                   .as_integer()
+                                   .unwrap() as i32;
+                    InputType::Integer(length)
+                }
+                "float" | "floats" | "f64" => {
+                    let length = pc.get("input_length")
+                                   .unwrap_or(&Value::Integer(-1))
+                                   .as_integer()
+                                   .unwrap() as i32;
+                    InputType::Float(length)
+                }
+                "str" | "string" => InputType::Str,
+                "byte" | "bytes" | "u8" => {
+                    let length = pc.get("input_length")
+                                   .unwrap_or(&Value::Integer(-1))
+                                   .as_integer()
+                                   .unwrap() as i32;
+                    InputType::Byte(length)
+                }
+            },
+            num_predict_workers: pc.get("num_predict_workers")
+                                   .unwrap_or(&Value::Integer(2))
+                                   .as_integer()
+                                   .unwrap() as u32,
+            num_update_workers: pc.get("num_update_workers")
+                                  .unwrap_or(&Value::Integer(1))
+                                  .as_integer()
+                                  .unwrap() as u32,
+            metrics: Arc::new(RwLock::new(metrics::Registry::new(pc.get("name")
+                                                                   .unwrap()
+                                                                   .as_str()
+                                                                   .unwrap()
+                                                                   .to_string()))),
+        };
+        conf
+    }
+
+    fn parse_model_confs(model_confs: &[Value]) -> Vec<ModelConf> {
+        let mut models = Vec::new();
+        for m in model_confs.iter() {
+            let mt = m.as_table().unwrap();
+            models.push(ModelConf::from_toml(mt));
+        }
+        models
     }
 }
+
+
 
 
 pub struct ModelConf {
@@ -52,11 +133,40 @@ pub struct ModelConf {
 }
 
 impl ModelConf {
-    fn from_toml_table() {
-        unimplemented!();
+    fn from_toml(mt: &Table) -> ModelConf {
+        ModelConf {
+            name: mt.get("name")
+                    .unwrap()
+                    .as_str()
+                    .unwrap()
+                    .to_string(),
+            num_outputs: mt.get("num_outputs")
+                           .unwrap_or(&Value::Integer(1))
+                           .as_integer()
+                           .unwrap() as usize,
+
+            addresses: get_addrs(mt.get("addresses")
+                                   .unwrap()
+                                   .as_slice()
+                                   .unwrap()
+                                   .to_vec()),
+        }
     }
 }
 
+pub fn get_addr(a: String) -> SocketAddr {
+    a.to_socket_addrs().unwrap().next().unwrap()
+}
+
+pub fn get_addrs(addrs: Vec<toml::Value>) -> Vec<SocketAddr> {
+    addrs.into_iter().map(|a| get_addr(a.as_str().unwrap().to_string())).collect::<Vec<_>>()
+    // a.to_socket_addrs().unwrap().next().unwrap()
+}
+
+pub fn get_addrs_str(addrs: Vec<String>) -> Vec<SocketAddr> {
+    addrs.into_iter().map(|a| get_addr(a)).collect::<Vec<_>>()
+    // a.to_socket_addrs().unwrap().next().unwrap()
+}
 
 
 impl ClipperConf {
