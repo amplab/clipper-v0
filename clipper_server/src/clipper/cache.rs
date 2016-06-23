@@ -8,6 +8,7 @@ use std::hash::{Hash, SipHasher, Hasher};
 use std::collections::HashMap;
 use hashing::{HashKey, HashStrategy, EqualityHasher};
 use configuration::{ClipperConf, ModelConf};
+use batching;
 
 
 struct CacheListener<V> {
@@ -94,10 +95,10 @@ pub trait PredictionCache<V> {
     /// Look up the key in the cache and return immediately
     fn fetch(&self, model: String, input: &Input) -> Option<V>;
 
-    /// Request that the cache entry be populated.
-    /// If there is already an entry in the cache, nothing happens.
-    /// Otherwise, the prediction will be sent to the batch scheduler for evaluation.
-    fn request(&self, model: String, input: Input);
+    // /// Request that the cache entry be populated.
+    // /// If there is already an entry in the cache, nothing happens.
+    // /// Otherwise, the prediction will be sent to the batch scheduler for evaluation.
+    // fn request(&self, model: String, input: Input);
 
     /// Insert the key-value pair into the hash, evicting an older entry
     /// if necessary. Called by model batch schedulers
@@ -109,28 +110,31 @@ pub trait PredictionCache<V> {
 
 pub struct SimplePredictionCache<V, H: HashStrategy> {
     caches: HashMap<String, Cache<V>>,
-    model_batchers: HashMap<String, FeatureHandle>,
+    // model_batchers: Arc<RwLock<HashMap<String, PredictionBatcher<SimplePredictionCache<V>, V>>>>,
     hash_strategy: H,
 }
 
 impl<V, H: HashStrategy> SimplePredictionCache<V, H> {
     /// Creates a new prediction cache for the provided set of models. All
     /// caches will be the same size and use the same hash function.
-    pub fn new(model_conf: ModelConf, slo_micros: u32, cache_size: usize) -> PredictionCache {
+    pub fn new(model_conf: &Vec<ModelConf>, cache_size: usize) -> PredictionCache {
         let mut caches: HashMap<String, Cache<V>> = HashMap::new();
-        for m in model_names.iter() {
-            caches.insert(m.clone(), Cache::new(cache_size));
+        for m in model_conf.iter() {
+            caches.insert(m.name.clone(), Cache::new(cache_size));
         }
-        let hasher = H::new();
 
+        // hashing might be stateful (e.g. LSH) which is why we create a new instance here
+        let hash_strategy = H::new();
 
-        // TODO: create model batchers, create actual struct
-        unimplemented!();
+        SimplePredictionCache {
+            caches: caches,
+            hash_strategy: hash_strategy,
+        }
     }
 }
 
 impl<V> PredictionCache<V> for SimplePredictionCache<V> {
-    fn fetch(&self, model: String, input: &Input) -> Option<V> {
+    fn fetch(&self, model: &String, input: &Input) -> Option<V> {
         match self.caches.get(model) {
             Some(c) => {
                 let hashkey = self.hash_strategy.hash(input, None);
@@ -140,15 +144,15 @@ impl<V> PredictionCache<V> for SimplePredictionCache<V> {
         }
     }
 
-    fn request(&self, model: String, input: Input) {
-        if self.fetch(model.clone(), &input).is_none() {
-            // TODO: schedule for evaluation
-            unimplemented!();
-        }
-    }
+    // fn request(&self, model: String, input: Input) {
+    //     if self.fetch(model.clone(), &input).is_none() {
+    //         // TODO: schedule for evaluation
+    //         unimplemented!();
+    //     }
+    // }
 
 
-    fn put(&self, model: String, input: &Input, v: V) {
+    fn put(&self, model: &String, input: &Input, v: V) {
         match self.caches.get(model) {
             Some(c) => {
                 let hashkey = self.hash_strategy.hash(input, None);
@@ -159,7 +163,7 @@ impl<V> PredictionCache<V> for SimplePredictionCache<V> {
     }
 
 
-    fn add_listener(&self, model: String, input: &Input, listener: Fn(V) -> ()) {
+    fn add_listener(&self, model: &String, input: &Input, listener: Fn(V) -> ()) {
         match self.caches.get(model) {
             Some(c) => {
                 let hashkey = self.hash_strategy.hash(input, None);
@@ -177,6 +181,7 @@ impl<V> PredictionCache<V> for SimplePredictionCache<V> {
         };
     }
 }
+
 
 #[cfg(test)]
 mod tests {
