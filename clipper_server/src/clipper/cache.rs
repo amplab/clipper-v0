@@ -93,12 +93,8 @@ impl<V> Cache<V> {
 pub trait PredictionCache<V> {
 
     /// Look up the key in the cache and return immediately
-    fn fetch(&self, model: String, input: &Input) -> Option<V>;
+    fn fetch(&self, model: &String, input: &Input) -> Option<V>;
 
-    // /// Request that the cache entry be populated.
-    // /// If there is already an entry in the cache, nothing happens.
-    // /// Otherwise, the prediction will be sent to the batch scheduler for evaluation.
-    // fn request(&self, model: String, input: Input);
 
     /// Insert the key-value pair into the hash, evicting an older entry
     /// if necessary. Called by model batch schedulers

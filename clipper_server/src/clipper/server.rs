@@ -5,6 +5,7 @@ use std::marker::PhantomData;
 use cache::{PredictionCache, SimplePredictionCache};
 use configuration::{ClipperConf, ModelConf};
 use hashing::{HashStrategy, EqualityHasher};
+use batching::RpcPredictRequest;
 
 // pub const SLO: i64 = 20;
 
@@ -124,12 +125,24 @@ impl<P, S> ClipperServer<P, S>
         }
     }
 
-    // asynchronous, takes a callback
-    pub fn schedule_prediction() {}
+    // TODO(replace worker vec with spmc (http://seanmonstar.github.io/spmc/spmc/index.html)
+    pub fn schedule_prediction(&self, r: PredictionRequest) {
+        let mut rng = thread_rng();
+        // randomly pick a worker
+
+        let w: usize = if self.prediction_workers.len() > 1 {
+            rng.gen_range::<usize>(0, self.workers.len())
+        } else {
+            0
+        };
+        self.prediction_workers[w].predict(req, max_predictions);
+    }
 
     // TODO: make sure scheduling here hashes on uid so all updates for a single user get sent
     // to the same thread
-    pub fn schedule_update() {}
+    pub fn schedule_update() {
+        unimplemented!();
+    }
 }
 
 struct PredictionWorker<P, S>
@@ -137,9 +150,9 @@ struct PredictionWorker<P, S>
           S: Serialize + Deserialize
 {
     worker_id: i32,
-    input_queue: mpsc::Sender<PredictionRequest>,
-    cache: Arc<PredictionCache<Output>>,
-    models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
+    input_queue: mpsc::Sender<(PredictionRequest, i32)>,
+    // cache: Arc<PredictionCache<Output>>,
+    // models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
     _policy_marker: PhantomData<P>,
     _state_marker: PhantomData<S>,
 }
@@ -155,33 +168,58 @@ impl<P, S> PredictionWorker<P, S>
                models: Arc<HashMap<String,
                                    PredictionBatcher<SimplePredictionCache<Output>, Output>>>)
                -> PredictionWorker {
-        let (sender, receiver) = mpsc::channel::<PredictionRequest>();
+        let (sender, receiver) = mpsc::channel::<(PredictionRequest, i32)>();
         thread::spawn(move || {
-            PredictionWorker::run(worker_id, receiver);
+            PredictionWorker::run(worker_id, receiver, cache, models);
         });
         PredictionWorker {
             worker_id: worker_id,
             input_queue: sender,
-            cache: cache,
-            models: models,
+            // cache: cache,
+            // models: models,
             _policy_marker: PhantomData,
             _state_marker: PhantomData,
         }
     }
 
     // spawn new thread in here, return mpsc::sender?
-    fn run(worker_id: i32, request_queue: mpsc::Receiver) {
+    fn run(worker_id: i32,
+           request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
+           cache: Arc<PredictionCache<Output>>,
+           models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>) {
         let slo_millis = time::Duration::milliseconds(SLO);
         let epsilon = time::Duration::milliseconds(slo_millis / 5);
         let cmt = RedisCMT::new_socket_connection();
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
               SLO);
-        while let Ok(req) = receiver.recv() {
+        while let Ok((req, max_preds)) = receiver.recv() {
             let correction_state: S = cmt.get(*(&req.user) as u32)
                                          .unwrap_or_else(cmt.get(0_u32).unwrap());
 
-            let elapsed_time = req.start_time.to(time::PreciseTime::now());
+            // TODO TODO TODO Send feature requests
+
+            let model_req_order = if max_preds < models.len() {
+                P::rank_models_desc(correction_state)
+            } else {
+                models.keys().collect()
+            };
+            let mut num_requests = 0;
+            let mut i = 0;
+            while num_requests < max_preds && i < models.len() {
+                // first check to see if the prediction is already cached
+                if cache.fetch(model_req_order[i], req.input).is_none() {
+                    // on cache miss, send to batching layer
+                    models.get(model_req_order[i].unwrap()).request_prediction(RpcPredictRequest {
+                        input: req.input,
+                        recv_time: req.recv_time.clone(),
+                    });
+                    num_requests += 1;
+                }
+                i += 1;
+            }
+
+            let elapsed_time = req.recv_time.to(time::PreciseTime::now());
             // TODO: assumes SLA less than 1 second
             if elapsed_time < slo_millis - epsilon {
                 let sleep_time = ::std::time::Duration::new(
@@ -190,21 +228,35 @@ impl<P, S> PredictionWorker<P, S>
                        sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
                 thread::sleep(sleep_time);
             }
-            let mut ys = Vec::new();
+            let mut ys = HashMap::new();
             let mut missing_ys = Vec::new();
+            for model_name in models.keys() {
+                match cache.fetch(model_name, &req.query) {
+                    Some(v) => ys.insert(model_name.clone(), v),
+                    None => missing_ys.push(model_name.clone()),
+                }
+            }
 
-
-
-
+            // use correction policy to make the final prediction
+            let prediction = P::predict(correction_state, ys, missing_ys);
+            // execute the user's callback on this thread
+            (req.on_predict)(prediction);
+            let end_time = time::PreciseTime::now();
+            let latency = req.start_time.to(end_time).num_microseconds().unwrap();
+            // TODO: metrics
+            // pred_metrics.latency_hist.insert(latency);
+            // pred_metrics.thruput_meter.mark(1);
+            // pred_metrics.pred_counter.incr(1);
         }
         info!("shutting down prediction worker {}", worker_id);
     }
 
-    // submit prediction, input is prediction and callback
-    pub fn predict() {}
+    pub fn predict(&self, r: PredictionRequest) {
+        self.input_queue.send(r).unwrap();
+    }
 
-    // renamed make_predictions
-    fn correct_predictions() -> Output {}
+    // // renamed make_predictions
+    // fn correct_predictions() -> Output {}
 
     // stop the thread for graceful shutdown
     pub fn shutdown() {}
