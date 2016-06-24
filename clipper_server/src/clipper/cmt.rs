@@ -14,7 +14,7 @@ use bincode;
 use redis::{self, Commands};
 use std::marker::PhantomData;
 
-trait CorrectionModelTable<S> where S: Serialize + Deserialize {
+pub trait CorrectionModelTable<S> where S: Serialize + Deserialize {
 
     // fn new() -> Self;
 
@@ -57,11 +57,11 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
 }
 
 
-impl CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
+impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
 {
     fn put(&mut self, uid: u32, state: &S) -> Result<(), String> {
         let bytes = try!(bincode::serde::serialize(state, bincode::SizeLimit::Infinite));
-        let _: () = try(self.connection.set(uid, bytes));
+        let _: () = try!(self.connection.set(uid, bytes));
         Ok(())
 
     }

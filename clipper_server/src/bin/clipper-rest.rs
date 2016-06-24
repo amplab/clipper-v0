@@ -22,7 +22,6 @@ use std::io::BufReader;
 use std::net::SocketAddr;
 
 use clipper::server::InputType;
-use clipper::features;
 
 // pub mod digits_benchmark;
 // pub mod faas_benchmark;

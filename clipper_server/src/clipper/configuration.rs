@@ -1,6 +1,13 @@
 use std::net::{ToSocketAddrs, SocketAddr, TcpStream, Shutdown};
+use std::sync::{RwLock, Arc, mpsc};
 use toml::{Parser, Array, Table, Value};
 use metrics;
+use server::InputType;
+use std::error::Error;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+use std::io::BufReader;
 
 
 pub struct ClipperConf {
@@ -164,7 +171,7 @@ pub fn get_addr(a: String) -> SocketAddr {
     a.to_socket_addrs().unwrap().next().unwrap()
 }
 
-pub fn get_addrs(addrs: Vec<toml::Value>) -> Vec<SocketAddr> {
+pub fn get_addrs(addrs: Vec<Value>) -> Vec<SocketAddr> {
     addrs.into_iter().map(|a| get_addr(a.as_str().unwrap().to_string())).collect::<Vec<_>>()
     // a.to_socket_addrs().unwrap().next().unwrap()
 }
@@ -223,7 +230,7 @@ impl ClipperConfBuilder {
         self
     }
 
-    pub fn use_lsh(&mut self, m: bool) -> &mut ClipperConfBuilder {
+    pub fn use_lsh(&mut self, l: bool) -> &mut ClipperConfBuilder {
         self.use_lsh = l;
         self
     }

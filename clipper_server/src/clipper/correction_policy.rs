@@ -1,4 +1,4 @@
-use server::Input;
+use server::{Input, Output};
 use std::collections::HashMap;
 use serde::ser::Serialize;
 use serde::de::Deserialize;

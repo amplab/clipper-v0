@@ -19,7 +19,7 @@ pub struct EqualityHasher {}
 
 impl HashStrategy for EqualityHasher {
 
-    pub fn new() -> EqualityHasher {
+    fn new() -> EqualityHasher {
         EqualityHasher {}
     }
 

@@ -4,6 +4,7 @@ use std::thread;
 use std::sync::{RwLock, Arc, mpsc};
 use std::collections::HashMap;
 use std::cmp;
+use std::marker::PhantomData;
 use rand::{thread_rng, Rng};
 use std::sync::atomic::AtomicUsize;
 use net2::TcpStreamExt;
@@ -13,6 +14,7 @@ use server::{self, InputType};
 use std::io::{Read, Write};
 use metrics;
 use rpc;
+use cache::PredictionCache;
 use hashing::{HashStrategy, EqualityHasher, HashKey};
 
 // TODO: Probably need a lifetime annotations here
@@ -98,7 +100,7 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
 
         let dynamic_batching = true;
 
-        let mut stream: TcpStream = TcpStream::connect(address).unwrap();
+        let mut stream: TcpStream = TcpStream::connect(addr).unwrap();
         stream.set_nodelay(true).unwrap();
         stream.set_read_timeout(None).unwrap();
         // let max_batch_size = batch_size;
@@ -106,18 +108,18 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
 
         // block until new request, then try to get more requests
         while let Ok(first_req) = receiver.recv() {
-            let mut batch: Vec<FeatureReq> = Vec::new();
+            let mut batch: Vec<RpcPredictRequest> = Vec::new();
             batch.push(first_req);
             let start_time = time::PreciseTime::now();
             let max_batch_size = if dynamic_batching {
                 cur_batch_size
             } else {
-                batch_size
+                5
             };
             assert!(max_batch_size >= 1);
             // while batch.len() < cur_batch_size {
             while batch.len() < max_batch_size {
-                if let Ok(req) = rx.try_recv() {
+                if let Ok(req) = receiver.try_recv() {
                     // let req_latency = req.req_start_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
                     // println!("req->features latency {} (ms)", (req_latency as f64 / 1000.0));
                     batch.push(req);
@@ -135,7 +137,7 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
             }
             thruput_meter.mark(batch.len());
             predictions_counter.incr(batch.len() as isize);
-            if latency > server::SLA * 1000 {
+            if latency > slo_millis * 1000 {
                 debug!("latency: {}, batch size: {}",
                        (latency as f64 / 1000.0),
                        batch.len());

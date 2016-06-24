@@ -2,6 +2,8 @@ use std::hash::{Hash, SipHasher, Hasher};
 use std::collections::HashMap;
 use hashing::{HashKey, HashStrategy, EqualityHasher};
 use configuration::{ClipperConf, ModelConf};
+use std::sync::{mpsc, RwLock, Arc};
+use server::Input;
 use batching;
 
 
@@ -47,7 +49,11 @@ impl<V> Cache<V> {
         let mut entry = self.data[index].write().unwrap();
         entry.key = Some(hashkey);
         entry.value = Some(value);
-        entry.listeners = (*entry).listeners.into_iter().filter(|l| !(l)(k, v.clone())).collect();
+        entry.listeners = (*entry)
+                              .listeners
+                              .into_iter()
+                              .filter(|l| !(l)(hashkey, value.clone()))
+                              .collect();
     }
 
     pub fn get(&self, hashkey: HashKey) -> Option<V> {

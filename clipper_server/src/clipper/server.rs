@@ -1,11 +1,19 @@
 
 use time;
-use cmt::{CorrectionModelTable, RedisCMT};
 use std::marker::PhantomData;
+use serde::ser::Serialize;
+use serde::de::Deserialize;
+use std::sync::{mpsc, RwLock, Arc};
+use std::collections::HashMap;
+use rand::{thread_rng, Rng};
+use std::thread;
+
+use cmt::{CorrectionModelTable, RedisCMT};
 use cache::{PredictionCache, SimplePredictionCache};
 use configuration::{ClipperConf, ModelConf};
 use hashing::{HashStrategy, EqualityHasher};
-use batching::RpcPredictRequest;
+use batching::{RpcPredictRequest, PredictionBatcher};
+use correction_policy::CorrectionPolicy;
 use metrics;
 
 // pub const SLO: i64 = 20;
@@ -85,6 +93,7 @@ struct ClipperServer<P, S>
     cache: Arc<SimplePredictionCache<Output>>,
     metrics: Arc<RwLock<metrics::Registry>>,
     input_type: InputType,
+    models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
 }
 
 
@@ -133,11 +142,12 @@ impl<P, S> ClipperServer<P, S>
             cache: cache,
             metrics: conf.metrics,
             input_type: conf.input_type,
+            models: models.clone(),
         }
     }
 
     // TODO: replace worker vec with spmc (http://seanmonstar.github.io/spmc/spmc/index.html)
-    pub fn schedule_prediction(&self, r: PredictionRequest) {
+    pub fn schedule_prediction(&self, req: PredictionRequest) {
         let mut rng = thread_rng();
         // randomly pick a worker
 
@@ -146,6 +156,7 @@ impl<P, S> ClipperServer<P, S>
         } else {
             0
         };
+        let max_predictions = self.models.len();
         self.prediction_workers[w].predict(req, max_predictions);
     }
 
@@ -218,8 +229,8 @@ impl<P, S> PredictionWorker<P, S>
         let cmt = RedisCMT::new_socket_connection();
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
-              SLO);
-        while let Ok((req, max_preds)) = receiver.recv() {
+              slo_millis / 1000.0);
+        while let Ok((req, max_preds)) = request_queue.recv() {
             let correction_state: S = cmt.get(*(&req.user) as u32)
                                          .unwrap_or_else(cmt.get(0_u32).unwrap());
             let model_req_order = if max_preds < models.len() {
