@@ -1,3 +1,7 @@
+use server::Input;
+use std::collections::HashMap;
+use serde::ser::Serialize;
+use serde::de::Deserialize;
 
 /// Correction policies are stateless, any required state is tracked separately
 /// and stored in the `CorrectionModelTable`
@@ -18,13 +22,42 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
     fn predict(state: &S, ys: HashMap<String, Output>, missing_ys: Vec<String>) -> Output;
 
     /// Prioritize the importance of models from highest to lowest priority.
-    fn rank_models_desc(model_names: Vec<&String>, state: &S) -> Vec<&String>;
+    fn rank_models_desc(state: &S, model_names: Vec<&String>) -> Vec<&String>;
 
-    fn train(state: &S) -> S;
-
+    fn train(state: &S,
+             inputs: Vec<&Input>,
+             predictions: Vec<HashMap<String, Output>>,
+             labels: Vec<Output>)
+             -> S;
 }
 
 struct DummyCorrectionPolicy {}
+
+impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
+    fn new(models: Vec<String>) -> Vec<f64> {
+        unimplemented!();
+    }
+
+    fn get_name() -> &'static str {
+        unimplemented!();
+    }
+
+    fn predict(state: &Vec<f64>, ys: HashMap<String, Output>, missing_ys: Vec<String>) -> Output {
+        unimplemented!();
+    }
+
+    fn rank_models_desc(state: &Vec<f64>, model_names: Vec<&String>) -> Vec<&String> {
+        unimplemented!();
+    }
+
+    fn train(state: &Vec<f64>,
+             inputs: Vec<&Input>,
+             predictions: Vec<HashMap<String, Output>>,
+             labels: Vec<Output>)
+             -> Vec<f64> {
+        unimplemented!();
+    }
+}
 
 // impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
 //     fn new(num_models: usize) -> Vec<f64> {

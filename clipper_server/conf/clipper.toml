@@ -1,11 +1,15 @@
 
 name = "clipper-test"
 slo_micros = 10000
-policy_name = "hello_world"
+correction_policy = "hello_world"
 use_lsh = true
+input_type = "int"
+input_length = -1
 
 num_predict_workers = 4
 num_update_workers = 2
+# largest prime less than 50000
+cache_size = 49999
 
 
 [[models]]

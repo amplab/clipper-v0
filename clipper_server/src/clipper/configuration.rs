@@ -11,13 +11,15 @@ pub struct ClipperConf {
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
     pub input_type: InputType,
-    pub training_data_file: Option<String>,
+    // TODO training data
+    // pub training_data_file: Option<String>,
     // TODO configurable output type
     //
     //
     // Internal system settings
     pub num_predict_workers: u32,
     pub num_observe_workers: u32,
+    pub cache_size: usize,
     pub metrics: Arc<RwLock<metrics::Registry>>,
 }
 
@@ -103,6 +105,10 @@ impl ClipperConf {
                                   .unwrap_or(&Value::Integer(1))
                                   .as_integer()
                                   .unwrap() as u32,
+            cache_size: pc.get("cache_size")
+                          .unwrap_or(&Value::Integer(49999))
+                          .as_integer()
+                          .unwrap() as usize,
             metrics: Arc::new(RwLock::new(metrics::Registry::new(pc.get("name")
                                                                    .unwrap()
                                                                    .as_str()
@@ -185,6 +191,7 @@ pub struct ClipperConfBuilder {
     // Internal system settings
     pub num_predict_workers: u32,
     pub num_observe_workers: u32,
+    pub cache_size: usize,
 }
 
 impl ClipperConfBuilder {
@@ -197,7 +204,13 @@ impl ClipperConfBuilder {
             input_type: InputType::Integer(-1),
             num_predict_workers: 2,
             num_observe_workers: 1,
+            cache_size: 49999,
         }
+    }
+
+    pub fn cache_size(&mut self, s: usize) -> &mut ClipperConfBuilder {
+        self.cache_size = s;
+        self
     }
 
     pub fn slo_micros(&mut self, m: u32) -> &mut ClipperConfBuilder {
@@ -278,7 +291,8 @@ impl ClipperConfBuilder {
             use_lsh: self.use_lsh,
             num_predict_workers: self.num_predict_workers,
             num_observe_workers: self.num_update_workers,
-            metrics: metrics::Registry::new(name.clone()),
+            cache_size: self.cache_size,
+            metrics: Arc::new(RwLock::new(metrics::Registry::new(name.clone()))),
         }
     }
 }

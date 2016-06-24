@@ -83,42 +83,42 @@ pub fn main() {
     }
 }
 
-fn parse_feature_config(fname: &String) -> Vec<(String, Vec<SocketAddr>)> {
-
-    let path = Path::new(fname);
-    let display = path.display();
-
-    let mut file = match File::open(&path) {
-        // The `description` method of `io::Error` returns a string that
-        // describes the error
-        Err(why) => {
-            panic!(format!("couldn't open {}: REASON: {}",
-                           display,
-                           Error::description(&why)))
-        }
-        Ok(file) => BufReader::new(file),
-    };
-
-    let mut toml_string = String::new();
-    match file.read_to_string(&mut toml_string) {
-        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
-        Ok(_) => print!("{} contains:\n{}", display, toml_string),
-    }
-
-    let features = toml::Parser::new(&toml_string).parse().unwrap();
-    let fs = features.get("features")
-                     .unwrap()
-                     .as_table()
-                     .unwrap()
-                     .iter()
-                     .map(|(k, v)| {
-                         (k.clone(),
-                          features::get_addrs(v.as_slice().unwrap().to_vec()))
-                     })
-                     .collect::<Vec<_>>();
-    info!("{:?}", fs);
-    fs
-}
+// fn parse_feature_config(fname: &String) -> Vec<(String, Vec<SocketAddr>)> {
+//
+//     let path = Path::new(fname);
+//     let display = path.display();
+//
+//     let mut file = match File::open(&path) {
+//         // The `description` method of `io::Error` returns a string that
+//         // describes the error
+//         Err(why) => {
+//             panic!(format!("couldn't open {}: REASON: {}",
+//                            display,
+//                            Error::description(&why)))
+//         }
+//         Ok(file) => BufReader::new(file),
+//     };
+//
+//     let mut toml_string = String::new();
+//     match file.read_to_string(&mut toml_string) {
+//         Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
+//         Ok(_) => print!("{} contains:\n{}", display, toml_string),
+//     }
+//
+//     let features = toml::Parser::new(&toml_string).parse().unwrap();
+//     let fs = features.get("features")
+//                      .unwrap()
+//                      .as_table()
+//                      .unwrap()
+//                      .iter()
+//                      .map(|(k, v)| {
+//                          (k.clone(),
+//                           features::get_addrs(v.as_slice().unwrap().to_vec()))
+//                      })
+//                      .collect::<Vec<_>>();
+//     info!("{:?}", fs);
+//     fs
+// }
 
 
 fn parse_digits_config(fname: &String) -> digits_benchmark::DigitsBenchConfig {

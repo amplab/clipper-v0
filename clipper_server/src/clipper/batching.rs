@@ -36,7 +36,8 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
                addrs: Vec<SocketAddr>,
                input_type: InputType,
                metric_register: Arc<RwLock<metrics::Registry>>,
-               cache: Arc<C>)
+               cache: Arc<C>,
+               slo_millis: u32)
                -> PredictionBatcher {
 
         let latency_hist: Arc<metrics::Histogram> = {
@@ -73,7 +74,8 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
                                        thruput_meter,
                                        predictions_counter,
                                        input_type,
-                                       cache);
+                                       cache,
+                                       slo_millis);
             });
         }
         PredictionBatcher {
@@ -91,7 +93,8 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
            thruput_meter: Arc<metrics::Meter>,
            predictions_counter: Arc<metrics::Counter>,
            input_type: InputType,
-           cache: Arc<C>) {
+           cache: Arc<C>,
+           slo_millis: u32) {
 
         let dynamic_batching = true;
 
@@ -140,10 +143,9 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
             if dynamic_batching {
                 // only try to increase the batch size if we actually sent a batch of maximum size
                 if batch.len() == cur_batch_size {
-                    cur_batch_size = update_batch_size(cur_batch_size,
-                                                       latency as u64,
-                                                       // TODO: Change to get SLO from right place
-                                                       server::SLO as u64 * 1000 as u64);
+                    cur_batch_size = update_batch_size_AIMD(cur_batch_size,
+                                                            latency as u64,
+                                                            slo_millis as u64);
                     // debug!("{} updated batch size to {}", name, cur_batch_size);
                 }
             }
@@ -167,22 +169,9 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
 
 
 
-pub fn get_addr(a: String) -> SocketAddr {
-    a.to_socket_addrs().unwrap().next().unwrap()
-}
-
-pub fn get_addrs(addrs: Vec<toml::Value>) -> Vec<SocketAddr> {
-    addrs.into_iter().map(|a| get_addr(a.as_str().unwrap().to_string())).collect::<Vec<_>>()
-    // a.to_socket_addrs().unwrap().next().unwrap()
-}
-
-pub fn get_addrs_str(addrs: Vec<String>) -> Vec<SocketAddr> {
-    addrs.into_iter().map(|a| get_addr(a)).collect::<Vec<_>>()
-    // a.to_socket_addrs().unwrap().next().unwrap()
-}
 
 
-fn update_batch_size(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
+fn update_batch_size_AIMD(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
     let batch_increment = 2;
     let backoff = 0.9;
     let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;

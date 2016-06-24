@@ -13,9 +13,14 @@ extern crate byteorder;
 #[macro_use]
 extern crate log;
 
+// TODO: some of these should probably not be public
 pub mod server;
 pub mod digits;
-pub mod features;
+pub mod batching;
 pub mod metrics;
 pub mod hashing;
 pub mod rpc;
+pub mod cache;
+pub mod cmt;
+pub mod configuration;
+pub mod correction_policy;

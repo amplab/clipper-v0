@@ -12,7 +12,6 @@ pub trait HashStrategy {
 }
 
 
-// TODO: fix hasher API
 
 #[derive(Clone)]
 pub struct EqualityHasher {}
