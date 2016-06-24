@@ -83,6 +83,8 @@ struct ClipperServer<P, S>
     update_workers: Vec<UpdateWorker<P, S>>,
     // model_names: Vec<String>,
     cache: Arc<SimplePredictionCache<Output>>,
+    metrics: Arc<RwLock<metrics::Registry>>,
+    input_type: InputType,
 }
 
 
@@ -90,7 +92,7 @@ impl<P, S> ClipperServer<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
 {
-    pub fn new(conf: ClipperConf) -> ClipperServer {
+    pub fn new(conf: ClipperConf) -> ClipperServer<P, S> {
 
         // let cache_size = 10000;
 
@@ -129,6 +131,8 @@ impl<P, S> ClipperServer<P, S>
             prediction_workers: prediction_workers,
             update_workers: update_workers,
             cache: cache,
+            metrics: conf.metrics,
+            input_type: conf.input_type,
         }
     }
 
@@ -143,6 +147,14 @@ impl<P, S> ClipperServer<P, S>
             0
         };
         self.prediction_workers[w].predict(req, max_predictions);
+    }
+
+    pub fn get_metrics(&self) -> Arc<RwLock<metrics::Registry>> {
+        self.metrics.clone()
+    }
+
+    pub fn get_input_type(&self) -> InputType {
+        self.input_type.clone()
     }
 
     // TODO: make sure scheduling here hashes on uid so all updates for a single user get sent
@@ -180,7 +192,7 @@ impl<P, S> PredictionWorker<P, S>
                cache: Arc<PredictionCache<Output>>,
                models: Arc<HashMap<String,
                                    PredictionBatcher<SimplePredictionCache<Output>, Output>>>)
-               -> PredictionWorker {
+               -> PredictionWorker<P, S> {
         let (sender, receiver) = mpsc::channel::<(PredictionRequest, i32)>();
         thread::spawn(move || {
             PredictionWorker::run(worker_id, slo_millis, receiver, cache, models);
@@ -330,7 +342,7 @@ impl<P, S> UpdateWorker<P, S>
                cache: Arc<PredictionCache<Output>>,
                models: Arc<HashMap<String,
                                    PredictionBatcher<SimplePredictionCache<Output>, Output>>>)
-               -> UpdateWorker {
+               -> UpdateWorker<P, S> {
         unimplemented!();
     }
 
