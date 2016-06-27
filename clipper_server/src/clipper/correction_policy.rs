@@ -22,7 +22,7 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
     fn predict(state: &S, ys: HashMap<String, Output>, missing_ys: Vec<String>) -> Output;
 
     /// Prioritize the importance of models from highest to lowest priority.
-    fn rank_models_desc(state: &S, model_names: Vec<&String>) -> Vec<&String>;
+    fn rank_models_desc<'a>(state: &S, model_names: Vec<&'a String>) -> Vec<&'a String>;
 
     fn train(state: &S,
              inputs: Vec<&Input>,
@@ -46,7 +46,7 @@ impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
         unimplemented!();
     }
 
-    fn rank_models_desc(state: &Vec<f64>, model_names: Vec<&String>) -> Vec<&String> {
+    fn rank_models_desc<'a>(state: &Vec<f64>, model_names: Vec<&'a String>) -> Vec<&'a String> {
         unimplemented!();
     }
 

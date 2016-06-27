@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 use std::io::BufReader;
+use std::collections::HashSet;
 
 
 pub struct ClipperConf {
@@ -24,8 +25,8 @@ pub struct ClipperConf {
     //
     //
     // Internal system settings
-    pub num_predict_workers: u32,
-    pub num_observe_workers: u32,
+    pub num_predict_workers: usize,
+    pub num_update_workers: usize,
     pub cache_size: usize,
     pub metrics: Arc<RwLock<metrics::Registry>>,
 }
@@ -80,7 +81,7 @@ impl ClipperConf {
                        .unwrap_or(&Value::Boolean(false))
                        .as_bool()
                        .unwrap(),
-            input_type: match pc.get("input_type").unwrap().as_str().unwrap() {
+            input_type: match pc.get("input_type").unwrap().as_str().unwrap().as_slice() {
                 "int" | "ints" | "integer" | "integers" | "i32" => {
                     let length = pc.get("input_length")
                                    .unwrap_or(&Value::Integer(-1))
@@ -107,11 +108,11 @@ impl ClipperConf {
             num_predict_workers: pc.get("num_predict_workers")
                                    .unwrap_or(&Value::Integer(2))
                                    .as_integer()
-                                   .unwrap() as u32,
+                                   .unwrap() as usize,
             num_update_workers: pc.get("num_update_workers")
                                   .unwrap_or(&Value::Integer(1))
                                   .as_integer()
-                                  .unwrap() as u32,
+                                  .unwrap() as usize,
             cache_size: pc.get("cache_size")
                           .unwrap_or(&Value::Integer(49999))
                           .as_integer()
@@ -196,21 +197,22 @@ pub struct ClipperConfBuilder {
     pub input_type: InputType,
 
     // Internal system settings
-    pub num_predict_workers: u32,
-    pub num_observe_workers: u32,
+    pub num_predict_workers: usize,
+    pub num_update_workers: usize,
     pub cache_size: usize,
 }
 
 impl ClipperConfBuilder {
     pub fn new() -> ClipperConfBuilder {
         ClipperConfBuilder {
+            name: "DEFAULT".to_string(),
             slo_micros: 20 * 1000,
-            policy_name: "default",
+            policy_name: "default".to_string(),
             models: Vec::new(),
             use_lsh: false,
             input_type: InputType::Integer(-1),
             num_predict_workers: 2,
-            num_observe_workers: 1,
+            num_update_workers: 1,
             cache_size: 49999,
         }
     }
@@ -240,12 +242,12 @@ impl ClipperConfBuilder {
         self
     }
 
-    pub fn num_predict_workers(&mut self, n: u32) -> &mut ClipperConfBuilder {
+    pub fn num_predict_workers(&mut self, n: usize) -> &mut ClipperConfBuilder {
         self.num_predict_workers = n;
         self
     }
 
-    pub fn num_update_workers(&mut self, n: u32) -> &mut ClipperConfBuilder {
+    pub fn num_update_workers(&mut self, n: usize) -> &mut ClipperConfBuilder {
         self.num_update_workers = n;
         self
     }
@@ -257,31 +259,50 @@ impl ClipperConfBuilder {
 
     pub fn input_type(&mut self, name: String, length: Option<i32>) -> &mut ClipperConfBuilder {
         let lc_name = name.to_lowercase();
-        let input_type = match lc_name {
-            "int" | "ints" | "integer" | "integers" | "i32" => {
-                match length {
-                    Some(l) => InputType::Integer(l),
-                    None => InputType::Integer(-1),
-                }
+
+        let mut int_keywords = HashSet::new();
+        int_keywords.insert("int".to_string());
+        int_keywords.insert("ints".to_string());
+        int_keywords.insert("integer".to_string());
+        int_keywords.insert("integers".to_string());
+        int_keywords.insert("i32".to_string());
+
+        let mut float_keywords = HashSet::new();
+        float_keywords.insert("float".to_string());
+        float_keywords.insert("floats".to_string());
+        float_keywords.insert("f64".to_string());
+
+        let mut str_keywords = HashSet::new();
+        str_keywords.insert("str".to_string());
+        str_keywords.insert("string".to_string());
+
+        let mut byte_keywords = HashSet::new();
+        byte_keywords.insert("byte".to_string());
+        byte_keywords.insert("bytes".to_string());
+        byte_keywords.insert("u8".to_string());
+
+        let input_type = if int_keywords.contains(&lc_name) {
+            match length {
+                Some(l) => InputType::Integer(l),
+                None => InputType::Integer(-1),
             }
-            "float" | "floats" | "f64" => {
-                match length {
-                    Some(l) => InputType::Float(l),
-                    None => InputType::Float(-1),
-                }
+        } else if float_keywords.contains(&lc_name) {
+            match length {
+                Some(l) => InputType::Float(l),
+                None => InputType::Float(-1),
             }
-            "str" | "string" => {
-                if length.is_some() {
-                    info!("length arg provided for string is ignored");
-                }
-                InputType::Str
+        } else if str_keywords.contains(&lc_name) {
+            if length.is_some() {
+                info!("length arg provided for string is ignored");
             }
-            "byte" | "bytes" | "u8" => {
-                match length {
-                    Some(l) => InputType::Byte(l),
-                    None => InputType::Byte(-1),
-                }
+            InputType::Str
+        } else if byte_keywords.contains(&lc_name) {
+            match length {
+                Some(l) => InputType::Byte(l),
+                None => InputType::Byte(-1),
             }
+        } else {
+            panic!("Invalid input type: {}", name);
         };
         self.input_type = input_type;
         self
@@ -297,8 +318,9 @@ impl ClipperConfBuilder {
             models: self.models,
             use_lsh: self.use_lsh,
             num_predict_workers: self.num_predict_workers,
-            num_observe_workers: self.num_update_workers,
+            num_update_workers: self.num_update_workers,
             cache_size: self.cache_size,
+            input_type: self.input_type,
             metrics: Arc::new(RwLock::new(metrics::Registry::new(name.clone()))),
         }
     }

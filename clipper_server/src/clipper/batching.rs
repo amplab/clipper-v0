@@ -10,21 +10,22 @@ use std::sync::atomic::AtomicUsize;
 use net2::TcpStreamExt;
 // use byteorder::{LittleEndian, WriteBytesExt};
 use toml;
-use server::{self, InputType};
+use server::{self, InputType, Input};
 use std::io::{Read, Write};
 use metrics;
 use rpc;
 use cache::PredictionCache;
 use hashing::{HashStrategy, EqualityHasher, HashKey};
 
-// TODO: Probably need a lifetime annotations here
+#[derive(Clone)]
 pub struct RpcPredictRequest {
-    pub input: &server::Input,
+    pub input: server::Input,
     pub recv_time: time::PreciseTime,
 }
 
 pub struct PredictionBatcher<C, V>
-    where C: PredictionCache<V>
+    where C: PredictionCache<V>,
+          V: 'static + Clone
 {
     name: String,
     input_queues: Vec<mpsc::Sender<RpcPredictRequest>>,
@@ -32,15 +33,35 @@ pub struct PredictionBatcher<C, V>
     _output_marker: PhantomData<V>,
 }
 
-impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
+impl<C, V> Clone for PredictionBatcher<C, V>
+    where C: PredictionCache<V>,
+          V: 'static + Clone
+{
+    fn clone(&self) -> PredictionBatcher<C, V> {
+        PredictionBatcher {
+            name: self.name.clone(),
+            input_queues: self.input_queues.clone(),
+            cache: self.cache.clone(),
+            _output_marker: self._output_marker.clone(),
+        }
+
+    }
+}
+
+
+
+
+impl<C, V> PredictionBatcher<C, V>
+    where C: PredictionCache<V>,
+          V: 'static + Clone
 {
     pub fn new(name: String,
                addrs: Vec<SocketAddr>,
                input_type: InputType,
                metric_register: Arc<RwLock<metrics::Registry>>,
                cache: Arc<C>,
-               slo_millis: u32)
-               -> PredictionBatcher {
+               slo_micros: u32)
+               -> PredictionBatcher<C, V> {
 
         let latency_hist: Arc<metrics::Histogram> = {
             let metric_name = format!("{}_model_latency", name);
@@ -77,7 +98,7 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
                                        predictions_counter,
                                        input_type,
                                        cache,
-                                       slo_millis);
+                                       slo_micros);
             });
         }
         PredictionBatcher {
@@ -96,7 +117,7 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
            predictions_counter: Arc<metrics::Counter>,
            input_type: InputType,
            cache: Arc<C>,
-           slo_millis: u32) {
+           slo_micros: u32) {
 
         let dynamic_batching = true;
 
@@ -137,7 +158,7 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
             }
             thruput_meter.mark(batch.len());
             predictions_counter.incr(batch.len() as isize);
-            if latency > slo_millis * 1000 {
+            if latency > slo_micros {
                 debug!("latency: {}, batch size: {}",
                        (latency as f64 / 1000.0),
                        batch.len());
@@ -147,7 +168,7 @@ impl<C, V> PredictionBatcher<C, V> where C: PredictionCache<V>
                 if batch.len() == cur_batch_size {
                     cur_batch_size = update_batch_size_AIMD(cur_batch_size,
                                                             latency as u64,
-                                                            slo_millis as u64);
+                                                            slo_micros as u64);
                     // debug!("{} updated batch size to {}", name, cur_batch_size);
                 }
             }

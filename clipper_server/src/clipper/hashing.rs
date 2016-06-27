@@ -4,7 +4,7 @@ use std::hash::{Hash, SipHasher, Hasher};
 
 pub type HashKey = u64;
 
-pub trait HashStrategy {
+pub trait HashStrategy: Clone {
 
     fn new() -> Self;
 

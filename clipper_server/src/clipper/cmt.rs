@@ -37,7 +37,7 @@ pub struct RedisCMT<S>
 
 impl<S> RedisCMT<S> where S: Serialize + Deserialize
 {
-    pub fn new_socket_connection() -> RedisCMT {
+    pub fn new_socket_connection() -> RedisCMT<S> {
         let client = redis::Client::open("unix:///tmp/redis.sock?db=1").unwrap();
         let con = client.get_connection().unwrap();
         RedisCMT {
@@ -46,7 +46,7 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
         }
     }
 
-    pub fn new_tcp_connection() -> RedisCMT {
+    pub fn new_tcp_connection() -> RedisCMT<S> {
         let client = redis::Client::open("redis://127.0.0.1/").unwrap();
         let con = client.get_connection().unwrap();
         RedisCMT {

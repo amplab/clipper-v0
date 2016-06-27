@@ -67,7 +67,7 @@ impl PredictionRequest {
         PredictionRequest {
             recv_time: time::PreciseTime::now(),
             uid: uid,
-            input: input,
+            query: input,
             on_predict: on_predict,
         }
     }
@@ -81,8 +81,6 @@ pub struct UpdateRequest {
 }
 
 
-// renamed dispatch, this is the external object we export from the library
-// to run clipper
 struct ClipperServer<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
@@ -90,10 +88,13 @@ struct ClipperServer<P, S>
     prediction_workers: Vec<PredictionWorker<P, S>>,
     update_workers: Vec<UpdateWorker<P, S>>,
     // model_names: Vec<String>,
-    cache: Arc<SimplePredictionCache<Output>>,
+    // TODO(#13): Change cache type signature to be a trait object once LSH
+    // is implemented
+    cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
     metrics: Arc<RwLock<metrics::Registry>>,
     input_type: InputType,
-    models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
+    models: HashMap<String,
+                    PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>, Output>>,
 }
 
 
@@ -107,7 +108,7 @@ impl<P, S> ClipperServer<P, S>
 
         // TODO(#13): once LSH is implemented make cache type configurable
         let cache: Arc<SimplePredictionCache<Output, EqualityHasher>> =
-            Arc::new(SimplePredictionCache::new(conf.cache_size));
+            Arc::new(SimplePredictionCache::new(&conf.models, conf.cache_size));
 
         let mut model_batchers = HashMap::new();
         for m in conf.models.into_iter() {
@@ -116,25 +117,26 @@ impl<P, S> ClipperServer<P, S>
                                            conf.input_type,
                                            conf.metrics.clone(),
                                            cache.clone(),
-                                           conf.slo_millis);
+                                           conf.slo_micros);
             model_batchers.insert(m.name.clone(), b);
         }
 
-        let models = Arc::new(model_batchers);
+        // let models = Arc::new(model_batchers);
+        let models = model_batchers;
 
 
 
 
         let mut prediction_workers = Vec::with_capacity(conf.num_predict_workers);
         for i in 0..conf.num_predict_workers {
-            prediction_workers.push(PredictionWorker::new(i,
-                                                          conf.slo_millis,
+            prediction_workers.push(PredictionWorker::new(i as i32,
+                                                          conf.slo_micros,
                                                           cache.clone(),
                                                           models.clone()));
         }
         let mut update_workers = Vec::with_capacity(conf.num_update_workers);
         for i in 0..conf.num_update_workers {
-            update_workers.push(UpdateWorker::new(i, cache.clone(), models.clone()));
+            update_workers.push(UpdateWorker::new(i as i32, cache.clone(), models.clone()));
         }
         ClipperServer {
             prediction_workers: prediction_workers,
@@ -152,11 +154,11 @@ impl<P, S> ClipperServer<P, S>
         // randomly pick a worker
 
         let w: usize = if self.prediction_workers.len() > 1 {
-            rng.gen_range::<usize>(0, self.workers.len())
+            rng.gen_range::<usize>(0, self.prediction_workers.len())
         } else {
             0
         };
-        let max_predictions = self.models.len();
+        let max_predictions = self.models.len() as i32;
         self.prediction_workers[w].predict(req, max_predictions);
     }
 
@@ -199,14 +201,15 @@ impl<P, S> PredictionWorker<P, S>
           S: Serialize + Deserialize
 {
     pub fn new(worker_id: i32,
-               slo_millis: u32,
-               cache: Arc<PredictionCache<Output>>,
-               models: Arc<HashMap<String,
-                                   PredictionBatcher<SimplePredictionCache<Output>, Output>>>)
+               slo_micros: u32,
+               cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
+               models: HashMap<String,
+                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>,
+                                                 Output>>)
                -> PredictionWorker<P, S> {
         let (sender, receiver) = mpsc::channel::<(PredictionRequest, i32)>();
         thread::spawn(move || {
-            PredictionWorker::run(worker_id, slo_millis, receiver, cache, models);
+            PredictionWorker::<P, S>::run(worker_id, slo_micros, receiver, cache.clone(), models);
         });
         PredictionWorker {
             worker_id: worker_id,
@@ -219,22 +222,24 @@ impl<P, S> PredictionWorker<P, S>
     }
 
     fn run(worker_id: i32,
-           slo_millis: u32,
+           slo_micros: u32,
            request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
-           cache: Arc<PredictionCache<Output>>,
-           models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>) {
-        let slo = time::Duration::milliseconds(slo_millis);
-        // let epsilon = time::Duration::milliseconds(slo_millis / 5);
+           cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
+           models: HashMap<String,
+                           PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>,
+                                             Output>>) {
+        let slo = time::Duration::microseconds(slo_micros as i64);
+        // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = time::Duration::milliseconds(1);
         let cmt = RedisCMT::new_socket_connection();
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
-              slo_millis / 1000.0);
+              slo_micros as f64 / 1000.0);
         while let Ok((req, max_preds)) = request_queue.recv() {
-            let correction_state: S = cmt.get(*(&req.user) as u32)
-                                         .unwrap_or_else(cmt.get(0_u32).unwrap());
-            let model_req_order = if max_preds < models.len() {
-                P::rank_models_desc(correction_state)
+            let correction_state: S = cmt.get(*(&req.uid) as u32)
+                                         .unwrap_or(cmt.get(0_u32).unwrap());
+            let model_req_order = if max_preds < models.len() as i32 {
+                P::rank_models_desc(&correction_state, models.keys().collect::<Vec<&String>>())
             } else {
                 models.keys().collect()
             };
@@ -242,10 +247,11 @@ impl<P, S> PredictionWorker<P, S>
             let mut i = 0;
             while num_requests < max_preds && i < models.len() {
                 // first check to see if the prediction is already cached
-                if cache.fetch(model_req_order[i], req.input).is_none() {
+                if cache.fetch(model_req_order[i], &req.query).is_none() {
                     // on cache miss, send to batching layer
-                    models.get(model_req_order[i].unwrap()).request_prediction(RpcPredictRequest {
-                        input: req.input,
+                    // TODO: can we avoid copying the input for each model?
+                    models.get(model_req_order[i]).request_prediction(RpcPredictRequest {
+                        input: req.query.clone(),
                         recv_time: req.recv_time.clone(),
                     });
                     num_requests += 1;
@@ -266,17 +272,19 @@ impl<P, S> PredictionWorker<P, S>
             let mut missing_ys = Vec::new();
             for model_name in models.keys() {
                 match cache.fetch(model_name, &req.query) {
-                    Some(v) => ys.insert(model_name.clone(), v),
+                    Some(v) => {
+                        ys.insert(model_name.clone(), v);
+                    }
                     None => missing_ys.push(model_name.clone()),
                 }
             }
 
             // use correction policy to make the final prediction
-            let prediction = P::predict(correction_state, ys, missing_ys);
+            let prediction = P::predict(&correction_state, ys, missing_ys);
             // execute the user's callback on this thread
             (req.on_predict)(prediction);
             let end_time = time::PreciseTime::now();
-            let latency = req.start_time.to(end_time).num_microseconds().unwrap();
+            let latency = req.recv_time.to(end_time).num_microseconds().unwrap();
             // TODO: metrics
             // pred_metrics.latency_hist.insert(latency);
             // pred_metrics.thruput_meter.mark(1);
@@ -285,8 +293,8 @@ impl<P, S> PredictionWorker<P, S>
         info!("shutting down prediction worker {}", worker_id);
     }
 
-    pub fn predict(&self, r: PredictionRequest) {
-        self.input_queue.send(r).unwrap();
+    pub fn predict(&self, r: PredictionRequest, max_preds: i32) {
+        self.input_queue.send((r, max_preds)).unwrap();
     }
 
     pub fn shutdown() {
@@ -340,7 +348,8 @@ struct UpdateWorker<P, S>
           S: Serialize + Deserialize
 {
     cache: Arc<PredictionCache<Output>>,
-    models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
+    models: HashMap<String,
+                    PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>, Output>>,
     _policy_marker: PhantomData<P>,
     _state_marker: PhantomData<S>,
 }
@@ -351,14 +360,15 @@ impl<P, S> UpdateWorker<P, S>
 {
     pub fn new(worker_id: i32,
                cache: Arc<PredictionCache<Output>>,
-               models: Arc<HashMap<String,
-                                   PredictionBatcher<SimplePredictionCache<Output>, Output>>>)
+               models: HashMap<String,
+                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>,
+                                                 Output>>)
                -> UpdateWorker<P, S> {
         unimplemented!();
     }
 
     // spawn new thread in here, return mpsc::sender?
-    fn run() -> mpsc::Sender {
+    fn run(request_queue: mpsc::Receiver<UpdateRequest>) {
         unimplemented!();
     }
 }

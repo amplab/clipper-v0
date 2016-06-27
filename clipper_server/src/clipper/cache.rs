@@ -7,53 +7,55 @@ use server::Input;
 use batching;
 
 
-struct CacheListener<V> {
+pub struct CacheListener<V: 'static + Clone> {
     /// Return `true` to be dropped from the listener list,
     /// otherwise the listener will be kept in place.
-    listener: Box<Fn(&HashKey, V) -> bool>,
+    listener: Box<Fn(HashKey, V) -> bool + Send + Sync>,
 }
 
 
-struct HashEntry<V> {
+struct HashEntry<V: 'static + Clone> {
     pub key: Option<HashKey>,
     pub value: Option<V>,
     pub listeners: Vec<CacheListener<V>>,
 }
 
-pub struct Cache<V> {
+pub struct Cache<V: 'static + Clone> {
     data: Arc<Vec<RwLock<HashEntry<V>>>>,
 }
 
 
-impl<V> Cache<V> {
+impl<V: 'static + Clone> Cache<V> {
     pub fn new(size: usize) -> Cache<V> {
         let mut data = Vec::with_capacity(size);
         for _ in 0..size {
-            data.push(HashEntry {
+            data.push(RwLock::new(HashEntry {
                 key: None,
                 value: None,
                 listeners: Vec::new(),
-            })
+            }))
         }
-        Cache { data: data }
+        Cache { data: Arc::new(data) }
     }
 
     fn get_index(&self, hashkey: HashKey) -> usize {
         let mut hasher = SipHasher::new();
         hashkey.hash(&mut hasher);
-        (hasher.finish() % self.data.len()) as usize
+        (hasher.finish() % self.data.len() as u64) as usize
     }
 
     pub fn put(&self, hashkey: HashKey, value: V) {
         let index = self.get_index(hashkey);
         let mut entry = self.data[index].write().unwrap();
         entry.key = Some(hashkey);
-        entry.value = Some(value);
-        entry.listeners = (*entry)
-                              .listeners
-                              .into_iter()
-                              .filter(|l| !(l)(hashkey, value.clone()))
-                              .collect();
+        entry.value = Some(value.clone());
+        entry.listeners.retain(|l| !(l.listener)(hashkey, value.clone()));
+
+        // entry.listeners
+        //      .into_iter()
+        //      .filter(|l| !(l.listener)(hashkey, value.clone()))
+        //      .collect();
+        // entry.listeners =
     }
 
     pub fn get(&self, hashkey: HashKey) -> Option<V> {
@@ -78,19 +80,27 @@ impl<V> Cache<V> {
         let index = self.get_index(hashkey);
         let mut entry = self.data[index].write().unwrap();
         entry.listeners.push(new_listener);
-        if let Some(ref k) = entry.key {
-            let v = entry.value.as_ref().unwrap();
-            entry.listeners = (*entry).listeners.into_iter().filter(|l| !(l)(k, v)).collect();
+        if entry.key.is_some() {
+            let k = entry.key.clone().unwrap();
+            let v = entry.value.clone().unwrap();
+            entry.listeners.retain(|l| !(l.listener)(k.clone(), v.clone()));
         }
+        // if let Some(ref k) = entry.key {
+        //     let v = entry.value.as_ref().unwrap();
+        //     entry.listeners.retain(|l| !(l.listener)(k.clone(), v.clone()));
+        // entry.listeners = (*entry)
+        //                       .listeners
+        //                       .into_iter()
+        //                       .filter(|l| !(l.listener)(k.clone(), v.clone()))
+        //                       .collect();
+        // }
     }
 }
 
 
 /// Handles higher-level semantics of caching predictions. This includes
-/// locality-sensitive hashing and other specialized hash functions, as well
-/// as sending cache requests on to the batching layer for model evaluation
-/// when needed.
-pub trait PredictionCache<V> {
+/// locality-sensitive hashing and other specialized hash functions.
+pub trait PredictionCache<V: 'static + Clone> {
 
     /// Look up the key in the cache and return immediately
     fn fetch(&self, model: &String, input: &Input) -> Option<V>;
@@ -100,20 +110,26 @@ pub trait PredictionCache<V> {
     /// if necessary. Called by model batch schedulers
     fn put(&self, model: String, input: &Input, v: V);
 
-    fn add_listener(&self, input: &Input, listener: Fn(V) -> ());
+    fn add_listener(&self,
+                    model: &String,
+                    input: &Input,
+                    listener: Box<Fn(V) -> () + Send + Sync>);
 
 }
 
-pub struct SimplePredictionCache<V, H: HashStrategy> {
-    caches: HashMap<String, Cache<V>>,
+pub struct SimplePredictionCache<V: 'static + Clone, H: HashStrategy + Send + Sync> {
+    caches: Arc<HashMap<String, Cache<V>>>,
     // model_batchers: Arc<RwLock<HashMap<String, PredictionBatcher<SimplePredictionCache<V>, V>>>>,
     hash_strategy: H,
 }
 
-impl<V, H: HashStrategy> SimplePredictionCache<V, H> {
+impl<V, H> SimplePredictionCache<V, H>
+    where V: Clone,
+          H: HashStrategy + Send + Sync
+{
     /// Creates a new prediction cache for the provided set of models. All
     /// caches will be the same size and use the same hash function.
-    pub fn new(model_conf: &Vec<ModelConf>, cache_size: usize) -> PredictionCache {
+    pub fn new(model_conf: &Vec<ModelConf>, cache_size: usize) -> SimplePredictionCache<V, H> {
         let mut caches: HashMap<String, Cache<V>> = HashMap::new();
         for m in model_conf.iter() {
             caches.insert(m.name.clone(), Cache::new(cache_size));
@@ -123,13 +139,16 @@ impl<V, H: HashStrategy> SimplePredictionCache<V, H> {
         let hash_strategy = H::new();
 
         SimplePredictionCache {
-            caches: caches,
+            caches: Arc::new(caches),
             hash_strategy: hash_strategy,
         }
     }
 }
 
-impl<V> PredictionCache<V> for SimplePredictionCache<V> {
+impl<V, H> PredictionCache<V> for SimplePredictionCache<V, H>
+    where V: Clone,
+          H: HashStrategy + Send + Sync
+{
     fn fetch(&self, model: &String, input: &Input) -> Option<V> {
         match self.caches.get(model) {
             Some(c) => {
@@ -148,8 +167,8 @@ impl<V> PredictionCache<V> for SimplePredictionCache<V> {
     // }
 
 
-    fn put(&self, model: &String, input: &Input, v: V) {
-        match self.caches.get(model) {
+    fn put(&self, model: String, input: &Input, v: V) {
+        match self.caches.get(&model) {
             Some(c) => {
                 let hashkey = self.hash_strategy.hash(input, None);
                 c.put(hashkey, v);
@@ -159,7 +178,10 @@ impl<V> PredictionCache<V> for SimplePredictionCache<V> {
     }
 
 
-    fn add_listener(&self, model: &String, input: &Input, listener: Fn(V) -> ()) {
+    fn add_listener(&self,
+                    model: &String,
+                    input: &Input,
+                    listener: Box<Fn(V) -> () + Send + Sync>) {
         match self.caches.get(model) {
             Some(c) => {
                 let hashkey = self.hash_strategy.hash(input, None);
