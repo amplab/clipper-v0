@@ -6,12 +6,9 @@
 //!
 
 
-use std::hash::Hash;
-use serde;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
 use bincode;
-use bincode::serde::SerializeError;
 use std::error::Error;
 use redis::{self, Commands};
 use std::marker::PhantomData;

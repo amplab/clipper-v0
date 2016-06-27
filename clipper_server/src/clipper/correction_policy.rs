@@ -31,25 +31,30 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
              -> S;
 }
 
-struct DummyCorrectionPolicy {}
+pub struct DummyCorrectionPolicy {}
 
 impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
+    #[allow(dead_code, unused_variables)]
     fn new(models: Vec<String>) -> Vec<f64> {
         unimplemented!();
     }
 
+    #[allow(dead_code)]
     fn get_name() -> &'static str {
         unimplemented!();
     }
 
+    #[allow(dead_code, unused_variables)]
     fn predict(state: &Vec<f64>, ys: HashMap<String, Output>, missing_ys: Vec<String>) -> Output {
         unimplemented!();
     }
 
+    #[allow(dead_code, unused_variables)]
     fn rank_models_desc<'a>(state: &Vec<f64>, model_names: Vec<&'a String>) -> Vec<&'a String> {
         unimplemented!();
     }
 
+    #[allow(dead_code, unused_variables)]
     fn train(state: &Vec<f64>,
              inputs: Vec<&Input>,
              predictions: Vec<HashMap<String, Output>>,

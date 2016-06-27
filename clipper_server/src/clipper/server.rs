@@ -222,7 +222,7 @@ impl<P, S> PredictionWorker<P, S>
         }
     }
 
-    #[allow(dead_code)]
+    #[allow(unused_variables)]
     fn run(worker_id: i32,
            slo_micros: u32,
            request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
@@ -285,8 +285,8 @@ impl<P, S> PredictionWorker<P, S>
             // execute the user's callback on this thread
             (req.on_predict)(prediction);
             let end_time = time::PreciseTime::now();
-            let latency = req.recv_time.to(end_time).num_microseconds().unwrap();
             // TODO: metrics
+            let latency = req.recv_time.to(end_time).num_microseconds().unwrap();
             // pred_metrics.latency_hist.insert(latency);
             // pred_metrics.thruput_meter.mark(1);
             // pred_metrics.pred_counter.incr(1);
@@ -358,11 +358,11 @@ struct UpdateWorker<P, S>
     _state_marker: PhantomData<S>,
 }
 
-#[allow(dead_code)]
 impl<P, S> UpdateWorker<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
 {
+    #[allow(unused_variables)]
     pub fn new(worker_id: i32,
                cache: Arc<PredictionCache<Output>>,
                models: HashMap<String,
@@ -371,7 +371,7 @@ impl<P, S> UpdateWorker<P, S>
         unimplemented!();
     }
 
-    // spawn new thread in here, return mpsc::sender?
+    #[allow(unused_variables,dead_code)]
     fn run(request_queue: mpsc::Receiver<UpdateRequest>) {
         unimplemented!();
     }

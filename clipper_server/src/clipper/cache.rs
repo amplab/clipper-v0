@@ -1,10 +1,9 @@
 use std::hash::{Hash, SipHasher, Hasher};
 use std::collections::HashMap;
-use hashing::{HashKey, HashStrategy, EqualityHasher};
-use configuration::{ClipperConf, ModelConf};
-use std::sync::{mpsc, RwLock, Arc};
+use hashing::{HashKey, HashStrategy};
+use configuration::ModelConf;
+use std::sync::{RwLock, Arc};
 use server::Input;
-use batching;
 
 
 pub struct CacheListener<V: 'static + Clone> {

@@ -1,21 +1,14 @@
 use time;
-use std::net::{ToSocketAddrs, SocketAddr, TcpStream, Shutdown};
+use std::net::{SocketAddr, TcpStream};
+// use std::net::Shutdown
 use std::thread;
 use std::sync::{RwLock, Arc, mpsc};
-use std::collections::HashMap;
 use std::cmp;
-use std::marker::PhantomData;
 use rand::{thread_rng, Rng};
-use std::sync::atomic::AtomicUsize;
-use net2::TcpStreamExt;
-// use byteorder::{LittleEndian, WriteBytesExt};
-use toml;
-use server::{self, InputType, Input, Output};
-use std::io::{Read, Write};
+use server::{self, InputType, Output};
 use metrics;
 use rpc;
 use cache::PredictionCache;
-use hashing::{HashStrategy, EqualityHasher, HashKey};
 
 
 #[derive(Clone)]
@@ -159,7 +152,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             if dynamic_batching {
                 // only try to increase the batch size if we actually sent a batch of maximum size
                 if batch.len() == cur_batch_size {
-                    cur_batch_size = update_batch_size_AIMD(cur_batch_size,
+                    cur_batch_size = update_batch_size_aimd(cur_batch_size,
                                                             latency as u64,
                                                             slo_micros as u64);
                     // debug!("{} updated batch size to {}", name, cur_batch_size);
@@ -187,7 +180,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
 
 
 
-fn update_batch_size_AIMD(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
+fn update_batch_size_aimd(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
     let batch_increment = 2;
     let backoff = 0.9;
     let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;

@@ -1,6 +1,6 @@
-use std::net::{ToSocketAddrs, SocketAddr, TcpStream, Shutdown};
-use std::sync::{RwLock, Arc, mpsc};
-use toml::{Parser, Array, Table, Value};
+use std::net::{ToSocketAddrs, SocketAddr};
+use std::sync::{RwLock, Arc};
+use toml::{Parser, Table, Value};
 use metrics;
 use server::InputType;
 use std::error::Error;
