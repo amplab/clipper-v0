@@ -15,17 +15,7 @@ extern crate log;
 extern crate env_logger;
 
 use docopt::Docopt;
-use std::error::Error;
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
-use std::io::BufReader;
-use std::net::SocketAddr;
 
-use clipper::server::InputType;
-
-// pub mod digits_benchmark;
-// pub mod faas_benchmark;
 pub mod rest;
 
 
@@ -43,6 +33,7 @@ Options:
 ";
 
 #[cfg_attr(rustfmt, rustfmt_skip)]
+#[allow(dead_code)]
 const OLD_USAGE: &'static str = "
 Clipper Server
 
