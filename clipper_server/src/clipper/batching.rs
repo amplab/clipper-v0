@@ -10,12 +10,13 @@ use std::sync::atomic::AtomicUsize;
 use net2::TcpStreamExt;
 // use byteorder::{LittleEndian, WriteBytesExt};
 use toml;
-use server::{self, InputType, Input};
+use server::{self, InputType, Input, Output};
 use std::io::{Read, Write};
 use metrics;
 use rpc;
 use cache::PredictionCache;
 use hashing::{HashStrategy, EqualityHasher, HashKey};
+
 
 #[derive(Clone)]
 pub struct RpcPredictRequest {
@@ -23,26 +24,21 @@ pub struct RpcPredictRequest {
     pub recv_time: time::PreciseTime,
 }
 
-pub struct PredictionBatcher<C, V>
-    where C: PredictionCache<V>,
-          V: 'static + Clone
+pub struct PredictionBatcher<C>
+    where C: PredictionCache<Output>
 {
     name: String,
     input_queues: Vec<mpsc::Sender<RpcPredictRequest>>,
     cache: Arc<C>,
-    _output_marker: PhantomData<V>,
 }
 
-impl<C, V> Clone for PredictionBatcher<C, V>
-    where C: PredictionCache<V>,
-          V: 'static + Clone
+impl<C> Clone for PredictionBatcher<C> where C: PredictionCache<Output>
 {
-    fn clone(&self) -> PredictionBatcher<C, V> {
+    fn clone(&self) -> PredictionBatcher<C> {
         PredictionBatcher {
             name: self.name.clone(),
             input_queues: self.input_queues.clone(),
             cache: self.cache.clone(),
-            _output_marker: self._output_marker.clone(),
         }
 
     }
@@ -51,9 +47,7 @@ impl<C, V> Clone for PredictionBatcher<C, V>
 
 
 
-impl<C, V> PredictionBatcher<C, V>
-    where C: PredictionCache<V>,
-          V: 'static + Clone
+impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send + Sync
 {
     pub fn new(name: String,
                addrs: Vec<SocketAddr>,
@@ -61,7 +55,7 @@ impl<C, V> PredictionBatcher<C, V>
                metric_register: Arc<RwLock<metrics::Registry>>,
                cache: Arc<C>,
                slo_micros: u32)
-               -> PredictionBatcher<C, V> {
+               -> PredictionBatcher<C> {
 
         let latency_hist: Arc<metrics::Histogram> = {
             let metric_name = format!("{}_model_latency", name);
@@ -105,7 +99,6 @@ impl<C, V> PredictionBatcher<C, V>
             name: name,
             input_queues: input_queues,
             cache: cache,
-            _output_marker: PhantomData,
         }
     }
 
@@ -158,7 +151,7 @@ impl<C, V> PredictionBatcher<C, V>
             }
             thruput_meter.mark(batch.len());
             predictions_counter.incr(batch.len() as isize);
-            if latency > slo_micros {
+            if latency > slo_micros as i64 {
                 debug!("latency: {}, batch size: {}",
                        (latency as f64 / 1000.0),
                        batch.len());
@@ -173,7 +166,7 @@ impl<C, V> PredictionBatcher<C, V>
                 }
             }
             for r in 0..batch.len() {
-                cache.put(name, batch[r], response_floats[r]);
+                cache.put(name, &batch[r].input, response_floats[r]);
             }
         }
         info!("shutting down model batcher {}", name);
@@ -184,7 +177,7 @@ impl<C, V> PredictionBatcher<C, V>
         // TODO: this could be optimized with
         // https://doc.rust-lang.org/rand/rand/distributions/range/struct.Range.html
         let mut rng = thread_rng();
-        let replica: u32 = rng.gen_range(0, self.input_queues.len());
+        let replica: usize = rng.gen_range(0, self.input_queues.len());
         self.input_queues[replica].send(req).unwrap();
     }
 }

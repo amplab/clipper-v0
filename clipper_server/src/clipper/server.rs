@@ -93,8 +93,7 @@ struct ClipperServer<P, S>
     cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
     metrics: Arc<RwLock<metrics::Registry>>,
     input_type: InputType,
-    models: HashMap<String,
-                    PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>, Output>>,
+    models: HashMap<String, PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
 }
 
 
@@ -204,8 +203,7 @@ impl<P, S> PredictionWorker<P, S>
                slo_micros: u32,
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: HashMap<String,
-                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>,
-                                                 Output>>)
+                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>)
                -> PredictionWorker<P, S> {
         let (sender, receiver) = mpsc::channel::<(PredictionRequest, i32)>();
         thread::spawn(move || {
@@ -226,8 +224,7 @@ impl<P, S> PredictionWorker<P, S>
            request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
-                           PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>,
-                                             Output>>) {
+                           PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>) {
         let slo = time::Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = time::Duration::milliseconds(1);
@@ -250,7 +247,7 @@ impl<P, S> PredictionWorker<P, S>
                 if cache.fetch(model_req_order[i], &req.query).is_none() {
                     // on cache miss, send to batching layer
                     // TODO: can we avoid copying the input for each model?
-                    models.get(model_req_order[i]).request_prediction(RpcPredictRequest {
+                    models.get(model_req_order[i]).unwrap().request_prediction(RpcPredictRequest {
                         input: req.query.clone(),
                         recv_time: req.recv_time.clone(),
                     });
@@ -348,8 +345,7 @@ struct UpdateWorker<P, S>
           S: Serialize + Deserialize
 {
     cache: Arc<PredictionCache<Output>>,
-    models: HashMap<String,
-                    PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>, Output>>,
+    models: HashMap<String, PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
     _policy_marker: PhantomData<P>,
     _state_marker: PhantomData<S>,
 }
@@ -361,8 +357,7 @@ impl<P, S> UpdateWorker<P, S>
     pub fn new(worker_id: i32,
                cache: Arc<PredictionCache<Output>>,
                models: HashMap<String,
-                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>,
-                                                 Output>>)
+                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>)
                -> UpdateWorker<P, S> {
         unimplemented!();
     }

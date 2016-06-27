@@ -52,12 +52,62 @@ impl ClipperConf {
             Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
             Ok(_) => print!("{} contains:\n{}", display, toml_string),
         }
-        ClipperConf::parse_toml_string(toml_string)
+        ClipperConf::parse_toml_string(&toml_string)
     }
 
     fn parse_toml_string(toml_string: &String) -> ClipperConf {
 
         let pc = Parser::new(&toml_string).parse().unwrap();
+
+        let provided_input_name = pc.get("input_type").unwrap().as_str().unwrap();
+        let lc_input_name = provided_input_name.to_lowercase();
+
+        let mut int_keywords = HashSet::new();
+        int_keywords.insert("int".to_string());
+        int_keywords.insert("ints".to_string());
+        int_keywords.insert("integer".to_string());
+        int_keywords.insert("integers".to_string());
+        int_keywords.insert("i32".to_string());
+
+        let mut float_keywords = HashSet::new();
+        float_keywords.insert("float".to_string());
+        float_keywords.insert("floats".to_string());
+        float_keywords.insert("f64".to_string());
+
+        let mut str_keywords = HashSet::new();
+        str_keywords.insert("str".to_string());
+        str_keywords.insert("string".to_string());
+
+        let mut byte_keywords = HashSet::new();
+        byte_keywords.insert("byte".to_string());
+        byte_keywords.insert("bytes".to_string());
+        byte_keywords.insert("u8".to_string());
+
+
+        let input_type = if int_keywords.contains(&lc_input_name) {
+
+            let length = pc.get("input_length")
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as i32;
+            InputType::Integer(length)
+        } else if float_keywords.contains(&lc_input_name) {
+            let length = pc.get("input_length")
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as i32;
+            InputType::Float(length)
+        } else if str_keywords.contains(&lc_input_name) {
+            InputType::Str
+        } else if byte_keywords.contains(&lc_input_name) {
+            let length = pc.get("input_length")
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as i32;
+            InputType::Byte(length)
+        } else {
+            panic!("Invalid input type: {}", provided_input_name);
+        };
         let conf = ClipperConf {
             name: pc.get("name")
                     .unwrap()
@@ -81,30 +131,9 @@ impl ClipperConf {
                        .unwrap_or(&Value::Boolean(false))
                        .as_bool()
                        .unwrap(),
-            input_type: match pc.get("input_type").unwrap().as_str().unwrap().as_slice() {
-                "int" | "ints" | "integer" | "integers" | "i32" => {
-                    let length = pc.get("input_length")
-                                   .unwrap_or(&Value::Integer(-1))
-                                   .as_integer()
-                                   .unwrap() as i32;
-                    InputType::Integer(length)
-                }
-                "float" | "floats" | "f64" => {
-                    let length = pc.get("input_length")
-                                   .unwrap_or(&Value::Integer(-1))
-                                   .as_integer()
-                                   .unwrap() as i32;
-                    InputType::Float(length)
-                }
-                "str" | "string" => InputType::Str,
-                "byte" | "bytes" | "u8" => {
-                    let length = pc.get("input_length")
-                                   .unwrap_or(&Value::Integer(-1))
-                                   .as_integer()
-                                   .unwrap() as i32;
-                    InputType::Byte(length)
-                }
-            },
+
+            input_type: input_type,
+
             num_predict_workers: pc.get("num_predict_workers")
                                    .unwrap_or(&Value::Integer(2))
                                    .as_integer()
@@ -182,10 +211,6 @@ pub fn get_addrs_str(addrs: Vec<String>) -> Vec<SocketAddr> {
     // a.to_socket_addrs().unwrap().next().unwrap()
 }
 
-
-impl ClipperConf {
-    pub fn from_toml(fname: &str) -> ClipperConf {}
-}
 
 pub struct ClipperConfBuilder {
     // General configuration
