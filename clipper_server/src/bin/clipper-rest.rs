@@ -9,6 +9,7 @@ extern crate linear_models;
 extern crate rand;
 extern crate hyper;
 extern crate time;
+extern crate serde;
 #[macro_use]
 extern crate log;
 extern crate env_logger;

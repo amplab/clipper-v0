@@ -10,8 +10,8 @@ use std::thread;
 
 use cmt::{CorrectionModelTable, RedisCMT};
 use cache::{PredictionCache, SimplePredictionCache};
-use configuration::{ClipperConf, ModelConf};
-use hashing::{HashStrategy, EqualityHasher};
+use configuration::ClipperConf;
+use hashing::EqualityHasher;
 use batching::{RpcPredictRequest, PredictionBatcher};
 use correction_policy::CorrectionPolicy;
 use metrics;
@@ -55,6 +55,7 @@ pub enum Input {
     },
 }
 
+#[allow(dead_code)]
 pub struct PredictionRequest {
     recv_time: time::PreciseTime,
     uid: u32,
@@ -73,6 +74,7 @@ impl PredictionRequest {
     }
 }
 
+#[allow(dead_code)]
 pub struct UpdateRequest {
     recv_time: time::PreciseTime,
     uid: u32,
@@ -81,7 +83,8 @@ pub struct UpdateRequest {
 }
 
 
-struct ClipperServer<P, S>
+#[allow(dead_code)]
+pub struct ClipperServer<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
 {
@@ -107,16 +110,16 @@ impl<P, S> ClipperServer<P, S>
 
         // TODO(#13): once LSH is implemented make cache type configurable
         let cache: Arc<SimplePredictionCache<Output, EqualityHasher>> =
-            Arc::new(SimplePredictionCache::new(&conf.models, conf.cache_size));
+            Arc::new(SimplePredictionCache::new(&conf.models, conf.cache_size.clone()));
 
         let mut model_batchers = HashMap::new();
         for m in conf.models.into_iter() {
             let b = PredictionBatcher::new(m.name.clone(),
-                                           m.addresses,
-                                           conf.input_type,
+                                           m.addresses.clone(),
+                                           conf.input_type.clone(),
                                            conf.metrics.clone(),
                                            cache.clone(),
-                                           conf.slo_micros);
+                                           conf.slo_micros.clone());
             model_batchers.insert(m.name.clone(), b);
         }
 
@@ -126,14 +129,14 @@ impl<P, S> ClipperServer<P, S>
 
 
 
-        let mut prediction_workers = Vec::with_capacity(conf.num_predict_workers);
+        let mut prediction_workers = Vec::with_capacity(conf.num_predict_workers.clone());
         for i in 0..conf.num_predict_workers {
             prediction_workers.push(PredictionWorker::new(i as i32,
-                                                          conf.slo_micros,
+                                                          conf.slo_micros.clone(),
                                                           cache.clone(),
                                                           models.clone()));
         }
-        let mut update_workers = Vec::with_capacity(conf.num_update_workers);
+        let mut update_workers = Vec::with_capacity(conf.num_update_workers.clone());
         for i in 0..conf.num_update_workers {
             update_workers.push(UpdateWorker::new(i as i32, cache.clone(), models.clone()));
         }
@@ -219,6 +222,7 @@ impl<P, S> PredictionWorker<P, S>
         }
     }
 
+    #[allow(dead_code)]
     fn run(worker_id: i32,
            slo_micros: u32,
            request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
@@ -294,12 +298,14 @@ impl<P, S> PredictionWorker<P, S>
         self.input_queue.send((r, max_preds)).unwrap();
     }
 
+    #[allow(dead_code)]
     pub fn shutdown() {
         unimplemented!();
     }
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 struct PredictionMetrics {
     latency_hist: Arc<metrics::Histogram>,
     pred_counter: Arc<metrics::Counter>,
@@ -307,6 +313,7 @@ struct PredictionMetrics {
     accuracy_counter: Arc<metrics::RatioCounter>,
 }
 
+#[allow(dead_code)]
 impl PredictionMetrics {
     pub fn new(metrics_register: Arc<RwLock<metrics::Registry>>) -> PredictionMetrics {
 
@@ -340,6 +347,7 @@ impl PredictionMetrics {
 }
 
 
+#[allow(dead_code)]
 struct UpdateWorker<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
@@ -350,6 +358,7 @@ struct UpdateWorker<P, S>
     _state_marker: PhantomData<S>,
 }
 
+#[allow(dead_code)]
 impl<P, S> UpdateWorker<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize

@@ -72,7 +72,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             metric_register.write().unwrap().create_counter(metric_name)
         };
 
-        let input_queues = Vec::with_capacity(addrs.len());
+        let mut input_queues = Vec::with_capacity(addrs.len());
         for a in addrs.iter() {
             let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
             input_queues.push(sender);
@@ -166,7 +166,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
                 }
             }
             for r in 0..batch.len() {
-                cache.put(name, &batch[r].input, response_floats[r]);
+                cache.put(name.clone(), &batch[r].input, response_floats[r]);
             }
         }
         info!("shutting down model batcher {}", name);
