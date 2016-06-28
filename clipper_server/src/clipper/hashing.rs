@@ -4,15 +4,26 @@ use std::hash::{Hash, SipHasher, Hasher};
 
 pub type HashKey = u64;
 
-pub trait FeatureHash {
-    fn query_hash(&self, input: &server::Input, salt: Option<i32>) -> HashKey;
+pub trait HashStrategy: Clone {
+
+    fn new() -> Self;
+
+    fn hash(&self, input: &server::Input, salt: Option<i32>) -> HashKey;
 }
 
-#[derive(Clone)]
-pub struct SimpleHasher;
 
-impl FeatureHash for SimpleHasher {
-    fn query_hash(&self, input: &server::Input, salt: Option<i32>) -> HashKey {
+
+#[derive(Clone)]
+pub struct EqualityHasher {}
+
+
+impl HashStrategy for EqualityHasher {
+
+    fn new() -> EqualityHasher {
+        EqualityHasher {}
+    }
+
+    fn hash(&self, input: &server::Input, salt: Option<i32>) -> HashKey {
         let mut hasher = SipHasher::new();
         match input {
             &server::Input::Floats {ref f, length: _ } => {
@@ -55,12 +66,3 @@ impl FeatureHash for SimpleHasher {
 }
 
 
-// pub struct LocalitySensitiveHash {
-//     hash_size: i32
-// }
-//
-// impl FeatureHash for LocalitySensitiveHash {
-//     fn hash(&self, input: &Vec<f64>) -> u64 {
-//
-//     }
-// }

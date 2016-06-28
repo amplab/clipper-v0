@@ -4,7 +4,7 @@ use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
 use std::io::{Read, Write, Cursor};
 use std::mem;
 use server::{Input, Output, InputType};
-use features::FeatureReq;
+use batching::RpcPredictRequest;
 
 
 
@@ -15,16 +15,15 @@ use features::FeatureReq;
 ///
 ///
 ///
-/// RPC HEADER format
-/// _1 byte: input format_
-///
-///     - 1: fixed length i32
-///     - 2: fixed length f64
-///     - 3: fixed length u8
-///     - 4: variable length i32
-///     - 5: variable length f64
-///     - 6: variable length u8
-///     - 7: variable length utf-8 encoded string
+/// #RPC HEADER format
+/// 1 byte: input format:
+///     1. fixed length i32
+///     2. fixed length f64
+///     3. fixed length u8
+///     4. variable length i32
+///     5. variable length f64
+///     6. variable length u8
+///     7. variable length utf-8 encoded string
 ///
 /// _4 bytes: the number of inputs as u32_
 ///
@@ -53,7 +52,7 @@ const VARBYTE_CODE: u8 = 6;
 const STRING_CODE: u8 = 7;
 
 pub fn send_batch(stream: &mut TcpStream,
-                  inputs: &Vec<FeatureReq>,
+                  inputs: &Vec<RpcPredictRequest>,
                   input_type: &InputType)
                   -> Vec<Output> {
     assert!(inputs.len() > 0);
@@ -95,7 +94,7 @@ pub fn send_batch(stream: &mut TcpStream,
     responses
 }
 
-pub fn encode_var_ints(inputs: &Vec<FeatureReq>) -> Vec<u8> {
+pub fn encode_var_ints(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     // let mut message_len = 5; // 1 byte type + 4 bytes num inputs
     let mut message = Vec::new();
     message.push(VARINT_CODE);
@@ -146,7 +145,7 @@ pub fn decode_var_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
     responses
 }
 
-pub fn encode_fixed_ints(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
+pub fn encode_fixed_ints(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
     // let mut message_len = 5; // 1 byte type + 4 bytes num inputs
     let mut message = Vec::new();
     message.push(FIXEDINT_CODE);
@@ -184,7 +183,7 @@ pub fn decode_fixed_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
     responses
 }
 
-fn encode_fixed_floats(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
+fn encode_fixed_floats(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(FIXEDFLOAT_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
@@ -204,7 +203,7 @@ fn encode_fixed_floats(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
     message
 }
 
-fn encode_var_floats(inputs: &Vec<FeatureReq>) -> Vec<u8> {
+fn encode_var_floats(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(VARFLOAT_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
@@ -233,16 +232,16 @@ fn encode_var_floats(inputs: &Vec<FeatureReq>) -> Vec<u8> {
     message
 }
 
-fn encode_fixed_bytes(inputs: &Vec<FeatureReq>, length: i32) -> Vec<u8> {
-    unreachable!()
+fn encode_fixed_bytes(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
+    unimplemented!()
 }
 
-fn encode_var_bytes(inputs: &Vec<FeatureReq>) -> Vec<u8> {
-    unreachable!()
+fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
+    unimplemented!()
 }
 
-fn encode_strs(inputs: &Vec<FeatureReq>) -> Vec<u8> {
-    unreachable!()
+fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
+    unimplemented!()
 }
 
 
@@ -252,10 +251,10 @@ fn encode_strs(inputs: &Vec<FeatureReq>) -> Vec<u8> {
 mod tests {
     use super::*;
     // use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
-    use std::io::Read;
+    // use std::io::Read;
     // use std::mem;
     use server::Input;
-    use features::FeatureReq;
+    use batching::RpcPredictRequest;
     use rand::{thread_rng, Rng};
     use time;
 
@@ -271,18 +270,17 @@ mod tests {
         // let inp_length = 4;
         let mut rng = thread_rng();
         let inp_length = rng.gen_range::<usize>(0, 3000);
-        let mut reqs: Vec<FeatureReq> = Vec::new();
+        let mut reqs: Vec<RpcPredictRequest> = Vec::new();
         let mut orig_inputs = Vec::new();
         for _ in 0..7 {
             let v = random_ints(inp_length);
             orig_inputs.push(v.clone());
-            let r = FeatureReq {
-                hash_key: 0_u64,
+            let r = RpcPredictRequest {
                 input: Input::Ints {
                     i: v,
                     length: inp_length as i32,
                 },
-                req_start_time: time::PreciseTime::now(),
+                recv_time: time::PreciseTime::now(),
             };
             reqs.push(r);
         }
@@ -297,17 +295,16 @@ mod tests {
     #[test]
     fn var_ints() {
         // let inp_length = 4;
-        let mut reqs: Vec<FeatureReq> = Vec::new();
+        let mut reqs: Vec<RpcPredictRequest> = Vec::new();
         let mut orig_inputs = Vec::new();
         let mut rng = thread_rng();
         for _ in 0..7 {
             let inp_length = rng.gen_range::<usize>(0, 3000);
             let v = random_ints(inp_length);
             orig_inputs.push(v.clone());
-            let r = FeatureReq {
-                hash_key: 0_u64,
+            let r = RpcPredictRequest {
                 input: Input::Ints { i: v, length: -1 },
-                req_start_time: time::PreciseTime::now(),
+                recv_time: time::PreciseTime::now(),
             };
             reqs.push(r);
         }

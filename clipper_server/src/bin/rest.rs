@@ -2,8 +2,9 @@
 use std::io::{Read, Write};
 use std::thread;
 use std::sync::{mpsc, RwLock, Arc};
-use std::net::SocketAddr;
 use std::boxed::Box;
+use serde::ser::Serialize;
+use serde::de::Deserialize;
 
 #[allow(unused_imports)]
 use hyper::{Get, Post, StatusCode, RequestUri, Decoder, Encoder, Next, Control};
@@ -11,8 +12,10 @@ use hyper::header::ContentLength;
 use hyper::net::HttpStream;
 use hyper::server::{Server, Handler, Request, Response};
 
-use clipper::server::{self, TaskModel, InputType};
-use clipper::{features, metrics};
+use clipper::server::{self, ClipperServer, InputType, PredictionRequest};
+use clipper::{metrics, configuration};
+use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy};
+
 
 
 
@@ -20,33 +23,48 @@ use clipper::{features, metrics};
 
 
 const PREDICT: &'static str = "/predict";
-// const UPDATE: &'static str = "/update";
+#[allow(dead_code)]
+const UPDATE: &'static str = "/update";
 
 
-struct PredictHandler<T>
-    where T: TaskModel + Send + Sync + 'static
+struct PredictHandler<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
 {
-    dispatcher: Arc<server::Dispatcher<T>>,
+    clipper: Arc<ClipperServer<P, S>>,
     result_string: String,
     result_channel: Option<mpsc::Receiver<String>>,
-    num_features: usize,
+    // num_features: usize,
     ctrl: Control,
     uid: u32,
     input_type: InputType,
 }
 
-impl<T> PredictHandler<T> where T: TaskModel + Send + Sync + 'static
+#[allow(dead_code)]
+struct UpdateHandler<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
 {
-    fn new(dispatcher: Arc<server::Dispatcher<T>>,
-           num_features: usize,
+    clipper: Arc<ClipperServer<P, S>>,
+    // num_features: usize,
+    ctrl: Control,
+    uid: u32,
+    input_type: InputType,
+}
+
+impl<P, S> PredictHandler<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
+{
+    fn new(clipper: Arc<ClipperServer<P, S>>,
            ctrl: Control,
            input_type: InputType)
-           -> PredictHandler<T> {
+           -> PredictHandler<P, S> {
         PredictHandler {
-            dispatcher: dispatcher,
+            clipper: clipper,
             result_string: "NO RESULT YET".to_string(),
             result_channel: None,
-            num_features: num_features,
+            // num_features: num_features,
             ctrl: ctrl,
             uid: 0,
             input_type: input_type,
@@ -106,8 +124,11 @@ fn parse_to_string(transport: &mut Decoder<HttpStream>) -> Result<server::Input,
 }
 
 
-impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for PredictHandler<T> {
-    fn on_request(&mut self, req: Request) -> Next {
+impl<P, S> Handler<HttpStream> for PredictHandler<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
+{
+    fn on_request(&mut self, req: Request<HttpStream>) -> Next {
         match *req.uri() {
             RequestUri::AbsolutePath(ref path) => {
                 match (req.method(), &path[0..PREDICT.len()]) {
@@ -150,8 +171,8 @@ impl<T: TaskModel + Send + Sync + 'static> Handler<HttpStream> for PredictHandle
                     tx.send(format!("predict: {}", y).to_string()).unwrap();
                     ctrl.ready(Next::write()).unwrap();
                 });
-                let r = server::PredictRequest::new(self.uid, i, 0_i32, on_pred);
-                self.dispatcher.dispatch(r, self.num_features);
+                let r = PredictionRequest::new(self.uid, i, on_pred);
+                self.clipper.schedule_prediction(r);
                 Next::wait()
             }
             Err(e) => {
@@ -199,42 +220,39 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
 }
 
 
-pub fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>, input_type: InputType) {
-    let server = Server::http(&"127.0.0.1:1337".parse().unwrap()).unwrap();
+fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
+{
 
-    let metrics_register = Arc::new(RwLock::new(metrics::Registry::new("CLIPPER REST API"
-                                                                           .to_string())));
+    let rest_server = Server::http(&"127.0.0.1:1337".parse().unwrap()).unwrap();
 
-    let (features, _): (Vec<_>, Vec<_>) = feature_addrs.into_iter()
-                                                       .map(|(n, a)| {
-                                                           features::create_feature_worker(
-                                  n, a, 0, metrics_register.clone(), input_type.clone())
-                                                       })
-                                                       .unzip();
+    let report_interval_secs = 15;
+    let _ = launch_monitor_thread(clipper.get_metrics(), report_interval_secs);
 
-    let num_workers = 2;
-    let num_features = features.len();
-    let num_users = 100;
+    let input_type = clipper.get_input_type();
 
-    let dispatcher = Arc::new(server::Dispatcher::new(num_workers,
-                                                      server::SLA,
-                                                      features.clone(),
-                                                      server::init_user_models(num_users,
-                                                                               num_features),
-                                                      metrics_register.clone()));
-
-    // let report_interval_secs = 15;
-    // let _ = launch_monitor_thread(metrics_register.clone(),
-    //                                                    report_interval_secs);
-
-
-    let (listening, server) = server.handle(|ctrl| {
-                                        PredictHandler::new(dispatcher.clone(),
-                                                            num_features,
-                                                            ctrl,
-                                                            input_type.clone())
-                                    })
-                                    .unwrap();
+    let (listening, server) = rest_server.handle(|ctrl| {
+                                             PredictHandler::new(clipper.clone(),
+                                                                 ctrl,
+                                                                 input_type.clone())
+                                         })
+                                         .unwrap();
     println!("Listening on http://{}", listening);
     server.run();
+
+}
+
+// pub fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>, input_type: InputType) {
+pub fn start(conf_path: &String) {
+
+    let config = configuration::ClipperConf::parse_from_toml(conf_path);
+    // let metrics = config.metrics.clone();
+    // let input_type = config.input_type.clone();
+
+    if config.policy_name == "hello world".to_string() {
+        start_listening(Arc::new(ClipperServer::<DummyCorrectionPolicy, Vec<f64>>::new(config)));
+    } else {
+        panic!("Unknown correction policy");
+    }
 }
