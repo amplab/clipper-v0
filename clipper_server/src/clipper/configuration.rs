@@ -9,7 +9,8 @@ use std::io::prelude::*;
 use std::path::Path;
 use std::io::BufReader;
 use std::collections::HashSet;
-
+use std::cmp::PartialEq;
+use std::fmt;
 
 pub struct ClipperConf {
     // General configuration
@@ -29,6 +30,37 @@ pub struct ClipperConf {
     pub num_update_workers: usize,
     pub cache_size: usize,
     pub metrics: Arc<RwLock<metrics::Registry>>,
+}
+
+impl fmt::Debug for ClipperConf {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "ClipperConf (\n\tname: {:?},\n\tslo_micros: {:?},\n\tpolicy_name: \
+                {:?},\n\tmodels: {:?},\n\tuse_lsh: {:?},\n\tinput_type: \
+                {:?},\n\tnum_predict_workers: {:?},\n\tnum_update_workers: {:?},\n\tcache_size: \
+                {:?}\n)",
+               self.name,
+               self.slo_micros,
+               self.policy_name,
+               self.models,
+               self.use_lsh,
+               self.input_type,
+               self.num_predict_workers,
+               self.num_update_workers,
+               self.cache_size)
+
+    }
+}
+
+impl PartialEq<ClipperConf> for ClipperConf {
+    fn eq(&self, other: &ClipperConf) -> bool {
+        self.name == other.name && self.slo_micros == other.slo_micros &&
+        self.policy_name == other.policy_name && self.models == other.models &&
+        self.use_lsh == other.use_lsh && self.input_type == other.input_type &&
+        self.num_predict_workers == other.num_predict_workers &&
+        self.num_update_workers == other.num_update_workers &&
+        self.cache_size == other.cache_size
+    }
 }
 
 impl ClipperConf {
@@ -168,6 +200,7 @@ impl ClipperConf {
 
 
 
+#[derive(PartialEq,Debug)]
 pub struct ModelConf {
     pub name: String,
     pub addresses: Vec<SocketAddr>,
@@ -175,8 +208,16 @@ pub struct ModelConf {
     pub num_outputs: usize,
 }
 
+// impl PartialEq<ModelConf> for ModelConf {
+//     fn eq(&self, other: &ModelConf) -> bool {
+//         self.name == other.name && self.addresses == other.addresses &&
+//         self.num_outputs == other.num_outputs
+//     }
+// }
+
+
 impl ModelConf {
-    fn from_toml(mt: &Table) -> ModelConf {
+    pub fn from_toml(mt: &Table) -> ModelConf {
         ModelConf {
             name: mt.get("name")
                     .unwrap()
@@ -193,6 +234,14 @@ impl ModelConf {
                                    .as_slice()
                                    .unwrap()
                                    .to_vec()),
+        }
+    }
+
+    pub fn new(name: String, addresses: Vec<String>, num_outputs: usize) -> ModelConf {
+        ModelConf {
+            name: name,
+            addresses: get_addrs_str(addresses),
+            num_outputs: num_outputs,
         }
     }
 }
@@ -334,19 +383,80 @@ impl ClipperConfBuilder {
     }
 
     /// Takes ownership of builder and moves built items into finalized ClipperConf.
-    pub fn finalize(self) -> ClipperConf {
-        let name = self.name;
+    pub fn finalize(&mut self) -> ClipperConf {
+        // let models = self.models.drain(..).collect()
         ClipperConf {
-            name: name.clone(),
+            name: self.name.clone(),
             slo_micros: self.slo_micros,
-            policy_name: self.policy_name,
-            models: self.models,
+            policy_name: self.policy_name.clone(),
+            models: self.models.drain(..).collect(),
             use_lsh: self.use_lsh,
             num_predict_workers: self.num_predict_workers,
             num_update_workers: self.num_update_workers,
             cache_size: self.cache_size,
-            input_type: self.input_type,
-            metrics: Arc::new(RwLock::new(metrics::Registry::new(name.clone()))),
+            input_type: self.input_type.clone(),
+            metrics: Arc::new(RwLock::new(metrics::Registry::new(self.name.clone()))),
         }
     }
+}
+
+
+
+#[cfg(test)]
+#[cfg_attr(rustfmt, rustfmt_skip)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn toml_parse() {
+        let toml_string = "
+name = \"clipper-test\"
+slo_micros = 10000
+correction_policy = \"hello_world\"
+use_lsh = true
+input_type = \"int\"
+input_length = -1
+
+num_predict_workers = 4
+num_update_workers = 2
+# largest prime less than 50000
+cache_size = 49999
+
+
+[[models]]
+name = \"m1\"
+addresses = [\"127.0.0.1:6002\", \"127.0.0.1:7002\", \"127.0.0.1:8002\"]
+num_outputs = 3
+
+[[models]]
+name = \"m2\"
+addresses = [\"127.0.0.1:6004\"]
+".to_string();
+
+    let toml_conf = ClipperConf::parse_toml_string(&toml_string);
+    let mut builder_conf = ClipperConfBuilder::new();
+    let m1 = ModelConf::new("m1".to_string(),
+                vec!["127.0.0.1:6002".to_string(),
+                     "127.0.0.1:7002".to_string(),
+                     "127.0.0.1:8002".to_string()], 3);
+    let m2 = ModelConf::new("m2".to_string(),
+                vec!["127.0.0.1:6004".to_string()], 1);
+
+    let built_conf = builder_conf.cache_size(49999)
+                                 .slo_micros(10000)
+                                 .name("clipper-test".to_string())
+                                 .policy_name("hello_world".to_string())
+                                 .use_lsh(true)
+                                 .input_type("int".to_string(), Some(-1))
+                                 .num_predict_workers(4)
+                                 .num_update_workers(2)
+                                 .add_model(m1)
+                                 .add_model(m2)
+                                 .finalize();
+
+    assert_eq!(toml_conf, built_conf);
+    }
+
+
+
 }

@@ -204,27 +204,23 @@ pub fn random_features(d: usize) -> Vec<f64> {
 }
 
 
-#[cfg(test)]
-#[cfg_attr(rustfmt, rustfmt_skip)]
-mod tests {
-// use io::ErrorKind;
-// use io::prelude::*;
-    use super::*;
-// use net::*;
-// use net::test::{next_test_ip4, next_test_ip6};
-    use sync::mpsc::channel;
-// use sys_common::AsInner;
-// use time;
-    use thread;
-    use cache::PredictionCache;
-
-    struct TestPredictionCache {}
-
-    impl<i32> PredictionCache<i32> for TestPredictionCache {}
-
-
-
-}
+// #[cfg(test)]
+// #[cfg_attr(rustfmt, rustfmt_skip)]
+// mod tests {
+//     use super::*;
+// // use std::sync::mpsc;
+// // use thread;
+//     use cache::PredictionCache;
+//     use std::clone::Clone;
+//
+//     #[derive(Clone)]
+//     struct TestPredictionCache {}
+//
+//     impl<i32> PredictionCache<i32> for TestPredictionCache {}
+//
+//
+//
+// }
 
 // pub struct FeatureReq {
 //     pub hash_key: HashKey,

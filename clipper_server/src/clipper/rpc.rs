@@ -15,16 +15,15 @@ use batching::RpcPredictRequest;
 ///
 ///
 ///
-/// RPC HEADER format
-/// _1 byte: input format_
-///
-///     - 1: fixed length i32
-///     - 2: fixed length f64
-///     - 3: fixed length u8
-///     - 4: variable length i32
-///     - 5: variable length f64
-///     - 6: variable length u8
-///     - 7: variable length utf-8 encoded string
+/// #RPC HEADER format
+/// 1 byte: input format:
+///     1. fixed length i32
+///     2. fixed length f64
+///     3. fixed length u8
+///     4. variable length i32
+///     5. variable length f64
+///     6. variable length u8
+///     7. variable length utf-8 encoded string
 ///
 /// _4 bytes: the number of inputs as u32_
 ///
@@ -252,7 +251,7 @@ fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
 mod tests {
     use super::*;
     // use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
-    use std::io::Read;
+    // use std::io::Read;
     // use std::mem;
     use server::Input;
     use batching::RpcPredictRequest;

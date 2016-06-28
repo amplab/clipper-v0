@@ -207,17 +207,21 @@ mod tests {
     use hashing::{HashStrategy, HashKey};
     use server::Input;
     use configuration::ModelConf;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::Arc;
 
+    #[derive(Clone)]
     struct IdentityHasher {}
 
     impl HashStrategy for IdentityHasher {
-        pub fn new() -> IdentityHasher {
+        fn new() -> IdentityHasher {
             IdentityHasher {}
         }
 
-        pub fn hash(&self, input: &Input, salt: Option<i32>) -> HashKey {
+        #[allow(unused_variables)]
+        fn hash(&self, input: &Input, salt: Option<i32>) -> HashKey {
             match input {
-                &server::Input::Ints { ref i, length: l } => {
+                &Input::Ints { ref i, length: l } => {
                     assert!(l == 1);
                     i[0] as u64
                 }
@@ -232,28 +236,28 @@ mod tests {
         let m2 = ModelConf { name: "m2".to_string(), addresses: Vec::new(), num_outputs: 1 };
         let model_conf = vec![m1, m2];
         let cache: SimplePredictionCache<i32, IdentityHasher> =
-            SimplePredictionCache::new(model_conf, size);
+            SimplePredictionCache::new(&model_conf, size);
         cache
     }
 
     #[test]
     fn fetch_existing_key() {
         let cache = create_cache(100);
-        let input = Input::Ints { i: vec![3], l: 1 };
-        cache.put("m1".to_string(), input, 33);
-        let result = cache.fetch("m1".to_string(), input);
+        let input = Input::Ints { i: vec![3], length: 1 };
+        cache.put("m1".to_string(), &input, 33);
+        let result = cache.fetch(&"m1".to_string(), &input);
         assert_eq!(result.unwrap(), 33);
-        let res2 = cache.fetch("m2".to_string(), input);
+        let res2 = cache.fetch(&"m2".to_string(), &input);
         assert!(res2.is_none());
     }
 
     #[test]
     fn fetch_missing_key() {
         let cache = create_cache(100);
-        let input = Input::Ints { i: vec![3], l: 1 };
-        let other_input = Input::Ints { i: vec![7], l: 1 };
-        cache.put("m1".to_string(), input, 33);
-        let result = cache.fetch("m1".to_string(), other_input);
+        let input = Input::Ints { i: vec![3], length: 1 };
+        let other_input = Input::Ints { i: vec![7], length: 1 };
+        cache.put("m1".to_string(), &input, 33);
+        let result = cache.fetch(&"m1".to_string(), &other_input);
         assert!(result.is_none());
     }
 
@@ -261,8 +265,8 @@ mod tests {
     #[should_panic]
     fn fetch_nonexistent_model() {
         let cache = create_cache(100);
-        let input = Input::Ints { i: vec![3], l: 1 };
-        cache.put("m7".to_string(), input, 33);
+        let input = Input::Ints { i: vec![3], length: 1 };
+        cache.put("m7".to_string(), &input, 33);
     }
 
 
@@ -270,45 +274,54 @@ mod tests {
     #[test]
     fn fire_listener_immediately() {
         let cache = create_cache(100);
-        let input = Input::Ints { i: vec![3], l: 1 };
-        let mut listener_fired = false;
-        cache.put("m1".to_string(), input, 33);
-        cache.add_listener("m1".to_string(), input, move |x| {
-            assert_eq!(x, 33);
-            listener_fired = true;
-        });
-        assert!(listener_fired);
+        let input = Input::Ints { i: vec![3], length: 1 };
+        let listener_fired = Arc::new(AtomicBool::new(false));
+        cache.put("m1".to_string(), &input, 33);
+        {
+            let listener_fired = listener_fired.clone();
+            cache.add_listener(&"m1".to_string(), &input, Box::new(move |x| {
+                assert_eq!(x, 33);
+                listener_fired.store(true, Ordering::SeqCst);
+            }));
+        }
+        assert!(listener_fired.load(Ordering::SeqCst));
     }
 
     #[test]
     fn fire_listener_later() {
         let cache = create_cache(100);
-        let input = Input::Ints { i: vec![3], l: 1 };
-        let mut listener_fired = false;
-        cache.add_listener("m1".to_string(), input, move |x| {
-            assert_eq!(x, 33);
-            listener_fired = true;
-        });
-        assert!(!listener_fired);
-        cache.put("m1".to_string(), input, 33);
-        assert!(listener_fired);
+        let input = Input::Ints { i: vec![3], length: 1 };
+        let listener_fired = Arc::new(AtomicBool::new(false));
+        {
+            let listener_fired = listener_fired.clone();
+            cache.add_listener(&"m1".to_string(), &input, Box::new(move |x| {
+                assert_eq!(x, 33);
+                listener_fired.store(true, Ordering::SeqCst);
+            }));
+        }
+        assert!(!listener_fired.load(Ordering::SeqCst));
+        cache.put("m1".to_string(), &input, 33);
+        assert!(listener_fired.load(Ordering::SeqCst));
     }
 
     #[test]
     fn dont_fire_listener_on_cache_collision() {
         let cache = create_cache(10);
-        let input = Input::Ints { i: vec![3], l: 1 };
-        let mut listener_fired = false;
-        cache.add_listener("m1".to_string(), input, move |x| {
-            assert_eq!(x, 33);
-            listener_fired = true;
-        });
-        assert!(!listener_fired);
-        for j in 5..5000 {
-            cache.put("m1".to_string(), Input::Ints { i: vec![j], l: 1 }, 66);
+        let input = Input::Ints { i: vec![3], length: 1 };
+        let listener_fired = Arc::new(AtomicBool::new(false));
+        {
+            let listener_fired = listener_fired.clone();
+            cache.add_listener(&"m1".to_string(), &input, Box::new(move |x| {
+                assert_eq!(x, 33);
+                listener_fired.store(true, Ordering::SeqCst);
+            }));
         }
-        assert!(!listener_fired);
-        cache.put("m1".to_string(), input, 33);
-        assert!(listener_fired);
+        assert!(!listener_fired.load(Ordering::SeqCst));
+        for j in 5..5000 {
+            cache.put("m1".to_string(), &Input::Ints { i: vec![j], length: 1 }, 66);
+        }
+        assert!(!listener_fired.load(Ordering::SeqCst));
+        cache.put("m1".to_string(), &input, 33);
+        assert!(listener_fired.load(Ordering::SeqCst));
     }
 }
