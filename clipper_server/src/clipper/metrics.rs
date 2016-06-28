@@ -223,25 +223,39 @@ impl Histogram {
             self.sample.read().unwrap().snapshot()
         };
         let sample_size = snapshot.len();
-        assert!(sample_size > 0, "cannot compute stats of empty histogram");
-        snapshot.sort();
-        let min = snapshot.first().unwrap();
-        let max = snapshot.last().unwrap();
-        let p99 = Histogram::percentile(&snapshot, 99);
-        let p95 = Histogram::percentile(&snapshot, 95);
-        let p50 = Histogram::percentile(&snapshot, 50);
-        let mean = snapshot.iter().fold(0, |acc, &x| acc + x) as f64 / snapshot.len() as f64;
-        let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
-        var = var / (sample_size - 1) as f64;
-        HistStats {
-            name: self.name.clone(),
-            min: *min,
-            max: *max,
-            mean: mean,
-            std: var.sqrt(),
-            p95: p95,
-            p99: p99,
-            p50: p50,
+        if sample_size == 0 {
+            HistStats {
+                name: self.name.clone(),
+                min: 0,
+                max: 0,
+                mean: 0.0,
+                std: 0.0,
+                p95: 0.0,
+                p99: 0.0,
+                p50: 0.0,
+            }
+
+        } else {
+
+            snapshot.sort();
+            let min = snapshot.first().unwrap();
+            let max = snapshot.last().unwrap();
+            let p99 = Histogram::percentile(&snapshot, 99);
+            let p95 = Histogram::percentile(&snapshot, 95);
+            let p50 = Histogram::percentile(&snapshot, 50);
+            let mean = snapshot.iter().fold(0, |acc, &x| acc + x) as f64 / snapshot.len() as f64;
+            let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
+            var = var / (sample_size - 1) as f64;
+            HistStats {
+                name: self.name.clone(),
+                min: *min,
+                max: *max,
+                mean: mean,
+                std: var.sqrt(),
+                p95: p95,
+                p99: p99,
+                p50: p50,
+            }
         }
     }
 

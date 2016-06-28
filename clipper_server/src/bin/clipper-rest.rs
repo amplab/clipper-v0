@@ -57,7 +57,7 @@ struct Args {
     // flag_speed: isize,
     // flag_drifting: bool,
     // flag_bench_conf: Option<String>,
-    flag_feature_conf: String,
+    flag_conf: String,
     // arg_b: Option<usize>,
     // cmd_digits: bool,
     // cmd_featurelats: bool,
@@ -77,7 +77,7 @@ pub fn main() {
 
     if args.cmd_start {
         // let features = parse_feature_config(&args.flag_feature_conf);
-        rest::start(&args.flag_feature_conf);
+        rest::start(&args.flag_conf);
     }
 
     // if args.cmd_digits {
