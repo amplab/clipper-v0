@@ -13,7 +13,7 @@ use rand;
 use rand::Rng;
 // use time::PreciseTime;
 
-use linear_models::linalg;
+use ml::linalg;
 // use mtl;
 
 pub const NUM_DIGITS: usize = 10;
