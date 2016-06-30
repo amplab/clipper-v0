@@ -21,7 +21,7 @@ pub trait CorrectionModelTable<S> where S: Serialize + Deserialize {
 
     fn put(&mut self, uid: u32, state: &S) -> Result<(), String>;
 
-    fn get(&self, uid: u32) -> Option<S>;
+    fn get(&self, uid: u32) -> Result<S, String>;
 
 
 }
@@ -58,6 +58,7 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
 
 impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
 {
+    // TODO: should this be immutable
     fn put(&mut self, uid: u32, state: &S) -> Result<(), String> {
         let bytes = try!(bincode::serde::serialize(state, bincode::SizeLimit::Infinite)
                              .map_err(|e| format!("{}", e.description())));
@@ -68,12 +69,13 @@ impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
 
     }
 
-    fn get(&self, uid: u32) -> Option<S> {
-        let fetch_result: redis::RedisResult<Vec<u8>> = self.connection.get(uid);
-        let stored_state: Option<S> = match fetch_result {
-            Ok(bytes) => Some(bincode::serde::deserialize(&bytes).unwrap()),
-            Err(_) => None,
-        };
-        stored_state
+    fn get(&self, uid: u32) -> Result<S, String> {
+        info!("fetching state for uid: {}", uid);
+        let bytes: Vec<u8> = try!(self.connection
+                                      .get(uid)
+                                      .map_err(|e| format!("{}", e.description())));
+        let stored_state: S = try!(bincode::serde::deserialize(&bytes)
+                                       .map_err(|e| format!("{}", e.description())));
+        Ok(stored_state)
     }
 }

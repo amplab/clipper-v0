@@ -4,6 +4,22 @@ version = "0.1.0"
 authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
 build = "build.rs"
 
+# liblinear-sys generates some intermediate files
+# that don't sit in /target and thus don't get cleaned
+# with cargo clean. If you install cargo-cln
+# (cargo install cargo-cln) this additional metadata will
+# clean it. This is only for sanitary reasons, it will be
+# cleaned and rebuilt at the appropriate optimization level
+# with every invocation of cargo build.
+[package.metadata]
+cln = [
+    ["rm", "liblinear-sys/liblinear/blas/blas.a",
+      "liblinear-sys/liblinear/blas/daxpy.o",
+      "liblinear-sys/liblinear/blas/ddot.o",
+      "liblinear-sys/liblinear/blas/dnrm2.o",
+      "liblinear-sys/liblinear/blas/dscal.o"]
+]
+
 [features]
 default = ["serde_codegen"]
 nightly = ["serde_macros"]
@@ -38,9 +54,12 @@ libc = "0.2"
 serde = "0.7"
 bincode = "0.5"
 serde_macros = { version = "*", optional = true }
+threadpool = "0.1"
+liblinear-sys = {path = "liblinear-sys", version = "0.1"}
+libsvm-sys = {path = "libsvm-sys", version = "0.1"}
 
-[dependencies.linear-models]
-git = "https://github.com/dcrankshaw/rust-linear-models"
+# [dependencies.linear-models]
+# git = "https://github.com/dcrankshaw/rust-linear-models"
 
 
 [dependencies.hyper]

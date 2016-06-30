@@ -236,13 +236,12 @@ impl Histogram {
             }
 
         } else {
-
             snapshot.sort();
             let min = snapshot.first().unwrap();
             let max = snapshot.last().unwrap();
-            let p99 = Histogram::percentile(&snapshot, 99);
-            let p95 = Histogram::percentile(&snapshot, 95);
-            let p50 = Histogram::percentile(&snapshot, 50);
+            let p99 = Histogram::percentile(&snapshot, 0.99);
+            let p95 = Histogram::percentile(&snapshot, 0.95);
+            let p50 = Histogram::percentile(&snapshot, 0.50);
             let mean = snapshot.iter().fold(0, |acc, &x| acc + x) as f64 / snapshot.len() as f64;
             let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
             var = var / (sample_size - 1) as f64;
@@ -259,24 +258,108 @@ impl Histogram {
         }
     }
 
-    fn percentile(snapshot: &Vec<i64>, p: usize) -> f64 {
-        assert!(p <= 100, "must supply a percentile between 0 and 100");
-        let sample_size = snapshot.len();
-        let per = if sample_size < 100 {
-            warn!("computing p{} of sample size smaller than 100", p);
-            snapshot[(sample_size - 1 - (100 - p)) as usize] as f64
-        } else if (sample_size % 100) == 0 {
-            let per_index: usize = sample_size * p / 100;
-            snapshot[per_index as usize] as f64
+
+    /// Compute the percentile rank of `snapshot`. The rank `p` must
+    /// be in [0.0, 1.0] (inclusive) and `snapshot` must be sorted.
+    ///
+    /// Algorithm is the third variant from
+    /// [Wikipedia](https://en.wikipedia.org/wiki/Percentile)
+    pub fn percentile(snapshot: &Vec<i64>, p: f64) -> f64 {
+        assert!(snapshot.len() > 0);
+        let sample_size = snapshot.len() as f64;
+        assert!(p >= 0.0 && p <= 1.0, "percentile out of bounds");
+        let x = if p <= 1.0 / (sample_size + 1.0) {
+            println!("a");
+            1.0
+        } else if p > 1.0 / (sample_size + 1.0) && p < sample_size / (sample_size + 1.0) {
+            println!("b");
+            p * (sample_size + 1.0)
         } else {
-            let per_index: f64 = (sample_size as f64) * (p as f64 / 100.0);
-            let per_below = per_index.floor() as usize;
-            let per_above = per_index.ceil() as usize;
-            (snapshot[per_below] as f64 + snapshot[per_above] as f64) / 2.0_f64
+            println!("c");
+            sample_size
+        };
+        let index = x.floor() as usize - 1;
+        let v = snapshot[index] as f64;
+        let rem = x % 1.0;
+        let per = if rem != 0.0 {
+            println!("rem: {}", rem);
+            v + rem * (snapshot[index + 1] - snapshot[index]) as f64
+        } else {
+            v
         };
         per
     }
+
+    // // TODO: this percentile calculation is wrong for numbers less than 100
+    // fn percentile(snapshot: &Vec<i64>, p: usize) -> f64 {
+    //     assert!(p <= 100, "must supply a percentile between 0 and 100");
+    //     let sample_size = snapshot.len();
+    //     let per = if sample_size == 1 {
+    //         snapshot[0]
+    //     } else if sample_size < 100 {
+    //         warn!("computing p{} of sample size smaller than 100", p);
+    //         snapshot[(sample_size - 1 - (100 - p)) as usize] as f64
+    //     } else if (sample_size % 100) == 0 {
+    //         let per_index: usize = sample_size * p / 100;
+    //         snapshot[per_index as usize] as f64
+    //     } else {
+    //         let per_index: f64 = (sample_size as f64) * (p as f64 / 100.0);
+    //         let per_below = per_index.floor() as usize;
+    //         let per_above = per_index.ceil() as usize;
+    //         (snapshot[per_below] as f64 + snapshot[per_above] as f64) / 2.0_f64
+    //     };
+    //     per
+    // }
 }
+
+
+#[cfg(test)]
+#[cfg_attr(rustfmt, rustfmt_skip)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn percentile() {
+        let snap = vec![15, 20, 35, 40, 50];
+        let p = 0.4;
+        let computed_percentile = Histogram::percentile(&snap, p);
+        assert!(computed_percentile - 26.0 < 0.000001);
+    }
+
+    #[test]
+    fn percentile_one_elem() {
+        let snap = vec![15];
+        let p = 0.4;
+        let computed_percentile = Histogram::percentile(&snap, p);
+        assert!(computed_percentile - 15.0 < 0.000001);
+    }
+
+    #[test]
+    fn percentile_one_elem_pzero() {
+        let snap = vec![15];
+        let p = 0.0;
+        let computed_percentile = Histogram::percentile(&snap, p);
+        assert!(computed_percentile - 15.0 < 0.000001);
+    }
+
+    #[test]
+    fn percentile_one_elem_p100() {
+        let snap = vec![15];
+        let p = 1.0;
+        let computed_percentile = Histogram::percentile(&snap, p);
+        assert!(computed_percentile - 15.0 < 0.000001);
+    }
+
+    #[test]
+    #[should_panic]
+    fn percentile_zero_elem() {
+        let snap = Vec::new();
+        let p = 0.5;
+        let _ = Histogram::percentile(&snap, p);
+    }
+}
+
+
 
 impl Metric for Histogram {
     fn clear(&self) {

@@ -43,4 +43,8 @@ if __name__=='__main__':
     args = sys.argv
     x, y = load_digits(os.path.expanduser("~/model-serving/data/mnist_data"), digits_filename = "test.data")
     # z = normalize_digits(x)
-    mnist_prediction(x[int(args[1])],int(args[2]))
+    inputs = args[2:]
+    for i in inputs:
+        mnist_prediction(x[int(args[1])],int(i))
+
+

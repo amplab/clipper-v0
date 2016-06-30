@@ -5,7 +5,7 @@ extern crate docopt;
 extern crate clipper;
 extern crate toml;
 extern crate rustc_serialize;
-extern crate linear_models;
+// extern crate linear_models;
 extern crate rand;
 extern crate hyper;
 extern crate time;
