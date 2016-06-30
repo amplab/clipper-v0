@@ -232,10 +232,14 @@ impl<P, S> PredictionWorker<P, S>
         let slo = time::Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = time::Duration::milliseconds(1);
-        let cmt = RedisCMT::new_socket_connection();
+        let mut cmt = RedisCMT::new_socket_connection();
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
               slo_micros as f64 / 1000.0);
+        if worker_id == 0 {
+            cmt.put(0 as u32, &P::new(models.keys().collect::<Vec<_>>())).unwrap();
+        }
+
         while let Ok((req, max_preds)) = request_queue.recv() {
             let correction_state: S = cmt.get(*(&req.uid) as u32)
                                          .unwrap_or(cmt.get(0_u32).unwrap());

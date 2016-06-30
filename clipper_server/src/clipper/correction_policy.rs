@@ -9,7 +9,7 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
 
     /// Initialize new correction state without any training data.
     /// `models` is a list of the new model IDs.
-    fn new(models: Vec<String>) -> S;
+    fn new(models: Vec<&String>) -> S;
 
     /// Each correction policy must provide a name, used for logging and debugging
     /// purposes.
@@ -35,23 +35,27 @@ pub struct DummyCorrectionPolicy {}
 
 impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
     #[allow(dead_code, unused_variables)]
-    fn new(models: Vec<String>) -> Vec<f64> {
-        unimplemented!();
+    fn new(models: Vec<&String>) -> Vec<f64> {
+        let mut v = Vec::with_capacity(models.len());
+        for i in 0..models.len() {
+            v.push(i as f64);
+        }
+        v
     }
 
     #[allow(dead_code)]
     fn get_name() -> &'static str {
-        unimplemented!();
+        "dummy_correction_model"
     }
 
     #[allow(dead_code, unused_variables)]
     fn predict(state: &Vec<f64>, ys: HashMap<String, Output>, missing_ys: Vec<String>) -> Output {
-        unimplemented!();
+        ys.len() as Output
     }
 
     #[allow(dead_code, unused_variables)]
     fn rank_models_desc<'a>(state: &Vec<f64>, model_names: Vec<&'a String>) -> Vec<&'a String> {
-        unimplemented!();
+        model_names
     }
 
     #[allow(dead_code, unused_variables)]
@@ -60,7 +64,11 @@ impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
              predictions: Vec<HashMap<String, Output>>,
              labels: Vec<Output>)
              -> Vec<f64> {
-        unimplemented!();
+        let mut new_state = Vec::new();
+        for i in state {
+            new_state.push(i + 2.0);
+        }
+        new_state
     }
 }
 
