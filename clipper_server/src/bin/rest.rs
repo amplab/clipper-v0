@@ -5,14 +5,17 @@ use std::sync::{mpsc, RwLock, Arc};
 use std::boxed::Box;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
+use std::error::Error;
+use serde_json;
 
 #[allow(unused_imports)]
 use hyper::{Get, Post, StatusCode, RequestUri, Decoder, Encoder, Next, Control};
-use hyper::header::ContentLength;
+use hyper::header::{ContentType, ContentLength};
+use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::net::HttpStream;
 use hyper::server::{Server, Handler, Request, Response};
 
-use clipper::server::{self, ClipperServer, InputType, PredictionRequest};
+use clipper::server::{Input, ClipperServer, InputType, PredictionRequest, UpdateRequest, Output};
 use clipper::{metrics, configuration};
 use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy};
 
@@ -23,11 +26,10 @@ use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy};
 
 
 const PREDICT: &'static str = "/predict";
-#[allow(dead_code)]
 const UPDATE: &'static str = "/update";
 
 
-struct PredictHandler<P, S>
+struct RequestHandler<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
 {
@@ -38,29 +40,49 @@ struct PredictHandler<P, S>
     ctrl: Control,
     uid: u32,
     input_type: InputType,
+    request_type: Option<RequestType>,
 }
 
-#[allow(dead_code)]
-struct UpdateHandler<P, S>
-    where P: CorrectionPolicy<S>,
-          S: Serialize + Deserialize
-{
-    clipper: Arc<ClipperServer<P, S>>,
-    // num_features: usize,
-    ctrl: Control,
+enum RequestType {
+    Predict,
+    Update,
+}
+
+#[derive(Serialize,Deserialize)]
+struct IntsInput {
     uid: u32,
-    input_type: InputType,
+    input: Vec<i32>,
+    label: Option<Output>,
+}
+#[derive(Serialize,Deserialize)]
+struct FloatsInput {
+    uid: u32,
+    input: Vec<f64>,
+    label: Option<Output>,
+}
+#[derive(Serialize,Deserialize)]
+struct StrInput {
+    uid: u32,
+    input: String,
+    label: Option<Output>,
+}
+#[derive(Serialize,Deserialize)]
+struct BytesInput {
+    uid: u32,
+    input: Vec<u8>,
+    label: Option<Output>,
 }
 
-impl<P, S> PredictHandler<P, S>
+
+impl<P, S> RequestHandler<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
 {
     fn new(clipper: Arc<ClipperServer<P, S>>,
            ctrl: Control,
            input_type: InputType)
-           -> PredictHandler<P, S> {
-        PredictHandler {
+           -> RequestHandler<P, S> {
+        RequestHandler {
             clipper: clipper,
             result_string: "NO RESULT YET".to_string(),
             result_channel: None,
@@ -68,83 +90,229 @@ impl<P, S> PredictHandler<P, S>
             ctrl: ctrl,
             uid: 0,
             input_type: input_type,
+            request_type: None,
         }
     }
 }
 
 
-fn parse_to_floats(transport: &mut Decoder<HttpStream>,
-                   length: i32)
-                   -> Result<server::Input, String> {
-    let mut request_str = String::new();
-    transport.read_to_string(&mut request_str).unwrap();
-    let parsed_floats: Vec<f64> = request_str.split(", ")
-                                             .map(|x| x.trim().parse::<f64>().unwrap())
-                                             .collect();
-    if length >= 0 && parsed_floats.len() as i32 != length {
-        Err(format!("input wrong length: expected {}, found {}",
-                    length,
-                    parsed_floats.len()))
-    } else {
-        Ok(server::Input::Floats {
-            f: parsed_floats,
-            length: length,
-        })
+// fn parse_to_floats(transport: &mut Decoder<HttpStream>, length: i32) -> Result<Input, String> {
+//     let mut request_str = String::new();
+//     transport.read_to_string(&mut request_str).unwrap();
+//     let parsed_floats: Vec<f64> = request_str.split(", ")
+//                                              .map(|x| x.trim().parse::<f64>().unwrap())
+//                                              .collect();
+//     if length >= 0 && parsed_floats.len() as i32 != length {
+//         Err(format!("input wrong length: expected {}, found {}",
+//                     length,
+//                     parsed_floats.len()))
+//     } else {
+//         Ok(Input::Floats {
+//             f: parsed_floats,
+//             length: length,
+//         })
+//     }
+// }
+
+// fn parse_to_ints(transport: &mut Decoder<HttpStream>, length: i32) -> Result<Input, String> {
+//     let mut request_str = String::new();
+//     transport.read_to_string(&mut request_str).unwrap();
+//     let splits = request_str.split(", ").collect::<Vec<&str>>();
+//     info!("{:?}", splits);
+//     let parsed_ints: Vec<i32> = request_str.split(", ")
+//                                            .map(|x| x.trim().parse::<i32>().unwrap())
+//                                            .collect();
+//     if length >= 0 && parsed_ints.len() as i32 != length {
+//         Err(format!("input wrong length: expected {}, found {}",
+//                     length,
+//                     parsed_ints.len()))
+//     } else {
+//         Ok(Input::Ints {
+//             i: parsed_ints,
+//             length: length,
+//         })
+//     }
+// }
+
+// fn parse_to_string(transport: &mut Decoder<HttpStream>) -> Result<Input, String> {
+//     let mut request_str = String::new();
+//     transport.read_to_string(&mut request_str).unwrap();
+//     Ok(Input::Str { s: request_str })
+// }
+
+// fn extract_uid_from_path(path: &String) -> u32 {
+//
+//     let query_str: Vec<&str> = path.split("?").collect();
+//     let uid = if query_str.len() > 1 {
+//         let q = query_str[1];
+//         let sp: Vec<&str> = q.split("=").collect();
+//         assert!(sp.len() == 2 && sp[0] == "uid");
+//         let provided_uid = sp[1].parse::<u32>().unwrap();
+//         assert!(provided_uid != 0, "Cannot provide user ID 0");
+//         provided_uid
+//     } else {
+//         0
+//     };
+//     uid
+// }
+
+
+fn decode_predict_input(input_type: &InputType,
+                        json_string: &String)
+                        -> Result<(u32, Input), String> {
+    match input_type {
+        &InputType::Integer(length) => {
+            let i: IntsInput = try!(serde_json::from_str(&json_string)
+                                        .map_err(|e| format!("{}", e.description())));
+            if length >= 0 && i.input.len() != length as usize {
+                return Err(format!("Wrong input length: expected {}, received {}",
+                                   length,
+                                   i.input.len()));
+            }
+            Ok((i.uid,
+                Input::Ints {
+                i: i.input,
+                length: length,
+            }))
+        }
+        &InputType::Float(length) => {
+            let i: FloatsInput = try!(serde_json::from_str(&json_string)
+                                          .map_err(|e| format!("{}", e.description())));
+            if length >= 0 && i.input.len() != length as usize {
+                return Err(format!("Wrong input length: expected {}, received {}",
+                                   length,
+                                   i.input.len()));
+            }
+            Ok((i.uid,
+                Input::Floats {
+                f: i.input,
+                length: length,
+            }))
+        }
+        &InputType::Byte(length) => {
+            let i: BytesInput = try!(serde_json::from_str(&json_string)
+                                         .map_err(|e| format!("{}", e.description())));
+            if length >= 0 && i.input.len() != length as usize {
+                return Err(format!("Wrong input length: expected {}, received {}",
+                                   length,
+                                   i.input.len()));
+            }
+            Ok((i.uid,
+                Input::Bytes {
+                b: i.input,
+                length: length,
+            }))
+        }
+        &InputType::Str => {
+            let i: StrInput = try!(serde_json::from_str(&json_string)
+                                       .map_err(|e| format!("{}", e.description())));
+            Ok((i.uid, Input::Str { s: i.input }))
+        }
     }
 }
 
-fn parse_to_ints(transport: &mut Decoder<HttpStream>,
-                 length: i32)
-                 -> Result<server::Input, String> {
-    let mut request_str = String::new();
-    info!("AAA");
-    transport.read_to_string(&mut request_str).unwrap();
-    info!("BBB");
-    let splits = request_str.split(", ").collect::<Vec<&str>>();
-    info!("{:?}", splits);
-    let parsed_ints: Vec<i32> = request_str.split(", ")
-                                           .map(|x| x.trim().parse::<i32>().unwrap())
-                                           .collect();
-    if length >= 0 && parsed_ints.len() as i32 != length {
-        Err(format!("input wrong length: expected {}, found {}",
-                    length,
-                    parsed_ints.len()))
-    } else {
-        Ok(server::Input::Ints {
-            i: parsed_ints,
-            length: length,
-        })
+fn decode_update_input(input_type: &InputType,
+                       json_string: &String)
+                       -> Result<(u32, Input, Output), String> {
+    match input_type {
+        &InputType::Integer(length) => {
+            let i: IntsInput = try!(serde_json::from_str(&json_string)
+                                        .map_err(|e| format!("{}", e.description())));
+            if length >= 0 && i.input.len() != length as usize {
+                return Err(format!("Wrong input length: expected {}, received {}",
+                                   length,
+                                   i.input.len()));
+            }
+            if i.label.is_none() {
+                return Err(format!("No label for update"));
+            }
+            Ok((i.uid,
+                Input::Ints {
+                i: i.input,
+                length: length,
+            },
+                i.label.unwrap()))
+        }
+        &InputType::Float(length) => {
+            let i: FloatsInput = try!(serde_json::from_str(&json_string)
+                                          .map_err(|e| format!("{}", e.description())));
+            if length >= 0 && i.input.len() != length as usize {
+                return Err(format!("Wrong input length: expected {}, received {}",
+                                   length,
+                                   i.input.len()));
+            }
+            if i.label.is_none() {
+                return Err(format!("No label for update"));
+            }
+            Ok((i.uid,
+                Input::Floats {
+                f: i.input,
+                length: length,
+            },
+                i.label.unwrap()))
+        }
+        &InputType::Byte(length) => {
+            let i: BytesInput = try!(serde_json::from_str(&json_string)
+                                         .map_err(|e| format!("{}", e.description())));
+            if length >= 0 && i.input.len() != length as usize {
+                return Err(format!("Wrong input length: expected {}, received {}",
+                                   length,
+                                   i.input.len()));
+            }
+            if i.label.is_none() {
+                return Err(format!("No label for update"));
+            }
+            Ok((i.uid,
+                Input::Bytes {
+                b: i.input,
+                length: length,
+            },
+                i.label.unwrap()))
+        }
+        &InputType::Str => {
+            let i: StrInput = try!(serde_json::from_str(&json_string)
+                                       .map_err(|e| format!("{}", e.description())));
+            if i.label.is_none() {
+                return Err(format!("No label for update"));
+            }
+            Ok((i.uid, Input::Str { s: i.input }, i.label.unwrap()))
+        }
     }
 }
 
-fn parse_to_string(transport: &mut Decoder<HttpStream>) -> Result<server::Input, String> {
-    let mut request_str = String::new();
-    transport.read_to_string(&mut request_str).unwrap();
-    Ok(server::Input::Str { s: request_str })
-}
-
-
-impl<P, S> Handler<HttpStream> for PredictHandler<P, S>
+impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
 {
     fn on_request(&mut self, req: Request<HttpStream>) -> Next {
+
+        // check content type
+        let headers = req.headers();
+        match headers.get::<ContentType>() {
+            Some(&ContentType(ref mime)) => {
+                match mime {
+                    &Mime(TopLevel::Application, SubLevel::Json, _) => {}
+                    _ => {
+                        self.result_string = format!("Incorrect mime type. Expected \
+                                                      application/json, found: {}",
+                                                     mime)
+                    }
+                }
+            }
+            None => warn!("no ContentType header found. Assuming application/json."),
+        }
+
         match *req.uri() {
             RequestUri::AbsolutePath(ref path) => {
-                match (req.method(), &path[0..PREDICT.len()]) {
+                match (req.method(), &path[..]) {
                     (&Post, PREDICT) => {
-                        let query_str: Vec<&str> = path.split("?").collect();
-                        self.uid = if query_str.len() > 1 {
-                            let q = query_str[1];
-                            let sp: Vec<&str> = q.split("=").collect();
-                            assert!(sp.len() == 2 && sp[0] == "uid");
-                            let provided_uid = sp[1].parse::<u32>().unwrap();
-                            assert!(provided_uid != 0, "Cannot provide user ID 0");
-                            provided_uid
-                        } else {
-                            0
-                        };
-                        info!("UID: {}", self.uid);
+                        // self.uid = extract_uid_from_path(path);
+                        self.request_type = Some(RequestType::Predict);
+                        Next::read()
+                    }
+                    (&Post, UPDATE) => {
+                        // self.uid = extract_uid_from_path(path);
+                        self.request_type = Some(RequestType::Update);
                         Next::read()
                     }
                     _ => Next::write(),
@@ -155,43 +323,65 @@ impl<P, S> Handler<HttpStream> for PredictHandler<P, S>
     }
 
     fn on_request_readable(&mut self, transport: &mut Decoder<HttpStream>) -> Next {
-        let input = match self.input_type {
-            InputType::Integer(length) => parse_to_ints(transport, length),
-            InputType::Float(length) => parse_to_floats(transport, length),
-            InputType::Byte(_) => panic!("unsupported input type"),
-            InputType::Str => parse_to_string(transport),
-        };
-        match input {
-            Ok(i) => {
-                // info!("query input: {:?}", i);
-                let ctrl = self.ctrl.clone();
-                let (tx, rx) = mpsc::channel::<String>();
-                self.result_channel = Some(rx);
-                let on_pred = Box::new(move |y| {
-                    tx.send(format!("predict: {}", y).to_string()).unwrap();
-                    ctrl.ready(Next::write()).unwrap();
-                });
-                let r = PredictionRequest::new(self.uid, i, on_pred);
-                self.clipper.schedule_prediction(r);
-                Next::wait()
+        let mut json_string = String::new();
+        transport.read_to_string(&mut json_string).unwrap();
+        match self.request_type {
+            Some(RequestType::Predict) => {
+                match decode_predict_input(&self.input_type, &json_string) {
+                    Ok((uid, input)) => {
+                        self.uid = uid;
+                        info!("/predict for user: {}", self.uid);
+                        let ctrl = self.ctrl.clone();
+                        let (tx, rx) = mpsc::channel::<String>();
+                        self.result_channel = Some(rx);
+                        let on_pred = Box::new(move |y| {
+                            tx.send(format!("predict: {}", y).to_string()).unwrap();
+                            ctrl.ready(Next::write()).unwrap();
+                        });
+                        let r = PredictionRequest::new(self.uid, input, on_pred);
+                        self.clipper.schedule_prediction(r);
+                        Next::wait()
+                    }
+                    Err(e) => {
+                        self.result_string = e.to_string();
+                        Next::write()
+                    }
+                }
             }
-            Err(e) => {
-                self.result_string = e.to_string();
-                Next::write()
+            Some(RequestType::Update) => {
+                match decode_update_input(&self.input_type, &json_string) {
+                    Ok((uid, input, label)) => {
+                        self.uid = uid;
+                        info!("/update for user: {}", self.uid);
+                        let u = UpdateRequest::new(self.uid, input, label);
+                        self.clipper.schedule_update(u);
+                        self.result_string = "Update scheduled".to_string();
+                        Next::write()
+                    }
+                    Err(e) => {
+                        self.result_string = e.to_string();
+                        Next::write()
+                    }
+                }
             }
+            None => Next::write(),
         }
     }
 
 
     fn on_response(&mut self, res: &mut Response) -> Next {
-        self.result_string = match self.result_channel {
-            Some(ref c) => c.recv().unwrap(),
-            None => {
-                warn!("query failed for some reason");
-                self.result_string.clone()
+        match self.request_type {
+            Some(RequestType::Predict) => {
+                self.result_string = match self.result_channel {
+                    Some(ref c) => c.recv().unwrap(),
+                    None => {
+                        warn!("query failed for some reason");
+                        self.result_string.clone()
+                    }
+                };
             }
-        };
-        // self.result_string = self.result_channel.recv().unwrap();
+            _ => {}
+        }
         res.headers_mut().set(ContentLength(self.result_string.as_bytes().len() as u64));
         Next::write()
     }
@@ -203,6 +393,7 @@ impl<P, S> Handler<HttpStream> for PredictHandler<P, S>
     }
 }
 
+
 #[allow(dead_code)]
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
                          report_interval_secs: u64)
@@ -213,8 +404,6 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
             let m = metrics_register.read().unwrap();
             info!("{}", m.report());
             m.reset();
-            // thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
-            // info!("{}", metrics_register.read().unwrap().report());
         }
     })
 }
@@ -227,13 +416,16 @@ fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
 
     let rest_server = Server::http(&"127.0.0.1:1337".parse().unwrap()).unwrap();
 
-    let report_interval_secs = 15;
-    let _ = launch_monitor_thread(clipper.get_metrics(), report_interval_secs);
+    // TODO: add admin server to update models
+    // let admin_server = Server::http(&"127.0.0.1:1338".parse().unwrap()).unwrap();
+
+    // let report_interval_secs = 15;
+    // let _ = launch_monitor_thread(clipper.get_metrics(), report_interval_secs);
 
     let input_type = clipper.get_input_type();
 
     let (listening, server) = rest_server.handle(|ctrl| {
-                                             PredictHandler::new(clipper.clone(),
+                                             RequestHandler::new(clipper.clone(),
                                                                  ctrl,
                                                                  input_type.clone())
                                          })

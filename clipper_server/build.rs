@@ -22,10 +22,16 @@ mod inner {
     pub fn main() {
         let out_dir = env::var_os("OUT_DIR").unwrap();
 
-        let src = Path::new("src/clipper/lib.rs.in");
-        let dst = Path::new(&out_dir).join("lib.rs");
 
-        serde_codegen::expand(&src, &dst).unwrap();
+        let libsrc = Path::new("src/clipper/lib.rs.in");
+        let libdst = Path::new(&out_dir).join("lib.rs");
+
+        serde_codegen::expand(&libsrc, &libdst).unwrap();
+
+        let restbin_src = Path::new("src/bin/clipper-rest.rs.in");
+        let restbin_dst = Path::new(&out_dir).join("clipper-rest.rs");
+
+        serde_codegen::expand(&restbin_src, &restbin_dst).unwrap();
     }
 }
 

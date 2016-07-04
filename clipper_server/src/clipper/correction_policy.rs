@@ -24,8 +24,12 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
     /// Prioritize the importance of models from highest to lowest priority.
     fn rank_models_desc<'a>(state: &S, model_names: Vec<&'a String>) -> Vec<&'a String>;
 
+    /// Update the correction model state with newly observed, labeled
+    /// training data. Each training example is used to train the model
+    /// exactly once, but multiple examples may be batched together into a
+    /// single call to `train()`.
     fn train(state: &S,
-             inputs: Vec<&Input>,
+             inputs: Vec<Input>,
              predictions: Vec<HashMap<String, Output>>,
              labels: Vec<Output>)
              -> S;
@@ -60,7 +64,7 @@ impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
 
     #[allow(dead_code, unused_variables)]
     fn train(state: &Vec<f64>,
-             inputs: Vec<&Input>,
+             inputs: Vec<Input>,
              predictions: Vec<HashMap<String, Output>>,
              labels: Vec<Output>)
              -> Vec<f64> {
