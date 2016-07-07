@@ -4,9 +4,9 @@
 
 class ClipperRPC {
     public:
-        ClipperRPC(char *s_addr, int portno);
+        ClipperRPC(std::unique_ptr<Model> &model, char *s_addr, int portno);
 
-        Model* model;
+        std::unique_ptr<Model> model;
 
         char* s_addr;
 
