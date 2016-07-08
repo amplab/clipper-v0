@@ -8,6 +8,7 @@ import datetime
 import sys
 import os
 
+SHUTDOWN_CODE = 0
 FIXEDINT_CODE = 1
 FIXEDFLOAT_CODE = 2
 FIXEDBYTE_CODE = 3
@@ -73,6 +74,10 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
 
             header, data = (data[:header_bytes], data[header_bytes:])
             input_type, num_inputs = struct.unpack("<BI", header)
+            if input_type == SHUTDOWN_CODE:
+                print("Shutting down connection")
+                self.request.sendall(np.array([1234]).astype('uint32').tobytes())
+                return
             if is_fixed_format(input_type):
                 additional_header_bytes = 4
                 while len(data) < additional_header_bytes:

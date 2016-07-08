@@ -43,6 +43,7 @@ use batching::RpcPredictRequest;
 /// followed by all of the strings concatenated together and compressed
 /// with LZ4
 
+const SHUTDOWN_CODE: u8 = 0;
 const FIXEDINT_CODE: u8 = 1;
 const FIXEDFLOAT_CODE: u8 = 2;
 const FIXEDBYTE_CODE: u8 = 3;
@@ -92,6 +93,20 @@ pub fn send_batch(stream: &mut TcpStream,
         responses.push(cursor.read_f64::<LittleEndian>().unwrap());
     }
     responses
+}
+
+pub fn shutdown(stream: &mut TcpStream) -> bool {
+    let mut message = Vec::new();
+    message.push(SHUTDOWN_CODE);
+    message.write_u32::<LittleEndian>(0 as u32).unwrap();
+    stream.write_all(&message[..]).unwrap();
+    stream.flush().unwrap();
+    let mut response_buffer: Vec<u8> = vec![0; 4];
+    stream.read_exact(&mut response_buffer).unwrap();
+    let mut cursor = Cursor::new(response_buffer);
+    let response = cursor.read_u32::<LittleEndian>().unwrap();
+    // info!("SHUTDOWN RESPONSE: {}", response);
+    response == 1234_u32
 }
 
 pub fn encode_var_ints(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {

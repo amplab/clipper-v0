@@ -6,6 +6,7 @@ use std::boxed::Box;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
 use std::error::Error;
+use std::time::Duration;
 use serde_json;
 
 #[allow(unused_imports)]
@@ -396,20 +397,28 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
 
 #[allow(dead_code)]
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
-                         report_interval_secs: u64)
+                         report_interval_secs: u64,
+                         shutdown_signal_rx: mpsc::Receiver<()>)
                          -> ::std::thread::JoinHandle<()> {
     thread::spawn(move || {
         loop {
-            thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
-            let m = metrics_register.read().unwrap();
-            info!("{}", m.report());
-            m.reset();
+            match shutdown_signal_rx.try_recv() {
+                Ok(_) | Err(mpsc::TryRecvError::Empty) => {
+                    thread::sleep(Duration::new(report_interval_secs, 0));
+                    let m = metrics_register.read().unwrap();
+                    info!("{}", m.report());
+                    m.reset();
+                }
+                Err(mpsc::TryRecvError::Disconnected) => break,
+            }
         }
+        info!("Shutting down metrics thread");
     })
 }
 
 
-fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
+#[allow(unused_variables)]
+fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>, clipper: Arc<ClipperServer<P, S>>)
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
 {
@@ -419,9 +428,11 @@ fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
     // TODO: add admin server to update models
     // let admin_server = Server::http(&"127.0.0.1:1338".parse().unwrap()).unwrap();
 
-    // let report_interval_secs = 15;
-    // let _ = launch_monitor_thread(clipper.get_metrics(), report_interval_secs);
-
+    let report_interval_secs = 15;
+    let (metrics_signal_tx, metrics_signal_rx) = mpsc::channel::<()>();
+    let _ = launch_monitor_thread(clipper.get_metrics(),
+                                  report_interval_secs,
+                                  metrics_signal_rx);
     let input_type = clipper.get_input_type();
 
     let (listening, server) = rest_server.handle(|ctrl| {
@@ -430,20 +441,29 @@ fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
                                                                  input_type.clone())
                                          })
                                          .unwrap();
-    println!("Listening on http://{}", listening);
+
+    let jh = thread::spawn(move || {
+        println!("Listening on http://{}", listening);
+        shutdown_signal.recv().unwrap();
+        metrics_signal_tx.send(()).unwrap();
+        listening.close();
+    });
     server.run();
+    println!("Done running");
+    jh.join().unwrap();
 
 }
 
 // pub fn start_listening(feature_addrs: Vec<(String, Vec<SocketAddr>)>, input_type: InputType) {
-pub fn start(conf_path: &String) {
+pub fn start(shutdown_signal: mpsc::Receiver<()>, conf_path: &String) {
 
     let config = configuration::ClipperConf::parse_from_toml(conf_path);
     // let metrics = config.metrics.clone();
     // let input_type = config.input_type.clone();
 
     if config.policy_name == "hello world".to_string() {
-        start_listening(Arc::new(ClipperServer::<DummyCorrectionPolicy, Vec<f64>>::new(config)));
+        start_listening(shutdown_signal,
+                        Arc::new(ClipperServer::<DummyCorrectionPolicy, Vec<f64>>::new(config)));
     } else {
         panic!("Unknown correction policy");
     }

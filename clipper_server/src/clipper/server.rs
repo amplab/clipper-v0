@@ -6,7 +6,8 @@ use serde::de::Deserialize;
 use std::sync::{mpsc, RwLock, Arc};
 use std::collections::{HashMap, VecDeque};
 use rand::{thread_rng, Rng};
-use std::{thread, cmp};
+use std::cmp;
+use std::thread::{self, JoinHandle};
 use std::time::Duration as StdDuration;
 
 use cmt::{CorrectionModelTable, RedisCMT};
@@ -188,8 +189,25 @@ impl<P, S> ClipperServer<P, S>
         // update worker. If there are
         self.update_workers[req.uid as usize % self.update_workers.len()].update(req);
     }
-    pub fn shutdown() {
-        unimplemented!();
+
+    // pub fn shutdown(&mut self) {
+    //     for p in self.prediction_workers.iter_mut() {
+    //         p.input_queue
+    //
+    //
+    //     }
+    // }
+}
+
+impl<P, S> Drop for ClipperServer<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
+{
+    fn drop(&mut self) {
+        self.prediction_workers.clear();
+        self.update_workers.clear();
+        self.models.clear();
+        warn!("Dropping ClipperServer");
     }
 }
 
@@ -305,7 +323,7 @@ impl<P, S> PredictionWorker<P, S>
             // pred_metrics.thruput_meter.mark(1);
             // pred_metrics.pred_counter.incr(1);
         }
-        info!("shutting down prediction worker {}", worker_id);
+        info!("ending loop: prediction worker {}", worker_id);
     }
 
     pub fn predict(&self, r: PredictionRequest, max_preds: i32) {
@@ -317,6 +335,16 @@ impl<P, S> PredictionWorker<P, S>
         unimplemented!();
     }
 }
+
+impl<P, S> Drop for PredictionWorker<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
+{
+    fn drop(&mut self) {
+        // info!("DROPPING PREDICTION WORKER {}", self.worker_id);
+    }
+}
+
 
 #[derive(Clone)]
 #[allow(dead_code)]
@@ -367,9 +395,10 @@ struct UpdateWorker<P, S>
           S: Serialize + Deserialize
 {
     worker_id: i32,
-    input_queue: mpsc::Sender<UpdateRequest>,
+    input_queue: mpsc::Sender<UpdateMessage>,
     _policy_marker: PhantomData<P>,
     _state_marker: PhantomData<S>,
+    runner_handle: Option<JoinHandle<()>>,
 }
 
 impl<P, S> UpdateWorker<P, S>
@@ -382,8 +411,8 @@ impl<P, S> UpdateWorker<P, S>
                                PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>)
                -> UpdateWorker<P, S> {
 
-        let (sender, receiver) = mpsc::channel::<UpdateRequest>();
-        thread::spawn(move || {
+        let (sender, receiver) = mpsc::channel::<UpdateMessage>();
+        let jh = thread::spawn(move || {
             UpdateWorker::<P, S>::run(worker_id, receiver, cache.clone(), models);
         });
         UpdateWorker {
@@ -393,22 +422,18 @@ impl<P, S> UpdateWorker<P, S>
             // models: models,
             _policy_marker: PhantomData,
             _state_marker: PhantomData,
+            runner_handle: Some(jh),
         }
     }
 
 
     pub fn update(&self, r: UpdateRequest) {
-        self.input_queue.send(r).unwrap();
-    }
-
-    #[allow(dead_code)]
-    pub fn shutdown() {
-        unimplemented!();
+        self.input_queue.send(UpdateMessage::Request(r)).unwrap();
     }
 
     #[allow(unused_variables)]
     fn run(worker_id: i32,
-           request_queue: mpsc::Receiver<UpdateRequest>,
+           request_queue: mpsc::Receiver<UpdateMessage>,
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
                            PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>) {
@@ -429,15 +454,27 @@ impl<P, S> UpdateWorker<P, S>
             let try_req = request_queue.try_recv();
             let mut sleep = false;
             match try_req {
-                Ok(req) => {
-                    UpdateWorker::<P, S>::stage_update(req,
-                                                       cache.clone(),
-                                                       &mut waiting_updates,
-                                                       &models)
+                Ok(message) => {
+                    match message {
+                        UpdateMessage::Request(req) => {
+                            UpdateWorker::<P, S>::stage_update(req,
+                                                               cache.clone(),
+                                                               &mut waiting_updates,
+                                                               &models)
+                        }
+                        UpdateMessage::Shutdown => {
+                            // info!("Update worker {} got shutdown message and is executing break",
+                            //       worker_id);
+                            break;
+                        }
+                    }
                     // models.keys().collect::<Vec<&String>>())
                 }
                 Err(mpsc::TryRecvError::Empty) => sleep = true,
-                Err(mpsc::TryRecvError::Disconnected) => break,
+                Err(mpsc::TryRecvError::Disconnected) => {
+                    // info!("Update worker {} detected disconnect", worker_id);
+                    break;
+                }
             }
 
             UpdateWorker::<P, S>::check_for_ready_updates(&mut waiting_updates,
@@ -473,7 +510,7 @@ impl<P, S> UpdateWorker<P, S>
         //                     &mut update_order,
         //                     models.keys.collect::<Vec<&String>>());
         // }
-        info!("shutting down update worker {}", worker_id);
+        info!("Ending loop: update worker {}", worker_id);
     }
 
     fn execute_updates(max_updates: usize,
@@ -484,12 +521,11 @@ impl<P, S> UpdateWorker<P, S>
         let num_updates = update_order.len();
         for uid_raw in update_order.drain(0..cmp::min(max_updates, num_updates)) {
             let uid = uid_raw as u32;
-            info!("Executing update for {}", uid);
             let mut update_deps = ready_updates.remove(&uid).unwrap();
             let correction_state: S = match cmt.get(uid) {
                 Ok(s) => s,
                 Err(e) => {
-                    warn!("Error in getting correction state for update: {}", e);
+                    info!("Error in getting correction state for update: {}", e);
                     info!("Creating model state for new user: {}", uid);
                     P::new(model_names.clone())
                 }
@@ -508,7 +544,7 @@ impl<P, S> UpdateWorker<P, S>
                                      collected_labels);
             match cmt.put(uid, &new_state) {
                 Ok(_) => {
-                    info!("putting new state for {}", uid);
+                    // info!("putting new state for {}", uid);
                 }
                 Err(e) => warn!("{}", e),
             }
@@ -606,10 +642,24 @@ impl<P, S> UpdateWorker<P, S>
             }
         }
         waiting_updates.push(update_dependencies);
-        info!("update staged");
     }
 }
 
+impl<P, S> Drop for UpdateWorker<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
+{
+    fn drop(&mut self) {
+        self.input_queue.send(UpdateMessage::Shutdown).unwrap();
+        self.runner_handle.take().unwrap().join().unwrap();
+        // info!("DROPPING UPDATE WORKER {}", self.worker_id);
+    }
+}
+
+enum UpdateMessage {
+    Request(UpdateRequest),
+    Shutdown,
+}
 
 struct UpdateDependencies {
     // state: Option<S>,

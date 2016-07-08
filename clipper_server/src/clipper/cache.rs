@@ -118,7 +118,6 @@ pub trait PredictionCache<V: 'static + Clone> {
 
 pub struct SimplePredictionCache<V: 'static + Clone, H: HashStrategy + Send + Sync> {
     caches: Arc<HashMap<String, Cache<V>>>,
-    // model_batchers: Arc<RwLock<HashMap<String, PredictionBatcher<SimplePredictionCache<V>, V>>>>,
     hash_strategy: H,
 }
 
