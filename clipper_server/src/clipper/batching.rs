@@ -1,5 +1,5 @@
 use time;
-use std::net::{SocketAddr, TcpStream, Shutdown};
+use std::net::{SocketAddr, TcpStream};
 // use std::net::Shutdown
 use std::thread::{self, JoinHandle};
 use std::sync::{RwLock, Arc, mpsc, Mutex};
@@ -186,7 +186,10 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
         }
         warn!("XXXXXXXXXXXXXXXXXXXXXXXXshutting down connection to model: {}",
               name);
-        stream.shutdown(Shutdown::Both).unwrap();
+        if !rpc::shutdown(&mut stream) {
+            warn!("Connection to model: {} did not shut down cleanly", name);
+        }
+        // stream.shutdown(Shutdown::Both).unwrap();
         warn!("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZshutting down model batcher {}",
               name);
     }

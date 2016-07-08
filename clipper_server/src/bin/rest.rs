@@ -428,13 +428,10 @@ fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
     // let admin_server = Server::http(&"127.0.0.1:1338".parse().unwrap()).unwrap();
 
     let report_interval_secs = 15;
-    {
-        let (shutdown_signal_tx, shutdown_signal_rx) = mpsc::channel::<()>();
-        let _ = launch_monitor_thread(clipper.get_metrics(),
-                                      report_interval_secs,
-                                      shutdown_signal_rx);
-
-    }
+    let (shutdown_signal_tx, shutdown_signal_rx) = mpsc::channel::<()>();
+    let _ = launch_monitor_thread(clipper.get_metrics(),
+                                  report_interval_secs,
+                                  shutdown_signal_rx);
     let input_type = clipper.get_input_type();
 
     let (listening, server) = rest_server.handle(|ctrl| {
@@ -443,11 +440,11 @@ fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
                                                                  input_type.clone())
                                          })
                                          .unwrap();
-    info!("abc");
+
+    shutdown_signal_tx.send(()).unwrap();
     listening.close();
-    info!("DEF");
-    println!("Listening on http://{}", listening);
-    server.run();
+    // println!("Listening on http://{}", listening);
+    // server.run();
 
 }
 
