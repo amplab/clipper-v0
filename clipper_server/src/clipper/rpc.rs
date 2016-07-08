@@ -105,7 +105,7 @@ pub fn shutdown(stream: &mut TcpStream) -> bool {
     stream.read_exact(&mut response_buffer).unwrap();
     let mut cursor = Cursor::new(response_buffer);
     let response = cursor.read_u32::<LittleEndian>().unwrap();
-    info!("SHUTDOWN RESPONSE: {}", response);
+    // info!("SHUTDOWN RESPONSE: {}", response);
     response == 1234_u32
 }
 

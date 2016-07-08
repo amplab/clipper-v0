@@ -29,7 +29,6 @@ pub struct PredictionBatcher<C>
 impl<C> Drop for PredictionBatcher<C> where C: PredictionCache<Output>
 {
     fn drop(&mut self) {
-        info!("Dropping Prediction batcher: {}", self.name);
         self.input_queues.clear();
         match Arc::try_unwrap(self.join_handles.take().unwrap()) {
             Ok(u) => {
@@ -38,7 +37,7 @@ impl<C> Drop for PredictionBatcher<C> where C: PredictionCache<Output>
                            .map(|mut jh| jh.take().unwrap().join().unwrap())
                            .collect::<Vec<_>>();
             }
-            Err(_) => info!("PredictionBatcher still has outstanding references"),
+            Err(_) => debug!("PredictionBatcher still has outstanding references"),
         }
     }
 }
@@ -46,7 +45,6 @@ impl<C> Drop for PredictionBatcher<C> where C: PredictionCache<Output>
 impl<C> Clone for PredictionBatcher<C> where C: PredictionCache<Output>
 {
     fn clone(&self) -> PredictionBatcher<C> {
-        info!("CLONING PREDICTION BATCHER");
         PredictionBatcher {
             name: self.name.clone(),
             input_queues: self.input_queues.clone(),
@@ -184,14 +182,10 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
                 cache.put(name.clone(), &batch[r].input, response_floats[r]);
             }
         }
-        warn!("XXXXXXXXXXXXXXXXXXXXXXXXshutting down connection to model: {}",
-              name);
         if !rpc::shutdown(&mut stream) {
             warn!("Connection to model: {} did not shut down cleanly", name);
         }
         // stream.shutdown(Shutdown::Both).unwrap();
-        warn!("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZshutting down model batcher {}",
-              name);
     }
 
 

@@ -9,6 +9,7 @@ extern crate rustc_serialize;
 extern crate rand;
 extern crate hyper;
 extern crate time;
+extern crate chan_signal;
 // extern crate serde;
 
 // #[macro_use]
@@ -16,6 +17,10 @@ extern crate time;
 // extern crate env_logger;
 
 use docopt::Docopt;
+use chan_signal::Signal;
+use std::sync::mpsc;
+use std::thread;
+// use std::time::Duration;
 
 pub mod rest;
 
@@ -75,9 +80,16 @@ pub fn main() {
 
     info!("{:?}", args);
 
+    let signal = chan_signal::notify(&[Signal::INT, Signal::TERM]);
     if args.cmd_start {
         // let features = parse_feature_config(&args.flag_feature_conf);
-        rest::start(&args.flag_conf);
+        let (tx, rx) = mpsc::channel::<()>();
+        let jh = thread::spawn(move || rest::start(rx, &args.flag_conf));
+        signal.recv().unwrap();
+        info!("shutdown signal detected");
+        // thread::sleep(Duration::from_secs(5));
+        tx.send(()).unwrap();
+        jh.join().unwrap();
     }
 
     // if args.cmd_digits {

@@ -341,7 +341,7 @@ impl<P, S> Drop for PredictionWorker<P, S>
           S: Serialize + Deserialize
 {
     fn drop(&mut self) {
-        info!("DROPPING PREDICTION WORKER {}", self.worker_id);
+        // info!("DROPPING PREDICTION WORKER {}", self.worker_id);
     }
 }
 
@@ -463,8 +463,8 @@ impl<P, S> UpdateWorker<P, S>
                                                                &models)
                         }
                         UpdateMessage::Shutdown => {
-                            info!("Update worker {} got shutdown message and is executing break",
-                                  worker_id);
+                            // info!("Update worker {} got shutdown message and is executing break",
+                            //       worker_id);
                             break;
                         }
                     }
@@ -472,7 +472,7 @@ impl<P, S> UpdateWorker<P, S>
                 }
                 Err(mpsc::TryRecvError::Empty) => sleep = true,
                 Err(mpsc::TryRecvError::Disconnected) => {
-                    info!("Update worker {} detected disconnect", worker_id);
+                    // info!("Update worker {} detected disconnect", worker_id);
                     break;
                 }
             }
@@ -521,12 +521,11 @@ impl<P, S> UpdateWorker<P, S>
         let num_updates = update_order.len();
         for uid_raw in update_order.drain(0..cmp::min(max_updates, num_updates)) {
             let uid = uid_raw as u32;
-            info!("Executing update for {}", uid);
             let mut update_deps = ready_updates.remove(&uid).unwrap();
             let correction_state: S = match cmt.get(uid) {
                 Ok(s) => s,
                 Err(e) => {
-                    warn!("Error in getting correction state for update: {}", e);
+                    info!("Error in getting correction state for update: {}", e);
                     info!("Creating model state for new user: {}", uid);
                     P::new(model_names.clone())
                 }
@@ -545,7 +544,7 @@ impl<P, S> UpdateWorker<P, S>
                                      collected_labels);
             match cmt.put(uid, &new_state) {
                 Ok(_) => {
-                    info!("putting new state for {}", uid);
+                    // info!("putting new state for {}", uid);
                 }
                 Err(e) => warn!("{}", e),
             }
@@ -643,7 +642,6 @@ impl<P, S> UpdateWorker<P, S>
             }
         }
         waiting_updates.push(update_dependencies);
-        info!("update staged");
     }
 }
 
@@ -654,7 +652,7 @@ impl<P, S> Drop for UpdateWorker<P, S>
     fn drop(&mut self) {
         self.input_queue.send(UpdateMessage::Shutdown).unwrap();
         self.runner_handle.take().unwrap().join().unwrap();
-        info!("DROPPING UPDATE WORKER {}", self.worker_id);
+        // info!("DROPPING UPDATE WORKER {}", self.worker_id);
     }
 }
 
