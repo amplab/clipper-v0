@@ -1,8 +1,8 @@
 use time;
-use std::net::{SocketAddr, TcpStream};
+use std::net::{SocketAddr, TcpStream, Shutdown};
 // use std::net::Shutdown
-use std::thread;
-use std::sync::{RwLock, Arc, mpsc};
+use std::thread::{self, JoinHandle};
+use std::sync::{RwLock, Arc, mpsc, Mutex};
 use std::cmp;
 use rand::{thread_rng, Rng};
 use server::{self, InputType, Output};
@@ -23,17 +23,36 @@ pub struct PredictionBatcher<C>
     name: String,
     input_queues: Vec<mpsc::Sender<RpcPredictRequest>>,
     cache: Arc<C>,
+    join_handles: Option<Arc<Mutex<Vec<Option<JoinHandle<()>>>>>>,
+}
+
+impl<C> Drop for PredictionBatcher<C> where C: PredictionCache<Output>
+{
+    fn drop(&mut self) {
+        info!("Dropping Prediction batcher: {}", self.name);
+        self.input_queues.clear();
+        match Arc::try_unwrap(self.join_handles.take().unwrap()) {
+            Ok(u) => {
+                let mut raw_handles = u.into_inner().unwrap();
+                raw_handles.drain(..)
+                           .map(|mut jh| jh.take().unwrap().join().unwrap())
+                           .collect::<Vec<_>>();
+            }
+            Err(_) => info!("PredictionBatcher still has outstanding references"),
+        }
+    }
 }
 
 impl<C> Clone for PredictionBatcher<C> where C: PredictionCache<Output>
 {
     fn clone(&self) -> PredictionBatcher<C> {
+        info!("CLONING PREDICTION BATCHER");
         PredictionBatcher {
             name: self.name.clone(),
             input_queues: self.input_queues.clone(),
             cache: self.cache.clone(),
+            join_handles: self.join_handles.clone(),
         }
-
     }
 }
 
@@ -66,6 +85,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
         };
 
         let mut input_queues = Vec::with_capacity(addrs.len());
+        let mut join_handles = Vec::with_capacity(addrs.len());
         for a in addrs.iter() {
             let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
             input_queues.push(sender);
@@ -76,7 +96,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             let predictions_counter = predictions_counter.clone();
             let input_type = input_type.clone();
             let cache = cache.clone();
-            thread::spawn(move || {
+            let jh = thread::spawn(move || {
                 PredictionBatcher::run(name,
                                        receiver,
                                        addr,
@@ -87,11 +107,13 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
                                        cache,
                                        slo_micros);
             });
+            join_handles.push(Some(jh));
         }
         PredictionBatcher {
             name: name,
             input_queues: input_queues,
             cache: cache,
+            join_handles: Some(Arc::new(Mutex::new(join_handles))),
         }
     }
 
@@ -162,7 +184,11 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
                 cache.put(name.clone(), &batch[r].input, response_floats[r]);
             }
         }
-        info!("shutting down model batcher {}", name);
+        warn!("XXXXXXXXXXXXXXXXXXXXXXXXshutting down connection to model: {}",
+              name);
+        stream.shutdown(Shutdown::Both).unwrap();
+        warn!("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZshutting down model batcher {}",
+              name);
     }
 
 

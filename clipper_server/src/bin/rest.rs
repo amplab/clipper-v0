@@ -396,19 +396,27 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
 
 #[allow(dead_code)]
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
-                         report_interval_secs: u64)
+                         report_interval_secs: u64,
+                         shutdown_signal_rx: mpsc::Receiver<()>)
                          -> ::std::thread::JoinHandle<()> {
     thread::spawn(move || {
         loop {
-            thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
-            let m = metrics_register.read().unwrap();
-            info!("{}", m.report());
-            m.reset();
+            match shutdown_signal_rx.try_recv() {
+                Ok(_) | Err(mpsc::TryRecvError::Empty) => {
+                    thread::sleep(::std::time::Duration::new(report_interval_secs, 0));
+                    let m = metrics_register.read().unwrap();
+                    info!("{}", m.report());
+                    m.reset();
+                }
+                Err(mpsc::TryRecvError::Disconnected) => break,
+            }
         }
+        info!("Shutting down metrics thread");
     })
 }
 
 
+#[allow(unused_variables)]
 fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize
@@ -419,9 +427,14 @@ fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
     // TODO: add admin server to update models
     // let admin_server = Server::http(&"127.0.0.1:1338".parse().unwrap()).unwrap();
 
-    // let report_interval_secs = 15;
-    // let _ = launch_monitor_thread(clipper.get_metrics(), report_interval_secs);
+    let report_interval_secs = 15;
+    {
+        let (shutdown_signal_tx, shutdown_signal_rx) = mpsc::channel::<()>();
+        let _ = launch_monitor_thread(clipper.get_metrics(),
+                                      report_interval_secs,
+                                      shutdown_signal_rx);
 
+    }
     let input_type = clipper.get_input_type();
 
     let (listening, server) = rest_server.handle(|ctrl| {
@@ -430,6 +443,9 @@ fn start_listening<P, S>(clipper: Arc<ClipperServer<P, S>>)
                                                                  input_type.clone())
                                          })
                                          .unwrap();
+    info!("abc");
+    listening.close();
+    info!("DEF");
     println!("Listening on http://{}", listening);
     server.run();
 
