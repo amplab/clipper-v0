@@ -80,6 +80,8 @@ pub fn main() {
 
     info!("{:?}", args);
 
+    // NOTE: Notify must be called before spawning any threads for the chan_signal
+    // library to work correctly.
     let signal = chan_signal::notify(&[Signal::INT, Signal::TERM]);
     if args.cmd_start {
         // let features = parse_feature_config(&args.flag_feature_conf);
