@@ -26,15 +26,23 @@ def normalize_digits(X):
     Z = (X - mu) / np.array([np.sqrt(z) if z > 0 else 1. for z in sigma])
     return Z 
 
+def mnist_update(x, y, uid):
+    url = "http://127.0.0.1:1337/update"
+    req_json = json.dumps({'uid': uid, 'input': list(x), 'label': y})
+    headers = {'Content-type': 'application/json'}
+    start = datetime.now()
+    r = requests.post(url, headers=headers, data=req_json)
+    end = datetime.now()
+    latency = (end - start).total_seconds() * 1000.0
+    print("'%s', %f ms" % (r.text, latency))
 
 def mnist_prediction(x, uid):
-    url = "http://127.0.0.1:1337/predict?uid=%(uid)s" % {'uid': uid}
-    headers = {}
-    # x_str = ", ".join(["%.3f" % a for a in x])
-    x_str = ", ".join(["%d" % a for a in x])
-    # print(x_str)
+    url = "http://127.0.0.1:1337/predict"
+    req_json = json.dumps({'uid': uid, 'input': list(x)})
+    headers = {'Content-type': 'application/json'}
+    # x_str = ", ".join(["%d" % a for a in x])
     start = datetime.now()
-    r = requests.post(url, data=x_str, headers=headers)
+    r = requests.post(url, headers=headers, data=req_json)
     end = datetime.now()
     latency = (end - start).total_seconds() * 1000.0
     print("'%s', %f ms" % (r.text, latency))
@@ -45,6 +53,7 @@ if __name__=='__main__':
     # z = normalize_digits(x)
     inputs = args[2:]
     for i in inputs:
-        mnist_prediction(x[int(args[1])],int(i))
+        # mnist_prediction(x[int(i)],int(args[1]))
+        mnist_update(x[int(i)], float(y[int(i)]), int(args[1]))
 
 
