@@ -10,6 +10,8 @@ class NoopModelWrapper : public Model {
         vector<double>* predict_floats(vector< vector<double> >& input);
 
         vector<double>* predict_ints(vector< vector<uint32_t> >& input);
+
+        vector<double>* predict_strings(vector< vector<string> >& input);
 };
 
 #endif
