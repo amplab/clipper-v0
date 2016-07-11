@@ -47,6 +47,16 @@ vector<double>* NoopModelWrapper::predict_ints(
     return predictions;
 }
 
+vector<double>* NoopModelWrapper::predict_strings(
+        vector<vector<std::string> >& input) {
+    int i;
+    vector<double> *predictions = new vector<double>(input.size());
+    for (i = 0; i < input.size(); i++) {
+        (*predictions)[i] = input[i].size();
+    }
+    return predictions;
+}
+
 int main() {
     std::unique_ptr<Model> model(new NoopModelWrapper());
     ClipperRPC *clipper_rpc_server =
