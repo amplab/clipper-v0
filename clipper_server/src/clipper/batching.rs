@@ -13,7 +13,7 @@ use cache::PredictionCache;
 
 #[derive(Clone)]
 pub struct RpcPredictRequest {
-    pub input: server::Input,
+    pub input: Arc<server::Input>,
     pub recv_time: time::PreciseTime,
 }
 

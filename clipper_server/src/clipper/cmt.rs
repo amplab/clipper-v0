@@ -13,7 +13,8 @@ use std::error::Error;
 use redis::{self, Commands};
 use std::marker::PhantomData;
 use std::isize;
-use server::{Input, Output};
+use server::{Input, Output, VersionedModel};
+use std::hash::{Hash, SipHasher, Hasher};
 
 pub const REDIS_CMT_DB: u32 = 1;
 pub const REDIS_UPDATE_DB: u32 = 2;
@@ -21,17 +22,6 @@ pub const REDIS_DEFAULT_PORT: u16 = 6379;
 // pub const REDIS_DEFAULT_PORT: u16 = 32775;
 pub const DEFAULT_REDIS_SOCKET: &'static str = "/tmp/redis.sock";
 
-pub trait CorrectionModelTable<S> where S: Serialize + Deserialize {
-
-    // fn new() -> Self;
-
-    // fn insert(&mut self, uid: u32, state: S);
-
-    fn put(&mut self, uid: u32, state: &S) -> Result<(), String>;
-
-    fn get(&self, uid: u32) -> Result<S, String>;
-
-}
 
 
 pub trait UpdateTable {
@@ -125,6 +115,18 @@ impl UpdateTable for RedisUpdateTable {
 }
 
 
+pub trait CorrectionModelTable<S> where S: Serialize + Deserialize {
+
+    // TODO: how to store correction state version? Hash of Vec<VersionedModel>??
+    fn put(&mut self,
+           uid: u32,
+           state: &S,
+           versioned_models: &Vec<VersionedModel>)
+           -> Result<(), String>;
+
+    fn get(&self, uid: u32, versioned_models: &Vec<VersionedModel>) -> Result<S, String>;
+
+}
 
 
 pub struct RedisCMT<S>
@@ -165,20 +167,30 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
 impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
 {
     // TODO: should this be immutable
-    fn put(&mut self, uid: u32, state: &S) -> Result<(), String> {
+    fn put(&mut self,
+           uid: u32,
+           state: &S,
+           versioned_models: &Vec<VersionedModel>)
+           -> Result<(), String> {
         let bytes = try!(bincode::serde::serialize(state, bincode::SizeLimit::Infinite)
                              .map_err(|e| format!("{}", e.description())));
+        let mut s = SipHasher::new();
+        versioned_models.hash(&mut s);
+        let version_hash = s.finish();
         let _: () = try!(self.connection
-                             .set(uid, bytes)
+                             .hset(uid, version_hash, bytes)
                              .map_err(|e| format!("{}", e.description())));
         Ok(())
 
     }
 
-    fn get(&self, uid: u32) -> Result<S, String> {
+    fn get(&self, uid: u32, versioned_models: &Vec<VersionedModel>) -> Result<S, String> {
         info!("fetching state for uid: {}", uid);
+        let mut s = SipHasher::new();
+        versioned_models.hash(&mut s);
+        let version_hash = s.finish();
         let bytes: Vec<u8> = try!(self.connection
-                                      .get(uid)
+                                      .hget(uid, version_hash)
                                       .map_err(|e| format!("{}", e.description())));
         let stored_state: S = try!(bincode::serde::deserialize(&bytes)
                                        .map_err(|e| format!("{}", e.description())));
@@ -227,7 +239,7 @@ mod tests {
     use super::*;
     // use redis::{self, Commands};
     use redis;
-    use server::{Input, Output};
+    use server::{Input, Output, VersionedModel};
 
     use std::process;
     use std::thread::sleep;
@@ -342,8 +354,16 @@ mod tests {
 
         let user_id = 33;
         let state = vec![4, 3, 2, 6, 73345, 2312];
-        cmt.put(user_id, &state).unwrap();
-        let fetched_state = cmt.get(user_id).unwrap();
+        let versioned_models = vec![VersionedModel {
+                                        name: "m1".to_string(),
+                                        version: Some(0),
+                                    },
+                                    VersionedModel {
+                                        name: "m3".to_string(),
+                                        version: Some(1),
+                                    }];
+        cmt.put(user_id, &state, &versioned_models).unwrap();
+        let fetched_state = cmt.get(user_id, &versioned_models).unwrap();
         assert_eq!(state, fetched_state);
     }
 

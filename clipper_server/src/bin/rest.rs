@@ -359,7 +359,7 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
                         info!("/update for user: {}", self.uid);
                         let u = UpdateRequest::new(self.uid,
                                                    vec![Update {
-                                                            query: input,
+                                                            query: Arc::new(input),
                                                             label: label,
                                                         }]);
                         self.clipper.schedule_update(u);

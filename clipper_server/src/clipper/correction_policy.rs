@@ -1,5 +1,6 @@
 use server::{Input, InputType, Output};
 use std::collections::HashMap;
+use std::sync::Arc;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
 use ml::{linalg, linear};
@@ -21,8 +22,11 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
     /// purposes.
     fn get_name() -> &'static str;
 
-    // need to think about the semantics of this method first
-    // fn add_model(state: &S) -> S;
+    // /// Update the correction model state when an offline model is added.
+    // ///
+    // /// For example, a linear model may expand the size of the
+    // /// vector and initialize the weight for the new model to 0.
+    // fn add_models(old_state: &S, new_model_name: &String) -> S;
 
     /// Make a correction to the available model predictions.
     fn predict(state: &S,
@@ -36,7 +40,7 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
     /// Update the correction model state with newly observed, labeled
     /// training data.
     fn train(state: &S,
-             inputs: Vec<Input>,
+             inputs: Vec<Arc<Input>>,
              predictions: Vec<HashMap<String, Output>>,
              labels: Vec<Output>)
              -> S;
@@ -111,7 +115,7 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
 
     #[allow(unused_variables)]
     fn train(state: &LinearCorrectionState,
-             inputs: Vec<Input>,
+             inputs: Vec<Arc<Input>>,
              predictions: Vec<HashMap<String, Output>>,
              labels: Vec<Output>)
              -> LinearCorrectionState {
@@ -185,7 +189,7 @@ impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
 
     #[allow(dead_code, unused_variables)]
     fn train(state: &Vec<f64>,
-             inputs: Vec<Input>,
+             inputs: Vec<Arc<Input>>,
              predictions: Vec<HashMap<String, Output>>,
              labels: Vec<Output>)
              -> Vec<f64> {

@@ -226,6 +226,7 @@ pub struct ModelConf {
     pub addresses: Vec<SocketAddr>,
     /// The dimension of the output vector this model produces
     pub num_outputs: usize,
+    pub version: u32,
 }
 
 // impl PartialEq<ModelConf> for ModelConf {
@@ -254,14 +255,24 @@ impl ModelConf {
                                    .as_slice()
                                    .unwrap()
                                    .to_vec()),
+
+            version: mt.get("version")
+                       .unwrap_or(&Value::Integer(1))
+                       .as_integer()
+                       .unwrap() as u32,
         }
     }
 
-    pub fn new(name: String, addresses: Vec<String>, num_outputs: usize) -> ModelConf {
+    pub fn new(name: String,
+               addresses: Vec<String>,
+               num_outputs: usize,
+               version: u32)
+               -> ModelConf {
         ModelConf {
             name: name,
             addresses: get_addrs_str(addresses),
             num_outputs: num_outputs,
+            version: version,
         }
     }
 }
@@ -472,10 +483,12 @@ cache_size = 49999
 name = \"m1\"
 addresses = [\"127.0.0.1:6002\", \"127.0.0.1:7002\", \"127.0.0.1:8002\"]
 num_outputs = 3
+version = 7
 
 [[models]]
 name = \"m2\"
 addresses = [\"127.0.0.1:6004\"]
+version = 2
 ".to_string();
 
     let toml_conf = ClipperConf::parse_toml_string(&toml_string);
@@ -483,9 +496,9 @@ addresses = [\"127.0.0.1:6004\"]
     let m1 = ModelConf::new("m1".to_string(),
                 vec!["127.0.0.1:6002".to_string(),
                      "127.0.0.1:7002".to_string(),
-                     "127.0.0.1:8002".to_string()], 3);
+                     "127.0.0.1:8002".to_string()], 3, 7);
     let m2 = ModelConf::new("m2".to_string(),
-                vec!["127.0.0.1:6004".to_string()], 1);
+                vec!["127.0.0.1:6004".to_string()], 1, 2);
 
     let built_conf = builder_conf.cache_size(49999)
                                  .slo_micros(10000)
