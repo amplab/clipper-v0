@@ -13,7 +13,6 @@ class NoopModelWrapper : public Model {
         vector<double>* predict_strings(vector< vector<string> >& input);
 };
 
-
 vector<double>* NoopModelWrapper::predict_bytes(
         vector<vector<char> >& input) {
     int i, j;
