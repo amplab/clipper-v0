@@ -4,6 +4,8 @@ use std::sync::Arc;
 use linear_raw;
 pub use linear_raw::{Struct_parameter, L2R_LR, L1R_LR, common};
 use ml::linalg;
+// use serde::ser::Serialize;
+// use serde::de::Deserialize;
 // use common;
 // use util;
 
@@ -122,7 +124,7 @@ impl Problem {
 }
 
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 #[allow(non_snake_case)] // to better match liblinear names
 pub struct Parameters {
     pub solver_type: u32,
@@ -166,7 +168,7 @@ impl Parameters {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct LogisticRegressionModel {
     pub params: Parameters,
     pub nr_class: i32,

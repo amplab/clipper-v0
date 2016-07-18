@@ -10,7 +10,8 @@ use std::cmp;
 use std::thread::{self, JoinHandle};
 use std::time::Duration as StdDuration;
 
-use cmt::{CorrectionModelTable, RedisCMT};
+use cmt::{CorrectionModelTable, RedisCMT, UpdateTable, RedisUpdateTable, REDIS_CMT_DB,
+          REDIS_UPDATE_DB, DEFAULT_REDIS_SOCKET};
 use cache::{PredictionCache, SimplePredictionCache};
 use configuration::ClipperConf;
 use hashing::EqualityHasher;
@@ -38,7 +39,7 @@ pub enum InputType {
 }
 
 // #[derive(Hash, Clone, Debug)]
-#[derive(Clone,Debug,Serialize,Deserialize)]
+#[derive(Clone,Debug,Serialize,Deserialize, PartialEq, PartialOrd)]
 pub enum Input {
     Str {
         s: String,
@@ -260,7 +261,7 @@ impl<P, S> PredictionWorker<P, S>
         let slo = Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = Duration::milliseconds(1);
-        let mut cmt = RedisCMT::new_socket_connection();
+        let mut cmt = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_CMT_DB);
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
               slo_micros as f64 / 1000.0);
@@ -437,7 +438,10 @@ impl<P, S> UpdateWorker<P, S>
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
                            PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>) {
-        let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection();
+        let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
+                                                                   REDIS_CMT_DB);
+        let mut update_table: RedisUpdateTable =
+            RedisUpdateTable::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_UPDATE_DB);
         info!("starting update worker {}", worker_id);
 
         // Max number of updates to perform from ready_updates before
@@ -460,7 +464,8 @@ impl<P, S> UpdateWorker<P, S>
                             UpdateWorker::<P, S>::stage_update(req,
                                                                cache.clone(),
                                                                &mut waiting_updates,
-                                                               &models)
+                                                               &models,
+                                                               &update_table)
                         }
                         UpdateMessage::Shutdown => {
                             // info!("Update worker {} got shutdown message and is executing break",
@@ -498,18 +503,6 @@ impl<P, S> UpdateWorker<P, S>
 
 
         }
-        // while let Ok(req) = request_queue.recv() {
-        //     stage_update(req, &mut waiting_updates);
-        //     check_for_ready_updates(&mut waiting_updates,
-        //                             &mut ready_updates,
-        //                             &mut update_order,
-        //                             models.len());
-        //
-        //     execute_updates(max_updates,
-        //                     &mut ready_updates,
-        //                     &mut update_order,
-        //                     models.keys.collect::<Vec<&String>>());
-        // }
         info!("Ending loop: update worker {}", worker_id);
     }
 
@@ -617,7 +610,8 @@ impl<P, S> UpdateWorker<P, S>
                     waiting_updates: &mut Vec<Arc<RwLock<UpdateDependencies>>>,
                     models: &HashMap<String,
                                      PredictionBatcher<SimplePredictionCache<Output,
-                                                                             EqualityHasher>>>) {
+                                                                             EqualityHasher>>>,
+                    update_table: &RedisUpdateTable) {
 
         // model_names: Vec<&String>) {
 
