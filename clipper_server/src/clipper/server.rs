@@ -4,12 +4,13 @@ use std::marker::PhantomData;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
 use std::sync::{mpsc, RwLock, Arc};
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::cmp;
 use std::thread::{self, JoinHandle};
 use std::time::Duration as StdDuration;
 
+#[allow(unused_imports)]
 use cmt::{CorrectionModelTable, RedisCMT, UpdateTable, RedisUpdateTable, REDIS_CMT_DB,
           REDIS_UPDATE_DB, DEFAULT_REDIS_SOCKET};
 use cache::{PredictionCache, SimplePredictionCache};
@@ -77,21 +78,28 @@ impl PredictionRequest {
     }
 }
 
+
+
+#[derive(Clone)]
+pub struct Update {
+    pub query: Input,
+    pub label: Output,
+}
+
 #[derive(Clone)]
 pub struct UpdateRequest {
     recv_time: PreciseTime,
     uid: u32,
-    query: Input,
-    label: Output,
+    updates: Vec<Update>, /* query: Input,
+                           * label: Output */
 }
 
 impl UpdateRequest {
-    pub fn new(uid: u32, input: Input, output: Output) -> UpdateRequest {
+    pub fn new(uid: u32, updates: Vec<Update>) -> UpdateRequest {
         UpdateRequest {
             recv_time: PreciseTime::now(),
             uid: uid,
-            query: input,
-            label: output,
+            updates: updates,
         }
     }
 }
@@ -208,7 +216,7 @@ impl<P, S> Drop for ClipperServer<P, S>
         self.prediction_workers.clear();
         self.update_workers.clear();
         self.models.clear();
-        warn!("Dropping ClipperServer");
+        info!("Dropping ClipperServer");
     }
 }
 
@@ -428,11 +436,17 @@ impl<P, S> UpdateWorker<P, S>
     }
 
 
+    /// A note on the implementation here: an `UpdateRequest` can contain
+    /// multiple pieces of training data which will be aggregated together
+    /// and result in a single call to `CorrectionPolicy::train()`.
+    /// However, each call to this function will result in a fetch of
+    /// the training data from the UpdateTable and a call to retrain
+    /// the correction policy, even if these requests overlap.
     pub fn update(&self, r: UpdateRequest) {
         self.input_queue.send(UpdateMessage::Request(r)).unwrap();
     }
 
-    #[allow(unused_variables)]
+    #[allow(unused_variables, unused_mut)]
     fn run(worker_id: i32,
            request_queue: mpsc::Receiver<UpdateMessage>,
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
@@ -449,9 +463,10 @@ impl<P, S> UpdateWorker<P, S>
         let update_batch_size: usize = 10;
 
         let mut waiting_updates: Vec<Arc<RwLock<UpdateDependencies>>> = Vec::new();
-        let mut ready_updates: HashMap<u32, Vec<UpdateDependencies>> = HashMap::new();
+        // let mut ready_updates: HashMap<u32, Vec<UpdateDependencies>> = HashMap::new();
+        let mut ready_updates: Vec<UpdateDependencies> = Vec::new();
         // Track the order of updates by user ID
-        let mut update_order = VecDeque::new();
+        // let mut update_order = VecDeque::new();
         let mut consecutive_sleeps = 0;
 
         loop {
@@ -465,7 +480,7 @@ impl<P, S> UpdateWorker<P, S>
                                                                cache.clone(),
                                                                &mut waiting_updates,
                                                                &models,
-                                                               &update_table)
+                                                               &mut update_table)
                         }
                         UpdateMessage::Shutdown => {
                             // info!("Update worker {} got shutdown message and is executing break",
@@ -484,12 +499,12 @@ impl<P, S> UpdateWorker<P, S>
 
             UpdateWorker::<P, S>::check_for_ready_updates(&mut waiting_updates,
                                                           &mut ready_updates,
-                                                          &mut update_order,
+                                                          // &mut update_order,
                                                           models.len());
 
             UpdateWorker::<P, S>::execute_updates(update_batch_size,
                                                   &mut ready_updates,
-                                                  &mut update_order,
+                                                  // &mut update_order,
                                                   models.keys().collect::<Vec<&String>>(),
                                                   &mut cmt);
 
@@ -506,47 +521,71 @@ impl<P, S> UpdateWorker<P, S>
         info!("Ending loop: update worker {}", worker_id);
     }
 
-    fn execute_updates(max_updates: usize,
-                       ready_updates: &mut HashMap<u32, Vec<UpdateDependencies>>,
-                       update_order: &mut VecDeque<usize>,
-                       model_names: Vec<&String>,
-                       cmt: &mut RedisCMT<S>) {
-        let num_updates = update_order.len();
-        for uid_raw in update_order.drain(0..cmp::min(max_updates, num_updates)) {
-            let uid = uid_raw as u32;
-            let mut update_deps = ready_updates.remove(&uid).unwrap();
-            let correction_state: S = match cmt.get(uid) {
-                Ok(s) => s,
-                Err(e) => {
-                    info!("Error in getting correction state for update: {}", e);
-                    info!("Creating model state for new user: {}", uid);
-                    P::new(model_names.clone())
-                }
-            };
-            let mut collected_inputs: Vec<Input> = Vec::new();
-            let mut collected_predictions: Vec<HashMap<String, Output>> = Vec::new();
-            let mut collected_labels: Vec<Output> = Vec::new();
-            for update in update_deps.drain(..) {
-                collected_inputs.push(update.req.query);
-                collected_predictions.push(update.predictions);
-                collected_labels.push(update.req.label);
-            }
-            let new_state = P::train(&correction_state,
-                                     collected_inputs,
-                                     collected_predictions,
-                                     collected_labels);
-            match cmt.put(uid, &new_state) {
-                Ok(_) => {
-                    // info!("putting new state for {}", uid);
-                }
-                Err(e) => warn!("{}", e),
-            }
+    // #[allow(unused_variables)]
+    fn stage_update(mut req: UpdateRequest,
+                    cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
+                    waiting_updates: &mut Vec<Arc<RwLock<UpdateDependencies>>>,
+                    models: &HashMap<String,
+                                     PredictionBatcher<SimplePredictionCache<Output,
+                                                                             EqualityHasher>>>,
+                    update_table: &mut RedisUpdateTable) {
+
+        // TODO: make window_size configurable
+        let window_size = 20;
+        let num_new_updates = req.updates.len();
+        // TODO: better error handling
+        let mut old_updates = update_table.get_updates(req.uid, window_size)
+                                          .unwrap()
+                                          .into_iter()
+                                          .map(|u| {
+                                              Update {
+                                                  query: u.0,
+                                                  label: u.1,
+                                              }
+                                          })
+                                          .collect::<Vec<_>>();
+        req.updates.append(&mut old_updates);
+
+        // now write new updates to UpdateTable
+        for i in 0..num_new_updates {
+            // TODO: better error handling
+            update_table.add_update(req.uid, &req.updates[i].query, &req.updates[i].label)
+                        .unwrap();
+
         }
+
+
+
+        // TODO: move to more fine-grained locking
+        let update_dependencies = Arc::new(RwLock::new(UpdateDependencies::new(req.clone())));
+        // Get predictions first as those are likely to incur the most latency
+        let mut idx = 0;
+        for update in req.updates.iter() {
+            for (m, b) in models.iter() {
+                let u = update_dependencies.clone();
+                let model_name = m.clone();
+                cache.add_listener(m,
+                                   &update.query,
+                                   Box::new(move |o| {
+                                       let mut deps = u.write().unwrap();
+                                       deps.predictions[idx].insert(model_name.clone(), o);
+                                   }));
+                if cache.fetch(m, &update.query).is_none() {
+                    b.request_prediction(RpcPredictRequest {
+                        input: update.query.clone(),
+                        recv_time: req.recv_time.clone(),
+                    });
+                }
+            }
+            idx += 1;
+        }
+        waiting_updates.push(update_dependencies);
     }
 
+
     fn check_for_ready_updates(waiting_updates: &mut Vec<Arc<RwLock<UpdateDependencies>>>,
-                               ready_updates: &mut HashMap<u32, Vec<UpdateDependencies>>,
-                               update_order: &mut VecDeque<usize>,
+                               ready_updates: &mut Vec<UpdateDependencies>,
+                               // update_order: &mut VecDeque<usize>,
                                num_models: usize) {
 
         // determine which waiting updates have all of their predictions
@@ -554,7 +593,15 @@ impl<P, S> UpdateWorker<P, S>
         let mut ready_update_indexes = Vec::new();
         for i in 0..waiting_updates.len() {
             let wu = waiting_updates.get(i).unwrap();
-            if wu.read().unwrap().predictions.len() == num_models {
+            let ref current_update_deps = wu.read().unwrap().predictions;
+            let mut ready = true;
+            for preds in current_update_deps.iter() {
+                if preds.len() < num_models {
+                    ready = false;
+                    break;
+                }
+            }
+            if ready {
                 ready_update_indexes.push(i);
             }
         }
@@ -566,11 +613,9 @@ impl<P, S> UpdateWorker<P, S>
                 Ok(u) => u.into_inner().unwrap(),
                 Err(_) => panic!("Uh oh"),
             };
-            // .unwrap()
-            // .into_inner()
-            // .unwrap();
+            ready_updates.push(update_dep);
 
-            let uid = update_dep.req.uid;
+            // let uid = update_dep.req.uid;
 
 
             // let mut done = false;
@@ -586,11 +631,11 @@ impl<P, S> UpdateWorker<P, S>
             //     ready_updates.insert(uid, vec![update_dep]);
             // }
 
-            let mut entry = ready_updates.entry(uid).or_insert(Vec::new());
-            if (*entry).len() == 0 {
-                update_order.push_back(uid as usize);
-            }
-            (*entry).push(update_dep);
+            // let mut entry = ready_updates.entry(uid).or_insert(Vec::new());
+            // if (*entry).len() == 0 {
+            //     update_order.push_back(uid as usize);
+            // }
+            // (*entry).push(update_dep);
 
             // match ready_updates.get_mut(&uid) {
             //     Some(u) => u.push(update_dep),
@@ -605,37 +650,44 @@ impl<P, S> UpdateWorker<P, S>
         }
     }
 
-    fn stage_update(req: UpdateRequest,
-                    cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
-                    waiting_updates: &mut Vec<Arc<RwLock<UpdateDependencies>>>,
-                    models: &HashMap<String,
-                                     PredictionBatcher<SimplePredictionCache<Output,
-                                                                             EqualityHasher>>>,
-                    update_table: &RedisUpdateTable) {
-
-        // model_names: Vec<&String>) {
-
-
-        let update_dependencies = Arc::new(RwLock::new(UpdateDependencies::new(req.clone())));
-        // Get predictions first as those are likely to incur the most latency
-        for (m, b) in models.iter() {
-            let u = update_dependencies.clone();
-            let model_name = m.clone();
-            cache.add_listener(m,
-                               &req.query,
-                               Box::new(move |o| {
-                                   let mut deps = u.write().unwrap();
-                                   deps.predictions.insert(model_name.clone(), o);
-                               }));
-            // TODO: check the cache
-            if cache.fetch(m, &req.query).is_none() {
-                b.request_prediction(RpcPredictRequest {
-                    input: req.query.clone(),
-                    recv_time: req.recv_time.clone(),
-                });
+    fn execute_updates(max_updates: usize,
+                       ready_updates: &mut Vec<UpdateDependencies>,
+                       // update_order: &mut VecDeque<usize>,
+                       model_names: Vec<&String>,
+                       cmt: &mut RedisCMT<S>) {
+        let num_updates = ready_updates.len();
+        for mut update_dep in ready_updates.drain(0..cmp::min(max_updates, num_updates)) {
+            let uid = update_dep.req.uid;
+            // let mut update_deps = ready_updates.remove(&uid).unwrap();
+            let correction_state: S = match cmt.get(uid) {
+                Ok(s) => s,
+                Err(e) => {
+                    info!("Error in getting correction state for update: {}", e);
+                    info!("Creating model state for new user: {}", uid);
+                    P::new(model_names.clone())
+                }
+            };
+            let mut collected_inputs: Vec<Input> = Vec::new();
+            let mut collected_predictions: Vec<HashMap<String, Output>> = Vec::new();
+            let mut collected_labels: Vec<Output> = Vec::new();
+            for (preds, update) in update_dep.predictions
+                                             .drain(..)
+                                             .zip(update_dep.req.updates.drain(..)) {
+                collected_inputs.push(update.query);
+                collected_predictions.push(preds);
+                collected_labels.push(update.label);
+            }
+            let new_state = P::train(&correction_state,
+                                     collected_inputs,
+                                     collected_predictions,
+                                     collected_labels);
+            match cmt.put(uid, &new_state) {
+                Ok(_) => {
+                    // info!("putting new state for {}", uid);
+                }
+                Err(e) => warn!("{}", e),
             }
         }
-        waiting_updates.push(update_dependencies);
     }
 }
 
@@ -658,16 +710,17 @@ enum UpdateMessage {
 struct UpdateDependencies {
     // state: Option<S>,
     req: UpdateRequest,
-    predictions: HashMap<String, Output>,
+    predictions: Vec<HashMap<String, Output>>,
 }
 
 
 impl UpdateDependencies {
     pub fn new(req: UpdateRequest) -> UpdateDependencies {
+        let num_updates = req.updates.len();
         UpdateDependencies {
             // state: None,
             req: req,
-            predictions: HashMap::new(),
+            predictions: vec![HashMap::new(); num_updates],
         }
     }
 }

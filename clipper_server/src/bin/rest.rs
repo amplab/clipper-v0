@@ -16,7 +16,8 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::net::HttpStream;
 use hyper::server::{Server, Handler, Request, Response};
 
-use clipper::server::{Input, ClipperServer, InputType, PredictionRequest, UpdateRequest, Output};
+use clipper::server::{Input, ClipperServer, InputType, PredictionRequest, UpdateRequest, Update,
+                      Output};
 use clipper::{metrics, configuration};
 use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy};
 
@@ -354,7 +355,11 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
                     Ok((uid, input, label)) => {
                         self.uid = uid;
                         info!("/update for user: {}", self.uid);
-                        let u = UpdateRequest::new(self.uid, input, label);
+                        let u = UpdateRequest::new(self.uid,
+                                                   vec![Update {
+                                                            query: input,
+                                                            label: label,
+                                                        }]);
                         self.clipper.schedule_update(u);
                         self.result_string = "Update scheduled".to_string();
                         Next::write()

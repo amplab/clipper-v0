@@ -116,6 +116,7 @@ impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
         for i in state {
             new_state.push(i + 2.0);
         }
+        info!("num inputs: {}, new state: {:?}", inputs.len(), new_state);
         new_state
     }
 }
