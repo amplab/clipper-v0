@@ -159,7 +159,10 @@ impl<P, S> ClipperServer<P, S>
         }
         let mut update_workers = Vec::with_capacity(conf.num_update_workers.clone());
         for i in 0..conf.num_update_workers {
-            update_workers.push(UpdateWorker::new(i as i32, cache.clone(), models.clone()));
+            update_workers.push(UpdateWorker::new(i as i32,
+                                                  cache.clone(),
+                                                  models.clone(),
+                                                  conf.window_size));
         }
         ClipperServer {
             prediction_workers: prediction_workers,
@@ -417,12 +420,13 @@ impl<P, S> UpdateWorker<P, S>
     pub fn new(worker_id: i32,
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: HashMap<String,
-                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>)
+                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+               window_size: isize)
                -> UpdateWorker<P, S> {
 
         let (sender, receiver) = mpsc::channel::<UpdateMessage>();
         let jh = thread::spawn(move || {
-            UpdateWorker::<P, S>::run(worker_id, receiver, cache.clone(), models);
+            UpdateWorker::<P, S>::run(worker_id, receiver, cache.clone(), models, window_size);
         });
         UpdateWorker {
             worker_id: worker_id,
@@ -451,7 +455,8 @@ impl<P, S> UpdateWorker<P, S>
            request_queue: mpsc::Receiver<UpdateMessage>,
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
-                           PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>) {
+                           PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+           window_size: isize) {
         let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
                                                                    REDIS_CMT_DB);
         let mut update_table: RedisUpdateTable =
@@ -480,7 +485,8 @@ impl<P, S> UpdateWorker<P, S>
                                                                cache.clone(),
                                                                &mut waiting_updates,
                                                                &models,
-                                                               &mut update_table)
+                                                               &mut update_table,
+                                                               window_size)
                         }
                         UpdateMessage::Shutdown => {
                             // info!("Update worker {} got shutdown message and is executing break",
@@ -528,10 +534,10 @@ impl<P, S> UpdateWorker<P, S>
                     models: &HashMap<String,
                                      PredictionBatcher<SimplePredictionCache<Output,
                                                                              EqualityHasher>>>,
-                    update_table: &mut RedisUpdateTable) {
+                    update_table: &mut RedisUpdateTable,
+                    window_size: isize) {
 
-        // TODO: make window_size configurable
-        let window_size = 20;
+        // let window_size = 20;
         let num_new_updates = req.updates.len();
         // TODO: better error handling
         let mut old_updates = update_table.get_updates(req.uid, window_size)
@@ -606,14 +612,26 @@ impl<P, S> UpdateWorker<P, S>
             }
         }
 
-        // move updates from the waiting queue to the ready queue
+
+        // Move updates from the waiting queue to the ready queue.
+        // As we remove elements from waiting_updates, everything behind
+        // that index is shifted an element to the left so the index changes. For this reason,
+        // we track the offset (how many items we've removed from earlier in the vector) to
+        // make sure remove the correct items. We iterate forward through the vec because updates
+        // get added to the vec in the order they arrive, so given two updates that are ready to be
+        // processed, we want to process the earlier one first.
+
+        let mut offset = 0;
         for i in ready_update_indexes {
             // Remove from Arc and RwLock
-            let update_dep: UpdateDependencies = match Arc::try_unwrap(waiting_updates.remove(i)) {
-                Ok(u) => u.into_inner().unwrap(),
-                Err(_) => panic!("Uh oh"),
-            };
+
+            let update_dep: UpdateDependencies =
+                match Arc::try_unwrap(waiting_updates.remove(i - offset)) {
+                    Ok(u) => u.into_inner().unwrap(),
+                    Err(_) => panic!("Uh oh"),
+                };
             ready_updates.push(update_dep);
+            offset += 1;
 
             // let uid = update_dep.req.uid;
 

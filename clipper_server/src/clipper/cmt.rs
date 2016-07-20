@@ -12,6 +12,7 @@ use bincode;
 use std::error::Error;
 use redis::{self, Commands};
 use std::marker::PhantomData;
+use std::isize;
 use server::{Input, Output};
 
 pub const REDIS_CMT_DB: u32 = 1;
@@ -75,9 +76,19 @@ impl UpdateTable for RedisUpdateTable {
     ///
     /// If `max_items` is less than 0, all updates will be provided.
     fn get_updates(&self, uid: u32, max_items: isize) -> Result<Vec<(Input, Output)>, String> {
+        if max_items == 0 {
+            return Ok(Vec::new());
+        }
+
         // NOTE: Redis LRANGE command is inclusive on both ends of the range
+        let low_idx = 0;
+        let high_idx = if max_items < 0 {
+            isize::MAX
+        } else {
+            max_items - 1
+        };
         let bytes: Vec<Vec<u8>> = try!(self.connection
-                                           .lrange(uid, 0, max_items - 1)
+                                           .lrange(uid, low_idx, high_idx)
                                            .map_err(|e| format!("{}", e.description())));
 
 
