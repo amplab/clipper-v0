@@ -127,6 +127,14 @@ impl<P, S> ClipperServer<P, S>
 {
     pub fn new(conf: ClipperConf) -> ClipperServer<P, S> {
 
+        // Ensure configuration is valid
+
+        assert!(P::accepts_input_type(conf.input_type),
+                format!("Invalid configuration: correction policy {} does not accept InputType \
+                         {:?}",
+                        P::get_name(),
+                        conf.input_type));
+
         // let cache_size = 10000;
 
         // TODO(#13): once LSH is implemented make cache type configurable
@@ -283,10 +291,10 @@ impl<P, S> PredictionWorker<P, S>
         while let Ok((req, max_preds)) = request_queue.recv() {
             let correction_state: S = cmt.get(*(&req.uid) as u32)
                                          .unwrap_or(cmt.get(0_u32).unwrap());
-            let model_req_order = if max_preds < models.len() as i32 {
+            let model_req_order: Vec<String> = if max_preds < models.len() as i32 {
                 P::rank_models_desc(&correction_state, models.keys().collect::<Vec<&String>>())
             } else {
-                models.keys().collect()
+                models.keys().map(|r| r.clone()).collect::<Vec<String>>()
             };
             let mut num_requests = 0;
             let mut i = 0;

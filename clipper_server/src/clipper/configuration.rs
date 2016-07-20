@@ -473,6 +473,4 @@ addresses = [\"127.0.0.1:6004\"]
     assert_eq!(toml_conf, built_conf);
     }
 
-
-
 }

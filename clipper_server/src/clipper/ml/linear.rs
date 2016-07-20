@@ -1,5 +1,5 @@
 use std::slice;
-use std::sync::Arc;
+// use std::sync::Arc;
 
 use linear_raw;
 pub use linear_raw::{Struct_parameter, L2R_LR, L1R_LR, common};
@@ -13,7 +13,7 @@ mod util {
 
     use std::marker::PhantomData;
     use linear_raw::common;
-    use std::sync::Arc;
+    // use std::sync::Arc;
 
 
 
@@ -37,8 +37,7 @@ mod util {
         }
     }
 
-    pub fn make_sparse_matrix(xs: &Vec<Arc<Vec<f64>>>)
-                              -> (Vec<Vec<common::Struct_feature_node>>, i32) {
+    pub fn make_sparse_matrix(xs: &Vec<Vec<f64>>) -> (Vec<Vec<common::Struct_feature_node>>, i32) {
 
         let mut examples: Vec<Vec<common::Struct_feature_node>> = Vec::with_capacity(xs.len());
 
@@ -100,7 +99,7 @@ pub struct Problem {
 
 
 impl Problem {
-    pub fn from_training_data(xs: &Vec<Arc<Vec<f64>>>, ys: &Vec<f64>) -> Problem {
+    pub fn from_training_data(xs: &Vec<Vec<f64>>, ys: &Vec<f64>) -> Problem {
         let (examples, max_index) = util::make_sparse_matrix(xs);
         let example_ptrs = util::vec_to_ptrs(&examples).vec;
         let labels = ys.clone();
