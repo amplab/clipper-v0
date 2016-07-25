@@ -1,5 +1,5 @@
 use std::ptr;
-use std::sync::Arc;
+// use std::sync::Arc;
 // use std::sync::mpsc;
 // use threadpool::ThreadPool;
 // use std::collections::HashMap;
@@ -53,7 +53,7 @@ impl TaskModel {
         &self.w
     }
 
-    pub fn train(k: usize, tid: usize, xs: &Vec<Arc<Vec<f64>>>, ys: &Vec<f64>) -> TaskModel {
+    pub fn train(k: usize, tid: usize, xs: &Vec<Vec<f64>>, ys: &Vec<f64>) -> TaskModel {
         let params = linear::Struct_parameter {
             solver_type: linear::L2R_LR,
             eps: 0.0001,

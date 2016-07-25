@@ -15,7 +15,7 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
 
     /// Returns true if this correction policy accepts the provided input type.
     /// Used to check for valid configurations at runtime.
-    fn accepts_input_type(input_type: InputType) -> bool;
+    fn accepts_input_type(input_type: &InputType) -> bool;
 
     /// Each correction policy must provide a name, used for logging and debugging
     /// purposes.
@@ -45,7 +45,7 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
 pub struct LogisticRegressionPolicy {}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct LinearCorrectionState {
+pub struct LinearCorrectionState {
     linear_model: Vec<f64>,
     anytime_estimators: Vec<f64>,
     offline_model_order: Vec<String>,
@@ -57,14 +57,14 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
             // initialize correction model to zero vector when we have no training data
             linear_model: vec![0.0; models.len()],
             anytime_estimators: vec![0.0; models.len()],
-            offline_model_order: models.clone(),
+            offline_model_order: models.iter().map(|m| (*m).clone()).collect::<Vec<String>>(),
         }
     }
 
     /// The linear correction policy ignores the original input
     /// and so it can accept all input types.
     #[allow(unused_variables)]
-    fn accepts_input_type(input_type: InputType) -> bool {
+    fn accepts_input_type(input_type: &InputType) -> bool {
         true
     }
 
@@ -80,8 +80,8 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
         // to do that because we don't allow updates to the correction state in this method.
         let mut x = Vec::with_capacity(state.linear_model.len());
         for i in 0..state.linear_model.len() {
-            let pred = match predictions.get(state.offline_model_order[i]) {
-                Some(p) => p,
+            let pred = match predictions.get(&state.offline_model_order[i]) {
+                Some(p) => *p,
                 None => {
                     debug_assert!(missing_predictions.contains(&state.offline_model_order[i]));
                     state.anytime_estimators[i]
@@ -96,19 +96,20 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
         }
     }
 
+    #[allow(unused_variables)]
     fn rank_models_desc(state: &LinearCorrectionState, model_names: Vec<&String>) -> Vec<String> {
-        let mut weight_magnitudes =
-            state.linear_model
-                 .map(|w| w.abs())
-                 .iter()
-                 .zip(state.offline_model_order
-                           .iter())
-                 .collect::<Vec<_>>()[..];
-        weight_magnitudes.sort_by(|a, b| b.0.partial_cmp(a.0).unwrap());
+        let mut weight_magnitudes = state.linear_model
+                                         .iter()
+                                         .map(|w| w.abs())
+                                         .zip(state.offline_model_order
+                                                   .iter())
+                                         .collect::<Vec<_>>();
+        weight_magnitudes.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
         let ordered_names = weight_magnitudes.iter().map(|pair| pair.1.clone()).collect::<Vec<_>>();
         ordered_names
     }
 
+    #[allow(unused_variables)]
     fn train(state: &LinearCorrectionState,
              inputs: Vec<Input>,
              predictions: Vec<HashMap<String, Output>>,
@@ -119,8 +120,8 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
         for map in predictions {
             let mut x = Vec::with_capacity(state.linear_model.len());
             for i in 0..state.linear_model.len() {
-                let pred = predictions.get(state.offline_model_order[i]).unwrap();
-                x.push(pred);
+                let pred = map.get(&state.offline_model_order[i]).unwrap();
+                x.push(*pred);
             }
             xs.push(x);
         }
@@ -137,11 +138,12 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
         };
         let prob = linear::Problem::from_training_data(&xs, &labels);
         let model = linear::train_logistic_regression(prob, params);
-        LinearCorrectionState {
-            linear_model: model.w,
-            anytime_estimators: linalg::mean_and_var(&xs).0,
-            offline_model_order: state.offline_model_order.clone(),
-        }
+        unimplemented!();
+        // LinearCorrectionState {
+        //     linear_model: model.w,
+        //     anytime_estimators: linalg::mean_and_var(&xs).0,
+        //     offline_model_order: state.offline_model_order.clone(),
+        // }
     }
 }
 
@@ -159,7 +161,8 @@ impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
         v
     }
 
-    fn accepts_input_type(input_type: InputType) -> bool {
+    #[allow(unused_variables)]
+    fn accepts_input_type(input_type: &InputType) -> bool {
         true
     }
 
@@ -178,7 +181,7 @@ impl CorrectionPolicy<Vec<f64>> for DummyCorrectionPolicy {
 
     #[allow(dead_code, unused_variables)]
     fn rank_models_desc(state: &Vec<f64>, model_names: Vec<&String>) -> Vec<String> {
-        model_names.clone()
+        model_names.iter().map(|s| (*s).clone()).collect::<Vec<_>>()
     }
 
     #[allow(dead_code, unused_variables)]

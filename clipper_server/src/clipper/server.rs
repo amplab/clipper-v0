@@ -129,7 +129,7 @@ impl<P, S> ClipperServer<P, S>
 
         // Ensure configuration is valid
 
-        assert!(P::accepts_input_type(conf.input_type),
+        assert!(P::accepts_input_type(&conf.input_type),
                 format!("Invalid configuration: correction policy {} does not accept InputType \
                          {:?}",
                         P::get_name(),
@@ -300,13 +300,15 @@ impl<P, S> PredictionWorker<P, S>
             let mut i = 0;
             while num_requests < max_preds && i < models.len() {
                 // first check to see if the prediction is already cached
-                if cache.fetch(model_req_order[i], &req.query).is_none() {
+                if cache.fetch(&model_req_order[i], &req.query).is_none() {
                     // on cache miss, send to batching layer
                     // TODO: can we avoid copying the input for each model?
-                    models.get(model_req_order[i]).unwrap().request_prediction(RpcPredictRequest {
-                        input: req.query.clone(),
-                        recv_time: req.recv_time.clone(),
-                    });
+                    models.get(&model_req_order[i])
+                          .unwrap()
+                          .request_prediction(RpcPredictRequest {
+                              input: req.query.clone(),
+                              recv_time: req.recv_time.clone(),
+                          });
                     num_requests += 1;
                 }
                 i += 1;

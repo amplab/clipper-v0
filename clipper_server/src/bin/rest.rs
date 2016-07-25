@@ -19,7 +19,8 @@ use hyper::server::{Server, Handler, Request, Response};
 use clipper::server::{Input, ClipperServer, InputType, PredictionRequest, UpdateRequest, Update,
                       Output};
 use clipper::{metrics, configuration};
-use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy, LogisticRegressionPolicy};
+use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy,
+                                 LogisticRegressionPolicy, LinearCorrectionState};
 
 
 
@@ -471,7 +472,8 @@ pub fn start(shutdown_signal: mpsc::Receiver<()>, conf_path: &String) {
                         Arc::new(ClipperServer::<DummyCorrectionPolicy, Vec<f64>>::new(config)));
     } else if config.policy_name == "logistic_regression".to_string() {
         start_listening(shutdown_signal,
-                        Arc::new(ClipperServer::<LogisticRegressionPolicy, Vec<f64>>::new(config)));
+                        Arc::new(ClipperServer::<LogisticRegressionPolicy,
+                                                 LinearCorrectionState>::new(config)));
     } else {
         panic!("Unknown correction policy");
     }
