@@ -1,10 +1,12 @@
 
 name = "clipper-test"
 slo_micros = 10000
-correction_policy = "hello world"
+# correction_policy = "hello world"
+correction_policy = "logistic_regression"
 use_lsh = true
 input_type = "int"
 input_length = 784
+window_size = -1
 
 num_predict_workers = 4
 num_update_workers = 4

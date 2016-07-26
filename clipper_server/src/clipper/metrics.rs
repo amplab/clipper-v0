@@ -269,20 +269,20 @@ impl Histogram {
         let sample_size = snapshot.len() as f64;
         assert!(p >= 0.0 && p <= 1.0, "percentile out of bounds");
         let x = if p <= 1.0 / (sample_size + 1.0) {
-            println!("a");
+            // println!("a");
             1.0
         } else if p > 1.0 / (sample_size + 1.0) && p < sample_size / (sample_size + 1.0) {
-            println!("b");
+            // println!("b");
             p * (sample_size + 1.0)
         } else {
-            println!("c");
+            // println!("c");
             sample_size
         };
         let index = x.floor() as usize - 1;
         let v = snapshot[index] as f64;
         let rem = x % 1.0;
         let per = if rem != 0.0 {
-            println!("rem: {}", rem);
+            // println!("rem: {}", rem);
             v + rem * (snapshot[index + 1] - snapshot[index]) as f64
         } else {
             v

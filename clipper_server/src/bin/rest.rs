@@ -1,5 +1,6 @@
 
-use std::io::{Read, Write};
+// use std::io::{Read, Write};
+use std::io::Read;
 use std::thread;
 use std::sync::{mpsc, RwLock, Arc};
 use std::boxed::Box;
@@ -16,9 +17,11 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::net::HttpStream;
 use hyper::server::{Server, Handler, Request, Response};
 
-use clipper::server::{Input, ClipperServer, InputType, PredictionRequest, UpdateRequest, Output};
+use clipper::server::{Input, ClipperServer, InputType, PredictionRequest, UpdateRequest, Update,
+                      Output};
 use clipper::{metrics, configuration};
-use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy};
+use clipper::correction_policy::{CorrectionPolicy, DummyCorrectionPolicy,
+                                 LogisticRegressionPolicy, LinearCorrectionState};
 
 
 
@@ -354,7 +357,11 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
                     Ok((uid, input, label)) => {
                         self.uid = uid;
                         info!("/update for user: {}", self.uid);
-                        let u = UpdateRequest::new(self.uid, input, label);
+                        let u = UpdateRequest::new(self.uid,
+                                                   vec![Update {
+                                                            query: input,
+                                                            label: label,
+                                                        }]);
                         self.clipper.schedule_update(u);
                         self.result_string = "Update scheduled".to_string();
                         Next::write()
@@ -464,6 +471,10 @@ pub fn start(shutdown_signal: mpsc::Receiver<()>, conf_path: &String) {
     if config.policy_name == "hello world".to_string() {
         start_listening(shutdown_signal,
                         Arc::new(ClipperServer::<DummyCorrectionPolicy, Vec<f64>>::new(config)));
+    } else if config.policy_name == "logistic_regression".to_string() {
+        start_listening(shutdown_signal,
+                        Arc::new(ClipperServer::<LogisticRegressionPolicy,
+                                                 LinearCorrectionState>::new(config)));
     } else {
         panic!("Unknown correction policy");
     }

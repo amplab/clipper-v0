@@ -26,7 +26,7 @@ def normalize_digits(X):
     Z = (X - mu) / np.array([np.sqrt(z) if z > 0 else 1. for z in sigma])
     return Z 
 
-def mnist_update(x, y, uid):
+def mnist_update(uid, x, y):
     url = "http://127.0.0.1:1337/update"
     req_json = json.dumps({'uid': uid, 'input': list(x), 'label': y})
     headers = {'Content-type': 'application/json'}
@@ -36,7 +36,7 @@ def mnist_update(x, y, uid):
     latency = (end - start).total_seconds() * 1000.0
     print("'%s', %f ms" % (r.text, latency))
 
-def mnist_prediction(x, uid):
+def mnist_prediction(uid, x):
     url = "http://127.0.0.1:1337/predict"
     req_json = json.dumps({'uid': uid, 'input': list(x)})
     headers = {'Content-type': 'application/json'}
@@ -51,9 +51,13 @@ if __name__=='__main__':
     args = sys.argv
     x, y = load_digits(os.path.expanduser("~/model-serving/data/mnist_data"), digits_filename = "test.data")
     # z = normalize_digits(x)
-    inputs = args[2:]
-    for i in inputs:
-        # mnist_prediction(x[int(i)],int(args[1]))
-        mnist_update(x[int(i)], float(y[int(i)]), int(args[1]))
+    # inputs = args[2:]
+    uid = int(args[1])
+    num_inputs = int(args[2])
+    for i in range(num_inputs):
+        # mnist_update(uid, x[int(i)], float(y[int(i)]))
+        example_num = np.random.randint(0,len(x))
+        # mnist_prediction(uid, x[example_num])
+        mnist_update(uid, x[example_num], float(y[example_num]))
 
 

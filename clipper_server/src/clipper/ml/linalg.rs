@@ -1,9 +1,9 @@
 use rand;
-use std::sync::Arc;
+// use std::sync::Arc;
 // use rand::distributions::normal;
 use rand::distributions::{Normal, IndependentSample};
 
-pub fn mean_and_var(xs: &Vec<Arc<Vec<f64>>>) -> (Vec<f64>, Vec<f64>) {
+pub fn mean_and_var(xs: &Vec<Vec<f64>>) -> (Vec<f64>, Vec<f64>) {
 
     let mut sums: Vec<f64> = vec![0.0; xs[0].len()];
     let mut sum_squares: Vec<f64> = vec![0.0; xs[0].len()];
@@ -48,9 +48,11 @@ pub fn dot(a: &Vec<f64>, b: &Vec<f64>) -> f64 {
     // assert_eq!(a.len(), b.len());
     let alen = a.len();
     let blen = b.len();
-    // if alen != blen {
-    //     println!("Warning: dotting vectors of different lengths: {} and {}", alen, blen);
-    // }
+    if alen != blen {
+        warn!("Warning: dotting vectors of different lengths: {} and {}",
+              alen,
+              blen);
+    }
     let max_idx = if alen > blen {
         blen
     } else {

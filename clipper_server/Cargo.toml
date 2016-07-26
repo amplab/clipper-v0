@@ -4,6 +4,34 @@ version = "0.1.0"
 authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
 build = "build.rs"
 
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'unwind'
+
+[profile.dev]
+opt-level = 3
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 1
+panic = 'unwind'
+
+# [profile.dev]
+# opt-level = 0      # controls the `--opt-level` the compiler builds with
+# debug = true       # controls whether the compiler passes `-g`
+# rpath = false      # controls whether the compiler passes `-C rpath`
+# lto = false        # controls `-C lto` for binaries and staticlibs
+# debug-assertions = true # controls whether debug assertions are enabled
+# codegen-units = 3  # controls whether the compiler passes `-C codegen-units`
+#                    # `codegen-units` is ignored when `lto = true`
+# panic = 'unwind'   # panic strategy (`-C panic=...`), can also be 'abort'
+
 # liblinear-sys generates some intermediate files
 # that don't sit in /target and thus don't get cleaned
 # with cargo clean. If you install cargo-cln

@@ -1,4 +1,4 @@
-use libc::{self, c_int, c_double};
+use libc::{c_int, c_double};
 use std::mem;
 use std::clone::Clone;
 

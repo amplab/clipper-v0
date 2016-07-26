@@ -29,6 +29,7 @@ pub struct ClipperConf {
     pub num_predict_workers: usize,
     pub num_update_workers: usize,
     pub cache_size: usize,
+    pub window_size: isize,
     pub metrics: Arc<RwLock<metrics::Registry>>,
 }
 
@@ -38,7 +39,7 @@ impl fmt::Debug for ClipperConf {
                "ClipperConf (\n\tname: {:?},\n\tslo_micros: {:?},\n\tpolicy_name: \
                 {:?},\n\tmodels: {:?},\n\tuse_lsh: {:?},\n\tinput_type: \
                 {:?},\n\tnum_predict_workers: {:?},\n\tnum_update_workers: {:?},\n\tcache_size: \
-                {:?}\n)",
+                {:?}\n\twindow_size: {:?})",
                self.name,
                self.slo_micros,
                self.policy_name,
@@ -47,7 +48,8 @@ impl fmt::Debug for ClipperConf {
                self.input_type,
                self.num_predict_workers,
                self.num_update_workers,
-               self.cache_size)
+               self.cache_size,
+               self.window_size)
 
     }
 }
@@ -59,7 +61,7 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.use_lsh == other.use_lsh && self.input_type == other.input_type &&
         self.num_predict_workers == other.num_predict_workers &&
         self.num_update_workers == other.num_update_workers &&
-        self.cache_size == other.cache_size
+        self.cache_size == other.cache_size && self.window_size == other.window_size
     }
 }
 
@@ -178,6 +180,10 @@ impl ClipperConf {
                           .unwrap_or(&Value::Integer(49999))
                           .as_integer()
                           .unwrap() as usize,
+            window_size: pc.get("window_size")
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as isize,
             metrics: Arc::new(RwLock::new(metrics::Registry::new(pc.get("name")
                                                                    .unwrap()
                                                                    .as_str()
@@ -269,6 +275,7 @@ pub struct ClipperConfBuilder {
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
     pub input_type: InputType,
+    pub window_size: isize,
 
     // Internal system settings
     pub num_predict_workers: usize,
@@ -288,11 +295,17 @@ impl ClipperConfBuilder {
             num_predict_workers: 2,
             num_update_workers: 1,
             cache_size: 49999,
+            window_size: -1,
         }
     }
 
     pub fn cache_size(&mut self, s: usize) -> &mut ClipperConfBuilder {
         self.cache_size = s;
+        self
+    }
+
+    pub fn window_size(&mut self, w: isize) -> &mut ClipperConfBuilder {
+        self.window_size = w;
         self
     }
 
@@ -395,6 +408,7 @@ impl ClipperConfBuilder {
             num_update_workers: self.num_update_workers,
             cache_size: self.cache_size,
             input_type: self.input_type.clone(),
+            window_size: self.window_size,
             metrics: Arc::new(RwLock::new(metrics::Registry::new(self.name.clone()))),
         }
     }
@@ -416,6 +430,7 @@ correction_policy = \"hello_world\"
 use_lsh = true
 input_type = \"int\"
 input_length = -1
+window_size = -1
 
 num_predict_workers = 4
 num_update_workers = 2
@@ -452,11 +467,10 @@ addresses = [\"127.0.0.1:6004\"]
                                  .num_update_workers(2)
                                  .add_model(m1)
                                  .add_model(m2)
+                                 .window_size(-1)
                                  .finalize();
 
     assert_eq!(toml_conf, built_conf);
     }
-
-
 
 }
