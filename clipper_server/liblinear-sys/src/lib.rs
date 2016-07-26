@@ -84,7 +84,7 @@ impl Default for Struct_model {
     }
 }
 
-#[link(name = "linear", kind = "static")]
+// #[link(name = "linear", kind = "static")]
 extern "C" {
     pub fn train(prob: *const Struct_problem,
                  param: *const Struct_parameter)
@@ -231,8 +231,9 @@ mod tests {
     #[test]
     fn train_model() {
         let num_examples = 10;
+        let num_features = 8;
         let train_data = (0..num_examples)
-                             .map(|_| random_floats(8))
+                             .map(|_| random_floats(num_features))
                              .collect::<Vec<Vec<f64>>>();
         let mut labels = Vec::with_capacity(num_examples);
         for i in 0..num_examples {
@@ -261,8 +262,7 @@ mod tests {
             // let nr_class = (*model).nr_class;
             // let nr_feature = (*model).nr_feature;
             let w = slice::from_raw_parts((*model).w, (*model).nr_feature as usize).to_vec();
-            // TODO: this will panic, just want to see what w is for now
-            assert_eq!(w, vec![1.2; 10]);
+            assert_eq!(w.len(), num_features);
             free_and_destroy_model(&model as *const *const Struct_model);
         }
 

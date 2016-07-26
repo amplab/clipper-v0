@@ -12,7 +12,7 @@ use std::time::Duration as StdDuration;
 
 #[allow(unused_imports)]
 use cmt::{CorrectionModelTable, RedisCMT, UpdateTable, RedisUpdateTable, REDIS_CMT_DB,
-          REDIS_UPDATE_DB, DEFAULT_REDIS_SOCKET};
+          REDIS_UPDATE_DB, DEFAULT_REDIS_SOCKET, REDIS_DEFAULT_PORT};
 use cache::{PredictionCache, SimplePredictionCache};
 use configuration::ClipperConf;
 use hashing::EqualityHasher;
@@ -280,7 +280,8 @@ impl<P, S> PredictionWorker<P, S>
         let slo = Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = Duration::milliseconds(1);
-        let mut cmt = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_CMT_DB);
+        // let mut cmt = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_CMT_DB);
+        let mut cmt = RedisCMT::new_tcp_connection("127.0.0.1", REDIS_DEFAULT_PORT, REDIS_CMT_DB);
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
               slo_micros as f64 / 1000.0);
@@ -368,48 +369,6 @@ impl<P, S> Drop for PredictionWorker<P, S>
 }
 
 
-#[derive(Clone)]
-#[allow(dead_code)]
-struct PredictionMetrics {
-    latency_hist: Arc<metrics::Histogram>,
-    pred_counter: Arc<metrics::Counter>,
-    thruput_meter: Arc<metrics::Meter>,
-    accuracy_counter: Arc<metrics::RatioCounter>,
-}
-
-#[allow(dead_code)]
-impl PredictionMetrics {
-    pub fn new(metrics_register: Arc<RwLock<metrics::Registry>>) -> PredictionMetrics {
-
-        let accuracy_counter = {
-            let acc_counter_name = format!("prediction accuracy ratio");
-            metrics_register.write().unwrap().create_ratio_counter(acc_counter_name)
-        };
-
-        let pred_counter = {
-            let counter_name = format!("prediction_counter");
-            metrics_register.write().unwrap().create_counter(counter_name)
-        };
-
-        let latency_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("prediction_latency");
-            metrics_register.write().unwrap().create_histogram(metric_name, 2056)
-        };
-
-        let thruput_meter: Arc<metrics::Meter> = {
-            let metric_name = format!("prediction_thruput");
-            metrics_register.write().unwrap().create_meter(metric_name)
-        };
-
-        PredictionMetrics {
-            latency_hist: latency_hist,
-            pred_counter: pred_counter,
-            thruput_meter: thruput_meter,
-            accuracy_counter: accuracy_counter,
-        }
-    }
-}
-
 
 #[allow(dead_code)]
 struct UpdateWorker<P, S>
@@ -467,10 +426,15 @@ impl<P, S> UpdateWorker<P, S>
            models: HashMap<String,
                            PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
            window_size: isize) {
-        let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
-                                                                   REDIS_CMT_DB);
+        // let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
+        //                                                            REDIS_CMT_DB);
+
+        let mut cmt: RedisCMT<S> = RedisCMT::new_tcp_connection("127.0.0.1",
+                                                                REDIS_DEFAULT_PORT,
+                                                                REDIS_CMT_DB);
         let mut update_table: RedisUpdateTable =
-            RedisUpdateTable::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_UPDATE_DB);
+            RedisUpdateTable::new_tcp_connection("127.0.0.1", REDIS_DEFAULT_PORT, REDIS_UPDATE_DB);
+        // RedisUpdateTable::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_UPDATE_DB);
         info!("starting update worker {}", worker_id);
 
         // Max number of updates to perform from ready_updates before
@@ -729,6 +693,49 @@ impl<P, S> Drop for UpdateWorker<P, S>
         // info!("DROPPING UPDATE WORKER {}", self.worker_id);
     }
 }
+
+#[derive(Clone)]
+#[allow(dead_code)]
+struct PredictionMetrics {
+    latency_hist: Arc<metrics::Histogram>,
+    pred_counter: Arc<metrics::Counter>,
+    thruput_meter: Arc<metrics::Meter>,
+    accuracy_counter: Arc<metrics::RatioCounter>,
+}
+
+#[allow(dead_code)]
+impl PredictionMetrics {
+    pub fn new(metrics_register: Arc<RwLock<metrics::Registry>>) -> PredictionMetrics {
+
+        let accuracy_counter = {
+            let acc_counter_name = format!("prediction accuracy ratio");
+            metrics_register.write().unwrap().create_ratio_counter(acc_counter_name)
+        };
+
+        let pred_counter = {
+            let counter_name = format!("prediction_counter");
+            metrics_register.write().unwrap().create_counter(counter_name)
+        };
+
+        let latency_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("prediction_latency");
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056)
+        };
+
+        let thruput_meter: Arc<metrics::Meter> = {
+            let metric_name = format!("prediction_thruput");
+            metrics_register.write().unwrap().create_meter(metric_name)
+        };
+
+        PredictionMetrics {
+            latency_hist: latency_hist,
+            pred_counter: pred_counter,
+            thruput_meter: thruput_meter,
+            accuracy_counter: accuracy_counter,
+        }
+    }
+}
+
 
 enum UpdateMessage {
     Request(UpdateRequest),

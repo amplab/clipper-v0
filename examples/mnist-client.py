@@ -55,9 +55,9 @@ if __name__=='__main__':
     uid = int(args[1])
     num_inputs = int(args[2])
     for i in range(num_inputs):
-        # mnist_prediction(uid, x[int(i)])
         # mnist_update(uid, x[int(i)], float(y[int(i)]))
         example_num = np.random.randint(0,len(x))
+        # mnist_prediction(uid, x[example_num])
         mnist_update(uid, x[example_num], float(y[example_num]))
 
 

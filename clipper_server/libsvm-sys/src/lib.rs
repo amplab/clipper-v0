@@ -134,3 +134,143 @@ extern "C" {
                                -> *const c_char;
     pub fn svm_check_probability_model(model: *const Struct_svm_model) -> c_int;
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    extern crate rand;
+    use self::rand::{thread_rng, Rng};
+    use std::{ptr, slice};
+    use std::marker::PhantomData;
+    // use common;
+
+    fn random_floats(d: usize) -> Vec<f64> {
+        let mut rng = thread_rng();
+        rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
+    }
+
+    #[test]
+    fn train_model() {
+        let num_examples = 10;
+        let train_data = (0..num_examples)
+                             .map(|_| random_floats(8))
+                             .collect::<Vec<Vec<f64>>>();
+        let mut labels = Vec::with_capacity(num_examples);
+        for i in 0..num_examples {
+            if i % 2 == 0 {
+                labels.push(1.0);
+            } else {
+                // TODO: should these be 0.0 or -1.0???
+                labels.push(0.0);
+            }
+        }
+        let problem = SVMProblem::from_training_data(&train_data, &labels);
+        let params = Struct_svm_parameter {
+            svm_type: C_SVC,
+            kernel_type: 2,
+            degree: 3,
+            gamma: 0.1_f64, // sklearn default
+            coef0: 0.0,
+            cache_size: 200_f64,
+            eps: 0.001,
+            C: 1_f64,
+            nr_weight: 0,
+            weight_label: ptr::null_mut(),
+            weight: ptr::null_mut(),
+            nu: 0.5,
+            p: 0.1,
+            shrinking: 1,
+            probability: 0,
+        };
+        unsafe {
+            let m = svm_train(&problem.raw as *const Struct_svm_problem,
+                              &params as *const Struct_svm_parameter);
+            let nSV = slice::from_raw_parts((*m).nSV, (*m).nr_class as usize).to_vec();
+            // TODO: this assert will fail, just want to see what nSV is
+            assert_eq!(nSV, vec![0]);
+        }
+    }
+
+    pub struct SVMProblem {
+        pub num_examples: i32,
+        pub max_index: i32,
+        pub labels: Vec<f64>,
+        pub examples: Vec<Vec<common::Struct_feature_node>>,
+        pub example_ptrs: Vec<*const common::Struct_feature_node>,
+        pub bias: f64,
+        pub raw: Struct_svm_problem,
+    }
+
+    impl SVMProblem {
+        pub fn from_training_data(xs: &Vec<Vec<f64>>, ys: &Vec<f64>) -> SVMProblem {
+            let (examples, max_index) = make_sparse_matrix(xs);
+            let example_ptrs = vec_to_ptrs(&examples).vec;
+            let labels = ys.clone();
+            let raw = Struct_svm_problem {
+                l: ys.len() as i32,
+                y: labels.as_ptr(),
+                x: (&example_ptrs[..]).as_ptr(),
+            };
+            SVMProblem {
+                num_examples: ys.len() as i32,
+                max_index: max_index,
+                labels: labels,
+                examples: examples,
+                example_ptrs: example_ptrs,
+                bias: -1.0,
+                raw: raw,
+            }
+        }
+    }
+
+    pub struct PtrVec<'a, T: 'a> {
+        pub vec: Vec<*const T>,
+        phantom: PhantomData<&'a Vec<T>>,
+    }
+
+    // TODO figure out how to use lifetimes
+    pub fn vec_to_ptrs<'a, T>(examples: &'a Vec<Vec<T>>) -> PtrVec<'a, T> {
+
+        // let all_x_vec: Vec<*mut Struct_feature_node> = Vec::new();
+        let mut first_x_vec: Vec<*const T> = Vec::with_capacity(examples.len());
+
+        for i in 0..examples.len() {
+            first_x_vec.push((&examples[i][..]).as_ptr());
+        }
+        PtrVec {
+            vec: first_x_vec,
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn make_sparse_matrix(xs: &Vec<Vec<f64>>) -> (Vec<Vec<common::Struct_feature_node>>, i32) {
+
+        let mut examples: Vec<Vec<common::Struct_feature_node>> = Vec::with_capacity(xs.len());
+
+        let mut max_index = 1;
+        for example in xs {
+            let mut features: Vec<common::Struct_feature_node> = Vec::new();
+            let mut idx = 1; // liblinear is 1-based indexing
+            for f in example.iter() {
+                if *f != 0.0 {
+                    if idx > max_index {
+                        max_index = idx;
+                    }
+                    let f_node = common::Struct_feature_node {
+                        index: idx,
+                        value: *f,
+                    };
+                    features.push(f_node);
+                }
+                idx += 1;
+            }
+            features.push(common::Struct_feature_node {
+                index: -1,
+                value: 0.0,
+            }); // -1 indicates end of feature vector
+            examples.push(features);
+        }
+        (examples, max_index)
+    }
+}

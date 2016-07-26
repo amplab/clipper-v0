@@ -13,7 +13,6 @@ fn main() {
         .cpp(true)
         .include("libsvm")
         .file("libsvm/svm.cpp")
-        .file("libsvm/svm.h")
         .compile("libsvm.a");
 
 }

@@ -17,6 +17,7 @@ use server::{Input, Output};
 
 pub const REDIS_CMT_DB: u32 = 1;
 pub const REDIS_UPDATE_DB: u32 = 2;
+pub const REDIS_DEFAULT_PORT: u16 = 6379;
 pub const DEFAULT_REDIS_SOCKET: &'static str = "/tmp/redis.sock";
 
 pub trait CorrectionModelTable<S> where S: Serialize + Deserialize {
@@ -55,6 +56,7 @@ impl RedisUpdateTable {
     pub fn new_socket_connection(socket_file: &str, db: u32) -> RedisUpdateTable {
         // let conn_string = format!("unix:///tmp/redis.sock?db={}", REDIS_UPDATE_DB);
         let conn_string = format!("unix://{}?db={}", socket_file, db);
+        info!("RedisUpdateTable connection string {}", conn_string);
         let client = redis::Client::open(conn_string.as_str()).unwrap();
         let con = client.get_connection().unwrap();
         RedisUpdateTable { connection: con }
@@ -63,6 +65,7 @@ impl RedisUpdateTable {
     pub fn new_tcp_connection(addr: &str, port: u16, db: u32) -> RedisUpdateTable {
         // let conn_string = format!("redis://127.0.0.1/{}", REDIS_UPDATE_DB);
         let conn_string = format!("redis://{}:{}/{}", addr, port, db);
+        info!("RedisUpdateTable connection string {}", conn_string);
         let client = redis::Client::open(conn_string.as_str()).unwrap();
         let con = client.get_connection().unwrap();
         RedisUpdateTable { connection: con }
@@ -135,6 +138,7 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
     pub fn new_socket_connection(socket_file: &str, db: u32) -> RedisCMT<S> {
         // let conn_string = format!("unix:///tmp/redis.sock?db={}", REDIS_CMT_DB);
         let conn_string = format!("unix://{}?db={}", socket_file, db);
+        info!("RedisCMT connection string {}", conn_string);
         let client = redis::Client::open(conn_string.as_str()).unwrap();
         let con = client.get_connection().unwrap();
         RedisCMT {
@@ -146,6 +150,7 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
     pub fn new_tcp_connection(addr: &str, port: u16, db: u32) -> RedisCMT<S> {
         // let conn_string = format!("redis://127.0.0.1/{}", REDIS_CMT_DB);
         let conn_string = format!("redis://{}:{}/{}", addr, port, db);
+        info!("RedisCMT connection string {}", conn_string);
         let client = redis::Client::open(conn_string.as_str()).unwrap();
         let con = client.get_connection().unwrap();
         RedisCMT {

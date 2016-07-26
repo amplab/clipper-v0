@@ -138,12 +138,11 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
         };
         let prob = linear::Problem::from_training_data(&xs, &labels);
         let model = linear::train_logistic_regression(prob, params);
-        unimplemented!();
-        // LinearCorrectionState {
-        //     linear_model: model.w,
-        //     anytime_estimators: linalg::mean_and_var(&xs).0,
-        //     offline_model_order: state.offline_model_order.clone(),
-        // }
+        LinearCorrectionState {
+            linear_model: model.w,
+            anytime_estimators: linalg::mean_and_var(&xs).0,
+            offline_model_order: state.offline_model_order.clone(),
+        }
     }
 }
 
