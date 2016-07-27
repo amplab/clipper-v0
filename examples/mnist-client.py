@@ -47,6 +47,7 @@ def mnist_prediction(uid, x):
     latency = (end - start).total_seconds() * 1000.0
     print("'%s', %f ms" % (r.text, latency))
 
+
 if __name__=='__main__':
     args = sys.argv
     x, y = load_digits(os.path.expanduser("~/model-serving/data/mnist_data"), digits_filename = "test.data")
