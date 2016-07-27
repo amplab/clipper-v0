@@ -2,74 +2,17 @@
 """
 Maybe we should define the abstractions in a Clipper cluster.
 
+What does this look like in local mode????
 """
 
+fake_authenticator = { 'root': 'password' }
 
-class ClipperClusterManager:
-    """
-        All actions through the API are associated with a specific user
-        to track provenance and add permissions.
-
-
-
-
-    How does cluster membership work?
-    How does cluster deployment work?
-    Atomicity, Isolation, Idempotence
-
-    Proposal:
-        Let's use etcd for cluster membership.
-        Does that mean the cluster manager connects directly to Etcd
-        to make changes, or does it connect to one of the Clipper instances
-        which then propagates the changes to Etcd? How do we want to manage shipping
-        models which could be 100s of MB?
-
-    """
-
-    def __init__(user_id):
-        pass
-
-
-    
-    def start(num_instances, nodes):
-        """
-            Start a new Clipper cluster on the provided list of machines.
-            
-            Questions:
-            How to access these machines? SSH? Expect a cluster manager?
-
-        """
-        pass
-
-    def connect(address):
-        """
-            Connect to a running Clipper cluster.
-
-            Questions:
-            + How is cluster membership handled? Etcd?
-        """
-
-    def shutdown(self):
-        """
-            Shutdown the connected cluster
-
-        """
-
-    def get_metrics(self):
-        self.get_system_metrics()
-        self.get_model_metrics()
-
-    def get_system_metrics(self):
-        """
-            Get physical performance metrics (latency, throughput, cache hits, perf, etc.)
-        """
-
-    def get_model_metrics(self):
-        """
-            Get model performance metrics
-        """
-
-
+def authenticate(user_id, key):
+    print("WARNING, THIS IS FAKE AUTHENTICATION. DO NOT USE!!!!!!!")
+    if fake_authenticator.get(user_id) == key:
+        True
+    else:
+        False
 
 class ClipperManager:
     """
@@ -153,8 +96,89 @@ class ClipperManager:
             will be considered independent, and version updates to one will
             not affect the other.
         """
-
         pass
+
+    def inspect_model(self, name):
+        """
+            Get diagnostic information about a model. This includes both
+            history of the model (who last modified it, when it was last updated)
+            but also performance (e.g. latency and throughput, cache hit rates,
+            how often it misses the latency SLO, etc.)
+        """
+
+    def set_model_permissions(self, name, permissions):
+        """
+            Let's look into Etcd permissions for this.
+        """
+
+
+
+class ClipperClusterManager:
+    """
+        All actions through the API are associated with a specific user
+        to track provenance and add permissions.
+
+
+
+
+        How does cluster membership work?
+        How does cluster deployment work?
+        Atomicity, Isolation, Idempotence
+
+        Proposal:
+            Let's use etcd for cluster membership.
+            Does that mean the cluster manager connects directly to Etcd
+            to make changes, or does it connect to one of the Clipper instances
+            which then propagates the changes to Etcd? How do we want to manage shipping
+            models which could be 100s of MB?
+
+    """
+
+    def __init__(user_id):
+        pass
+
+
+    
+    def start(num_instances, nodes):
+        """
+            Start a new Clipper cluster on the provided list of machines.
+            
+            Questions:
+            How to access these machines? SSH? Expect a cluster manager?
+
+        """
+        pass
+
+    def connect(address):
+        """
+            Connect to a running Clipper cluster.
+
+            Questions:
+            + How is cluster membership handled? Etcd?
+        """
+
+    def shutdown(self):
+        """
+            Shutdown the connected cluster
+
+        """
+
+    def get_metrics(self):
+        self.get_system_metrics()
+        self.get_model_metrics()
+
+    def get_system_metrics(self):
+        """
+            Get physical performance metrics (latency, throughput, cache hits, perf, etc.)
+        """
+
+    def get_model_metrics(self):
+        """
+            Get model performance metrics
+        """
+
+
+
 
 
 
