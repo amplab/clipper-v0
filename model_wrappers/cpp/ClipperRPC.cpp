@@ -33,7 +33,7 @@ bool is_var_format(char input_type) {
 }
 
 void ClipperRPC::handle(int newsockfd) {
-    char buffer[256], *data;
+    char buffer[256];
     int i, j, n, bytes_read, header_bytes = 5;
     int additional_header_bytes, total_bytes_expected;
     uint32_t input_type, num_inputs, input_len, shutdown_msg;
@@ -41,7 +41,7 @@ void ClipperRPC::handle(int newsockfd) {
     vector<vector<double> > v_double;
     vector<vector<uint32_t> > v_int;
     vector<vector<string> > v_str;
-    vector<double> *predictions;
+    vector<double> predictions;
 
     printf("Handling new connection\n");
     while (true) {
@@ -75,7 +75,7 @@ void ClipperRPC::handle(int newsockfd) {
             bytes_read -= (header_bytes + additional_header_bytes);
             if (input_type == FIXEDBYTE_CODE) {
                 total_bytes_expected = input_len*num_inputs;
-                data = new char[total_bytes_expected];
+                char data[total_bytes_expected];
                 memset(data, 0, total_bytes_expected);
                 memcpy(data, &buffer[header_bytes + additional_header_bytes],
                        bytes_read);
@@ -95,7 +95,7 @@ void ClipperRPC::handle(int newsockfd) {
                 }
             } else if (input_type == FIXEDFLOAT_CODE) {
                 total_bytes_expected = 8*input_len*num_inputs;
-                data = new char[total_bytes_expected];
+                char data[total_bytes_expected];
                 memset(data, 0, total_bytes_expected);
                 memcpy(data, &buffer[header_bytes + additional_header_bytes],
                        bytes_read);
@@ -115,7 +115,7 @@ void ClipperRPC::handle(int newsockfd) {
                 }
             } else if (input_type == FIXEDINT_CODE) {
                 total_bytes_expected = 4*input_len*num_inputs;
-                data = new char[total_bytes_expected];
+                char data[total_bytes_expected];
                 memset(data, 0, total_bytes_expected);
                 memcpy(data, &buffer[header_bytes + additional_header_bytes],
                        bytes_read);
@@ -151,13 +151,10 @@ void ClipperRPC::handle(int newsockfd) {
         } else {
             predictions = model->predict_strings(v_str);
         }
-        for (int i = 0; i < predictions->size(); i++) {
-            write(newsockfd, &(*predictions)[i], 8);
-            printf("Prediction %d: %f\n", i, (*predictions)[i]);
-        }
 
-        delete predictions;
-        free(data);
+        for (int i = 0; i < predictions.size(); i++) {
+            write(newsockfd, &predictions[i], 8);
+        }
     }
 }
 
