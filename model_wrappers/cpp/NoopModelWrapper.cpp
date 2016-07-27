@@ -4,66 +4,68 @@
 
 class NoopModelWrapper : public Model {
     public:
-        vector<double>* predict_bytes(vector< vector<char> >& input);
+        vector<double> predictions;
 
-        vector<double>* predict_floats(vector< vector<double> >& input);
+        vector<double>& predict_bytes(vector< vector<char> >& input);
 
-        vector<double>* predict_ints(vector< vector<uint32_t> >& input);
+        vector<double>& predict_floats(vector< vector<double> >& input);
 
-        vector<double>* predict_strings(vector< vector<string> >& input);
+        vector<double>& predict_ints(vector< vector<uint32_t> >& input);
+
+        vector<double>& predict_strings(vector< vector<string> >& input);
 };
 
-vector<double>* NoopModelWrapper::predict_bytes(
+vector<double>& NoopModelWrapper::predict_bytes(
         vector<vector<char> >& input) {
     int i, j;
     double total;
-    vector<double> *predictions = new vector<double>(input.size());
+    predictions.resize(input.size());
     for (i = 0; i < input.size(); i++) {
         total = 0;
         for (j = 0; j < input[i].size(); j++) {
             total += input[i][j];
         }
-        (*predictions)[i] = total;
+        predictions[i] = total;
     }
     return predictions;
 }
 
-vector<double>* NoopModelWrapper::predict_floats(
+vector<double>& NoopModelWrapper::predict_floats(
         vector<vector<double> >& input) {
     int i, j;
     double total;
-    vector<double> *predictions = new vector<double>(input.size());
+    predictions.resize(input.size());
     for (i = 0; i < input.size(); i++) {
         total = 0;
         for (j = 0; j < input[i].size(); j++) {
             total += input[i][j];
         }
-        (*predictions)[i] = total;
+        predictions[i] = total;
     }
     return predictions;
 }
 
-vector<double>* NoopModelWrapper::predict_ints(
+vector<double>& NoopModelWrapper::predict_ints(
         vector<vector<uint32_t> >& input) {
     int i, j;
     double total;
-    vector<double> *predictions = new vector<double>(input.size());
+    predictions.resize(input.size());
     for (i = 0; i < input.size(); i++) {
         total = 0;
         for (j = 0; j < input[i].size(); j++) {
             total += input[i][j];
         }
-        (*predictions)[i] = total;
+        predictions[i] = total;
     }
     return predictions;
 }
 
-vector<double>* NoopModelWrapper::predict_strings(
+vector<double>& NoopModelWrapper::predict_strings(
         vector<vector<std::string> >& input) {
     int i;
-    vector<double> *predictions = new vector<double>(input.size());
+    predictions.resize(input.size());
     for (i = 0; i < input.size(); i++) {
-        (*predictions)[i] = input[i].size();
+        predictions[i] = input[i].size();
     }
     return predictions;
 }
