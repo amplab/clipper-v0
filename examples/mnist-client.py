@@ -47,6 +47,7 @@ def mnist_prediction(uid, x):
     latency = (end - start).total_seconds() * 1000.0
     print("'%s', %f ms" % (r.text, latency))
 
+
 if __name__=='__main__':
     args = sys.argv
     x, y = load_digits(os.path.expanduser("~/model-serving/data/mnist_data"), digits_filename = "test.data")
@@ -57,7 +58,7 @@ if __name__=='__main__':
     for i in range(num_inputs):
         # mnist_update(uid, x[int(i)], float(y[int(i)]))
         example_num = np.random.randint(0,len(x))
-        # mnist_prediction(uid, x[example_num])
+        mnist_prediction(uid, x[example_num])
         mnist_update(uid, x[example_num], float(y[example_num]))
 
 
