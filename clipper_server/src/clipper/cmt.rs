@@ -18,6 +18,7 @@ use server::{Input, Output};
 pub const REDIS_CMT_DB: u32 = 1;
 pub const REDIS_UPDATE_DB: u32 = 2;
 pub const REDIS_DEFAULT_PORT: u16 = 6379;
+// pub const REDIS_DEFAULT_PORT: u16 = 32775;
 pub const DEFAULT_REDIS_SOCKET: &'static str = "/tmp/redis.sock";
 
 pub trait CorrectionModelTable<S> where S: Serialize + Deserialize {

@@ -31,6 +31,8 @@ pub struct ClipperConf {
     pub cache_size: usize,
     pub window_size: isize,
     pub metrics: Arc<RwLock<metrics::Registry>>,
+    pub redis_ip: String,
+    pub redis_port: u16,
 }
 
 impl fmt::Debug for ClipperConf {
@@ -39,7 +41,7 @@ impl fmt::Debug for ClipperConf {
                "ClipperConf (\n\tname: {:?},\n\tslo_micros: {:?},\n\tpolicy_name: \
                 {:?},\n\tmodels: {:?},\n\tuse_lsh: {:?},\n\tinput_type: \
                 {:?},\n\tnum_predict_workers: {:?},\n\tnum_update_workers: {:?},\n\tcache_size: \
-                {:?}\n\twindow_size: {:?})",
+                {:?}\n\twindow_size: {:?}\n\tredis_ip: {:?}\n\tredis_port: {:?})",
                self.name,
                self.slo_micros,
                self.policy_name,
@@ -49,7 +51,9 @@ impl fmt::Debug for ClipperConf {
                self.num_predict_workers,
                self.num_update_workers,
                self.cache_size,
-               self.window_size)
+               self.window_size,
+               self.redis_ip,
+               self.redis_port)
 
     }
 }
@@ -61,7 +65,8 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.use_lsh == other.use_lsh && self.input_type == other.input_type &&
         self.num_predict_workers == other.num_predict_workers &&
         self.num_update_workers == other.num_update_workers &&
-        self.cache_size == other.cache_size && self.window_size == other.window_size
+        self.cache_size == other.cache_size && self.window_size == other.window_size &&
+        self.redis_ip == other.redis_ip && self.redis_port == other.redis_port
     }
 }
 
@@ -184,6 +189,15 @@ impl ClipperConf {
                            .unwrap_or(&Value::Integer(-1))
                            .as_integer()
                            .unwrap() as isize,
+            redis_port: pc.get("redis_port")
+                          .unwrap_or(&Value::Integer(6379))
+                          .as_integer()
+                          .unwrap() as u16,
+            redis_ip: pc.get("redis_ip")
+                        .unwrap_or(&Value::String("127.0.0.1".to_string()))
+                        .as_str()
+                        .unwrap()
+                        .to_string(),
             metrics: Arc::new(RwLock::new(metrics::Registry::new(pc.get("name")
                                                                    .unwrap()
                                                                    .as_str()
@@ -276,6 +290,8 @@ pub struct ClipperConfBuilder {
     pub use_lsh: bool,
     pub input_type: InputType,
     pub window_size: isize,
+    pub redis_ip: String,
+    pub redis_port: u16,
 
     // Internal system settings
     pub num_predict_workers: usize,
@@ -296,6 +312,8 @@ impl ClipperConfBuilder {
             num_update_workers: 1,
             cache_size: 49999,
             window_size: -1,
+            redis_ip: "127.0.0.1".to_string(),
+            redis_port: 6379,
         }
     }
 
@@ -341,6 +359,16 @@ impl ClipperConfBuilder {
 
     pub fn name(&mut self, n: String) -> &mut ClipperConfBuilder {
         self.name = n;
+        self
+    }
+
+    pub fn redis_ip(&mut self, ri: String) -> &mut ClipperConfBuilder {
+        self.redis_ip = ri;
+        self
+    }
+
+    pub fn redis_port(&mut self, rp: u16) -> &mut ClipperConfBuilder {
+        self.redis_port = rp;
         self
     }
 
@@ -409,6 +437,8 @@ impl ClipperConfBuilder {
             cache_size: self.cache_size,
             input_type: self.input_type.clone(),
             window_size: self.window_size,
+            redis_ip: self.redis_ip.clone(),
+            redis_port: self.redis_port,
             metrics: Arc::new(RwLock::new(metrics::Registry::new(self.name.clone()))),
         }
     }
