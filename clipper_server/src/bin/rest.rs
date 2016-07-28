@@ -430,7 +430,7 @@ fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>, clipper: Arc<Clipp
           S: Serialize + Deserialize
 {
 
-    let rest_server = Server::http(&"127.0.0.1:1337".parse().unwrap()).unwrap();
+    let rest_server = Server::http(&"0.0.0.0:1337".parse().unwrap()).unwrap();
 
     // TODO: add admin server to update models
     // let admin_server = Server::http(&"127.0.0.1:1338".parse().unwrap()).unwrap();

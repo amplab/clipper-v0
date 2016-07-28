@@ -27,7 +27,7 @@ def normalize_digits(X):
     return Z 
 
 def mnist_update(uid, x, y):
-    url = "http://127.0.0.1:1337/update"
+    url = "http://localhost:1337/update"
     req_json = json.dumps({'uid': uid, 'input': list(x), 'label': y})
     headers = {'Content-type': 'application/json'}
     start = datetime.now()
@@ -37,7 +37,7 @@ def mnist_update(uid, x, y):
     print("'%s', %f ms" % (r.text, latency))
 
 def mnist_prediction(uid, x):
-    url = "http://127.0.0.1:1337/predict"
+    url = "http://localhost:1337/predict"
     req_json = json.dumps({'uid': uid, 'input': list(x)})
     headers = {'Content-type': 'application/json'}
     # x_str = ", ".join(["%d" % a for a in x])
@@ -58,6 +58,6 @@ if __name__=='__main__':
         # mnist_update(uid, x[int(i)], float(y[int(i)]))
         example_num = np.random.randint(0,len(x))
         mnist_prediction(uid, x[example_num])
-        # mnist_update(uid, x[example_num], float(y[example_num]))
+        mnist_update(uid, x[example_num], float(y[example_num]))
 
 
