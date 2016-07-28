@@ -163,14 +163,18 @@ impl<P, S> ClipperServer<P, S>
             prediction_workers.push(PredictionWorker::new(i as i32,
                                                           conf.slo_micros.clone(),
                                                           cache.clone(),
-                                                          models.clone()));
+                                                          models.clone(),
+                                                          conf.redis_ip.clone(),
+                                                          conf.redis_port));
         }
         let mut update_workers = Vec::with_capacity(conf.num_update_workers.clone());
         for i in 0..conf.num_update_workers {
             update_workers.push(UpdateWorker::new(i as i32,
                                                   cache.clone(),
                                                   models.clone(),
-                                                  conf.window_size));
+                                                  conf.window_size,
+                                                  conf.redis_ip.clone(),
+                                                  conf.redis_port));
         }
         ClipperServer {
             prediction_workers: prediction_workers,
@@ -254,11 +258,19 @@ impl<P, S> PredictionWorker<P, S>
                slo_micros: u32,
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: HashMap<String,
-                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>)
+                               PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+               redis_ip: String,
+               redis_port: u16)
                -> PredictionWorker<P, S> {
         let (sender, receiver) = mpsc::channel::<(PredictionRequest, i32)>();
         thread::spawn(move || {
-            PredictionWorker::<P, S>::run(worker_id, slo_micros, receiver, cache.clone(), models);
+            PredictionWorker::<P, S>::run(worker_id,
+                                          slo_micros,
+                                          receiver,
+                                          cache.clone(),
+                                          models,
+                                          redis_ip,
+                                          redis_port);
         });
         PredictionWorker {
             worker_id: worker_id,
@@ -276,12 +288,14 @@ impl<P, S> PredictionWorker<P, S>
            request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
-                           PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>) {
+                           PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+           redis_ip: String,
+           redis_port: u16) {
         let slo = Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = Duration::milliseconds(1);
         // let mut cmt = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_CMT_DB);
-        let mut cmt = RedisCMT::new_tcp_connection("127.0.0.1", REDIS_DEFAULT_PORT, REDIS_CMT_DB);
+        let mut cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
               slo_micros as f64 / 1000.0);
@@ -390,12 +404,20 @@ impl<P, S> UpdateWorker<P, S>
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: HashMap<String,
                                PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
-               window_size: isize)
+               window_size: isize,
+               redis_ip: String,
+               redis_port: u16)
                -> UpdateWorker<P, S> {
 
         let (sender, receiver) = mpsc::channel::<UpdateMessage>();
         let jh = thread::spawn(move || {
-            UpdateWorker::<P, S>::run(worker_id, receiver, cache.clone(), models, window_size);
+            UpdateWorker::<P, S>::run(worker_id,
+                                      receiver,
+                                      cache.clone(),
+                                      models,
+                                      window_size,
+                                      redis_ip,
+                                      redis_port);
         });
         UpdateWorker {
             worker_id: worker_id,
@@ -425,15 +447,17 @@ impl<P, S> UpdateWorker<P, S>
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
                            PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
-           window_size: isize) {
+           window_size: isize,
+           redis_ip: String,
+           redis_port: u16) {
         // let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
         //                                                            REDIS_CMT_DB);
 
-        let mut cmt: RedisCMT<S> = RedisCMT::new_tcp_connection("127.0.0.1",
-                                                                REDIS_DEFAULT_PORT,
+        let mut cmt: RedisCMT<S> = RedisCMT::new_tcp_connection(&redis_ip,
+                                                                redis_port,
                                                                 REDIS_CMT_DB);
         let mut update_table: RedisUpdateTable =
-            RedisUpdateTable::new_tcp_connection("127.0.0.1", REDIS_DEFAULT_PORT, REDIS_UPDATE_DB);
+            RedisUpdateTable::new_tcp_connection(&redis_ip, redis_port, REDIS_UPDATE_DB);
         // RedisUpdateTable::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_UPDATE_DB);
         info!("starting update worker {}", worker_id);
 
