@@ -235,25 +235,29 @@ mod tests {
     use std::collections::LinkedList;
     use rand::{thread_rng, Rng};
 
-    pub static SERVER_PORT: u16 = 38991;
+    // pub static SERVER_PORT: u16 = 38991;
     // pub static SERVER_UNIX_PATH: &'static str = "/tmp/clipper-redis-test.sock";
 
     pub struct RedisServer {
         pub process: process::Child,
+        pub port: u16,
     }
 
     impl RedisServer {
-        pub fn new() -> RedisServer {
+        pub fn new(port: u16) -> RedisServer {
             let mut cmd = process::Command::new("redis-server");
             cmd.stdout(process::Stdio::null())
                .stderr(process::Stdio::null())
                .arg("--port")
-               .arg(SERVER_PORT.to_string())
+               .arg(port.to_string())
                .arg("--bind")
                .arg("127.0.0.1");
 
             let process = cmd.spawn().unwrap();
-            RedisServer { process: process }
+            RedisServer {
+                process: process,
+                port: port,
+            }
         }
 
         #[allow(dead_code)]
@@ -263,7 +267,7 @@ mod tests {
 
 
         pub fn get_client_addr(&self) -> redis::ConnectionAddr {
-            redis::ConnectionAddr::Tcp("127.0.0.1".to_string(), SERVER_PORT)
+            redis::ConnectionAddr::Tcp("127.0.0.1".to_string(), self.port)
         }
     }
 
@@ -280,8 +284,8 @@ mod tests {
     }
 
     impl TestContext {
-        fn new(db: u32) -> TestContext {
-            let server = RedisServer::new();
+        fn new(port: u16, db: u32) -> TestContext {
+            let server = RedisServer::new(port);
 
             let client = redis::Client::open(redis::ConnectionInfo {
                              addr: Box::new(server.get_client_addr()),
@@ -331,11 +335,10 @@ mod tests {
     #[test]
     #[allow(unused_variables)]
     fn cmt_put_get() {
-        let db = 3;
-        let ctx = TestContext::new(db);
-        let mut cmt: RedisCMT<Vec<i32>> = RedisCMT::new_tcp_connection("127.0.0.1",
-                                                                       SERVER_PORT,
-                                                                       db);
+        let db = 0;
+        let port = 38890;
+        let ctx = TestContext::new(port, db);
+        let mut cmt: RedisCMT<Vec<i32>> = RedisCMT::new_tcp_connection("127.0.0.1", port, db);
 
         let user_id = 33;
         let state = vec![4, 3, 2, 6, 73345, 2312];
@@ -347,8 +350,9 @@ mod tests {
     #[test]
     #[allow(unused_variables)]
     fn update_table_add_updates() {
-        let db = 3;
-        let ctx = TestContext::new(db);
+        let db = 0;
+        let port = 38891;
+        let ctx = TestContext::new(port, db);
         let l = 3;
         let input_vec = vec![Input::Ints {
                                  i: random_ints(l),
@@ -366,7 +370,7 @@ mod tests {
         redis::cmd("DEL").arg(uid).execute(&con);
 
 
-        let mut update_table = RedisUpdateTable::new_tcp_connection("127.0.0.1", SERVER_PORT, db);
+        let mut update_table = RedisUpdateTable::new_tcp_connection("127.0.0.1", port, db);
         update_table.add_update(uid, &input_vec[0], &output_vec[0]).unwrap();
         let fetched_update: Vec<(Input, Output)> = update_table.get_updates(uid, 5).unwrap();
         assert_eq!(fetched_update.len(), 1);
@@ -377,8 +381,9 @@ mod tests {
     #[test]
     #[allow(unused_variables)]
     fn update_table_window_updates() {
-        let db = 3;
-        let ctx = TestContext::new(db);
+        let db = 0;
+        let port = 38892;
+        let ctx = TestContext::new(port, db);
         let num_inputs = 45;
         let input_len = 33;
         let uid = 21;
@@ -388,7 +393,7 @@ mod tests {
         // con.del(uid).unwrap();
         let mut rng = thread_rng();
         let mut local_updates = LinkedList::new();
-        let mut update_table = RedisUpdateTable::new_tcp_connection("127.0.0.1", SERVER_PORT, db);
+        let mut update_table = RedisUpdateTable::new_tcp_connection("127.0.0.1", port, db);
         for i in 0..num_inputs {
             let new_input = Input::Ints {
                 i: random_ints(input_len),
