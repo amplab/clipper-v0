@@ -1,0 +1,38 @@
+# FROM frolvlad/alpine-glibc
+FROM alpine:3.4
+
+MAINTAINER Dan Crankshaw <dscrankshaw@gmail.com>
+
+COPY spark_docker_deps/spark-1.6.2-bin-hadoop2.6.tgz /tmp/
+COPY __init__.py rpc.py spark_modelwrapper.py /tmp/
+
+ENV JAVA_HOME=/usr/lib/jvm/default-jvm
+ENV SPARK_HOME=/tmp/spark-1.6.2-bin-hadoop2.6
+ENV CLIPPER_MODEL_PATH=/model
+
+
+# RUN apk add --no-cache openjdk7 && \
+#     ln -sf "${JAVA_HOME}/bin/"* "/usr/bin/"
+
+RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+# && mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2 \
+&& ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2 \
+&& apk update \
+&& apk add --no-cache --virtual .build_deps git python \
+python-dev gfortran build-base  \
+&& apk add --no-cache openjdk7 py-pip py-numpy@testing bash \
+&& ln -sf "${JAVA_HOME}/bin/"* "/usr/bin/" \
+&& tar zxvf /tmp/spark-1.6.2-bin-hadoop2.6.tgz -C /tmp/ \
+&& pip install findspark \
+&& mkdir -p /model \
+&& apk del .build_deps
+
+# RUN export PATH=$PATH:/lib64
+
+
+EXPOSE 6001
+
+CMD ["python", "/tmp/spark_modelwrapper.py"]
+
+
+

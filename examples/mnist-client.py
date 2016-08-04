@@ -58,6 +58,6 @@ if __name__=='__main__':
         # mnist_update(uid, x[int(i)], float(y[int(i)]))
         example_num = np.random.randint(0,len(x))
         mnist_prediction(uid, x[example_num])
-        mnist_update(uid, x[example_num], float(y[example_num]))
+        # mnist_update(uid, x[example_num], float(y[example_num]))
 
 

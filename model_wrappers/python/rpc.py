@@ -133,7 +133,8 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
 
 
 
-def start(model_wrapper, ip, port):
+def start(model_wrapper, port):
+    ip = "0.0.0.0"
     server = SocketServer.TCPServer((ip, port), ClipperRpc)
     server.model = model_wrapper
     # server.handle_request()
