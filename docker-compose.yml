@@ -2,19 +2,19 @@ version: '2'
 
 services:
   redis:
-    image: clipper/redis
-    ports:
-      - 6379
+    image: redis:alpine
+    # ports:
+    #   - 6379:6379
   sparkmw:
     image: clipper/spark-mw-dev
-    ports:
-      - 6001
+    # ports:
+    #   - 6001:6001
+    volumes:
+      - /Users/crankshaw/clipper/model_wrappers/python/spark_models/spark_lr_pred_1:/model
   clipper:
     image: cl-dev
-    links:
+    depends_on:
       - redis
       - sparkmw
     ports:
-      - 1337
-    volumes:
-      - /Users/crankshaw/clipper/model_wrappers/python/spark_models/spark_lr_pred_1:/model
+      - 1337:1337
