@@ -1,111 +1,108 @@
-// #![allow(dead_code)]
-// use std::error::Error;
-// use std::result::Result;
-// use std::fs::{File, OpenOptions};
-// use std::io::prelude::*;
-// use std::path::Path;
-// use std::io::{BufReader, BufWriter};
-// // use std::sync::Arc;
+#![allow(dead_code)]
+use std::error::Error;
+use std::result::Result;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+use std::io::BufReader;
+// use std::sync::Arc;
 // use std::collections::HashSet;
 // use std::iter::FromIterator;
-// // use std::fmt;
+// use std::fmt;
 // use rand;
 // use rand::Rng;
-// // use time::PreciseTime;
-//
-// use ml::linalg;
-// // use mtl;
-//
-// pub const NUM_DIGITS: usize = 10;
-//
-// pub struct TrainingData {
-//     pub xs: Vec<Arc<Vec<f64>>>,
-//     pub ys: Arc<Vec<f64>>,
-// }
-//
-// pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
-//     let path = Path::new(fpath);
-//     let display = path.display();
-//
-//     let file = match File::open(&path) {
-//         // The `description` method of `io::Error` returns a string that
-//         // describes the error
-//         Err(why) => {
-//             return Err(format!("couldn't open {}: REASON: {}",
-//                                display,
-//                                Error::description(&why)))
-//         }
-//         Ok(file) => BufReader::new(file),
-//     };
-//
-//     // pointer to first feature_node struct in each example
-//     let mut xs: Vec<Arc<Vec<f64>>> = Vec::new();
-//     let mut ys: Vec<f64> = Vec::new();
-//     for line in file.lines().filter_map(|result| result.ok()) {
-//         let mut split = line.split(",").collect::<Vec<&str>>();
-//         // println!("{:?}", split);
-//         let label = match split.first() {
-//             Some(l) => {
-//                 match l.trim().parse::<f64>() {
-//                     Ok(n) => n,
-//                     Err(why) => return Err(format!("couldn't parse {}", Error::description(&why))),
-//                 }
-//             }
-//             None => return Err("malformed label".to_string()),
-//         };
-//         let mut features: Vec<f64> = Vec::new();
-//         split.remove(0); // remove the label, only features remaining
-//         for f in split.iter().map(|x| x.trim().parse::<f64>().unwrap()) {
-//             features.push(f);
-//         }
-//         xs.push(Arc::new(features));
-//         ys.push(label);
-//     }
-//     Ok(TrainingData {
-//         xs: xs,
-//         ys: Arc::new(ys),
-//     })
-// }
-//
-// pub fn normalize(training_data: &TrainingData) -> TrainingData {
-//     let zs = normalize_matrix(&training_data.xs);
-//     TrainingData {
-//         xs: zs,
-//         ys: training_data.ys.clone(),
-//     }
-// }
-//
-// pub fn normalize_matrix(xs: &Vec<Arc<Vec<f64>>>) -> Vec<Arc<Vec<f64>>> {
-//
-//     let (means, vars) = linalg::mean_and_var(&xs);
-//
-//     let mut zs: Vec<Arc<Vec<f64>>> = Vec::with_capacity(xs.len());
-//     for point in xs {
-//         let mut idx = 0;
-//         let mut new_x: Vec<f64> = vec![0.0; point.len()];
-//         for feature in point.iter() {
-//             let sigma = if vars[idx] > 0.0 {
-//                 vars[idx].powf(0.5)
-//             } else {
-//                 1.0
-//             };
-//             new_x[idx] = (feature - means[idx]) / sigma;
-//             idx += 1;
-//         }
-//         zs.push(Arc::new(new_x));
-//     }
-//     zs
-// }
-//
-//
+// use time::PreciseTime;
+
+use clipper::ml::linalg;
+// use mtl;
+
+pub const NUM_DIGITS: usize = 10;
+
+pub struct TrainingData {
+    pub xs: Vec<Vec<f64>>,
+    pub ys: Vec<f64>,
+}
+
+pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
+    let path = Path::new(fpath);
+    let display = path.display();
+
+    let file = match File::open(&path) {
+        // The `description` method of `io::Error` returns a string that
+        // describes the error
+        Err(why) => {
+            return Err(format!("couldn't open {}: REASON: {}",
+                               display,
+                               Error::description(&why)))
+        }
+        Ok(file) => BufReader::new(file),
+    };
+
+    // pointer to first feature_node struct in each example
+    let mut xs: Vec<Vec<f64>> = Vec::new();
+    let mut ys: Vec<f64> = Vec::new();
+    for line in file.lines().filter_map(|result| result.ok()) {
+        let mut split = line.split(",").collect::<Vec<&str>>();
+        // println!("{:?}", split);
+        let label = match split.first() {
+            Some(l) => {
+                match l.trim().parse::<f64>() {
+                    Ok(n) => n,
+                    Err(why) => return Err(format!("couldn't parse {}", Error::description(&why))),
+                }
+            }
+            None => return Err("malformed label".to_string()),
+        };
+        let mut features: Vec<f64> = Vec::new();
+        split.remove(0); // remove the label, only features remaining
+        for f in split.iter().map(|x| x.trim().parse::<f64>().unwrap()) {
+            features.push(f);
+        }
+        xs.push(features);
+        ys.push(label);
+    }
+    Ok(TrainingData { xs: xs, ys: ys })
+}
+
+pub fn normalize(training_data: &TrainingData) -> TrainingData {
+    let zs = normalize_matrix(&training_data.xs);
+    TrainingData {
+        xs: zs,
+        ys: training_data.ys.clone(),
+    }
+}
+
+pub fn normalize_matrix(xs: &Vec<Vec<f64>>) -> Vec<Vec<f64>> {
+
+    let (means, vars) = linalg::mean_and_var(&xs);
+
+    let mut zs: Vec<Vec<f64>> = Vec::with_capacity(xs.len());
+    for point in xs {
+        let mut idx = 0;
+        let mut new_x: Vec<f64> = vec![0.0; point.len()];
+        for feature in point.iter() {
+            let sigma = if vars[idx] > 0.0 {
+                vars[idx].powf(0.5)
+            } else {
+                1.0
+            };
+            new_x[idx] = (feature - means[idx]) / sigma;
+            idx += 1;
+        }
+        zs.push(new_x);
+    }
+    zs
+}
+
+
 // // #[derive(Debug)]
 // pub struct DigitsTask {
 //     pub pref: f64,
-//     pub offline_train_x: Vec<Arc<Vec<f64>>>,
-//     pub online_train_x: Vec<Arc<Vec<f64>>>,
+//     pub offline_train_x: Vec<Vec<f64>>,
+//     pub online_train_x: Vec<Vec<f64>>,
 //     pub offline_train_y: Vec<f64>,
 //     pub online_train_y: Vec<f64>,
-//     pub test_x: Vec<Arc<Vec<f64>>>,
+//     pub test_x: Vec<Vec<f64>>,
 //     pub test_y: Vec<f64>, // pub model: Option<mtl::LogisticRegression>
 // }
 //
@@ -165,21 +162,21 @@
 //         }
 //     }
 // }
-//
-// // impl fmt::Display for DigitsTask {
-// //     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-// //         // The `f` value implements the `Write` trait, which is what the
-// //         // write! macro is expecting. Note that this formatting ignores the
-// //         // various flags provided to format strings.
-// //         write!(f,
-// //                "(pref: {}, train_x: {}, train_y: {})",
-// //                self.pref,
-// //                self.train_x,
-// //                self.train_y)
-// //     }
-// // }
-//
-//
+
+// impl fmt::Display for DigitsTask {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         // The `f` value implements the `Write` trait, which is what the
+//         // write! macro is expecting. Note that this formatting ignores the
+//         // various flags provided to format strings.
+//         write!(f,
+//                "(pref: {}, train_x: {}, train_y: {})",
+//                self.pref,
+//                self.train_x,
+//                self.train_y)
+//     }
+// }
+
+
 // pub fn create_online_dataset(training_data: &TrainingData,
 //                              test_data: &TrainingData,
 //                              offline_task_size: usize,
@@ -222,9 +219,9 @@
 //     }
 //     tasks
 // }
-//
-//
-//
+
+
+
 // pub fn create_mtl_datasets(training_data: &TrainingData,
 //                            test_data: &TrainingData,
 //                            task_size: usize,
@@ -277,7 +274,7 @@
 //      all_test_xs,
 //      all_test_ys)
 // }
-//
+
 // fn select_datapoints(pref_digit: f64,
 //                      num_points: usize,
 //                      data: &TrainingData)
@@ -369,79 +366,79 @@
 //     train_file.flush().unwrap();
 //     test_file.flush().unwrap();
 // }
+
+// #[allow(unused_mut)]
+// pub fn load_tasks(fname: &str) -> (
+//         Vec<DigitsTask>, // list of tasks
+//         Vec<Arc<Vec<f64>>>, // train_xs
+//         Vec<f64>, // train_ys
+//         Vec<usize>, //train_ts
+//         Vec<Arc<Vec<f64>>>, // test_xs
+//         Vec<f64> // test_ys
+//         ) {
 //
-// // #[allow(unused_mut)]
-// // pub fn load_tasks(fname: &str) -> (
-// //         Vec<DigitsTask>, // list of tasks
-// //         Vec<Arc<Vec<f64>>>, // train_xs
-// //         Vec<f64>, // train_ys
-// //         Vec<usize>, //train_ts
-// //         Vec<Arc<Vec<f64>>>, // test_xs
-// //         Vec<f64> // test_ys
-// //         ) {
-// //
-// //     // Load files
-// //     let pf = fname.to_string() + ".pref";
-// //     let trf = fname.to_string() + ".train";
-// //     let tef = fname.to_string() + ".test";
-// //
-// //     let pref_path = Path::new(&pf);
-// //     let train_path = Path::new(&trf);
-// //     let test_path = Path::new(&tef);
-// //     let mut options = OpenOptions::new();
-// //     options.read(true);
-// //
-// //     let mut pref_file = BufReader::new(options.open(&pref_path).unwrap());
-// //     let mut train_file = BufReader::new(options.open(&train_path).unwrap());
-// //     let mut test_file = BufReader::new(options.open(&test_path).unwrap());
-// //
-// //     let (train_tids, train_xs, train_ys) = parse_data_file(train_file);
-// //     let (test_tids, test_xs, test_ys) = parse_data_file(test_file);
-// //     let prefs = parse_prefs(pref_file);
-// //     println!("loading {} tasks", prefs.len());
-// //
-// //
-// //     // extract tasks from loaded data
-// //     let mut tasks: Vec<DigitsTask> = Vec::new();
-// //     let mut train_idx = 0;
-// //     let mut test_idx = 0;
-// //     for (tid, pref) in prefs.iter().enumerate() {
-// //         let mut cur_train_xs: Vec<Arc<Vec<f64>>> = Vec::new();
-// //         let mut cur_train_ys: Vec<f64> = Vec::new();
-// //         let mut cur_test_xs: Vec<Arc<Vec<f64>>> = Vec::new();
-// //         let mut cur_test_ys: Vec<f64> = Vec::new();
-// //         loop {
-// //             assert!(train_tids[train_idx] == tid);
-// //             cur_train_xs.push(train_xs[train_idx].clone());
-// //             cur_train_ys.push(train_ys[train_idx]);
-// //             train_idx += 1;
-// //             if train_tids.len() <= train_idx || train_tids[train_idx] > tid {
-// //                 break;
-// //             }
-// //         }
-// //         loop {
-// //             assert!(test_tids[test_idx] == tid);
-// //             cur_test_xs.push(test_xs[test_idx].clone());
-// //             cur_test_ys.push(test_ys[test_idx]);
-// //             test_idx += 1;
-// //             if test_tids.len() <= test_idx ||  test_tids[test_idx] > tid {
-// //                 break;
-// //             }
-// //         }
-// //
-// //         tasks.push(DigitsTask {
-// //             pref: *pref,
-// //             train_x: cur_train_xs,
-// //             train_y: cur_train_ys,
-// //             test_x: cur_test_xs,
-// //             test_y: cur_test_ys,
-// //             // model: None,
-// //         });
-// //     }
-// //
-// //     (tasks, train_xs, train_ys, train_tids, test_xs, test_ys)
-// // }
+//     // Load files
+//     let pf = fname.to_string() + ".pref";
+//     let trf = fname.to_string() + ".train";
+//     let tef = fname.to_string() + ".test";
 //
+//     let pref_path = Path::new(&pf);
+//     let train_path = Path::new(&trf);
+//     let test_path = Path::new(&tef);
+//     let mut options = OpenOptions::new();
+//     options.read(true);
+//
+//     let mut pref_file = BufReader::new(options.open(&pref_path).unwrap());
+//     let mut train_file = BufReader::new(options.open(&train_path).unwrap());
+//     let mut test_file = BufReader::new(options.open(&test_path).unwrap());
+//
+//     let (train_tids, train_xs, train_ys) = parse_data_file(train_file);
+//     let (test_tids, test_xs, test_ys) = parse_data_file(test_file);
+//     let prefs = parse_prefs(pref_file);
+//     println!("loading {} tasks", prefs.len());
+//
+//
+//     // extract tasks from loaded data
+//     let mut tasks: Vec<DigitsTask> = Vec::new();
+//     let mut train_idx = 0;
+//     let mut test_idx = 0;
+//     for (tid, pref) in prefs.iter().enumerate() {
+//         let mut cur_train_xs: Vec<Arc<Vec<f64>>> = Vec::new();
+//         let mut cur_train_ys: Vec<f64> = Vec::new();
+//         let mut cur_test_xs: Vec<Arc<Vec<f64>>> = Vec::new();
+//         let mut cur_test_ys: Vec<f64> = Vec::new();
+//         loop {
+//             assert!(train_tids[train_idx] == tid);
+//             cur_train_xs.push(train_xs[train_idx].clone());
+//             cur_train_ys.push(train_ys[train_idx]);
+//             train_idx += 1;
+//             if train_tids.len() <= train_idx || train_tids[train_idx] > tid {
+//                 break;
+//             }
+//         }
+//         loop {
+//             assert!(test_tids[test_idx] == tid);
+//             cur_test_xs.push(test_xs[test_idx].clone());
+//             cur_test_ys.push(test_ys[test_idx]);
+//             test_idx += 1;
+//             if test_tids.len() <= test_idx ||  test_tids[test_idx] > tid {
+//                 break;
+//             }
+//         }
+//
+//         tasks.push(DigitsTask {
+//             pref: *pref,
+//             train_x: cur_train_xs,
+//             train_y: cur_train_ys,
+//             test_x: cur_test_xs,
+//             test_y: cur_test_ys,
+//             // model: None,
+//         });
+//     }
+//
+//     (tasks, train_xs, train_ys, train_tids, test_xs, test_ys)
+// }
+
 // fn parse_prefs(r: BufReader<File>) -> Vec<f64> {
 //     let mut prefs: Vec<f64> = Vec::new();
 //
@@ -469,50 +466,50 @@
 //     }
 //     prefs
 // }
-//
-// pub fn parse_data_file(r: BufReader<File>)
-//                        -> (Vec<usize>, // task ids
-//                            Vec<Arc<Vec<f64>>>, // xs
-//                            Vec<f64>) {
-//     // ys
-//
-//     let mut xs: Vec<Arc<Vec<f64>>> = Vec::new();
-//     let mut ys: Vec<f64> = Vec::new();
-//     let mut tids: Vec<usize> = Vec::new();
-//     for line in r.lines().filter_map(|result| result.ok()) {
-//         let mut split = line.split(",").collect::<Vec<&str>>();
-//         // println!("{:?}", split);
-//         let tid = match split.first() {
-//             Some(l) => {
-//                 match l.trim().parse::<usize>() {
-//                     Ok(n) => n,
-//                     Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
-//                 }
-//             }
-//             None => panic!("malformed label".to_string()),
-//         };
-//         split.remove(0); // remove the tid, only features remaining
-//         let label = match split.first() {
-//             Some(l) => {
-//                 match l.trim().parse::<f64>() {
-//                     Ok(n) => n,
-//                     Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
-//                 }
-//             }
-//             None => panic!("malformed label".to_string()),
-//         };
-//         split.remove(0); // remove the label, only features remaining
-//         let mut features: Vec<f64> = Vec::new();
-//         for f in split.iter().map(|x| x.trim().parse::<f64>().unwrap()) {
-//             features.push(f);
-//         }
-//         xs.push(Arc::new(features));
-//         ys.push(label);
-//         tids.push(tid);
-//     }
-//
-//     (tids, xs, ys)
-// }
+
+pub fn parse_data_file(r: BufReader<File>)
+                       -> (Vec<usize>, // task ids
+                           Vec<Vec<f64>>, // xs
+                           Vec<f64>) {
+    // ys
+
+    let mut xs: Vec<Vec<f64>> = Vec::new();
+    let mut ys: Vec<f64> = Vec::new();
+    let mut tids: Vec<usize> = Vec::new();
+    for line in r.lines().filter_map(|result| result.ok()) {
+        let mut split = line.split(",").collect::<Vec<&str>>();
+        // println!("{:?}", split);
+        let tid = match split.first() {
+            Some(l) => {
+                match l.trim().parse::<usize>() {
+                    Ok(n) => n,
+                    Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
+                }
+            }
+            None => panic!("malformed label".to_string()),
+        };
+        split.remove(0); // remove the tid, only features remaining
+        let label = match split.first() {
+            Some(l) => {
+                match l.trim().parse::<f64>() {
+                    Ok(n) => n,
+                    Err(why) => panic!(format!("couldn't parse {}", Error::description(&why))),
+                }
+            }
+            None => panic!("malformed label".to_string()),
+        };
+        split.remove(0); // remove the label, only features remaining
+        let mut features: Vec<f64> = Vec::new();
+        for f in split.iter().map(|x| x.trim().parse::<f64>().unwrap()) {
+            features.push(f);
+        }
+        xs.push(features);
+        ys.push(label);
+        tids.push(tid);
+    }
+
+    (tids, xs, ys)
+}
 
 
 // #[cfg(test)]

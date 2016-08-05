@@ -314,6 +314,101 @@ pub struct ClipperServer<P, S>
     input_type: InputType,
     // models: HashMap<String, PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
     models: ModelSet,
+    server_metrics: ServerMetrics,
+}
+
+
+#[derive(Clone)]
+struct ServerMetrics {
+    pub num_queued_predictions_counter: Arc<metrics::Counter>,
+    pub num_queued_updates_counter: Arc<metrics::Counter>,
+}
+
+#[derive(Clone)]
+struct PredictionMetrics {
+    pub num_queued_predictions_counter: Arc<metrics::Counter>,
+    pub latency_hist: Arc<metrics::Histogram>,
+    pub pred_counter: Arc<metrics::Counter>,
+    pub thruput_meter: Arc<metrics::Meter>,
+    pub accuracy_counter: Arc<metrics::RatioCounter>,
+}
+
+impl PredictionMetrics {
+    pub fn new(metrics_register: Arc<RwLock<metrics::Registry>>) -> PredictionMetrics {
+
+        let accuracy_counter = {
+            let acc_counter_name = format!("prediction accuracy ratio");
+            metrics_register.write().unwrap().create_ratio_counter(acc_counter_name)
+        };
+
+        let pred_counter = {
+            let counter_name = format!("prediction_counter");
+            metrics_register.write().unwrap().create_counter(counter_name)
+        };
+
+        let latency_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("prediction_latency");
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056)
+        };
+
+        let thruput_meter: Arc<metrics::Meter> = {
+            let metric_name = format!("prediction_thruput");
+            metrics_register.write().unwrap().create_meter(metric_name)
+        };
+
+        let queued_predictions_counter: Arc<metrics::Counter> = {
+            let metric_name = format!("queued_predictions");
+            metrics_register.write().unwrap().create_counter(metric_name)
+        };
+
+        PredictionMetrics {
+            num_queued_predictions_counter: queued_predictions_counter,
+            latency_hist: latency_hist,
+            pred_counter: pred_counter,
+            thruput_meter: thruput_meter,
+            accuracy_counter: accuracy_counter,
+        }
+    }
+}
+
+#[derive(Clone)]
+struct UpdateMetrics {
+    pub num_queued_updates_counter: Arc<metrics::Counter>,
+    pub latency_hist: Arc<metrics::Histogram>,
+    pub update_counter: Arc<metrics::Counter>,
+    pub thruput_meter: Arc<metrics::Meter>, // accuracy_counter: Arc<metrics::RatioCounter>,
+}
+
+impl UpdateMetrics {
+    pub fn new(metrics_register: Arc<RwLock<metrics::Registry>>) -> UpdateMetrics {
+
+        let update_counter = {
+            let counter_name = format!("update_counter");
+            metrics_register.write().unwrap().create_counter(counter_name)
+        };
+
+        let latency_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("update_latency");
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056)
+        };
+
+        let thruput_meter: Arc<metrics::Meter> = {
+            let metric_name = format!("update_thruput");
+            metrics_register.write().unwrap().create_meter(metric_name)
+        };
+
+        let queued_updates_counter: Arc<metrics::Counter> = {
+            let metric_name = format!("queued_updates");
+            metrics_register.write().unwrap().create_counter(metric_name)
+        };
+
+        UpdateMetrics {
+            num_queued_updates_counter: queued_updates_counter,
+            latency_hist: latency_hist,
+            update_counter: update_counter,
+            thruput_meter: thruput_meter,
+        }
+    }
 }
 
 
@@ -337,23 +432,18 @@ impl<P, S> ClipperServer<P, S>
         let cache: Arc<SimplePredictionCache<Output, EqualityHasher>> =
             Arc::new(SimplePredictionCache::with_models(&conf.models, conf.cache_size.clone()));
 
+        let prediction_metrics = PredictionMetrics::new(conf.metrics.clone());
+
+        let update_metrics = UpdateMetrics::new(conf.metrics.clone());
+
+        let server_metrics = ServerMetrics {
+            num_queued_predictions_counter: prediction_metrics.num_queued_predictions_counter
+                                                              .clone(),
+            num_queued_updates_counter: update_metrics.num_queued_updates_counter.clone(),
+        };
+
+
         let models = ModelSet::from_conf(&conf, cache.clone());
-        // let mut model_batchers = HashMap::new();
-        // for m in conf.models.into_iter() {
-        //     let b = PredictionBatcher::new(m.name.clone(),
-        //                                    m.addresses.clone(),
-        //                                    conf.input_type.clone(),
-        //                                    conf.metrics.clone(),
-        //                                    cache.clone(),
-        //                                    conf.slo_micros.clone());
-        //     model_batchers.insert(m.name.clone(), b);
-        // }
-        //
-        // // let models = Arc::new(model_batchers);
-        // let models = model_batchers;
-
-
-
 
         let mut prediction_workers = Vec::with_capacity(conf.num_predict_workers.clone());
         for i in 0..conf.num_predict_workers {
@@ -362,7 +452,8 @@ impl<P, S> ClipperServer<P, S>
                                                           cache.clone(),
                                                           models.clone(),
                                                           conf.redis_ip.clone(),
-                                                          conf.redis_port));
+                                                          conf.redis_port,
+                                                          prediction_metrics.clone()));
         }
         let mut update_workers = Vec::with_capacity(conf.num_update_workers.clone());
         for i in 0..conf.num_update_workers {
@@ -371,7 +462,8 @@ impl<P, S> ClipperServer<P, S>
                                                   models.clone(),
                                                   conf.window_size,
                                                   conf.redis_ip.clone(),
-                                                  conf.redis_port));
+                                                  conf.redis_port,
+                                                  update_metrics.clone()));
         }
         ClipperServer {
             prediction_workers: prediction_workers,
@@ -380,11 +472,13 @@ impl<P, S> ClipperServer<P, S>
             metrics: conf.metrics,
             input_type: conf.input_type,
             models: models,
+            server_metrics: server_metrics,
         }
     }
 
     // TODO: replace worker vec with spmc (http://seanmonstar.github.io/spmc/spmc/index.html)
     pub fn schedule_prediction(&self, req: PredictionRequest) {
+        self.server_metrics.num_queued_predictions_counter.incr(1);
         let mut rng = thread_rng();
         // randomly pick a worker
 
@@ -411,8 +505,9 @@ impl<P, S> ClipperServer<P, S>
     }
 
     pub fn schedule_update(&self, req: UpdateRequest) {
+        self.server_metrics.num_queued_updates_counter.incr(1);
         // Ensure that all updates for a given user ID go to the same
-        // update worker. If there are
+        // update worker.
         self.update_workers[req.uid as usize % self.update_workers.len()].update(req);
     }
 
@@ -450,6 +545,7 @@ struct PredictionWorker<P, S>
     // models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
     _policy_marker: PhantomData<P>,
     _state_marker: PhantomData<S>,
+    prediction_metrics: PredictionMetrics,
 }
 
 
@@ -462,7 +558,8 @@ impl<P, S> PredictionWorker<P, S>
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: ModelSet,
                redis_ip: String,
-               redis_port: u16)
+               redis_port: u16,
+               prediction_metrics: PredictionMetrics)
                -> PredictionWorker<P, S> {
         let (input_sender, input_receiver) = mpsc::channel::<(PredictionRequest, i32)>();
         let (output_sender, output_receiver) = mpsc::channel::<PredictionRequest>();
@@ -470,6 +567,7 @@ impl<P, S> PredictionWorker<P, S>
             let cache = cache.clone();
             let models = models.clone();
             let redis_ip = redis_ip.clone();
+            // let prediction_metrics = prediction_metrics.clone();
             thread::spawn(move || {
                 PredictionWorker::<P, S>::run_input_thread(worker_id,
                                                            input_receiver,
@@ -480,15 +578,19 @@ impl<P, S> PredictionWorker<P, S>
                                                            redis_port);
             });
         }
-        thread::spawn(move || {
-            PredictionWorker::<P, S>::run_output_thread(worker_id,
-                                                        slo_micros,
-                                                        output_receiver,
-                                                        cache,
-                                                        // models,
-                                                        redis_ip,
-                                                        redis_port);
-        });
+        {
+            let prediction_metrics = prediction_metrics.clone();
+            thread::spawn(move || {
+                PredictionWorker::<P, S>::run_output_thread(worker_id,
+                                                            slo_micros,
+                                                            output_receiver,
+                                                            cache,
+                                                            // models,
+                                                            redis_ip,
+                                                            redis_port,
+                                                            prediction_metrics);
+            });
+        }
         PredictionWorker {
             worker_id: worker_id,
             input_queue: input_sender,
@@ -496,6 +598,7 @@ impl<P, S> PredictionWorker<P, S>
             // models: models,
             _policy_marker: PhantomData,
             _state_marker: PhantomData,
+            prediction_metrics: prediction_metrics,
         }
     }
 
@@ -571,7 +674,8 @@ impl<P, S> PredictionWorker<P, S>
                          cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                          // models: ModelSet,
                          redis_ip: String,
-                         redis_port: u16) {
+                         redis_port: u16,
+                         prediction_metrics: PredictionMetrics) {
         let slo = Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = Duration::milliseconds(1);
@@ -620,9 +724,10 @@ impl<P, S> PredictionWorker<P, S>
             let end_time = PreciseTime::now();
             // TODO: metrics
             let latency = req.recv_time.to(end_time).num_microseconds().unwrap();
-            // pred_metrics.latency_hist.insert(latency);
-            // pred_metrics.thruput_meter.mark(1);
-            // pred_metrics.pred_counter.incr(1);
+            prediction_metrics.latency_hist.insert(latency);
+            prediction_metrics.thruput_meter.mark(1);
+            prediction_metrics.pred_counter.incr(1);
+            prediction_metrics.num_queued_predictions_counter.decr(1);
         }
         info!("ending output loop: prediction worker {}", worker_id);
     }
@@ -665,6 +770,7 @@ struct UpdateWorker<P, S>
     _policy_marker: PhantomData<P>,
     _state_marker: PhantomData<S>,
     runner_handle: Option<JoinHandle<()>>,
+    update_metrics: UpdateMetrics,
 }
 
 impl<P, S> UpdateWorker<P, S>
@@ -676,19 +782,25 @@ impl<P, S> UpdateWorker<P, S>
                models: ModelSet,
                window_size: isize,
                redis_ip: String,
-               redis_port: u16)
+               redis_port: u16,
+               update_metrics: UpdateMetrics)
                -> UpdateWorker<P, S> {
 
         let (sender, receiver) = mpsc::channel::<UpdateMessage>();
-        let jh = thread::spawn(move || {
-            UpdateWorker::<P, S>::run(worker_id,
-                                      receiver,
-                                      cache.clone(),
-                                      models,
-                                      window_size,
-                                      redis_ip,
-                                      redis_port);
-        });
+        let jh;
+        {
+            let update_metrics = update_metrics.clone();
+            jh = thread::spawn(move || {
+                UpdateWorker::<P, S>::run(worker_id,
+                                          receiver,
+                                          cache.clone(),
+                                          models,
+                                          window_size,
+                                          redis_ip,
+                                          redis_port,
+                                          update_metrics);
+            });
+        }
         UpdateWorker {
             worker_id: worker_id,
             input_queue: sender,
@@ -697,6 +809,7 @@ impl<P, S> UpdateWorker<P, S>
             _policy_marker: PhantomData,
             _state_marker: PhantomData,
             runner_handle: Some(jh),
+            update_metrics: update_metrics,
         }
     }
 
@@ -718,7 +831,8 @@ impl<P, S> UpdateWorker<P, S>
            models: ModelSet,
            window_size: isize,
            redis_ip: String,
-           redis_port: u16) {
+           redis_port: u16,
+           update_metrics: UpdateMetrics) {
         // let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
         //                                                            REDIS_CMT_DB);
 
@@ -775,7 +889,10 @@ impl<P, S> UpdateWorker<P, S>
 
             UpdateWorker::<P, S>::check_for_ready_updates(&mut waiting_updates, &mut ready_updates);
 
-            UpdateWorker::<P, S>::execute_updates(update_batch_size, &mut ready_updates, &mut cmt);
+            UpdateWorker::<P, S>::execute_updates(update_batch_size,
+                                                  &mut ready_updates,
+                                                  &mut cmt,
+                                                  &update_metrics);
 
 
             if sleep {
@@ -899,7 +1016,8 @@ impl<P, S> UpdateWorker<P, S>
     fn execute_updates(max_updates: usize,
                        ready_updates: &mut Vec<UpdateDependencies>,
                        // update_order: &mut VecDeque<usize>,
-                       cmt: &mut RedisCMT<S>) {
+                       cmt: &mut RedisCMT<S>,
+                       update_metrics: &UpdateMetrics) {
         let num_updates = ready_updates.len();
         for mut update_dep in ready_updates.drain(0..cmp::min(max_updates, num_updates)) {
             let uid = update_dep.req.uid;
@@ -943,10 +1061,18 @@ impl<P, S> UpdateWorker<P, S>
                                     .as_ref()
                                     .unwrap()) {
                 Ok(_) => {
+
                     // info!("putting new state for {}", uid);
                 }
                 Err(e) => warn!("{}", e),
             }
+
+            let end_time = PreciseTime::now();
+            let latency = update_dep.req.recv_time.to(end_time).num_microseconds().unwrap();
+            update_metrics.latency_hist.insert(latency);
+            update_metrics.thruput_meter.mark(1);
+            update_metrics.update_counter.incr(1);
+            update_metrics.num_queued_updates_counter.decr(1);
         }
     }
 }
@@ -959,48 +1085,6 @@ impl<P, S> Drop for UpdateWorker<P, S>
         self.input_queue.send(UpdateMessage::Shutdown).unwrap();
         self.runner_handle.take().unwrap().join().unwrap();
         // info!("DROPPING UPDATE WORKER {}", self.worker_id);
-    }
-}
-
-#[derive(Clone)]
-#[allow(dead_code)]
-struct PredictionMetrics {
-    latency_hist: Arc<metrics::Histogram>,
-    pred_counter: Arc<metrics::Counter>,
-    thruput_meter: Arc<metrics::Meter>,
-    accuracy_counter: Arc<metrics::RatioCounter>,
-}
-
-#[allow(dead_code)]
-impl PredictionMetrics {
-    pub fn new(metrics_register: Arc<RwLock<metrics::Registry>>) -> PredictionMetrics {
-
-        let accuracy_counter = {
-            let acc_counter_name = format!("prediction accuracy ratio");
-            metrics_register.write().unwrap().create_ratio_counter(acc_counter_name)
-        };
-
-        let pred_counter = {
-            let counter_name = format!("prediction_counter");
-            metrics_register.write().unwrap().create_counter(counter_name)
-        };
-
-        let latency_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("prediction_latency");
-            metrics_register.write().unwrap().create_histogram(metric_name, 2056)
-        };
-
-        let thruput_meter: Arc<metrics::Meter> = {
-            let metric_name = format!("prediction_thruput");
-            metrics_register.write().unwrap().create_meter(metric_name)
-        };
-
-        PredictionMetrics {
-            latency_hist: latency_hist,
-            pred_counter: pred_counter,
-            thruput_meter: thruput_meter,
-            accuracy_counter: accuracy_counter,
-        }
     }
 }
 

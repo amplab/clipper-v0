@@ -424,7 +424,7 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
 }
 
 
-#[allow(unused_variables)]
+#[allow(unused_variables)] // needed for metrics shutdown signal
 fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>, clipper: Arc<ClipperServer<P, S>>)
     where P: CorrectionPolicy<S>,
           S: Serialize + Deserialize

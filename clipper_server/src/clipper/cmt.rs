@@ -213,7 +213,7 @@ impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
     }
 
     fn get(&self, uid: u32, versioned_models: &Vec<VersionedModel>) -> Result<S, String> {
-        info!("fetching state for uid: {}", uid);
+        debug!("fetching state for uid: {}", uid);
         let mut s = SipHasher::new();
         versioned_models.hash(&mut s);
         let version_hash = s.finish();
