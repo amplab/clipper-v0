@@ -464,19 +464,34 @@ impl<P, S> PredictionWorker<P, S>
                redis_ip: String,
                redis_port: u16)
                -> PredictionWorker<P, S> {
-        let (sender, receiver) = mpsc::channel::<(PredictionRequest, i32)>();
+        let (input_sender, input_receiver) = mpsc::channel::<(PredictionRequest, i32)>();
+        let (output_sender, output_receiver) = mpsc::channel::<PredictionRequest>();
+        {
+            let cache = cache.clone();
+            let models = models.clone();
+            let redis_ip = redis_ip.clone();
+            thread::spawn(move || {
+                PredictionWorker::<P, S>::run_input_thread(worker_id,
+                                                           input_receiver,
+                                                           output_sender,
+                                                           cache,
+                                                           models,
+                                                           redis_ip,
+                                                           redis_port);
+            });
+        }
         thread::spawn(move || {
-            PredictionWorker::<P, S>::run(worker_id,
-                                          slo_micros,
-                                          receiver,
-                                          cache.clone(),
-                                          models,
-                                          redis_ip,
-                                          redis_port);
+            PredictionWorker::<P, S>::run_output_thread(worker_id,
+                                                        slo_micros,
+                                                        output_receiver,
+                                                        cache,
+                                                        // models,
+                                                        redis_ip,
+                                                        redis_port);
         });
         PredictionWorker {
             worker_id: worker_id,
-            input_queue: sender,
+            input_queue: input_sender,
             // cache: cache,
             // models: models,
             _policy_marker: PhantomData,
@@ -484,42 +499,91 @@ impl<P, S> PredictionWorker<P, S>
         }
     }
 
-    // TODO TODO TODO: having prediction dispatch and response in the same
-    // thread will significantly limit throughput.
+    fn run_input_thread(worker_id: i32,
+                        request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
+                        send_queue: mpsc::Sender<PredictionRequest>,
+                        cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
+                        models: ModelSet,
+                        redis_ip: String,
+                        redis_port: u16) {
+        let cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
+        info!("starting input prediction worker {} ", worker_id);
+        while let Ok((mut req, max_preds)) = request_queue.recv() {
+            {
+                req.offline_models = Some(models.get_versioned_models(&req.offline_models));
+
+                // let model_names = models.get_names(&req.offline_models)
+                //                         .map(|vm| vm.name)
+                //                         .collect::<Vec<_>>();
+                // TODO: take into account model versions
+                let model_names = req.offline_models
+                                     .as_ref()
+                                     .unwrap()
+                                     .iter()
+                                     .map(|r| &r.name)
+                                     .collect::<Vec<&String>>();
+                let model_req_order: Vec<String> =
+                    if max_preds < req.offline_models.as_ref().unwrap().len() as i32 {
+                        let correction_state: S = cmt.get(*(&req.uid) as u32,
+                                                          req.offline_models.as_ref().unwrap())
+                                                     .unwrap_or(P::new(model_names.clone()));
+                        P::rank_models_desc(&correction_state, model_names.clone())
+                    } else {
+                        // models.keys().map(|r| r.clone()).collect::<Vec<String>>()
+                        model_names.iter().map(|m| (*m).clone()).collect::<Vec<String>>()
+                    };
+                let mut num_requests = 0;
+                let mut i = 0;
+                let mut model_name_version_map: HashMap<&String, &u32> = HashMap::new();
+                for vm in req.offline_models.as_ref().unwrap() {
+                    model_name_version_map.insert(&vm.name, vm.version.as_ref().unwrap());
+                }
+                while num_requests < max_preds && i < model_req_order.len() {
+                    // first check to see if the prediction is already cached
+                    if cache.fetch(&model_req_order[i], &req.query).is_none() {
+                        // TODO: can we avoid copying the input for each model?
+                        // Yes! Use an Arc!
+                        let vm = VersionedModel {
+                            name: model_req_order[i].clone(),
+                            version: Some(**model_name_version_map.get(&model_req_order[i])
+                                                                  .unwrap()),
+                        };
+                        models.request_prediction(&vm,
+                                                  RpcPredictRequest {
+                                                      input: req.query.clone(),
+                                                      recv_time: req.recv_time.clone(),
+                                                  });
+                        num_requests += 1;
+                    }
+                    i += 1;
+                }
+            }
+            send_queue.send(req).unwrap();
+
+        }
+        info!("ending input loop: prediction worker {}", worker_id);
+    }
+
     #[allow(unused_variables)]
-    fn run(worker_id: i32,
-           slo_micros: u32,
-           request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
-           cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
-           models: ModelSet,
-           redis_ip: String,
-           redis_port: u16) {
+    fn run_output_thread(worker_id: i32,
+                         slo_micros: u32,
+                         request_queue: mpsc::Receiver<PredictionRequest>,
+                         cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
+                         // models: ModelSet,
+                         redis_ip: String,
+                         redis_port: u16) {
         let slo = Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
         let epsilon = Duration::milliseconds(1);
         // let mut cmt = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_CMT_DB);
-        let mut cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
-        info!("starting prediction worker {} with {} ms SLO",
+        let cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
+        info!("starting prediction worker {} output thread with {} ms SLO",
               worker_id,
               slo_micros as f64 / 1000.0);
 
-        // TODO: remove this probably
-        if worker_id == 0 {
-            // cmt.put(0 as u32, &P::new(models.keys().collect::<Vec<_>>())).unwrap();
-            let versioned_models = models.get_versioned_models(&None);
-            let model_names = versioned_models.iter()
-                                              .map(|vm| &vm.name)
-                                              .collect::<Vec<_>>();
-            cmt.put(0 as u32, &P::new(model_names), &versioned_models).unwrap();
-        }
 
-        while let Ok((mut req, max_preds)) = request_queue.recv() {
-            req.offline_models = Some(models.get_versioned_models(&req.offline_models));
+        while let Ok(req) = request_queue.recv() {
 
-            // let model_names = models.get_names(&req.offline_models)
-            //                         .map(|vm| vm.name)
-            //                         .collect::<Vec<_>>();
-            // TODO: take into account model versions
             let model_names = req.offline_models
                                  .as_ref()
                                  .unwrap()
@@ -529,45 +593,6 @@ impl<P, S> PredictionWorker<P, S>
             let correction_state: S = cmt.get(*(&req.uid) as u32,
                                               req.offline_models.as_ref().unwrap())
                                          .unwrap_or(P::new(model_names.clone()));
-            let model_req_order: Vec<String> =
-                if max_preds < req.offline_models.as_ref().unwrap().len() as i32 {
-                    P::rank_models_desc(&correction_state, model_names.clone())
-                } else {
-                    // models.keys().map(|r| r.clone()).collect::<Vec<String>>()
-                    model_names.iter().map(|m| (*m).clone()).collect::<Vec<String>>()
-                };
-            let mut num_requests = 0;
-            let mut i = 0;
-            let mut model_name_version_map: HashMap<&String, &u32> = HashMap::new();
-            for vm in req.offline_models.as_ref().unwrap() {
-                model_name_version_map.insert(&vm.name, vm.version.as_ref().unwrap());
-            }
-            while num_requests < max_preds && i < model_req_order.len() {
-                // first check to see if the prediction is already cached
-                if cache.fetch(&model_req_order[i], &req.query).is_none() {
-                    // TODO: can we avoid copying the input for each model?
-                    // Yes! Use an Arc!
-                    let vm = VersionedModel {
-                        name: model_req_order[i].clone(),
-                        version: Some(**model_name_version_map.get(&model_req_order[i]).unwrap()),
-                    };
-                    models.request_prediction(&vm,
-                                              RpcPredictRequest {
-                                                  input: req.query.clone(),
-                                                  recv_time: req.recv_time.clone(),
-                                              });
-                    // models.get(&model_req_order[i])
-                    //       .unwrap()
-                    //       .request_prediction(RpcPredictRequest {
-                    //           input: req.query.clone(),
-                    //           recv_time: req.recv_time.clone(),
-                    //       });
-                    num_requests += 1;
-                }
-                i += 1;
-            }
-
-            // TODO: this sleeping should not be happening here
             let elapsed_time = req.recv_time.to(PreciseTime::now());
             // NOTE: assumes SLA less than 1 second
             if elapsed_time < slo - epsilon {
@@ -599,7 +624,7 @@ impl<P, S> PredictionWorker<P, S>
             // pred_metrics.thruput_meter.mark(1);
             // pred_metrics.pred_counter.incr(1);
         }
-        info!("ending loop: prediction worker {}", worker_id);
+        info!("ending output loop: prediction worker {}", worker_id);
     }
 
     /// Execute the provided prediction request,
@@ -868,38 +893,6 @@ impl<P, S> UpdateWorker<P, S>
             ready_updates.push(update_dep);
             offset += 1;
 
-            // let uid = update_dep.req.uid;
-
-
-            // let mut done = false;
-            // if let Some(u) = ready_updates.get_mut(&uid) {
-            //     u.push(update_dep);
-            //     done = true;
-            // }
-            // if !done {
-            //     // If no entries for this user exist, add their user ID to the back of
-            //     // the update queue. If they have an existing vec of updates, they are already
-            //     // in the update queue and so we don't need to add them.
-            //     update_order.push_back(uid as usize);
-            //     ready_updates.insert(uid, vec![update_dep]);
-            // }
-
-            // let mut entry = ready_updates.entry(uid).or_insert(Vec::new());
-            // if (*entry).len() == 0 {
-            //     update_order.push_back(uid as usize);
-            // }
-            // (*entry).push(update_dep);
-
-            // match ready_updates.get_mut(&uid) {
-            //     Some(u) => u.push(update_dep),
-            //     None => {
-            //         // If no entries for this user exist, add their user ID to the back of
-            //         // the update queue. If they have an existing vec of updates, they are already
-            //         // in the update queue and so we don't need to add them.
-            //         update_order.push_back(uid as usize);
-            //         ready_updates.insert(uid, vec![update_dep]);
-            //     }
-            // }
         }
     }
 
