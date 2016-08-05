@@ -1,5 +1,6 @@
 use time;
 use std::net::{SocketAddr, TcpStream};
+use std::time::Duration as StdDuration;
 // use std::net::Shutdown
 use std::thread::{self, JoinHandle};
 use std::sync::{RwLock, Arc, mpsc, Mutex};
@@ -127,7 +128,21 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
 
         let dynamic_batching = true;
 
-        let mut stream: TcpStream = TcpStream::connect(addr).unwrap();
+        let mut stream: TcpStream;
+        loop {
+            match TcpStream::connect(addr) {
+                Ok(s) => {
+                    info!("Connected to {} model wrapper at {:?}", name, addr);
+                    stream = s;
+                    break;
+                }
+                Err(_) => {
+                    info!("Couldn't connect to {} model wrapper. Sleeping 1 second",
+                          name);
+                    thread::sleep(StdDuration::from_millis(500));
+                }
+            }
+        }
         stream.set_nodelay(true).unwrap();
         stream.set_read_timeout(None).unwrap();
         // let max_batch_size = batch_size;

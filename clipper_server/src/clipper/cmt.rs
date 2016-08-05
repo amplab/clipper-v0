@@ -15,6 +15,8 @@ use std::marker::PhantomData;
 use std::isize;
 use server::{Input, Output, VersionedModel};
 use std::hash::{Hash, SipHasher, Hasher};
+use std::thread;
+use std::time::Duration as StdDuration;
 
 pub const REDIS_CMT_DB: u32 = 1;
 pub const REDIS_UPDATE_DB: u32 = 2;
@@ -43,23 +45,48 @@ pub struct RedisUpdateTable {
     connection: redis::Connection,
 }
 
+
+fn redis_connect(conn_string: String) -> redis::Connection {
+    info!("Trying to connect to Redis");
+    loop {
+        match redis::Client::open(conn_string.as_str()) {
+            Ok(client) => {
+                match client.get_connection() {
+                    Ok(con) => return con,
+                    _ => {
+                        info!("Couldn't connect to Redis: {}, sleeping 1 second",
+                              conn_string);
+                        thread::sleep(StdDuration::from_millis(500));
+                    }
+                }
+            }
+            _ => {
+                info!("Couldn't connect to Redis: {}, sleeping 1 second",
+                      conn_string);
+                thread::sleep(StdDuration::from_millis(500));
+            }
+        }
+    }
+
+}
+
 impl RedisUpdateTable {
     pub fn new_socket_connection(socket_file: &str, db: u32) -> RedisUpdateTable {
         // let conn_string = format!("unix:///tmp/redis.sock?db={}", REDIS_UPDATE_DB);
         let conn_string = format!("unix://{}?db={}", socket_file, db);
         info!("RedisUpdateTable connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
-        RedisUpdateTable { connection: con }
+        RedisUpdateTable { connection: redis_connect(conn_string) }
     }
+
 
     pub fn new_tcp_connection(addr: &str, port: u16, db: u32) -> RedisUpdateTable {
         // let conn_string = format!("redis://127.0.0.1/{}", REDIS_UPDATE_DB);
         let conn_string = format!("redis://{}:{}/{}", addr, port, db);
         info!("RedisUpdateTable connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
-        RedisUpdateTable { connection: con }
+        RedisUpdateTable { connection: redis_connect(conn_string) }
+        // let client = redis::Client::open(conn_string.as_str()).unwrap();
+        // let con = client.get_connection().unwrap();
+        // RedisUpdateTable { connection: con }
     }
 }
 
@@ -142,10 +169,11 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
         // let conn_string = format!("unix:///tmp/redis.sock?db={}", REDIS_CMT_DB);
         let conn_string = format!("unix://{}?db={}", socket_file, db);
         info!("RedisCMT connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
+        // RedisUpdateTable { connection: redis_connect(conn_string) }
+        // let client = redis::Client::open(conn_string.as_str()).unwrap();
+        // let con = client.get_connection().unwrap();
         RedisCMT {
-            connection: con,
+            connection: redis_connect(conn_string),
             _correction_state_marker: PhantomData,
         }
     }
@@ -154,10 +182,10 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
         // let conn_string = format!("redis://127.0.0.1/{}", REDIS_CMT_DB);
         let conn_string = format!("redis://{}:{}/{}", addr, port, db);
         info!("RedisCMT connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
+        // let client = redis::Client::open(conn_string.as_str()).unwrap();
+        // let con = client.get_connection().unwrap();
         RedisCMT {
-            connection: con,
+            connection: redis_connect(conn_string),
             _correction_state_marker: PhantomData,
         }
     }

@@ -7,18 +7,18 @@ use_lsh = true
 input_type = "int"
 input_length = 784
 window_size = -1
-redis_ip = "172.17.0.3"
+redis_ip = "redis"
 redis_port = 6379
 
-num_predict_workers = 4
-num_update_workers = 4
+num_predict_workers = 1
+num_update_workers = 1
 # largest prime less than 50000
 cache_size = 49999
 
 
 [[models]]
 name = "pyspark_lr"
-addresses = ["172.17.0.2:6001"]
+addresses = ["sparkmw:6001"]
 num_outputs = 1
 
 # [[models]]

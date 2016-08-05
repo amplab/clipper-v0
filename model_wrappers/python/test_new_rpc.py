@@ -26,4 +26,4 @@ class NoopModelWrapper(rpc.ModelWrapperBase):
 
 if __name__=='__main__':
     model = NoopModelWrapper()
-    rpc.start(model, "127.0.0.1", 6001)
+    rpc.start(model, 6001)
