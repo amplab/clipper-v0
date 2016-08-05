@@ -21,6 +21,11 @@ use std::time::Duration;
 use std::sync::{mpsc, Arc, RwLock};
 use docopt::Docopt;
 use toml::{Parser, Value};
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+use std::io::BufReader;
+use std::error::Error;
 
 mod digits;
 
@@ -79,8 +84,26 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
 
 #[allow(unused_variables)] // needed for metrics shutdown signal
 fn start_digits_benchmark(conf_path: &String) {
+    let path = Path::new(conf_path);
+    let display = path.display();
 
-    let pc = Parser::new(conf_path).parse().unwrap();
+    let mut file = match File::open(&path) {
+        // The `description` method of `io::Error` returns a string that
+        // describes the error
+        Err(why) => {
+            panic!(format!("couldn't open {}: REASON: {}",
+                           display,
+                           Error::description(&why)))
+        }
+        Ok(file) => BufReader::new(file),
+    };
+
+    let mut toml_string = String::new();
+    match file.read_to_string(&mut toml_string) {
+        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
+        Ok(_) => print!("{} contains:\n{}", display, toml_string),
+    }
+    let pc = Parser::new(&toml_string).parse().unwrap();
     let mnist_path = pc.get("mnist_path").unwrap().as_str().unwrap().to_string();
     let num_requests = pc.get("num_benchmark_requests")
                          .unwrap_or(&Value::Integer(10000))
@@ -111,6 +134,9 @@ fn start_digits_benchmark(conf_path: &String) {
     let mut rng = thread_rng();
     let num_users = 1;
     while events_fired < num_requests {
+        if events_fired % 20000 == 0 {
+            info!("Submitted {} requests", events_fired);
+        }
         let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
         let input = Input::Floats {
             f: norm_test_data.xs[idx].clone(),
@@ -119,8 +145,12 @@ fn start_digits_benchmark(conf_path: &String) {
         let user = rng.gen_range::<u32>(0, num_users);
         {
             let sender = sender.clone();
+            // let req_num = events_fired;
             let on_pred = Box::new(move |_| {
                 sender.send(()).unwrap();
+                // if req_num % 100 == 0 {
+                //     info!("completed prediction {}", req_num);
+                // }
             });
             let r = PredictionRequest::new(user, input, on_pred);
             clipper.schedule_prediction(r);
@@ -128,6 +158,8 @@ fn start_digits_benchmark(conf_path: &String) {
         events_fired += 1;
     }
 
-    let _ = receiver.iter().take(num_requests).collect::<Vec<_>>();
-
+    for _ in 0..num_requests {
+        receiver.recv().unwrap();
+    }
+    // let _ = receiver.iter().take(num_requests).collect::<Vec<_>>();
 }

@@ -70,12 +70,17 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
 
         let latency_hist: Arc<metrics::Histogram> = {
             let metric_name = format!("{}_model_latency", name);
-            metric_register.write().unwrap().create_histogram(metric_name, 2056)
+            metric_register.write().unwrap().create_histogram(metric_name, 8224)
         };
 
         let thruput_meter: Arc<metrics::Meter> = {
             let metric_name = format!("{}_model_thruput", name);
             metric_register.write().unwrap().create_meter(metric_name)
+        };
+
+        let batch_size_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("{}_model_batch_size", name);
+            metric_register.write().unwrap().create_histogram(metric_name, 8224)
         };
 
         let predictions_counter: Arc<metrics::Counter> = {
@@ -91,6 +96,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             let name = name.clone();
             let addr = a.clone();
             let latency_hist = latency_hist.clone();
+            let batch_size_hist = batch_size_hist.clone();
             let thruput_meter = thruput_meter.clone();
             let predictions_counter = predictions_counter.clone();
             let input_type = input_type.clone();
@@ -100,6 +106,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
                                        receiver,
                                        addr,
                                        latency_hist,
+                                       batch_size_hist,
                                        thruput_meter,
                                        predictions_counter,
                                        input_type,
@@ -120,6 +127,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
            receiver: mpsc::Receiver<RpcPredictRequest>,
            addr: SocketAddr,
            latency_hist: Arc<metrics::Histogram>,
+           batch_size_hist: Arc<metrics::Histogram>,
            thruput_meter: Arc<metrics::Meter>,
            predictions_counter: Arc<metrics::Counter>,
            input_type: InputType,
@@ -179,6 +187,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             }
             thruput_meter.mark(batch.len());
             predictions_counter.incr(batch.len() as isize);
+            batch_size_hist.insert(batch.len() as i64);
             if latency > slo_micros as i64 {
                 debug!("latency: {}, batch size: {}",
                        (latency as f64 / 1000.0),
