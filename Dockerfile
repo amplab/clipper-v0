@@ -11,7 +11,7 @@ RUN apt-get update \
 # && ssh-keyscan -H github.com >> ~/.ssh/known_hosts \
 # && git clone --recursive git@github.com:amplab/clipper.git \
 && cd clipper/benchmarks \
-&& cargo build \
+&& cargo build --release \
 && rm -rf /var/lib/apt/lists/* \
 && mkdir /mnist_data
 
@@ -24,6 +24,6 @@ ENV RUST_BACKTRACE=1
 # CMD ["--conf=/rust/clipper/clipper_server/conf/test.toml"]
 
 # COPY digits_bench.toml /rust/clipper/benchmarks/digits_bench.toml
-ENTRYPOINT ["/rust/clipper/benchmarks/target/debug/clipper-benchmarks", "digits"]
+ENTRYPOINT ["/rust/clipper/benchmarks/target/release/clipper-benchmarks", "digits"]
 CMD ["--conf=/tmp/digits_bench.toml"]
 

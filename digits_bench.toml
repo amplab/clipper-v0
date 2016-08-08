@@ -1,5 +1,5 @@
 name = "clipper-test"
-slo_micros = 10000
+slo_micros = 20000
 # correction_policy = "hello world"
 correction_policy = "logistic_regression"
 use_lsh = true
@@ -9,16 +9,17 @@ window_size = -1
 redis_ip = "redis"
 redis_port = 6379
 
-num_predict_workers = 8
+num_predict_workers = 2
 num_update_workers = 1
 # largest prime less than 50000
 cache_size = 49999
 mnist_path = "/mnist_data/test.data"
 num_benchmark_requests = 200000
+target_qps = 10000
 
 
 [[models]]
-name = "m1"
+name = "spark-lr-mw"
 addresses = ["sparkmw:6001"]
 num_outputs = 1
 version = 1

@@ -468,9 +468,7 @@ pub fn normalize_matrix(xs: &Vec<Vec<f64>>) -> Vec<Vec<f64>> {
 // }
 
 pub fn parse_data_file(r: BufReader<File>)
-                       -> (Vec<usize>, // task ids
-                           Vec<Vec<f64>>, // xs
-                           Vec<f64>) {
+                       -> (Vec<usize> /* task ids */, Vec<Vec<f64>> /* xs */, Vec<f64>) {
     // ys
 
     let mut xs: Vec<Vec<f64>> = Vec::new();

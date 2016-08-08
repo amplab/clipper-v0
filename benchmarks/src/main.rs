@@ -52,8 +52,8 @@ fn main() {
     env_logger::init().unwrap();
 
     let args: Args = Docopt::new(USAGE)
-                         .and_then(|d| d.decode())
-                         .unwrap_or_else(|e| e.exit());
+        .and_then(|d| d.decode())
+        .unwrap_or_else(|e| e.exit());
 
     info!("{:?}", args);
     if args.cmd_digits {
@@ -69,7 +69,8 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
     thread::spawn(move || {
         loop {
             match shutdown_signal_rx.try_recv() {
-                Ok(_) | Err(mpsc::TryRecvError::Empty) => {
+                Ok(_) |
+                Err(mpsc::TryRecvError::Empty) => {
                     thread::sleep(Duration::new(report_interval_secs, 0));
                     let m = metrics_register.read().unwrap();
                     info!("{}", m.report());
@@ -106,11 +107,16 @@ fn start_digits_benchmark(conf_path: &String) {
     let pc = Parser::new(&toml_string).parse().unwrap();
     let mnist_path = pc.get("mnist_path").unwrap().as_str().unwrap().to_string();
     let num_requests = pc.get("num_benchmark_requests")
-                         .unwrap_or(&Value::Integer(10000))
-                         .as_integer()
-                         .unwrap() as usize;
+        .unwrap_or(&Value::Integer(100000))
+        .as_integer()
+        .unwrap() as usize;
+    let target_qps = pc.get("target_qps")
+        .unwrap_or(&Value::Integer(10000))
+        .as_integer()
+        .unwrap() as usize;
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
-    let norm_test_data = digits::normalize(&all_test_data);
+    let norm_test_data = all_test_data;
+    // let norm_test_data = digits::normalize(&all_test_data);
 
     info!("MNIST data loaded: {} points", norm_test_data.ys.len());
     // let input_type = InputType::Integer(784);
@@ -133,29 +139,37 @@ fn start_digits_benchmark(conf_path: &String) {
     let mut events_fired = 0;
     let mut rng = thread_rng();
     let num_users = 1;
+    let batch_size = 200;
+    let inter_batch_sleep_time_ms = 1000 / (target_qps / batch_size) as u64;
     while events_fired < num_requests {
-        if events_fired % 20000 == 0 {
-            info!("Submitted {} requests", events_fired);
+        for _ in 0..batch_size {
+            if events_fired % 20000 == 0 {
+                info!("Submitted {} requests", events_fired);
+            }
+            let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
+            let mut input_data = norm_test_data.xs[idx].clone();
+            // make each input unique so there are no cache hits
+            input_data[0] = events_fired as f64;
+            let input = Input::Floats {
+                f: input_data,
+                length: 784,
+            };
+            let user = rng.gen_range::<u32>(0, num_users);
+            {
+                let sender = sender.clone();
+                // let req_num = events_fired;
+                let on_pred = Box::new(move |_| {
+                    sender.send(()).unwrap();
+                    // if req_num % 100 == 0 {
+                    //     info!("completed prediction {}", req_num);
+                    // }
+                });
+                let r = PredictionRequest::new(user, input, on_pred);
+                clipper.schedule_prediction(r);
+            }
+            events_fired += 1;
         }
-        let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
-        let input = Input::Floats {
-            f: norm_test_data.xs[idx].clone(),
-            length: 784,
-        };
-        let user = rng.gen_range::<u32>(0, num_users);
-        {
-            let sender = sender.clone();
-            // let req_num = events_fired;
-            let on_pred = Box::new(move |_| {
-                sender.send(()).unwrap();
-                // if req_num % 100 == 0 {
-                //     info!("completed prediction {}", req_num);
-                // }
-            });
-            let r = PredictionRequest::new(user, input, on_pred);
-            clipper.schedule_prediction(r);
-        }
-        events_fired += 1;
+        thread::sleep(Duration::from_millis(inter_batch_sleep_time_ms));
     }
 
     for _ in 0..num_requests {

@@ -10,12 +10,10 @@ use serde_json;
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
 trait Metric<R: Serialize + Deserialize> {
-
     fn report(&self) -> R;
 
     /// Must have way to atomically clear state
     fn clear(&self);
-
 }
 
 
@@ -100,7 +98,9 @@ impl RatioCounter {
     }
 
     pub fn incr(&self, n_incr: usize, d_incr: usize) {
-        self.numerator.fetch_add(n_incr, Ordering::Relaxed);
+        if n_incr > 0 {
+            self.numerator.fetch_add(n_incr, Ordering::Relaxed);
+        }
         self.denominator.fetch_add(d_incr, Ordering::Relaxed);
     }
 
