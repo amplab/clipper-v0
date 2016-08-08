@@ -10,13 +10,15 @@ services:
     # ports:
     #   - 6001:6001
     volumes:
-      - /Users/crankshaw/clipper/model_wrappers/python/spark_models/spark_lr_pred_1:/model
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/spark_lr_pred_1:/model"
   clipper:
     image: cl-dev
     depends_on:
       - redis
       - sparkmw
     volumes:
-      - /Users/crankshaw/model-serving/data/mnist_data/:/mnist_data
+      # - /Users/crankshaw/model-serving/data/mnist_data/:/mnist_data
+      - "${MNIST_PATH}:/mnist_data"
+      - "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml"
     # ports:
     #   - 1337:1337

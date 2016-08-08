@@ -6,7 +6,7 @@ use_lsh = true
 input_type = "float"
 input_length = 784
 window_size = -1
-redis_ip = "localhost"
+redis_ip = "redis"
 redis_port = 6379
 
 num_predict_workers = 8
@@ -19,7 +19,7 @@ num_benchmark_requests = 200000
 
 [[models]]
 name = "m1"
-addresses = ["127.0.0.1:6001"]
+addresses = ["sparkmw:6001"]
 num_outputs = 1
 version = 1
 

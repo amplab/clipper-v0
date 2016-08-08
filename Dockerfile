@@ -23,7 +23,7 @@ ENV RUST_BACKTRACE=1
 # ENTRYPOINT ["/rust/clipper/clipper_server/target/debug/clipper-rest", "start"]
 # CMD ["--conf=/rust/clipper/clipper_server/conf/test.toml"]
 
-COPY digits_bench.toml /rust/clipper/benchmarks/digits_bench.toml
+# COPY digits_bench.toml /rust/clipper/benchmarks/digits_bench.toml
 ENTRYPOINT ["/rust/clipper/benchmarks/target/debug/clipper-benchmarks", "digits"]
-CMD ["--conf=/rust/clipper/benchmarks/digits_bench.toml"]
+CMD ["--conf=/tmp/digits_bench.toml"]
 
