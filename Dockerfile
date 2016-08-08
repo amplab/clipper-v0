@@ -12,7 +12,8 @@ RUN apt-get update \
 # && git clone --recursive git@github.com:amplab/clipper.git \
 && cd clipper/benchmarks \
 && cargo build \
-&& rm -rf /var/lib/apt/lists/*
+&& rm -rf /var/lib/apt/lists/* \
+&& mkdir /mnist_data
 
 ENV RUST_LOG=info
 ENV RUST_BACKTRACE=1
