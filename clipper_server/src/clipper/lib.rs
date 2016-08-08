@@ -4,6 +4,7 @@
 
 extern crate serde;
 extern crate bincode;
+extern crate serde_json;
 #[macro_use]
 extern crate log;
 

@@ -3,12 +3,15 @@ use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
+use serde::ser::Serialize;
+use serde::de::Deserialize;
+use serde_json;
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
-trait Metric {
+trait Metric<R: Serialize + Deserialize> {
 
-    fn report(&self) -> String;
+    fn report(&self) -> R;
 
     /// Must have way to atomically clear state
     fn clear(&self);
@@ -22,23 +25,22 @@ pub struct Counter {
     count: AtomicIsize,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct CounterStats {
     name: String,
     count: isize,
 }
 
-impl Metric for Counter {
+impl Metric<CounterStats> for Counter {
     fn clear(&self) {
         self.count.store(0, Ordering::SeqCst);
     }
 
-    fn report(&self) -> String {
-        let stats = CounterStats {
+    fn report(&self) -> CounterStats {
+        CounterStats {
             name: self.name.clone(),
             count: self.count.load(Ordering::SeqCst),
-        };
-        format!("{:?}", stats)
+        }
     }
 }
 
@@ -65,27 +67,26 @@ pub struct RatioCounter {
     denominator: AtomicUsize,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct RatioStats {
     name: String,
     ratio: f64,
 }
 
-impl Metric for RatioCounter {
+impl Metric<RatioStats> for RatioCounter {
     // TODO: This has a race condition.
     fn clear(&self) {
         self.denominator.store(0, Ordering::SeqCst);
         self.numerator.store(0, Ordering::SeqCst);
     }
 
-    fn report(&self) -> String {
+    fn report(&self) -> RatioStats {
         let ratio = self.numerator.load(Ordering::SeqCst) as f64 /
                     self.denominator.load(Ordering::SeqCst) as f64;
-        let stats = RatioStats {
+        RatioStats {
             name: self.name.clone(),
             ratio: ratio,
-        };
-        format!("{:?}", stats)
+        }
     }
 }
 
@@ -162,32 +163,31 @@ impl Meter {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct MeterStats {
     name: String,
     rate: f64,
     unit: String,
 }
 
-impl Metric for Meter {
+impl Metric<MeterStats> for Meter {
     fn clear(&self) {
         let mut t = self.start_time.write().unwrap();
         *t = time::PreciseTime::now();
         self.count.store(0, Ordering::SeqCst);
     }
 
-    fn report(&self) -> String {
+    fn report(&self) -> MeterStats {
 
-        let stats = MeterStats {
+        MeterStats {
             name: self.name.clone(),
             rate: self.get_rate_secs(),
             unit: "events per second".to_string(),
-        };
-        format!("{:?}", stats)
+        }
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct HistStats {
     pub name: String,
     pub min: i64,
@@ -361,14 +361,14 @@ mod tests {
 
 
 
-impl Metric for Histogram {
+impl Metric<HistStats> for Histogram {
     fn clear(&self) {
         let mut res = self.sample.write().unwrap();
         res.clear();
     }
 
-    fn report(&self) -> String {
-        format!("{:?}", self.stats())
+    fn report(&self) -> HistStats {
+        self.stats()
     }
 }
 
@@ -413,6 +413,17 @@ impl ReservoirSampler {
     }
 }
 
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct Stats {
+    // #[serde(rename="Name")]
+    name: String,
+    counters: Option<Vec<CounterStats>>,
+    // #[serde(rename="RatioCounters")]
+    ratio_counters: Option<Vec<RatioStats>>,
+    histograms: Option<Vec<HistStats>>,
+    meters: Option<Vec<MeterStats>>,
+}
 
 pub struct Registry {
     pub name: String,
@@ -459,40 +470,74 @@ impl Registry {
     }
 
     pub fn report(&self) -> String {
-        let mut report_string = String::new();
-        report_string.push_str(&format!("\n{} Metrics\n", self.name));
+        let counter_stats = if self.counters.len() > 0 {
+            Some(self.counters.iter().map(|x| x.report()).collect::<Vec<CounterStats>>())
+        } else {
+            None
+        };
 
-        if self.counters.len() > 0 {
-            report_string.push_str("\tCounters:\n");
-            for x in self.counters.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let ratio_stats = if self.ratio_counters.len() > 0 {
+            Some(self.ratio_counters.iter().map(|x| x.report()).collect::<Vec<RatioStats>>())
+        } else {
+            None
+        };
 
-        if self.ratio_counters.len() > 0 {
-            report_string.push_str("\tRatios:\n");
-            for x in self.ratio_counters.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let hist_stats = if self.histograms.len() > 0 {
+            Some(self.histograms.iter().map(|x| x.report()).collect::<Vec<HistStats>>())
+        } else {
+            None
+        };
 
-        if self.histograms.len() > 0 {
-            report_string.push_str("\tHistograms:\n");
-            for x in self.histograms.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let meter_stats = if self.meters.len() > 0 {
+            Some(self.meters.iter().map(|x| x.report()).collect::<Vec<MeterStats>>())
+        } else {
+            None
+        };
 
-        if self.meters.len() > 0 {
-            report_string.push_str("\tMeters:\n");
-            for x in self.meters.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let stats = Stats {
+            name: self.name.clone(),
+            counters: counter_stats,
+            ratio_counters: ratio_stats,
+            histograms: hist_stats,
+            meters: meter_stats,
+        };
+
+        serde_json::ser::to_string_pretty(&stats).unwrap()
+
+        // let mut report_string = String::new();
+        // report_string.push_str(&format!("\n{} Metrics\n", self.name));
+
+        // if self.counters.len() > 0 {
+        //     report_string.push_str("\tCounters:\n");
+        //     for x in self.counters.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
+        //
+        // if self.ratio_counters.len() > 0 {
+        //     report_string.push_str("\tRatios:\n");
+        //     for x in self.ratio_counters.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
+        //
+        // if self.histograms.len() > 0 {
+        //     report_string.push_str("\tHistograms:\n");
+        //     for x in self.histograms.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
+        //
+        // if self.meters.len() > 0 {
+        //     report_string.push_str("\tMeters:\n");
+        //     for x in self.meters.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
 
 
-        debug!("{}", report_string);
-        report_string
+        // debug!("{}", report_string);
+        // report_string
     }
 
     // pub fn report_and_reset(&self) -> String {
