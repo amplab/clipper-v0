@@ -11,7 +11,10 @@ use std::io::BufReader;
 use std::collections::HashSet;
 use std::cmp::PartialEq;
 use std::fmt;
+// use serde::ser::Serialize;
+use serde_json;
 
+#[derive(Serialize)]
 pub struct ClipperConf {
     // General configuration
     pub name: String,
@@ -20,16 +23,14 @@ pub struct ClipperConf {
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
     pub input_type: InputType,
-    // TODO training data
-    // pub training_data_file: Option<String>,
-    // TODO configurable output type
-    //
-    //
+    pub batch_size: i32,
+
     // Internal system settings
     pub num_predict_workers: usize,
     pub num_update_workers: usize,
     pub cache_size: usize,
     pub window_size: isize,
+    #[serde(skip_serializing)]
     pub metrics: Arc<RwLock<metrics::Registry>>,
     pub redis_ip: String,
     pub redis_port: u16,
@@ -37,24 +38,7 @@ pub struct ClipperConf {
 
 impl fmt::Debug for ClipperConf {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "ClipperConf (\n\tname: {:?},\n\tslo_micros: {:?},\n\tpolicy_name: \
-                {:?},\n\tmodels: {:?},\n\tuse_lsh: {:?},\n\tinput_type: \
-                {:?},\n\tnum_predict_workers: {:?},\n\tnum_update_workers: {:?},\n\tcache_size: \
-                {:?}\n\twindow_size: {:?}\n\tredis_ip: {:?}\n\tredis_port: {:?})",
-               self.name,
-               self.slo_micros,
-               self.policy_name,
-               self.models,
-               self.use_lsh,
-               self.input_type,
-               self.num_predict_workers,
-               self.num_update_workers,
-               self.cache_size,
-               self.window_size,
-               self.redis_ip,
-               self.redis_port)
-
+        write!(f, "{}", serde_json::ser::to_string_pretty(&self).unwrap())
     }
 }
 
@@ -66,7 +50,8 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.num_predict_workers == other.num_predict_workers &&
         self.num_update_workers == other.num_update_workers &&
         self.cache_size == other.cache_size && self.window_size == other.window_size &&
-        self.redis_ip == other.redis_ip && self.redis_port == other.redis_port
+        self.redis_ip == other.redis_ip && self.redis_port == other.redis_port &&
+        self.batch_size == other.batch_size
     }
 }
 
@@ -173,6 +158,11 @@ impl ClipperConf {
 
             input_type: input_type,
 
+            batch_size: pc.get("batch_size")
+                          .unwrap_or(&Value::Integer(-1))
+                          .as_integer()
+                          .unwrap() as i32,
+
             num_predict_workers: pc.get("num_predict_workers")
                                    .unwrap_or(&Value::Integer(2))
                                    .as_integer()
@@ -220,7 +210,7 @@ impl ClipperConf {
 
 
 
-#[derive(PartialEq,Debug)]
+#[derive(PartialEq,Debug,Serialize)]
 pub struct ModelConf {
     pub name: String,
     pub addresses: Vec<SocketAddr>,
@@ -303,6 +293,7 @@ pub struct ClipperConfBuilder {
     pub window_size: isize,
     pub redis_ip: String,
     pub redis_port: u16,
+    pub batch_size: i32,
 
     // Internal system settings
     pub num_predict_workers: usize,
@@ -325,6 +316,7 @@ impl ClipperConfBuilder {
             window_size: -1,
             redis_ip: "127.0.0.1".to_string(),
             redis_port: 6379,
+            batch_size: -1
         }
     }
 
@@ -340,6 +332,11 @@ impl ClipperConfBuilder {
 
     pub fn slo_micros(&mut self, m: u32) -> &mut ClipperConfBuilder {
         self.slo_micros = m;
+        self
+    }
+
+    pub fn batch_size(&mut self, b: i32) -> &mut ClipperConfBuilder {
+        self.batch_size = b;
         self
     }
 
@@ -450,6 +447,7 @@ impl ClipperConfBuilder {
             window_size: self.window_size,
             redis_ip: self.redis_ip.clone(),
             redis_port: self.redis_port,
+            batch_size: self.batch_size,
             metrics: Arc::new(RwLock::new(metrics::Registry::new(self.name.clone()))),
         }
     }
@@ -472,6 +470,7 @@ use_lsh = true
 input_type = \"int\"
 input_length = -1
 window_size = -1
+batch_size = 10
 
 num_predict_workers = 4
 num_update_workers = 2
@@ -511,6 +510,7 @@ version = 2
                                  .add_model(m1)
                                  .add_model(m2)
                                  .window_size(-1)
+                                 .batch_size(10)
                                  .finalize();
 
     assert_eq!(toml_conf, built_conf);

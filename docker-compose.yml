@@ -9,7 +9,10 @@ services:
     image: cl-dev
     depends_on:
       - redis
-      - mw1
+      - mw1_0
+      - mw1_1
+      - mw1_2
+      - mw1_3
       - mw2
       - mw3
       - mw4
@@ -25,10 +28,26 @@ services:
       - "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro"
     # ports:
     #   - 1337:1337
-  mw1:
+  mw1_0:
     image: clipper/spark-mw-dev
     volumes:
       - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_1:/model:ro"
+  mw1_1:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_1:/model:ro"
+  mw1_2:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_1:/model:ro"
+  mw1_3:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_1:/model:ro"
+
+
+
+
   mw2:
     image: clipper/spark-mw-dev
     volumes:

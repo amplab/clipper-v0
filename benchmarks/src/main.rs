@@ -74,7 +74,7 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
                     thread::sleep(Duration::new(report_interval_secs, 0));
                     let m = metrics_register.read().unwrap();
                     info!("{}", m.report());
-                    // m.reset();
+                    m.reset();
                 }
                 Err(mpsc::TryRecvError::Disconnected) => break,
             }
@@ -130,11 +130,8 @@ fn start_digits_benchmark(conf_path: &String) {
     let clipper = Arc::new(ClipperServer::<LogisticRegressionPolicy,
                                            LinearCorrectionState>::new(config));
 
-    let report_interval_secs = 5;
+    let report_interval_secs = 10;
     let (metrics_signal_tx, metrics_signal_rx) = mpsc::channel::<()>();
-    let _ = launch_monitor_thread(clipper.get_metrics(),
-                                  report_interval_secs,
-                                  metrics_signal_rx);
 
 
     info!("starting benchmark");
@@ -145,6 +142,16 @@ fn start_digits_benchmark(conf_path: &String) {
     let num_users = 1;
     // let batch_size = 200;
     let inter_batch_sleep_time_ms = 1000 / (target_qps / batch_size) as u64;
+
+    thread::sleep(Duration::from_secs(10));
+    {
+      let metrics_register = clipper.get_metrics();
+      let m = metrics_register.read().unwrap();
+      m.reset();
+    }
+    let _ = launch_monitor_thread(clipper.get_metrics(),
+                                  report_interval_secs,
+                                  metrics_signal_rx);
     while events_fired < num_requests {
         for _ in 0..batch_size {
             if events_fired % 20000 == 0 {
