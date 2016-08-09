@@ -331,6 +331,7 @@ struct PredictionMetrics {
     pub thruput_meter: Arc<metrics::Meter>,
     pub accuracy_counter: Arc<metrics::RatioCounter>,
     pub cache_hit_counter: Arc<metrics::RatioCounter>,
+    pub in_time_predictions_hist: Arc<metrics::Histogram>,
 }
 
 impl PredictionMetrics {
@@ -348,7 +349,7 @@ impl PredictionMetrics {
 
         let latency_hist: Arc<metrics::Histogram> = {
             let metric_name = format!("prediction_latency");
-            metrics_register.write().unwrap().create_histogram(metric_name, 2056)
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056*2)
         };
 
         let thruput_meter: Arc<metrics::Meter> = {
@@ -366,6 +367,11 @@ impl PredictionMetrics {
             metrics_register.write().unwrap().create_ratio_counter(metric_name)
         };
 
+        let in_time_predictions_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("in_time_predictions");
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056*2)
+        };
+
         PredictionMetrics {
             num_queued_predictions_counter: queued_predictions_counter,
             latency_hist: latency_hist,
@@ -373,6 +379,7 @@ impl PredictionMetrics {
             thruput_meter: thruput_meter,
             accuracy_counter: accuracy_counter,
             cache_hit_counter: cache_hit_counter,
+            in_time_predictions_hist: in_time_predictions_hist
         }
     }
 }
@@ -729,6 +736,7 @@ impl<P, S> PredictionWorker<P, S>
                     None => missing_ys.push(model_name.clone()),
                 }
             }
+            prediction_metrics.in_time_predictions_hist.insert(ys.len() as i64);
 
             // use correction policy to make the final prediction
             let prediction = P::predict(&correction_state, ys, missing_ys);
@@ -741,6 +749,7 @@ impl<P, S> PredictionWorker<P, S>
             prediction_metrics.thruput_meter.mark(1);
             prediction_metrics.pred_counter.incr(1);
             prediction_metrics.num_queued_predictions_counter.decr(1);
+
         }
         info!("ending output loop: prediction worker {}", worker_id);
     }

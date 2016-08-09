@@ -5,20 +5,63 @@ services:
     image: redis:alpine
     # ports:
     #   - 6379:6379
-  sparkmw:
-    image: clipper/spark-mw-dev
-    # ports:
-    #   - 6001:6001
-    volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/spark_lr_pred_1:/model"
   clipper:
     image: cl-dev
     depends_on:
       - redis
-      - sparkmw
+      - mw1
+      - mw2
+      - mw3
+      - mw4
+      - mw5
+      - mw6
+      - mw7
+      - mw8
+      - mw9
+      - mw10
     volumes:
       # - /Users/crankshaw/model-serving/data/mnist_data/:/mnist_data
-      - "${MNIST_PATH}:/mnist_data"
-      - "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml"
+      - "${MNIST_PATH}:/mnist_data:ro"
+      - "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro"
     # ports:
     #   - 1337:1337
+  mw1:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_1:/model:ro"
+  mw2:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_2:/model:ro"
+  mw3:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+  mw4:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_4:/model:ro"
+  mw5:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_5:/model:ro"
+  mw6:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_6:/model:ro"
+  mw7:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_7:/model:ro"
+  mw8:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_8:/model:ro"
+  mw9:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_9:/model:ro"
+  mw10:
+    image: clipper/spark-mw-dev
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_10:/model:ro"

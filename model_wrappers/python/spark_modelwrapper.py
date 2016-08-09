@@ -10,11 +10,12 @@ findspark.init()
 import pyspark
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
-# from pyspark.mllib.classification import SVMModel, SVMWithSGD
+from pyspark.mllib.classification import SVMModel, SVMWithSGD
+from pyspark.mllib.tree import RandomForestModel
 
 
 
-class PySparkLRModelWrapper(rpc.ModelWrapperBase):
+class PySparkModelWrapper(rpc.ModelWrapperBase):
 
 
     def __init__(self, path):
@@ -24,9 +25,25 @@ class PySparkLRModelWrapper(rpc.ModelWrapperBase):
             .set("spark.kryoserializer.buffer.mb", "128") \
             .set("master", "local")
         sc = SparkContext(conf=conf, batchSize=10)
-        self.model = LogisticRegressionModel.load(sc, path)
+        success = False
+        try:
+            self.model = LogisticRegressionModel.load(sc, path)
+            success = True
+            print("Started Spark and loaded LogisticRegressionModel")
+        except Exception as e:
+            pass
+        if not success:
+            try:
+                self.model = SVMModel.load(sc, path)
+                success = True
+                print("Started Spark and loaded SVMModel")
+            except Exception as e:
+                pass
+        if not success:
+            self.model = RandomForestModel.load(sc, path)
+            success = True
+            print("Started Spark and loaded RandomForestModel")
         self.path = path
-        print("Started Spark and loaded Logistic Regression")
 
 
     def predict_ints(self, inputs):
@@ -48,6 +65,6 @@ class PySparkLRModelWrapper(rpc.ModelWrapperBase):
 if __name__=='__main__':
     model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path)
-    model = PySparkLRModelWrapper(model_path)
+    model = PySparkModelWrapper(model_path)
     rpc.start(model, 6001)
 

@@ -114,6 +114,10 @@ fn start_digits_benchmark(conf_path: &String) {
         .unwrap_or(&Value::Integer(10000))
         .as_integer()
         .unwrap() as usize;
+    let batch_size = pc.get("bench_batch_size")
+        .unwrap_or(&Value::Integer(100))
+        .as_integer()
+        .unwrap() as usize;
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
     let norm_test_data = all_test_data;
     // let norm_test_data = digits::normalize(&all_test_data);
@@ -139,7 +143,7 @@ fn start_digits_benchmark(conf_path: &String) {
     let mut events_fired = 0;
     let mut rng = thread_rng();
     let num_users = 1;
-    let batch_size = 200;
+    // let batch_size = 200;
     let inter_batch_sleep_time_ms = 1000 / (target_qps / batch_size) as u64;
     while events_fired < num_requests {
         for _ in 0..batch_size {

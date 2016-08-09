@@ -9,21 +9,72 @@ window_size = -1
 redis_ip = "redis"
 redis_port = 6379
 
-num_predict_workers = 2
+num_predict_workers = 8
 num_update_workers = 1
 # largest prime less than 50000
 cache_size = 49999
 mnist_path = "/mnist_data/test.data"
-num_benchmark_requests = 200000
-target_qps = 10000
+num_benchmark_requests = 1000000
+target_qps = 9000
+bench_batch_size = 400
 
 
 [[models]]
-name = "spark-lr-mw"
-addresses = ["sparkmw:6001"]
+name = "mw1"
+addresses = ["mw1:6001"]
 num_outputs = 1
 version = 1
 
-# [[models]]
-# name = "m2"
-# addresses = ["127.0.0.1:6004"]
+[[models]]
+name = "mw2"
+addresses = ["mw2:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw3"
+addresses = ["mw3:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw4"
+addresses = ["mw4:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw5"
+addresses = ["mw5:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw6"
+addresses = ["mw6:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw7"
+addresses = ["mw7:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw8"
+addresses = ["mw8:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw9"
+addresses = ["mw9:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw10"
+addresses = ["mw10:6001"]
+num_outputs = 1
+version = 1
