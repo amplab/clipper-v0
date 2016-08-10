@@ -546,6 +546,24 @@ impl<P, S> Drop for ClipperServer<P, S>
     }
 }
 
+// struct SyncPredictionWorker<P,S>
+//     where P: CorrectionPolicy<S>,
+//           S: Serialize + Deserialize
+// {
+//     worker_id: i32,
+//     input_queue: mpsc::Sender<(PredictionRequest, i32)>,
+//     // cache: Arc<PredictionCache<Output>>,
+//     // models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
+//     _policy_marker: PhantomData<P>,
+//     _state_marker: PhantomData<S>,
+//     prediction_metrics: PredictionMetrics,
+// }
+
+
+
+
+
+
 
 #[derive(Clone)]
 struct PredictionWorker<P, S>
@@ -698,7 +716,7 @@ impl<P, S> PredictionWorker<P, S>
                          prediction_metrics: PredictionMetrics) {
         let slo = Duration::microseconds(slo_micros as i64);
         // let epsilon = time::Duration::milliseconds(slo_micros / 5.0 * 1000.0);
-        let epsilon = Duration::milliseconds(1);
+        let epsilon = Duration::milliseconds(3);
         // let mut cmt = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_CMT_DB);
         let cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
         info!("starting prediction worker {} output thread with {} ms SLO",

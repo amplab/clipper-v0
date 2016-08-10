@@ -142,6 +142,9 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
         };
         let prob = linear::Problem::from_training_data(&xs, &labels);
         let model = linear::train_logistic_regression(prob, params);
+        info!("New correction state: {:?}, offline_model_order: {:?}",
+              model.w,
+              state.offline_model_order);
         LinearCorrectionState {
             linear_model: model.w,
             anytime_estimators: linalg::mean_and_var(&xs).0,

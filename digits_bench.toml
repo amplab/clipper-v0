@@ -15,14 +15,32 @@ num_update_workers = 1
 # largest prime less than 50000
 cache_size = 49999
 mnist_path = "/mnist_data/test.data"
-num_benchmark_requests = 1000000
-target_qps = 35000
-bench_batch_size = 1200
+num_benchmark_requests = 500000
+target_qps = 1000
+bench_batch_size = 100
 
 
 [[models]]
-name = "mw1"
-addresses = ["mw1_0:6001", "mw1_1:6001", "mw1_2:6001", "mw1_3:6001"]
+name = "rf_d1"
+addresses = ["rf_d1_r1:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "rf_d2"
+addresses = ["rf_d2_r1:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "rf_d4"
+addresses = ["rf_d4_r1:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "rf_d8"
+addresses = ["rf_d8_r1:6001"]
 num_outputs = 1
 version = 1
 

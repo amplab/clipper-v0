@@ -62,7 +62,7 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
 
 
     def handle(self):
-        print("HANDLING NEW CONNECTION")
+        print("HANDLING NEW CONNECTION", file=sys.stderr)
         while True:
             header_bytes = 5
             data = ""
@@ -75,7 +75,7 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
             header, data = (data[:header_bytes], data[header_bytes:])
             input_type, num_inputs = struct.unpack("<BI", header)
             if input_type == SHUTDOWN_CODE:
-                print("Shutting down connection")
+                print("Shutting down connection", file=sys.stderr)
                 self.request.sendall(np.array([1234]).astype('uint32').tobytes())
                 return
             if is_fixed_format(input_type):
@@ -138,7 +138,7 @@ def start(model_wrapper, port):
     server = SocketServer.TCPServer((ip, port), ClipperRpc)
     server.model = model_wrapper
     # server.handle_request()
-    print("Starting to serve")
+    print("Starting to serve", file=sys.stderr)
     server.serve_forever()
 
 

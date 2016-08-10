@@ -12,7 +12,7 @@ extern crate log;
 extern crate env_logger;
 
 use rand::{thread_rng, Rng};
-use clipper::server::{ClipperServer, Input, PredictionRequest};
+use clipper::server::{ClipperServer, Input, PredictionRequest, UpdateRequest, Update};
 use clipper::configuration;
 use clipper::metrics;
 use clipper::correction_policy::{LinearCorrectionState, LogisticRegressionPolicy};
@@ -119,8 +119,8 @@ fn start_digits_benchmark(conf_path: &String) {
         .as_integer()
         .unwrap() as usize;
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
-    let norm_test_data = all_test_data;
-    // let norm_test_data = digits::normalize(&all_test_data);
+    // let norm_test_data = all_test_data;
+    let norm_test_data = digits::normalize(&all_test_data);
 
     info!("MNIST data loaded: {} points", norm_test_data.ys.len());
     // let input_type = InputType::Integer(784);
@@ -135,7 +135,25 @@ fn start_digits_benchmark(conf_path: &String) {
 
 
     info!("starting benchmark");
-    let (sender, receiver) = mpsc::channel::<()>();
+    let (sender, receiver) = mpsc::channel::<bool>();
+
+    let accuracy_counter = {
+        let acc_counter_name = format!("digits accuracy ratio");
+        let clipper_metrics = clipper.get_metrics();
+        let mut m = clipper_metrics.write().unwrap();
+        m.create_ratio_counter(acc_counter_name)
+    };
+
+    let receiver_jh = thread::spawn(move || {
+        for _ in 0..num_requests {
+            let correct = receiver.recv().unwrap();
+            if correct {
+                accuracy_counter.incr(1,1);
+            } else {
+                accuracy_counter.incr(0,1);
+            }
+        }
+    });
 
     let mut events_fired = 0;
     let mut rng = thread_rng();
@@ -144,9 +162,34 @@ fn start_digits_benchmark(conf_path: &String) {
     let inter_batch_sleep_time_ms = 1000 / (target_qps / batch_size) as u64;
 
     thread::sleep(Duration::from_secs(10));
+
+    // train correction policy
+    let mut num_pos_examples = 0;
+    let mut updates = Vec::new();
+    while num_pos_examples < 80 {
+        let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
+        let label = norm_test_data.ys[idx];
+        let input_data = norm_test_data.xs[idx].clone();
+        let y = if label == 3.0 {
+          num_pos_examples += 1;
+          1.0
+        } else {
+          0.0
+        };
+        let input = Input::Floats {
+            f: input_data,
+            length: 784,
+        };
+        updates.push(Update { query: Arc::new(input), label: y });
+    }
+    let user = rng.gen_range::<u32>(0, num_users);
+    let update_req = UpdateRequest::new(user, updates);
+    clipper.schedule_update(update_req);
+    thread::sleep(Duration::from_secs(10));
     {
       let metrics_register = clipper.get_metrics();
       let m = metrics_register.read().unwrap();
+      info!("{}", m.report());
       m.reset();
     }
     let _ = launch_monitor_thread(clipper.get_metrics(),
@@ -160,17 +203,23 @@ fn start_digits_benchmark(conf_path: &String) {
             let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
             let mut input_data = norm_test_data.xs[idx].clone();
             // make each input unique so there are no cache hits
-            input_data[0] = events_fired as f64;
+            input_data[783] = events_fired as f64;
+            let label = norm_test_data.ys[idx];
+            let y = if label == 3.0 {
+                1.0
+            } else {
+                0.0
+            };
             let input = Input::Floats {
                 f: input_data,
                 length: 784,
             };
-            let user = rng.gen_range::<u32>(0, num_users);
+            // let user = rng.gen_range::<u32>(0, num_users);
             {
                 let sender = sender.clone();
                 // let req_num = events_fired;
-                let on_pred = Box::new(move |_| {
-                    sender.send(()).unwrap();
+                let on_pred = Box::new(move |pred_y| {
+                    sender.send(pred_y == y).unwrap();
                     // if req_num % 100 == 0 {
                     //     info!("completed prediction {}", req_num);
                     // }
@@ -183,8 +232,15 @@ fn start_digits_benchmark(conf_path: &String) {
         thread::sleep(Duration::from_millis(inter_batch_sleep_time_ms));
     }
 
-    for _ in 0..num_requests {
-        receiver.recv().unwrap();
-    }
+    receiver_jh.join().unwrap();
+
+    // for _ in 0..num_requests {
+    //     let correct = receiver.recv().unwrap();
+    //     if correct {
+    //         accuracy_counter.incr(1,1);
+    //     } else {
+    //         accuracy_counter.incr(0,1);
+    //     }
+    // }
     // let _ = receiver.iter().take(num_requests).collect::<Vec<_>>();
 }

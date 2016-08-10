@@ -1,0 +1,17 @@
+# FROM frolvlad/alpine-glibc
+# FROM alpine:3.4
+FROM continuumio/anaconda:latest
+
+MAINTAINER Dan Crankshaw <dscrankshaw@gmail.com>
+
+# COPY spark_docker_deps/spark-1.6.2-bin-hadoop2.6.tgz /tmp/
+COPY __init__.py rpc.py sklearn_modelwrapper.py /tmp/
+
+ENV CLIPPER_MODEL_PATH=/model
+
+RUN mkdir -p /model \
+
+EXPOSE 6001
+
+CMD ["python", "/tmp/sklearn_modelwrapper.py"]
+
