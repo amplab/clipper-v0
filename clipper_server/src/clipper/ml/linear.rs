@@ -200,9 +200,22 @@ impl LogisticRegressionModel {
         safe_model
     }
 
+    pub fn new(dim: usize) -> LogisticRegressionModel {
+        LogisticRegressionModel {
+        params: Parameters::default(),
+        nr_class: 2,
+        nr_feature: dim as i32,
+        w: vec![0.0; dim],
+        label: Some(vec![1]),
+        bias: 0.0
+        }
+
+    }
+
     pub fn logistic_regression_predict(&self, x: &Vec<f64>) -> f64 {
         let dot = linalg::dot(&self.w, x);
         let (pos, neg) = self.get_labels();
+        info!("pos label: {}, neg label: {}", pos, neg);
         let pred = if dot > 0_f64 {
             pos
         } else {
@@ -250,3 +263,13 @@ pub fn train_logistic_regression(prob: Problem,
     };
     model
 }
+
+
+// #[cfg_attr(rustfmt, rustfmt_skip)]
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//
+//
+// }

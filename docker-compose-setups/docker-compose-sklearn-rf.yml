@@ -9,52 +9,22 @@ services:
     image: cl-dev
     depends_on:
       - redis
-      - rf_d1_r1
-      - rf_d1_r2
-      - rf_d1_r3
-      - rf_d1_r4
-      - rf_d2_r1
-      - rf_d2_r2
-      - rf_d2_r3
-      - rf_d2_r4
       - rf_d4_r1
-      - rf_d4_r2
-      - rf_d4_r3
-      - rf_d4_r4
+      # - rf_d4_r2
+      # - rf_d4_r3
+      # - rf_d4_r4
       - rf_d8_r1
-      - rf_d8_r2
-      - rf_d8_r3
-      - rf_d8_r4
+      # - rf_d8_r2
+      # - rf_d8_r3
+      # - rf_d8_r4
+      - svm_r1
+      - log_reg_r1
     volumes:
       # - /Users/crankshaw/model-serving/data/mnist_data/:/mnist_data
       - "${MNIST_PATH}:/mnist_data:ro"
       - "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro"
     # ports:
     #   - 1337:1337
-  rf_d1_r1:
-    image: clipper/sklearn-mw
-    volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth1/:/model:ro"
-    environment:
-      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth1.pkl
-  rf_d1_r2:
-    image: clipper/sklearn-mw
-    volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth1/:/model:ro"
-    environment:
-      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth1.pkl
-  rf_d1_r3:
-    image: clipper/sklearn-mw
-    volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth1/:/model:ro"
-    environment:
-      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth1.pkl
-  rf_d1_r4:
-    image: clipper/sklearn-mw
-    volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth1/:/model:ro"
-    environment:
-      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth1.pkl
 
 
   rf_d2_r1:
@@ -131,3 +101,42 @@ services:
       - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth8/:/model:ro"
     environment:
       - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth8.pkl
+
+  rf_d16_r1:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl
+  rf_d16_r2:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl
+  rf_d16_r3:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl
+  rf_d16_r4:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl
+  
+  svm_r1:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/svm_pred3.pkl
+
+  log_reg_r1:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl

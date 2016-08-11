@@ -1,30 +1,33 @@
+from __future__ import print_function
 import pandas as pd
 import numpy as np
-import sklearn.linear_model as lm
-import sklearn.svm as svm
+from sklearn import linear_model as lm
+from sklearn import svm
 # import sklearn.ensemble.RandomForestClassifier as RFC
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.externals import joblib
 import os
 import sys
 
-def load_digits(digits_location, digits_filename = "train.data"):
+def load_digits(digits_location, digits_filename = "train.data", norm=True):
     digits_path = digits_location + "/" + digits_filename
-    print "Source file:", digits_path
+    print("Source file: %s" % digits_path)
     df = pd.read_csv(digits_path, sep=",", header=None)
     data = df.values
-    print "Number of image files:", len(data)
+    print("Number of image files: %d" % len(data))
     y = data[:,0]
     X = data[:,1:]
-    mu = np.mean(X,0)
-    sigma = np.var(X,0)
-    Z = (X - mu) / np.array([np.sqrt(z) if z > 0 else 1. for z in sigma])
+    Z = X
+    if norm:
+        mu = np.mean(X,0)
+        sigma = np.var(X,0)
+        Z = (X - mu) / np.array([np.sqrt(z) if z > 0 else 1. for z in sigma])
     return (Z, y)
 
 
 def train_rf(label, num_trees, depths):
     X, y = load_digits("/crankshaw-local/mnist/data")
-    my_y = [1. if i == label else 0. for i in y]
+    my_y = [1. if i == label else -1.0 for i in y]
     models = {}
     for d in depths:
         model = RFC(n_estimators=num_trees, max_depth=d)
@@ -37,6 +40,40 @@ def train_rf(label, num_trees, depths):
         joblib.dump(model, 'sklearn_models/%s/%s.pkl' % (fname, fname)) 
         models[d] = model
     return models
+
+def train_svm(label):
+    fname = "svm_pred%d" % (label)
+    path = 'sklearn_models/%s/%s.pkl' % (fname, fname)
+    print("Training svm model")
+    X, y = load_digits("/crankshaw-local/mnist/data")
+    my_y = [1. if i == label else -1.0 for i in y]
+    model = svm.SVC()
+    model.fit(X, my_y)
+    try:
+        os.mkdir('sklearn_models/%s' % fname)
+    except OSError:
+        print("directory already exists. Might overwrite existing file")
+    joblib.dump(model, path) 
+    print("Done training svm model")
+    # model = joblib.load(path)
+    return model
+
+def train_logistic_regression(label):
+    fname = "log_regression_pred%d" % (label)
+    path = 'sklearn_models/%s/%s.pkl' % (fname, fname)
+    print("Training logistic regression")
+    X, y = load_digits("/crankshaw-local/mnist/data")
+    my_y = [1. if i == label else -1.0 for i in y]
+    model = lm.LogisticRegression()
+    model.fit(X, my_y)
+    try:
+        os.mkdir('sklearn_models/%s' % fname)
+    except OSError:
+        print("directory already exists. Might overwrite existing file")
+    joblib.dump(model, path) 
+    print("Done training logistic regression model")
+    # model = joblib.load(path)
+    return model
 
 
 # # Predicts if digit is 1
@@ -91,42 +128,43 @@ def train_rf(label, num_trees, depths):
 
 if __name__=='__main__':
 
-    # norm_digits_save()
-    # digits_loc = "/crankshaw-local/mnist/data"
-    #
-    # start = int(sys.argv[1])
-    # end = int(sys.argv[2])
-    # for label in range(start,end + 1):
-    #     f_name = "predict_%d_svm" % label
-    #     try:
-    #         os.mkdir('sklearn_models/%s' % f_name)
-    #     except OSError:
-    #         print("directory already exists. Might overwrite existing file")
-    #     print "training label %d" % label
-    #     f = TestFeature(digits_loc, label)
-    #     joblib.dump(f, 'sklearn_models/%s/%s.pkl' % (f_name, f_name)) 
-    # f = joblib.load('test_model/predict_1_svm.pkl') 
-    # print "model trained"
     label = 3
-    depths = [1,2,4,8]
-    models = train_rf(label, 50, depths)
-    test_x, test_y = load_digits("/crankshaw-local/mnist/data", digits_filename="test.data")
-    for d in depths:
-        pred_wrong = 0.
-        pred_total = 500
-        for i in range(pred_total):
-            idx = np.random.randint(len(test_y))
-            y_p = models[d].predict(test_x[idx])[0]
-            y_t = test_y[idx] - 1
-            if y_t == label:
-                y_t = 1.0
-            else:
-                y_t = 0.0
-            if y_t != y_p:
-                pred_wrong += 1.
-        print "Depth: %d, error: %f" % (d, float(pred_wrong)/float(pred_total))
-            
-
-
-
-
+    depths = [2, 4, 8, 16]
+    train_rf(label, 50, depths)
+    models = {"lr": train_logistic_regression(label), "svm": train_svm(label)}
+    # test_x, test_y = load_digits("/crankshaw-local/mnist/data", digits_filename="test.data", norm=True)
+    # for m in models:
+    #     pred_wrong = 0
+    #     num_pos_labels = 0
+    #     num_neg_labels = 0
+    #     pos_predicted = 0
+    #     neg_predicted = 0
+    #     pred_total = len(test_y)
+    #     for idx in range(len(test_y)):
+    #         # idx = np.random.randint(len(test_y))
+    #         y_p = models[m].predict(test_x[idx].reshape(1, -1))[0]
+    #         y_t = test_y[idx] - 1
+    #         if y_t == label:
+    #             y_t = 1.0
+    #             num_pos_labels += 1
+    #         else:
+    #             y_t = -1.0
+    #             num_neg_labels += 1
+    #         if y_t != y_p:
+    #             pred_wrong += 1
+    #         if y_p == -1.0:
+    #             neg_predicted += 1
+    #         else:
+    #             pos_predicted += 1
+    #
+    #     print("Model: %s, error: %f, pos_predicted: %d, neg_predicted: %d, pos_labels: %d, neg_labels: %d" % (m,
+    #             float(pred_wrong)/float(pred_total),
+    #             pos_predicted,
+    #             neg_predicted,
+    #             num_pos_labels,
+    #             num_neg_labels))
+    #         
+    #
+    #
+    #
+    #

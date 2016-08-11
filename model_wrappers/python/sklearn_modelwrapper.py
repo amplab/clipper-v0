@@ -28,14 +28,20 @@ class SklearnModelWrapper(rpc.ModelWrapperBase):
 
 
     def predict_ints(self, inputs):
-        return self.model.predict(inputs)
+        preds = self.model.predict(inputs)
+        print("sum: %f, len: %d" % (preds.sum(), len(preds)), file=sys.stderr)
+        return preds
+        # return self.model.predict(inputs)
         # for x in inputs:
         #     preds.append(float(self.model.predict(x)))
         # # print("predicting %d integer inputs" % len(inputs))
         # return np.array(preds)
 
     def predict_floats(self, inputs):
-        return self.model.predict(inputs)
+        preds = self.model.predict(inputs)
+        print("sum: %f, len: %d" % (preds.sum(), len(preds)), file=sys.stderr)
+        # print("sum: %f, len: %d" % (preds.sum(), len(preds)))
+        return preds
         # preds = []
         # for x in inputs:
         #     preds.append(float(self.model.predict(x)))

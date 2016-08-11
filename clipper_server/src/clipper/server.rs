@@ -188,7 +188,7 @@ impl ModelSet {
                                            conf.input_type.clone(),
                                            conf.metrics.clone(),
                                            cache.clone(),
-                                           conf.slo_micros.clone());
+                                           (conf.slo_micros.clone() as f64 * 0.8).floor() as u32);
             batchers.insert(VersionedModel {
                                 name: m.name.clone(),
                                 version: Some(m.version),
@@ -664,7 +664,10 @@ impl<P, S> PredictionWorker<P, S>
                     if max_preds < req.offline_models.as_ref().unwrap().len() as i32 {
                         let correction_state: S =
                             cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
-                                .unwrap_or(P::new(model_names.clone()));
+                                .unwrap_or({
+                                    info!("creating new correction model for user: {}", req.uid);
+                                    P::new(model_names.clone())
+                                });
                         P::rank_models_desc(&correction_state, model_names.clone())
                     } else {
                         // models.keys().map(|r| r.clone()).collect::<Vec<String>>()
@@ -734,7 +737,10 @@ impl<P, S> PredictionWorker<P, S>
                 .collect::<Vec<&String>>();
             let correction_state: S =
                 cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
-                    .unwrap_or(P::new(model_names.clone()));
+                    .unwrap_or({
+                            info!("creating new correction model for user: {}", req.uid);
+                            P::new(model_names.clone())
+                    });
             let elapsed_time = req.recv_time.to(PreciseTime::now());
             // NOTE: assumes SLA less than 1 second
             if elapsed_time < slo - epsilon {

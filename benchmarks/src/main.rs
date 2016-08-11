@@ -12,10 +12,12 @@ extern crate log;
 extern crate env_logger;
 
 use rand::{thread_rng, Rng};
+#[allow(unused_imports)]
 use clipper::server::{ClipperServer, Input, PredictionRequest, UpdateRequest, Update};
 use clipper::configuration;
 use clipper::metrics;
-use clipper::correction_policy::{LinearCorrectionState, LogisticRegressionPolicy};
+#[allow(unused_imports)]
+use clipper::correction_policy::{LinearCorrectionState, LogisticRegressionPolicy, AveragePolicy};
 use std::thread;
 use std::time::Duration;
 use std::sync::{mpsc, Arc, RwLock};
@@ -41,6 +43,8 @@ Options:
   -h --help                             Show this screen.
   --conf=</path/to/conf.toml>           Path to features config file.
 ";
+
+const LABEL: f64 = 3.0;
 
 #[derive(Debug, RustcDecodable)]
 struct Args {
@@ -74,7 +78,7 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
                     thread::sleep(Duration::new(report_interval_secs, 0));
                     let m = metrics_register.read().unwrap();
                     info!("{}", m.report());
-                    m.reset();
+                    // m.reset();
                 }
                 Err(mpsc::TryRecvError::Disconnected) => break,
             }
@@ -121,6 +125,24 @@ fn start_digits_benchmark(conf_path: &String) {
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
     // let norm_test_data = all_test_data;
     let norm_test_data = digits::normalize(&all_test_data);
+    let mut first_three_pos = -1;
+    let mut last_three_pos = -1;
+    for i in 0..all_test_data.ys.len() {
+      if all_test_data.ys[i] == LABEL {
+        if first_three_pos < 0 {
+          first_three_pos = i as i32;
+        }
+      } else if all_test_data.ys[i] == LABEL + 1.0 {
+        if last_three_pos < 0 {
+          last_three_pos = (i - 1) as i32;
+        }
+      }
+    }
+    assert_eq!(all_test_data.ys[first_three_pos as usize], LABEL);
+    assert_eq!(all_test_data.ys[(first_three_pos - 1) as usize], LABEL - 1.0);
+    assert_eq!(all_test_data.ys[last_three_pos as usize], LABEL);
+    assert_eq!(all_test_data.ys[(last_three_pos + 1) as usize], LABEL + 1.0);
+
 
     info!("MNIST data loaded: {} points", norm_test_data.ys.len());
     // let input_type = InputType::Integer(784);
@@ -129,13 +151,15 @@ fn start_digits_benchmark(conf_path: &String) {
     let config = configuration::ClipperConf::parse_from_toml(conf_path);
     let clipper = Arc::new(ClipperServer::<LogisticRegressionPolicy,
                                            LinearCorrectionState>::new(config));
+    // let clipper = Arc::new(ClipperServer::<AveragePolicy,
+    //                                        ()>::new(config));
 
     let report_interval_secs = 10;
     let (metrics_signal_tx, metrics_signal_rx) = mpsc::channel::<()>();
 
 
     info!("starting benchmark");
-    let (sender, receiver) = mpsc::channel::<bool>();
+    let (sender, receiver) = mpsc::channel::<(f64, bool)>();
 
     let accuracy_counter = {
         let acc_counter_name = format!("digits accuracy ratio");
@@ -144,13 +168,35 @@ fn start_digits_benchmark(conf_path: &String) {
         m.create_ratio_counter(acc_counter_name)
     };
 
+    let pred_ones_counter = {
+        let counter_name = format!("pred_ones_counter");
+        let clipper_metrics = clipper.get_metrics();
+        let mut m = clipper_metrics.write().unwrap();
+        m.create_counter(counter_name)
+    };
+
+    let pred_zeros_counter = {
+        let counter_name = format!("pred_zeros_counter");
+        let clipper_metrics = clipper.get_metrics();
+        let mut m = clipper_metrics.write().unwrap();
+        m.create_counter(counter_name)
+    };
+
     let receiver_jh = thread::spawn(move || {
         for _ in 0..num_requests {
-            let correct = receiver.recv().unwrap();
+            let (pred, correct) = receiver.recv().unwrap();
             if correct {
                 accuracy_counter.incr(1,1);
             } else {
                 accuracy_counter.incr(0,1);
+            }
+            
+            if pred == 1.0 {
+              pred_ones_counter.incr(1);
+            } else if pred == -1.0 {
+              pred_zeros_counter.incr(1);
+            } else {
+              warn!("unexpected label: {}", pred);
             }
         }
     });
@@ -166,15 +212,21 @@ fn start_digits_benchmark(conf_path: &String) {
     // train correction policy
     let mut num_pos_examples = 0;
     let mut updates = Vec::new();
-    while num_pos_examples < 80 {
-        let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
+    while num_pos_examples < 200 {
+        // let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
+
+        let idx = if updates.len() % 2 == 0 {
+          rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
+        } else {
+          rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
+        };
         let label = norm_test_data.ys[idx];
         let input_data = norm_test_data.xs[idx].clone();
-        let y = if label == 3.0 {
+        let y = if label == LABEL {
           num_pos_examples += 1;
           1.0
         } else {
-          0.0
+          -1.0
         };
         let input = Input::Floats {
             f: input_data,
@@ -182,7 +234,9 @@ fn start_digits_benchmark(conf_path: &String) {
         };
         updates.push(Update { query: Arc::new(input), label: y });
     }
-    let user = rng.gen_range::<u32>(0, num_users);
+    // let user = rng.gen_range::<u32>(0, num_users);
+    let user = 1;
+
     let update_req = UpdateRequest::new(user, updates);
     clipper.schedule_update(update_req);
     thread::sleep(Duration::from_secs(10));
@@ -200,15 +254,19 @@ fn start_digits_benchmark(conf_path: &String) {
             if events_fired % 20000 == 0 {
                 info!("Submitted {} requests", events_fired);
             }
-            let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
-            let mut input_data = norm_test_data.xs[idx].clone();
+            let idx = if events_fired % 2 == 0 {
+              rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
+            } else {
+              rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
+            };
+            let input_data = norm_test_data.xs[idx].clone();
             // make each input unique so there are no cache hits
-            input_data[783] = events_fired as f64;
+            // input_data[783] = events_fired as f64;
             let label = norm_test_data.ys[idx];
-            let y = if label == 3.0 {
+            let y = if label == LABEL {
                 1.0
             } else {
-                0.0
+                -1.0
             };
             let input = Input::Floats {
                 f: input_data,
@@ -219,7 +277,7 @@ fn start_digits_benchmark(conf_path: &String) {
                 let sender = sender.clone();
                 // let req_num = events_fired;
                 let on_pred = Box::new(move |pred_y| {
-                    sender.send(pred_y == y).unwrap();
+                    sender.send((pred_y, pred_y == y)).unwrap();
                     // if req_num % 100 == 0 {
                     //     info!("completed prediction {}", req_num);
                     // }
