@@ -226,6 +226,11 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
 
 
 
+trait Batcher {
+
+    fn update_batch_size(&mut self, measurement: LatencyMeasurement) -> usize;
+
+}
 
 fn update_batch_size_aimd(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
     let batch_increment = 2;
@@ -244,6 +249,54 @@ fn update_batch_size_aimd(cur_batch: usize, cur_time_micros: u64, max_time_micro
         new_batch as usize
     }
 }
+
+// // Making this a struct so data is labeled and because
+// // we may want to measure
+// struct LatencyMeasurement {
+//     latency: u64,
+//     batch_size: u32,
+//     alpha: f64,
+//     beta: f64
+// }
+//
+// struct LearnedBatcher {
+//     measurements: Vec<LatencyMeasurement>,
+// }
+//
+//
+// impl Batcher for LearnedBatcher {
+//
+//     // Linear regression equations come from:
+//     // http://math.stackexchange.com/questions/204020/what-is-the-equation-used-to-calculate-a-linear-trendline
+//     fn update_batch_size(&mut self, measurement: LatencyMeasurement) -> usize {
+//         self.measurements.push(measurement);
+//         if update {
+//         
+//             let n = self.measurements.len();
+//             let mut sum_xy = 0;
+//             let mut sum_x = 0;
+//             let mut sum_y = 0;
+//             let mut sum_x_squared = 0;
+//             for m in measurements.iter() {
+//                 sum_xy += m.latency * m.batch_size;
+//                 sum_x += m.batch_size;
+//                 sum_x_squared += m.batch_size*m.batch_size;
+//                 sum_y += m.latency;
+//             }
+//             
+//             // NOTE: y = alpha * x + beta
+//             let alpha = (n * sum_xy - sum_x * sum_y) as f64 / (n * sum_x_squared - (sum_x * sum_x)) as f64;
+//             let beta = (sum_y as f64 - alpha * sum_x as f64) / (n as f64);
+//         }
+//         
+//
+//     }
+//
+//
+// }
+
+
+
 
 pub fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();

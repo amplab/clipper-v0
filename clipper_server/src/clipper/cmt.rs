@@ -218,7 +218,7 @@ impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
         let bytes = try!(bincode::serde::serialize(state, bincode::SizeLimit::Infinite)
                              .map_err(|e| format!("{}", e.description())));
         let version_hash = versioned_model_hash(versioned_models);
-        info!("CMT PUT: versioned models: {:?}, hash: {}", versioned_models, version_hash);
+        // info!("CMT PUT: versioned models: {:?}, hash: {}", versioned_models, version_hash);
         let _: () = try!(self.connection
                              .hset(uid, version_hash, bytes)
                              .map_err(|e| format!("{}", e.description())));
@@ -229,7 +229,7 @@ impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
     fn get(&self, uid: u32, versioned_models: &Vec<VersionedModel>) -> Result<S, String> {
         debug!("fetching state for uid: {}", uid);
         let version_hash = versioned_model_hash(versioned_models);
-        info!("CMT GET: versioned models: {:?}, hash: {}", versioned_models, version_hash);
+        // info!("CMT GET: versioned models: {:?}, hash: {}", versioned_models, version_hash);
         let bytes: Vec<u8> = try!(self.connection
                                       .hget(uid, version_hash)
                                       .map_err(|e| format!("{}", e.description())));

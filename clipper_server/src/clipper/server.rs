@@ -665,7 +665,7 @@ impl<P, S> PredictionWorker<P, S>
                         let correction_state: S =
                             cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
                                 .unwrap_or({
-                                    info!("creating new correction model for user: {}", req.uid);
+                                    info!("INPUT THREAD: creating new correction model for user: {}", req.uid);
                                     P::new(model_names.clone())
                                 });
                         P::rank_models_desc(&correction_state, model_names.clone())
@@ -737,8 +737,8 @@ impl<P, S> PredictionWorker<P, S>
                 .collect::<Vec<&String>>();
             let correction_state: S =
                 cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
-                    .unwrap_or({
-                            info!("creating new correction model for user: {}", req.uid);
+                    .unwrap_or_else(|e| {
+                            info!("OUTPUT THREAD: user: {}, error: {}", req.uid, e);
                             P::new(model_names.clone())
                     });
             let elapsed_time = req.recv_time.to(PreciseTime::now());
