@@ -14,6 +14,8 @@ use std::fmt;
 // use serde::ser::Serialize;
 use serde_json;
 
+use batching::BatchStrategy;
+
 #[derive(Serialize)]
 pub struct ClipperConf {
     // General configuration
@@ -23,7 +25,8 @@ pub struct ClipperConf {
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
     pub input_type: InputType,
-    pub batch_size: i32,
+    // pub batch_size: i32,
+    pub batch_strategy: BatchStrategy,
 
     // Internal system settings
     pub num_predict_workers: usize,
@@ -50,8 +53,8 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.num_predict_workers == other.num_predict_workers &&
         self.num_update_workers == other.num_update_workers &&
         self.cache_size == other.cache_size && self.window_size == other.window_size &&
-        self.redis_ip == other.redis_ip && self.redis_port == other.redis_port &&
-        self.batch_size == other.batch_size
+        self.redis_ip == other.redis_ip &&
+        self.redis_port == other.redis_port && self.batch_strategy == other.batch_strategy
     }
 }
 
@@ -111,88 +114,88 @@ impl ClipperConf {
         let input_type = if int_keywords.contains(&lc_input_name) {
 
             let length = pc.get("input_length")
-                           .unwrap_or(&Value::Integer(-1))
-                           .as_integer()
-                           .unwrap() as i32;
+                .unwrap_or(&Value::Integer(-1))
+                .as_integer()
+                .unwrap() as i32;
             InputType::Integer(length)
         } else if float_keywords.contains(&lc_input_name) {
             let length = pc.get("input_length")
-                           .unwrap_or(&Value::Integer(-1))
-                           .as_integer()
-                           .unwrap() as i32;
+                .unwrap_or(&Value::Integer(-1))
+                .as_integer()
+                .unwrap() as i32;
             InputType::Float(length)
         } else if str_keywords.contains(&lc_input_name) {
             InputType::Str
         } else if byte_keywords.contains(&lc_input_name) {
             let length = pc.get("input_length")
-                           .unwrap_or(&Value::Integer(-1))
-                           .as_integer()
-                           .unwrap() as i32;
+                .unwrap_or(&Value::Integer(-1))
+                .as_integer()
+                .unwrap() as i32;
             InputType::Byte(length)
         } else {
             panic!("Invalid input type: {}", provided_input_name);
         };
         let conf = ClipperConf {
             name: pc.get("name")
-                    .unwrap()
-                    .as_str()
-                    .unwrap()
-                    .to_string(),
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .to_string(),
             slo_micros: pc.get("slo_micros")
-                          .unwrap_or(&Value::Integer(20000))
-                          .as_integer()
-                          .unwrap() as u32,
+                .unwrap_or(&Value::Integer(20000))
+                .as_integer()
+                .unwrap() as u32,
             policy_name: pc.get("correction_policy")
-                           .unwrap()
-                           .as_str()
-                           .unwrap()
-                           .to_string(),
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .to_string(),
             models: ClipperConf::parse_model_confs(pc.get("models")
-                                                     .unwrap()
-                                                     .as_slice()
-                                                     .unwrap()),
+                .unwrap()
+                .as_slice()
+                .unwrap()),
+
+            batch_strategy: ClipperConf::parse_batcher_toml(pc.get("batching")
+                .unwrap()
+                .as_table()
+                .unwrap()),
             use_lsh: pc.get("use_lsh")
-                       .unwrap_or(&Value::Boolean(false))
-                       .as_bool()
-                       .unwrap(),
+                .unwrap_or(&Value::Boolean(false))
+                .as_bool()
+                .unwrap(),
 
             input_type: input_type,
 
-            batch_size: pc.get("batch_size")
-                          .unwrap_or(&Value::Integer(-1))
-                          .as_integer()
-                          .unwrap() as i32,
-
             num_predict_workers: pc.get("num_predict_workers")
-                                   .unwrap_or(&Value::Integer(2))
-                                   .as_integer()
-                                   .unwrap() as usize,
+                .unwrap_or(&Value::Integer(2))
+                .as_integer()
+                .unwrap() as usize,
             num_update_workers: pc.get("num_update_workers")
-                                  .unwrap_or(&Value::Integer(1))
-                                  .as_integer()
-                                  .unwrap() as usize,
+                .unwrap_or(&Value::Integer(1))
+                .as_integer()
+                .unwrap() as usize,
             cache_size: pc.get("cache_size")
-                          .unwrap_or(&Value::Integer(49999))
-                          .as_integer()
-                          .unwrap() as usize,
+                .unwrap_or(&Value::Integer(49999))
+                .as_integer()
+                .unwrap() as usize,
             window_size: pc.get("window_size")
-                           .unwrap_or(&Value::Integer(-1))
-                           .as_integer()
-                           .unwrap() as isize,
+                .unwrap_or(&Value::Integer(-1))
+                .as_integer()
+                .unwrap() as isize,
             redis_port: pc.get("redis_port")
-                          .unwrap_or(&Value::Integer(6379))
-                          .as_integer()
-                          .unwrap() as u16,
+                .unwrap_or(&Value::Integer(6379))
+                .as_integer()
+                .unwrap() as u16,
             redis_ip: pc.get("redis_ip")
-                        .unwrap_or(&Value::String("127.0.0.1".to_string()))
-                        .as_str()
-                        .unwrap()
-                        .to_string(),
+                .unwrap_or(&Value::String("127.0.0.1".to_string()))
+                .as_str()
+                .unwrap()
+                .to_string(),
             metrics: Arc::new(RwLock::new(metrics::Registry::new(pc.get("name")
-                                                                   .unwrap()
-                                                                   .as_str()
-                                                                   .unwrap()
-                                                                   .to_string()))),
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .to_string()))),
         };
         conf
     }
@@ -204,6 +207,29 @@ impl ClipperConf {
             models.push(ModelConf::from_toml(mt));
         }
         models
+    }
+
+    fn parse_batcher_toml(bt: &Table) -> BatchStrategy {
+        let strategy = bt.get("strategy").unwrap().as_str().unwrap();
+        match strategy {
+            "learned" => {
+                let sample_size = bt.get("sample_size")
+                    .unwrap_or(&Value::Integer(1000))
+                    .as_integer()
+                    .unwrap() as usize;
+                BatchStrategy::Learned { sample_size: sample_size }
+            }
+            "static" => {
+
+                let batch_size = bt.get("batch_size")
+                    .unwrap_or(&Value::Integer(-1))
+                    .as_integer()
+                    .unwrap() as usize;
+                BatchStrategy::Static { size: batch_size }
+            }
+            "aimd" => BatchStrategy::AIMD,
+            _ => panic!("Invalid batch strategy: {}", strategy),
+        }
     }
 }
 
@@ -231,25 +257,25 @@ impl ModelConf {
     pub fn from_toml(mt: &Table) -> ModelConf {
         ModelConf {
             name: mt.get("name")
-                    .unwrap()
-                    .as_str()
-                    .unwrap()
-                    .to_string(),
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .to_string(),
             num_outputs: mt.get("num_outputs")
-                           .unwrap_or(&Value::Integer(1))
-                           .as_integer()
-                           .unwrap() as usize,
+                .unwrap_or(&Value::Integer(1))
+                .as_integer()
+                .unwrap() as usize,
 
             addresses: get_addrs(mt.get("addresses")
-                                   .unwrap()
-                                   .as_slice()
-                                   .unwrap()
-                                   .to_vec()),
+                .unwrap()
+                .as_slice()
+                .unwrap()
+                .to_vec()),
 
             version: mt.get("version")
-                       .unwrap_or(&Value::Integer(1))
-                       .as_integer()
-                       .unwrap() as u32,
+                .unwrap_or(&Value::Integer(1))
+                .as_integer()
+                .unwrap() as u32,
         }
     }
 
@@ -293,7 +319,8 @@ pub struct ClipperConfBuilder {
     pub window_size: isize,
     pub redis_ip: String,
     pub redis_port: u16,
-    pub batch_size: i32,
+    // pub batch_size: i32,
+    pub batch_strategy: BatchStrategy,
 
     // Internal system settings
     pub num_predict_workers: usize,
@@ -316,7 +343,7 @@ impl ClipperConfBuilder {
             window_size: -1,
             redis_ip: "127.0.0.1".to_string(),
             redis_port: 6379,
-            batch_size: -1
+            batch_strategy: BatchStrategy::Learned { sample_size: 1000 },
         }
     }
 
@@ -335,8 +362,8 @@ impl ClipperConfBuilder {
         self
     }
 
-    pub fn batch_size(&mut self, b: i32) -> &mut ClipperConfBuilder {
-        self.batch_size = b;
+    pub fn batch_strategy(&mut self, b: BatchStrategy) -> &mut ClipperConfBuilder {
+        self.batch_strategy = b;
         self
     }
 
@@ -447,7 +474,7 @@ impl ClipperConfBuilder {
             window_size: self.window_size,
             redis_ip: self.redis_ip.clone(),
             redis_port: self.redis_port,
-            batch_size: self.batch_size,
+            batch_strategy: self.batch_strategy.clone(),
             metrics: Arc::new(RwLock::new(metrics::Registry::new(self.name.clone()))),
         }
     }
@@ -470,12 +497,15 @@ use_lsh = true
 input_type = \"int\"
 input_length = -1
 window_size = -1
-batch_size = 10
 
 num_predict_workers = 4
 num_update_workers = 2
 # largest prime less than 50000
 cache_size = 49999
+
+[batching]
+strategy = \"learned\"
+sample_size = 2000
 
 
 [[models]]
@@ -510,10 +540,11 @@ version = 2
                                  .add_model(m1)
                                  .add_model(m2)
                                  .window_size(-1)
-                                 .batch_size(10)
+                                 .batch_strategy(BatchStrategy::Learned {sample_size: 2000 })
                                  .finalize();
 
     assert_eq!(toml_conf, built_conf);
     }
+
 
 }

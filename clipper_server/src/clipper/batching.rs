@@ -5,6 +5,7 @@ use std::time::Duration as StdDuration;
 use std::thread::{self, JoinHandle};
 use std::sync::{RwLock, Arc, mpsc, Mutex};
 use std::cmp;
+use std::boxed::Box;
 use rand::{thread_rng, Rng};
 use server::{self, InputType, Output};
 use metrics;
@@ -27,7 +28,8 @@ pub struct PredictionBatcher<C>
     join_handles: Option<Arc<Mutex<Vec<Option<JoinHandle<()>>>>>>,
 }
 
-impl<C> Drop for PredictionBatcher<C> where C: PredictionCache<Output>
+impl<C> Drop for PredictionBatcher<C>
+    where C: PredictionCache<Output>
 {
     fn drop(&mut self) {
         self.input_queues.clear();
@@ -35,15 +37,16 @@ impl<C> Drop for PredictionBatcher<C> where C: PredictionCache<Output>
             Ok(u) => {
                 let mut raw_handles = u.into_inner().unwrap();
                 raw_handles.drain(..)
-                           .map(|mut jh| jh.take().unwrap().join().unwrap())
-                           .collect::<Vec<_>>();
+                    .map(|mut jh| jh.take().unwrap().join().unwrap())
+                    .collect::<Vec<_>>();
             }
             Err(_) => debug!("PredictionBatcher still has outstanding references"),
         }
     }
 }
 
-impl<C> Clone for PredictionBatcher<C> where C: PredictionCache<Output>
+impl<C> Clone for PredictionBatcher<C>
+    where C: PredictionCache<Output>
 {
     fn clone(&self) -> PredictionBatcher<C> {
         PredictionBatcher {
@@ -58,14 +61,16 @@ impl<C> Clone for PredictionBatcher<C> where C: PredictionCache<Output>
 
 
 
-impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send + Sync
+impl<C> PredictionBatcher<C>
+    where C: PredictionCache<Output> + 'static + Send + Sync
 {
     pub fn new(name: String,
                addrs: Vec<SocketAddr>,
                input_type: InputType,
                metric_register: Arc<RwLock<metrics::Registry>>,
                cache: Arc<C>,
-               slo_micros: u32)
+               slo_micros: u32,
+               batch_strategy: BatchStrategy)
                -> PredictionBatcher<C> {
 
         let latency_hist: Arc<metrics::Histogram> = {
@@ -101,6 +106,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             let predictions_counter = predictions_counter.clone();
             let input_type = input_type.clone();
             let cache = cache.clone();
+            let batch_strategy = batch_strategy.clone();
             let jh = thread::spawn(move || {
                 PredictionBatcher::run(name,
                                        receiver,
@@ -111,7 +117,8 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
                                        predictions_counter,
                                        input_type,
                                        cache,
-                                       slo_micros);
+                                       slo_micros,
+                                       batch_strategy);
             });
             join_handles.push(Some(jh));
         }
@@ -132,7 +139,8 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
            predictions_counter: Arc<metrics::Counter>,
            input_type: InputType,
            cache: Arc<C>,
-           slo_micros: u32) {
+           slo_micros: u32,
+           batch_strategy: BatchStrategy) {
 
         let dynamic_batching = true;
 
@@ -155,17 +163,22 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
         stream.set_read_timeout(None).unwrap();
         // let max_batch_size = batch_size;
         let mut cur_batch_size = 1;
+        let mut batcher: Box<Batcher> = match batch_strategy {
+            BatchStrategy::Static { size: s } => {
+                Box::new(StaticBatcher { batch_size: s }) as Box<Batcher>
+            }
+            BatchStrategy::AIMD => Box::new(AIMDBatcher {}) as Box<Batcher>,
+            BatchStrategy::Learned { sample_size } => {
+                Box::new(LearnedBatcher::new(sample_size)) as Box<Batcher>
+            }
+        };
 
         // block until new request, then try to get more requests
         while let Ok(first_req) = receiver.recv() {
             let mut batch: Vec<RpcPredictRequest> = Vec::new();
             batch.push(first_req);
             let start_time = time::PreciseTime::now();
-            let max_batch_size = if dynamic_batching {
-                cur_batch_size
-            } else {
-                5
-            };
+            let max_batch_size = if dynamic_batching { cur_batch_size } else { 5 };
             assert!(max_batch_size >= 1);
             // while batch.len() < cur_batch_size {
             while batch.len() < max_batch_size {
@@ -195,12 +208,16 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             }
             if dynamic_batching {
                 // only try to increase the batch size if we actually sent a batch of maximum size
-                if batch.len() == cur_batch_size {
-                    cur_batch_size = update_batch_size_aimd(cur_batch_size,
-                                                            latency as u64,
-                                                            slo_micros as u64);
-                    // debug!("{} updated batch size to {}", name, cur_batch_size);
-                }
+                cur_batch_size = batcher.update_batch_size(LatencyMeasurement {
+                                                               latency: latency as u64,
+                                                               batch_size: batch.len(),
+                                                           },
+                                                           slo_micros as u64);
+                // if batch.len() == cur_batch_size {
+                //     cur_batch_size = update_batch_size_aimd(cur_batch_size,
+                //                                             latency as u64,
+                //                                             slo_micros as u64);
+                // }
             }
             for r in 0..batch.len() {
                 cache.put(name.clone(), &batch[r].input, response_floats[r]);
@@ -223,16 +240,39 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
 }
 
 
-
-
-
-trait Batcher {
-
-    fn update_batch_size(&mut self, measurement: LatencyMeasurement) -> usize;
-
+#[derive(Debug, Serialize, PartialEq, Eq, Clone)]
+pub enum BatchStrategy {
+    Static { size: usize },
+    AIMD,
+    Learned { sample_size: usize },
 }
 
-fn update_batch_size_aimd(cur_batch: usize, cur_time_micros: u64, max_time_micros: u64) -> usize {
+trait Batcher {
+    fn update_batch_size(&mut self, measurement: LatencyMeasurement, max_latency: u64) -> usize;
+}
+
+struct AIMDBatcher { }
+
+struct StaticBatcher {
+    batch_size: usize,
+}
+
+impl Batcher for StaticBatcher {
+    fn update_batch_size(&mut self, _: LatencyMeasurement, _: u64) -> usize {
+        self.batch_size
+    }
+}
+
+impl Batcher for AIMDBatcher {
+    fn update_batch_size(&mut self, measurement: LatencyMeasurement, max_latency: u64) -> usize {
+        update_batch_size_aimd(&measurement, max_latency)
+    }
+}
+
+
+fn update_batch_size_aimd(measurement: &LatencyMeasurement, max_time_micros: u64) -> usize {
+    let cur_batch = measurement.batch_size;
+    let cur_time_micros = measurement.latency;
     let batch_increment = 2;
     let backoff = 0.9;
     let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;
@@ -250,50 +290,103 @@ fn update_batch_size_aimd(cur_batch: usize, cur_time_micros: u64, max_time_micro
     }
 }
 
-// // Making this a struct so data is labeled and because
-// // we may want to measure
-// struct LatencyMeasurement {
-//     latency: u64,
-//     batch_size: u32,
-//     alpha: f64,
-//     beta: f64
-// }
-//
-// struct LearnedBatcher {
-//     measurements: Vec<LatencyMeasurement>,
-// }
-//
-//
-// impl Batcher for LearnedBatcher {
-//
-//     // Linear regression equations come from:
-//     // http://math.stackexchange.com/questions/204020/what-is-the-equation-used-to-calculate-a-linear-trendline
-//     fn update_batch_size(&mut self, measurement: LatencyMeasurement) -> usize {
-//         self.measurements.push(measurement);
-//         if update {
-//         
-//             let n = self.measurements.len();
-//             let mut sum_xy = 0;
-//             let mut sum_x = 0;
-//             let mut sum_y = 0;
-//             let mut sum_x_squared = 0;
-//             for m in measurements.iter() {
-//                 sum_xy += m.latency * m.batch_size;
-//                 sum_x += m.batch_size;
-//                 sum_x_squared += m.batch_size*m.batch_size;
-//                 sum_y += m.latency;
-//             }
-//             
-//             // NOTE: y = alpha * x + beta
-//             let alpha = (n * sum_xy - sum_x * sum_y) as f64 / (n * sum_x_squared - (sum_x * sum_x)) as f64;
-//             let beta = (sum_y as f64 - alpha * sum_x as f64) / (n as f64);
-//         }
-//         
-//
-//     }
-//
-//
-// }
+// Making this a struct so data is labeled and because
+// we may want to measure
+struct LatencyMeasurement {
+    latency: u64,
+    batch_size: usize,
+}
+
+struct LearnedBatcher {
+    measurements: Vec<LatencyMeasurement>,
+    alpha: f64,
+    beta: f64,
+    num_samples: usize,
+    batch_size: usize,
+    // try an intermediate period of exploration
+    calibrated: bool,
+}
+
+impl LearnedBatcher {
+    pub fn new(num_samples: usize) -> LearnedBatcher {
+        LearnedBatcher {
+            measurements: Vec::with_capacity(num_samples),
+            alpha: 1.0,
+            beta: 1.0,
+            num_samples: num_samples,
+            batch_size: 1,
+            calibrated: false,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn reset(&mut self) {
+        self.measurements.clear();
+        self.alpha = 1.0;
+        self.beta = 1.0;
+        self.batch_size = 1;
+        self.calibrated = false;
+    }
+
+    fn throughput(&self, batch_size: usize) -> f64 {
+        let s = batch_size as f64;
+        s / (self.alpha * s + self.beta)
+    }
+}
+
+
+impl Batcher for LearnedBatcher {
+    fn update_batch_size(&mut self, measurement: LatencyMeasurement, max_latency: u64) -> usize {
+        if !self.calibrated {
+            self.measurements.push(measurement);
+            if self.measurements.len() >= self.num_samples {
+
+                let n = self.measurements.len() as u64;
+                let mut sum_xy: u64 = 0;
+                let mut sum_x: u64 = 0;
+                let mut sum_y: u64 = 0;
+                let mut sum_x_squared: u64 = 0;
+                for m in self.measurements.iter() {
+                    sum_xy += m.latency * m.batch_size as u64;
+                    sum_x += m.batch_size as u64;
+                    sum_x_squared += (m.batch_size * m.batch_size) as u64;
+                    sum_y += m.latency;
+                }
+
+                // NOTE: y = alpha * x + beta
+                let alpha = (n * sum_xy - sum_x * sum_y) as f64 /
+                            (n * sum_x_squared - (sum_x * sum_x)) as f64;
+                let beta = (sum_y as f64 - alpha * sum_x as f64) / (n as f64);
+                info!("Updated batching model: alpha = {}, beta = {}", alpha, beta);
+                self.alpha = alpha;
+                self.beta = beta;
+                // lat = (alpha * batch_size) + beta;
+                let max_batch_size = ((max_latency as f64 - beta) / alpha).round() as usize;
+                info!("Updated batching model: max_batch_size: {}, alpha = {}, beta = {}",
+                      max_batch_size,
+                      alpha,
+                      beta);
+                let baseline_thruput = self.throughput(1);
+                let max_thruput = self.throughput(max_batch_size);
+                info!("Predicted max thruput: {}, baseline: {}, increase: {}",
+                      max_thruput,
+                      baseline_thruput,
+                      max_thruput / baseline_thruput);
+                // TODO TODO TODO: maximize throughput with minimal batch size, rather than
+                // taking the max batch size here
+                self.batch_size = max_batch_size;
+                // self.measurements.clear();
+
+            } else {
+                // do an intermediate period of exploration to get a range of measurements
+                // without wildly exceeding latency SLOs
+                self.batch_size = update_batch_size_aimd(self.measurements.last().unwrap(),
+                                                         max_latency);
+            }
+        }
+        self.batch_size
+    }
+}
 
 
 

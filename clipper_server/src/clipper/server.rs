@@ -42,21 +42,10 @@ pub enum InputType {
 // #[derive(Hash, Clone, Debug)]
 #[derive(Clone,Debug,Serialize,Deserialize, PartialEq, PartialOrd)]
 pub enum Input {
-    Str {
-        s: String,
-    },
-    Bytes {
-        b: Vec<u8>,
-        length: i32,
-    },
-    Ints {
-        i: Vec<i32>,
-        length: i32,
-    },
-    Floats {
-        f: Vec<f64>,
-        length: i32,
-    },
+    Str { s: String },
+    Bytes { b: Vec<u8>, length: i32 },
+    Ints { i: Vec<i32>, length: i32 },
+    Floats { f: Vec<f64>, length: i32 },
 }
 
 #[allow(dead_code)]
@@ -176,6 +165,7 @@ impl ModelSet {
         false
     }
 
+
     pub fn from_conf(conf: &ClipperConf,
                      cache: Arc<SimplePredictionCache<Output, EqualityHasher>>)
                      -> ModelSet {
@@ -188,7 +178,8 @@ impl ModelSet {
                                            conf.input_type.clone(),
                                            conf.metrics.clone(),
                                            cache.clone(),
-                                           (conf.slo_micros.clone() as f64 * 0.8).floor() as u32);
+                                           (conf.slo_micros.clone() as f64 * 0.8).floor() as u32,
+                                           conf.batch_strategy.clone());
             batchers.insert(VersionedModel {
                                 name: m.name.clone(),
                                 version: Some(m.version),
@@ -349,7 +340,7 @@ impl PredictionMetrics {
 
         let latency_hist: Arc<metrics::Histogram> = {
             let metric_name = format!("prediction_latency");
-            metrics_register.write().unwrap().create_histogram(metric_name, 2056*2)
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056 * 2)
         };
 
         let thruput_meter: Arc<metrics::Meter> = {
@@ -369,7 +360,7 @@ impl PredictionMetrics {
 
         let in_time_predictions_hist: Arc<metrics::Histogram> = {
             let metric_name = format!("in_time_predictions");
-            metrics_register.write().unwrap().create_histogram(metric_name, 2056*2)
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056 * 2)
         };
 
         PredictionMetrics {
@@ -379,7 +370,7 @@ impl PredictionMetrics {
             thruput_meter: thruput_meter,
             accuracy_counter: accuracy_counter,
             cache_hit_counter: cache_hit_counter,
-            in_time_predictions_hist: in_time_predictions_hist
+            in_time_predictions_hist: in_time_predictions_hist,
         }
     }
 }
@@ -665,7 +656,9 @@ impl<P, S> PredictionWorker<P, S>
                         let correction_state: S =
                             cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
                                 .unwrap_or({
-                                    info!("INPUT THREAD: creating new correction model for user: {}", req.uid);
+                                    info!("INPUT THREAD: creating new correction model for user: \
+                                           {}",
+                                          req.uid);
                                     P::new(model_names.clone())
                                 });
                         P::rank_models_desc(&correction_state, model_names.clone())
@@ -738,8 +731,8 @@ impl<P, S> PredictionWorker<P, S>
             let correction_state: S =
                 cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
                     .unwrap_or_else(|e| {
-                            info!("OUTPUT THREAD: user: {}, error: {}", req.uid, e);
-                            P::new(model_names.clone())
+                        info!("OUTPUT THREAD: user: {}, error: {}", req.uid, e);
+                        P::new(model_names.clone())
                     });
             let elapsed_time = req.recv_time.to(PreciseTime::now());
             // NOTE: assumes SLA less than 1 second
