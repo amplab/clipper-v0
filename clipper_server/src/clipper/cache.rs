@@ -100,20 +100,19 @@ impl<V: 'static + Clone> Cache<V> {
 /// Handles higher-level semantics of caching predictions. This includes
 /// locality-sensitive hashing and other specialized hash functions.
 pub trait PredictionCache<V: 'static + Clone> {
-
     /// Look up the key in the cache and return immediately
-    fn fetch(&self, model: &String, input: &Input) -> Option<V>;
+    fn fetch(&self, model: &String, input: &Input, salt: Option<i32>) -> Option<V>;
 
 
     /// Insert the key-value pair into the hash, evicting an older entry
     /// if necessary. Called by model batch schedulers
-    fn put(&self, model: String, input: &Input, v: V);
+    fn put(&self, model: String, input: &Input, v: V, salt: Option<i32>);
 
     fn add_listener(&self,
                     model: &String,
                     input: &Input,
+                    salt: Option<i32>,
                     listener: Box<Fn(V) -> () + Send + Sync>);
-
 }
 
 pub struct SimplePredictionCache<V: 'static + Clone, H: HashStrategy + Send + Sync> {
@@ -166,11 +165,11 @@ impl<V, H> PredictionCache<V> for SimplePredictionCache<V, H>
     where V: Clone,
           H: HashStrategy + Send + Sync
 {
-    fn fetch(&self, model: &String, input: &Input) -> Option<V> {
+    fn fetch(&self, model: &String, input: &Input, salt: Option<i32>) -> Option<V> {
         let cache_reader = self.caches.read().unwrap();
         match cache_reader.get(model) {
             Some(c) => {
-                let hashkey = self.hash_strategy.hash(input, None);
+                let hashkey = self.hash_strategy.hash(input, salt);
                 c.get(hashkey)
             }
             None => {
@@ -180,10 +179,10 @@ impl<V, H> PredictionCache<V> for SimplePredictionCache<V, H>
         }
     }
 
-    fn put(&self, model: String, input: &Input, v: V) {
+    fn put(&self, model: String, input: &Input, v: V, salt: Option<i32>) {
         // very basic OCC
         let mut maybe_add_cache = false;
-        let hashkey = self.hash_strategy.hash(input, None);
+        let hashkey = self.hash_strategy.hash(input, salt);
         {
             let cache_reader = self.caches.read().unwrap();
             match cache_reader.get(&model) {
@@ -243,11 +242,12 @@ impl<V, H> PredictionCache<V> for SimplePredictionCache<V, H>
     fn add_listener(&self,
                     model: &String,
                     input: &Input,
+                    salt: Option<i32>,
                     listener: Box<Fn(V) -> () + Send + Sync>) {
 
         // Simple form of OCC
         let maybe_add_cache;
-        let hashkey = self.hash_strategy.hash(input, None);
+        let hashkey = self.hash_strategy.hash(input, salt);
         let wrapped_listener = Box::new(move |h, v| {
             if h == hashkey {
                 (listener)(v);
@@ -289,16 +289,16 @@ impl<V, H> PredictionCache<V> for SimplePredictionCache<V, H>
                 cache_writer.insert(model.clone(), model_cache);
             } else {
                 cache_writer.get(model)
-                            .unwrap()
-                            .add_listener(hashkey, CacheListener { listener: wrapped_listener });
+                    .unwrap()
+                    .add_listener(hashkey, CacheListener { listener: wrapped_listener });
             }
         } else {
             // Model caches are never deleted, so if it existed during the
             // earlier check it is guaranteed to still exist.
             let cache_reader = self.caches.read().unwrap();
             cache_reader.get(model)
-                        .unwrap()
-                        .add_listener(hashkey, CacheListener { listener: wrapped_listener });
+                .unwrap()
+                .add_listener(hashkey, CacheListener { listener: wrapped_listener });
 
         }
     }

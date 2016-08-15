@@ -294,6 +294,7 @@ impl ModelConf {
 }
 
 pub fn get_addr(a: String) -> SocketAddr {
+    info!("{}", a);
     a.to_socket_addrs().unwrap().next().unwrap()
 }
 

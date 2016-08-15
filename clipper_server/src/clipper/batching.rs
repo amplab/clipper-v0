@@ -19,6 +19,7 @@ use cache::PredictionCache;
 pub struct RpcPredictRequest {
     pub input: Arc<server::Input>,
     pub recv_time: time::PreciseTime,
+    pub salt: Option<i32>,
 }
 
 pub struct PredictionBatcher<C>
@@ -213,7 +214,10 @@ impl<C> PredictionBatcher<C>
                                                        },
                                                        slo_micros as u64);
             for r in 0..batch.len() {
-                cache.put(name.clone(), &batch[r].input, response_floats[r]);
+                cache.put(name.clone(),
+                          &batch[r].input,
+                          response_floats[r],
+                          batch[r].salt.clone());
             }
         }
         if !rpc::shutdown(&mut stream) {

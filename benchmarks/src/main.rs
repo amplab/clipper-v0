@@ -6,6 +6,7 @@ extern crate toml;
 extern crate rand;
 extern crate rustc_serialize;
 extern crate docopt;
+extern crate time;
 
 #[macro_use]
 extern crate log;
@@ -20,13 +21,14 @@ use clipper::metrics;
 use clipper::correction_policy::{LinearCorrectionState, LogisticRegressionPolicy, AveragePolicy};
 use std::thread;
 use std::time::Duration;
+// use time;
 use std::sync::{mpsc, Arc, RwLock};
 use docopt::Docopt;
 use toml::{Parser, Value};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use std::io::BufReader;
+use std::io::{BufReader, BufWriter};
 use std::error::Error;
 
 mod digits;
@@ -110,6 +112,7 @@ fn start_digits_benchmark(conf_path: &String) {
     }
     let pc = Parser::new(&toml_string).parse().unwrap();
     let mnist_path = pc.get("mnist_path").unwrap().as_str().unwrap().to_string();
+    let results_path = pc.get("results_path").unwrap().as_str().unwrap().to_string();
     let num_requests = pc.get("num_benchmark_requests")
         .unwrap_or(&Value::Integer(100000))
         .as_integer()
@@ -122,24 +125,29 @@ fn start_digits_benchmark(conf_path: &String) {
         .unwrap_or(&Value::Integer(100))
         .as_integer()
         .unwrap() as usize;
+    let salt_cache = pc.get("salt_cache")
+        .unwrap_or(&Value::Boolean(true))
+        .as_bool()
+        .unwrap();
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
     // let norm_test_data = all_test_data;
     let norm_test_data = digits::normalize(&all_test_data);
     let mut first_three_pos = -1;
     let mut last_three_pos = -1;
     for i in 0..all_test_data.ys.len() {
-      if all_test_data.ys[i] == LABEL {
-        if first_three_pos < 0 {
-          first_three_pos = i as i32;
+        if all_test_data.ys[i] == LABEL {
+            if first_three_pos < 0 {
+                first_three_pos = i as i32;
+            }
+        } else if all_test_data.ys[i] == LABEL + 1.0 {
+            if last_three_pos < 0 {
+                last_three_pos = (i - 1) as i32;
+            }
         }
-      } else if all_test_data.ys[i] == LABEL + 1.0 {
-        if last_three_pos < 0 {
-          last_three_pos = (i - 1) as i32;
-        }
-      }
     }
     assert_eq!(all_test_data.ys[first_three_pos as usize], LABEL);
-    assert_eq!(all_test_data.ys[(first_three_pos - 1) as usize], LABEL - 1.0);
+    assert_eq!(all_test_data.ys[(first_three_pos - 1) as usize],
+               LABEL - 1.0);
     assert_eq!(all_test_data.ys[last_three_pos as usize], LABEL);
     assert_eq!(all_test_data.ys[(last_three_pos + 1) as usize], LABEL + 1.0);
 
@@ -186,17 +194,17 @@ fn start_digits_benchmark(conf_path: &String) {
         for _ in 0..num_requests {
             let (pred, correct) = receiver.recv().unwrap();
             if correct {
-                accuracy_counter.incr(1,1);
+                accuracy_counter.incr(1, 1);
             } else {
-                accuracy_counter.incr(0,1);
+                accuracy_counter.incr(0, 1);
             }
-            
+
             if pred == 1.0 {
-              pred_ones_counter.incr(1);
+                pred_ones_counter.incr(1);
             } else if pred == -1.0 {
-              pred_zeros_counter.incr(1);
+                pred_zeros_counter.incr(1);
             } else {
-              warn!("unexpected label: {}", pred);
+                warn!("unexpected label: {}", pred);
             }
         }
     });
@@ -216,23 +224,26 @@ fn start_digits_benchmark(conf_path: &String) {
         // let idx = rng.gen_range::<usize>(0, norm_test_data.ys.len());
 
         let idx = if updates.len() % 2 == 0 {
-          rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
+            rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
         } else {
-          rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
+            rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
         };
         let label = norm_test_data.ys[idx];
         let input_data = norm_test_data.xs[idx].clone();
         let y = if label == LABEL {
-          num_pos_examples += 1;
-          1.0
+            num_pos_examples += 1;
+            1.0
         } else {
-          -1.0
+            -1.0
         };
         let input = Input::Floats {
             f: input_data,
             length: 784,
         };
-        updates.push(Update { query: Arc::new(input), label: y });
+        updates.push(Update {
+            query: Arc::new(input),
+            label: y,
+        });
     }
     // let user = rng.gen_range::<u32>(0, num_users);
     let user = 1;
@@ -241,10 +252,10 @@ fn start_digits_benchmark(conf_path: &String) {
     clipper.schedule_update(update_req);
     thread::sleep(Duration::from_secs(10));
     {
-      let metrics_register = clipper.get_metrics();
-      let m = metrics_register.read().unwrap();
-      info!("{}", m.report());
-      m.reset();
+        let metrics_register = clipper.get_metrics();
+        let m = metrics_register.read().unwrap();
+        info!("{}", m.report());
+        m.reset();
     }
     let _ = launch_monitor_thread(clipper.get_metrics(),
                                   report_interval_secs,
@@ -255,19 +266,15 @@ fn start_digits_benchmark(conf_path: &String) {
                 info!("Submitted {} requests", events_fired);
             }
             let idx = if events_fired % 2 == 0 {
-              rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
+                rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
             } else {
-              rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
+                rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
             };
             let input_data = norm_test_data.xs[idx].clone();
             // make each input unique so there are no cache hits
             // input_data[783] = events_fired as f64;
             let label = norm_test_data.ys[idx];
-            let y = if label == LABEL {
-                1.0
-            } else {
-                -1.0
-            };
+            let y = if label == LABEL { 1.0 } else { -1.0 };
             let input = Input::Floats {
                 f: input_data,
                 length: 784,
@@ -282,7 +289,7 @@ fn start_digits_benchmark(conf_path: &String) {
                     //     info!("completed prediction {}", req_num);
                     // }
                 });
-                let r = PredictionRequest::new(user, input, on_pred);
+                let r = PredictionRequest::new(user, input, on_pred, salt_cache);
                 clipper.schedule_prediction(r);
             }
             events_fired += 1;
@@ -291,6 +298,24 @@ fn start_digits_benchmark(conf_path: &String) {
     }
 
     receiver_jh.join().unwrap();
+    {
+        let metrics_register = clipper.get_metrics();
+        let m = metrics_register.read().unwrap();
+        let final_metrics = m.report();
+        let timestamp = time::strftime("%Y%m%d-%k_%M_%S", &time::now()).unwrap();
+        let results_fname = format!("{}/{}_results.json", results_path, timestamp);
+        info!("writing results to: {}", results_fname);
+        let res_path = Path::new(&results_fname);
+        let mut results_writer = BufWriter::new(File::create(res_path).unwrap());
+        results_writer.write(&final_metrics.into_bytes()).unwrap();
+
+        let config_fname = format!("{}/{}_config.toml", results_path, timestamp);
+        // info!("writing results to: {}", results_fname);
+        let config_path = Path::new(&config_fname);
+        let mut config_writer = BufWriter::new(File::create(config_path).unwrap());
+        config_writer.write(&toml_string.into_bytes()).unwrap();
+
+    }
 
     // for _ in 0..num_requests {
     //     let correct = receiver.recv().unwrap();

@@ -20,7 +20,7 @@ mnist_path = "/mnist_data/test.data"
 # mnist_path = "/crankshaw-local/mnist/data/test.data"
 num_benchmark_requests = 500000
 target_qps = 20000
-bench_batch_size = 300
+bench_batch_size = 100
 salt_cache = true
 
 [batching]
@@ -29,32 +29,8 @@ sample_size = 500
 
 
 [[models]]
-name = "log_reg"
-addresses = ["log_reg_r0:6001","log_reg_r1:6001",]
-num_outputs = 1
-version = 1
-
-[[models]]
-name = "linearsvm"
-addresses = ["linearsvm_r0:6001","linearsvm_r1:6001",]
-num_outputs = 1
-version = 1
-
-[[models]]
-name = "rf_d8"
-addresses = ["rf_d8_r0:6001","rf_d8_r1:6001",]
-num_outputs = 1
-version = 1
-
-[[models]]
-name = "rf_d16"
-addresses = ["rf_d16_r0:6001","rf_d16_r1:6001",]
-num_outputs = 1
-version = 1
-
-[[models]]
 name = "svm_pred3"
-addresses = ["svm_pred3_r0:6001","svm_pred3_r1:6001",]
+addresses = ["svm_pred3_r0:6001","svm_pred3_r1:6001","svm_pred3_r2:6001","svm_pred3_r3:6001","svm_pred3_r4:6001","svm_pred3_r5:6001","svm_pred3_r6:6001","svm_pred3_r7:6001","svm_pred3_r8:6001","svm_pred3_r9:6001",]
 num_outputs = 1
 version = 1
 

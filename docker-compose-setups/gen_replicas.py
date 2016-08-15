@@ -13,12 +13,12 @@ def gen_replicas(base_text, sub_dict, num_replicas):
     for i in range(num_replicas):
         deps_str += """
       - {model_name}_r{replica_num}""".format(replica_num = i, **sub_dict)
-        models_addr_str += "{model_name}_r{replica_num}:6001,".format(replica_num = i, **sub_dict)
+        models_addr_str += "\"{model_name}_r{replica_num}:6001\",".format(replica_num = i, **sub_dict)
 
     models_toml = """
 [[models]]
 name = "{model_name}"
-addresses = ["{models_addr_str}"]
+addresses = [{models_addr_str}]
 num_outputs = 1
 version = 1
 """
@@ -42,6 +42,15 @@ def sklearn_svm_sub_dict():
             "image": "clipper/sklearn-mw",
             "model_path": "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/",
             "container_model_path": "/model/svm_pred3.pkl"
+            }
+    return sub_dict
+
+def sklearn_linearsvm_sub_dict():
+    sub_dict = {
+            "model_name": "linearsvm",
+            "image": "clipper/sklearn-mw",
+            "model_path": "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
+            "container_model_path": "/model/linearsvm_pred3.pkl"
             }
     return sub_dict
 
@@ -78,6 +87,7 @@ services:
     volumes:
       - "${{MNIST_PATH}}:/mnist_data:ro"
       - "${{CLIPPER_ROOT}}/digits_bench.toml:/tmp/digits_bench.toml:ro"
+      - "${{CLIPPER_ROOT}}/benchmarking_logs:/tmp/benchmarking_logs"
 
 {deps_definitions}
 """
@@ -92,7 +102,37 @@ services:
 """
     # num_replicas = int(sys.argv[1])
 
-    
+    base_toml = """
+name = "clipper-test"
+slo_micros = 20000
+# correction_policy = "hello world"
+correction_policy = "logistic_regression"
+use_lsh = false
+input_type = "float"
+input_length = 784
+window_size = -1
+redis_ip = "redis"
+redis_port = 6379
+# batch_size = -1
+results_path = "/tmp/benchmarking_logs"
+
+num_predict_workers = 8
+num_update_workers = 1
+# largest prime less than 50000
+cache_size = 49999
+mnist_path = "/mnist_data/test.data"
+# mnist_path = "/crankshaw-local/mnist/data/test.data"
+num_benchmark_requests = 500000
+target_qps = 20000
+bench_batch_size = 300
+salt_cache = true
+
+[batching]
+strategy = "learned"
+sample_size = 500
+
+{model_defs}
+"""    
 
     container_def_str = ""
     deps_str = ""
@@ -108,16 +148,22 @@ services:
     models_toml += cur_model_toml
 
     ### SVM
-    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_svm_sub_dict(), 2)
+    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_svm_sub_dict(), 5)
+    # container_def_str += cur_container_def
+    # deps_str += cur_deps_str
+    # models_toml += cur_model_toml
+
+    ### LINEAR SVM
+    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_linearsvm_sub_dict(), 2)
     container_def_str += cur_container_def
     deps_str += cur_deps_str
     models_toml += cur_model_toml
 
-    ### RF D4
-    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(4), 2)
-    container_def_str += cur_container_def
-    deps_str += cur_deps_str
-    models_toml += cur_model_toml
+    # ### RF D4
+    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(4), 2)
+    # container_def_str += cur_container_def
+    # deps_str += cur_deps_str
+    # models_toml += cur_model_toml
 
     ### RF D8
     cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(8), 2)
@@ -140,10 +186,14 @@ services:
     deps_str += cur_deps_str
     models_toml += cur_model_toml
 
-    text = prefix_text.format(additional_deps = deps_str, deps_definitions=container_def_str)
-    print(models_toml)
+    docker_text = prefix_text.format(additional_deps = deps_str, deps_definitions=container_def_str)
+    
+    toml_text = base_toml.format(model_defs = models_toml)
+    with open("../digits_bench.toml", 'w') as f:
+        f.write(toml_text)
+
     with open("docker-compose.yml", 'w') as f:
-        f.write(text)
+        f.write(docker_text)
         # for i in range(num_replicas):
         #     f.write(line % i)
 

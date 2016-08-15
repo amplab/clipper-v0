@@ -10,10 +10,8 @@ services:
       - redis
       - log_reg_r0
       - log_reg_r1
-      - svm_r0
-      - svm_r1
-      - rf_d4_r0
-      - rf_d4_r1
+      - linearsvm_r0
+      - linearsvm_r1
       - rf_d8_r0
       - rf_d8_r1
       - rf_d16_r0
@@ -24,6 +22,7 @@ services:
     volumes:
       - "${MNIST_PATH}:/mnist_data:ro"
       - "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro"
+      - "${CLIPPER_ROOT}/benchmarking_logs:/tmp/benchmarking_logs"
 
 
   log_reg_r0:
@@ -42,36 +41,20 @@ services:
       - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl
 
 
-  svm_r0:
+  linearsvm_r0:
     image: clipper/sklearn-mw
     volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
     environment:
-      - CLIPPER_MODEL_PATH=/model/svm_pred3.pkl
+      - CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl
 
 
-  svm_r1:
+  linearsvm_r1:
     image: clipper/sklearn-mw
     volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
     environment:
-      - CLIPPER_MODEL_PATH=/model/svm_pred3.pkl
-
-
-  rf_d4_r0:
-    image: clipper/sklearn-mw
-    volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth4/:/model:ro"
-    environment:
-      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth4.pkl
-
-
-  rf_d4_r1:
-    image: clipper/sklearn-mw
-    volumes:
-      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth4/:/model:ro"
-    environment:
-      - CLIPPER_MODEL_PATH=/model/50rf_pred3_depth4.pkl
+      - CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl
 
 
   rf_d8_r0:

@@ -41,6 +41,23 @@ def train_rf(label, num_trees, depths):
         models[d] = model
     return models
 
+def train_linear_svm(label):
+    fname = "linearsvm_pred%d" % (label)
+    path = 'sklearn_models/%s/%s.pkl' % (fname, fname)
+    print("Training linear svm model")
+    X, y = load_digits("/crankshaw-local/mnist/data")
+    my_y = [1. if i == label else -1.0 for i in y]
+    model = svm.LinearSVC(dual=False)
+    model.fit(X, my_y)
+    try:
+        os.mkdir('sklearn_models/%s' % fname)
+    except OSError:
+        print("directory already exists. Might overwrite existing file")
+    joblib.dump(model, path) 
+    print("Done training linear svm model")
+    # model = joblib.load(path)
+    return model
+
 def train_svm(label):
     fname = "svm_pred%d" % (label)
     path = 'sklearn_models/%s/%s.pkl' % (fname, fname)
@@ -130,41 +147,39 @@ if __name__=='__main__':
 
     label = 3
     depths = [2, 4, 8, 16]
-    train_rf(label, 50, depths)
-    models = {"lr": train_logistic_regression(label), "svm": train_svm(label)}
-    # test_x, test_y = load_digits("/crankshaw-local/mnist/data", digits_filename="test.data", norm=True)
-    # for m in models:
-    #     pred_wrong = 0
-    #     num_pos_labels = 0
-    #     num_neg_labels = 0
-    #     pos_predicted = 0
-    #     neg_predicted = 0
-    #     pred_total = len(test_y)
-    #     for idx in range(len(test_y)):
-    #         # idx = np.random.randint(len(test_y))
-    #         y_p = models[m].predict(test_x[idx].reshape(1, -1))[0]
-    #         y_t = test_y[idx] - 1
-    #         if y_t == label:
-    #             y_t = 1.0
-    #             num_pos_labels += 1
-    #         else:
-    #             y_t = -1.0
-    #             num_neg_labels += 1
-    #         if y_t != y_p:
-    #             pred_wrong += 1
-    #         if y_p == -1.0:
-    #             neg_predicted += 1
-    #         else:
-    #             pos_predicted += 1
-    #
-    #     print("Model: %s, error: %f, pos_predicted: %d, neg_predicted: %d, pos_labels: %d, neg_labels: %d" % (m,
-    #             float(pred_wrong)/float(pred_total),
-    #             pos_predicted,
-    #             neg_predicted,
-    #             num_pos_labels,
-    #             num_neg_labels))
-    #         
-    #
-    #
-    #
-    #
+    # train_rf(label, 50, depths)
+    # models = {"lr": train_logistic_regression(label), "svm": train_svm(label)}
+    models = {"linear_svm": train_linear_svm(label)}
+
+    test_x, test_y = load_digits("/crankshaw-local/mnist/data", digits_filename="test.data", norm=True)
+    for m in models:
+        pred_wrong = 0
+        num_pos_labels = 0
+        num_neg_labels = 0
+        pos_predicted = 0
+        neg_predicted = 0
+        pred_total = len(test_y)
+        for idx in range(len(test_y)):
+            # idx = np.random.randint(len(test_y))
+            y_p = models[m].predict(test_x[idx].reshape(1, -1))[0]
+            y_t = test_y[idx] - 1
+            if y_t == label:
+                y_t = 1.0
+                num_pos_labels += 1
+            else:
+                y_t = -1.0
+                num_neg_labels += 1
+            if y_t != y_p:
+                pred_wrong += 1
+            if y_p == -1.0:
+                neg_predicted += 1
+            else:
+                pos_predicted += 1
+
+        print("Model: %s, error: %f, pos_predicted: %d, neg_predicted: %d, pos_labels: %d, neg_labels: %d" % (m,
+                float(pred_wrong)/float(pred_total),
+                pos_predicted,
+                neg_predicted,
+                num_pos_labels,
+                num_neg_labels))
+

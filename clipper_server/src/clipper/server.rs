@@ -53,6 +53,7 @@ pub struct PredictionRequest {
     recv_time: PreciseTime,
     uid: u32,
     query: Arc<Input>,
+    salt: Option<i32>,
     on_predict: Box<OnPredict>,
     /// Specifies which offline models to use by name
     /// and version. If offline models is `None`, then the latest
@@ -66,11 +67,21 @@ pub struct PredictionRequest {
 }
 
 impl PredictionRequest {
-    pub fn new(uid: u32, input: Input, on_predict: Box<OnPredict>) -> PredictionRequest {
+    pub fn new(uid: u32,
+               input: Input,
+               on_predict: Box<OnPredict>,
+               salt: bool)
+               -> PredictionRequest {
         PredictionRequest {
             recv_time: PreciseTime::now(),
             uid: uid,
             query: Arc::new(input),
+            salt: if salt {
+                let mut rng = thread_rng();
+                Some(rng.gen::<i32>())
+            } else {
+                None
+            },
             on_predict: on_predict,
             offline_models: None, // correction_policy: None,
         }
@@ -674,9 +685,7 @@ impl<P, S> PredictionWorker<P, S>
                 }
                 while num_requests < max_preds && i < model_req_order.len() {
                     // first check to see if the prediction is already cached
-                    if cache.fetch(&model_req_order[i], &req.query).is_none() || true {
-                        // TODO: can we avoid copying the input for each model?
-                        // Yes! Use an Arc!
+                    if cache.fetch(&model_req_order[i], &req.query, req.salt.clone()).is_none() {
                         let vm = VersionedModel {
                             name: model_req_order[i].clone(),
                             version: Some(**model_name_version_map.get(&model_req_order[i])
@@ -686,6 +695,7 @@ impl<P, S> PredictionWorker<P, S>
                                                   RpcPredictRequest {
                                                       input: req.query.clone(),
                                                       recv_time: req.recv_time.clone(),
+                                                      salt: req.salt.clone(),
                                                   });
                         num_requests += 1;
                         prediction_metrics.cache_hit_counter.incr(0, 1);
@@ -746,7 +756,7 @@ impl<P, S> PredictionWorker<P, S>
             let mut ys = HashMap::new();
             let mut missing_ys = Vec::new();
             for model_name in model_names {
-                match cache.fetch(model_name, &req.query) {
+                match cache.fetch(model_name, &req.query, req.salt.clone()) {
                     Some(v) => {
                         ys.insert(model_name.clone(), v);
                     }
@@ -988,16 +998,18 @@ impl<P, S> UpdateWorker<P, S>
                 let model_name = m.name.clone();
                 cache.add_listener(&m.name,
                                    &update.query,
+                                   None,
                                    Box::new(move |o| {
                                        let mut deps = u.write().unwrap();
                                        deps.predictions[idx].insert(model_name.clone(), o);
                                    }));
-                if cache.fetch(&m.name, &update.query).is_none() {
+                if cache.fetch(&m.name, &update.query, None).is_none() {
 
                     models.request_prediction(&m,
                                               RpcPredictRequest {
                                                   input: update.query.clone(),
                                                   recv_time: req.recv_time.clone(),
+                                                  salt: None,
                                               });
                 }
             }
