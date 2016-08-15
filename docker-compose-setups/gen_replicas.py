@@ -87,7 +87,7 @@ services:
     volumes:
       - "${{MNIST_PATH}}:/mnist_data:ro"
       - "${{CLIPPER_ROOT}}/digits_bench.toml:/tmp/digits_bench.toml:ro"
-      - "${{CLIPPER_ROOT}}/benchmarking_logs:/tmp/benchmarking_logs"
+      - "${{CLIPPER_ROOT}}/benchmarking_logs/clipper_thruput_num_mws:/tmp/benchmarking_logs"
 
 {deps_definitions}
 """
@@ -123,8 +123,8 @@ cache_size = 49999
 mnist_path = "/mnist_data/test.data"
 # mnist_path = "/crankshaw-local/mnist/data/test.data"
 num_benchmark_requests = 500000
-target_qps = 20000
-bench_batch_size = 300
+target_qps = 50000
+bench_batch_size = 10000
 salt_cache = true
 
 [batching]

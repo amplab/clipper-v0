@@ -22,7 +22,7 @@ services:
     volumes:
       - "${MNIST_PATH}:/mnist_data:ro"
       - "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro"
-      - "${CLIPPER_ROOT}/benchmarking_logs:/tmp/benchmarking_logs"
+      - "${CLIPPER_ROOT}/benchmarking_logs/clipper_thruput_num_mws:/tmp/benchmarking_logs"
 
 
   log_reg_r0:
