@@ -10,18 +10,19 @@ services:
     depends_on:
       - redis
       - mw1_0
-      - mw1_1
-      - mw1_2
-      - mw1_3
+      # - mw1_1
+      # - mw1_2
+      # - mw1_3
       - mw2
       - mw3
-      - mw4
-      - mw5
-      - mw6
-      - mw7
-      - mw8
-      - mw9
-      - mw10
+      # - mw4
+      # - mw5
+      # - mw6
+      # - mw7
+      # - mw8
+      # - mw9
+      # - mw10
+      - svm_r1
     volumes:
       # - /Users/crankshaw/model-serving/data/mnist_data/:/mnist_data
       - "${MNIST_PATH}:/mnist_data:ro"
@@ -84,3 +85,10 @@ services:
     image: clipper/spark-mw-dev
     volumes:
       - "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_10:/model:ro"
+
+  svm_r1:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/svm_pred3.pkl

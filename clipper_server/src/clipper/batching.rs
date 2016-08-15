@@ -11,6 +11,8 @@ use server::{self, InputType, Output};
 use metrics;
 use rpc;
 use cache::PredictionCache;
+// use serde::ser::Serialize;
+// use serde_json;
 
 
 #[derive(Clone)]
@@ -142,7 +144,6 @@ impl<C> PredictionBatcher<C>
            slo_micros: u32,
            batch_strategy: BatchStrategy) {
 
-        let dynamic_batching = true;
 
         let mut stream: TcpStream;
         loop {
@@ -169,7 +170,7 @@ impl<C> PredictionBatcher<C>
             }
             BatchStrategy::AIMD => Box::new(AIMDBatcher {}) as Box<Batcher>,
             BatchStrategy::Learned { sample_size } => {
-                Box::new(LearnedBatcher::new(sample_size)) as Box<Batcher>
+                Box::new(LearnedBatcher::new(name.clone(), sample_size)) as Box<Batcher>
             }
         };
 
@@ -178,10 +179,9 @@ impl<C> PredictionBatcher<C>
             let mut batch: Vec<RpcPredictRequest> = Vec::new();
             batch.push(first_req);
             let start_time = time::PreciseTime::now();
-            let max_batch_size = if dynamic_batching { cur_batch_size } else { 5 };
-            assert!(max_batch_size >= 1);
-            // while batch.len() < cur_batch_size {
-            while batch.len() < max_batch_size {
+            // let max_batch_size =  cur_batch_size;
+            assert!(cur_batch_size >= 1);
+            while batch.len() < cur_batch_size {
                 if let Ok(req) = receiver.try_recv() {
                     // let req_latency = req.req_start_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
                     // println!("req->features latency {} (ms)", (req_latency as f64 / 1000.0));
@@ -206,19 +206,12 @@ impl<C> PredictionBatcher<C>
                        (latency as f64 / 1000.0),
                        batch.len());
             }
-            if dynamic_batching {
-                // only try to increase the batch size if we actually sent a batch of maximum size
-                cur_batch_size = batcher.update_batch_size(LatencyMeasurement {
-                                                               latency: latency as u64,
-                                                               batch_size: batch.len(),
-                                                           },
-                                                           slo_micros as u64);
-                // if batch.len() == cur_batch_size {
-                //     cur_batch_size = update_batch_size_aimd(cur_batch_size,
-                //                                             latency as u64,
-                //                                             slo_micros as u64);
-                // }
-            }
+            // only try to increase the batch size if we actually sent a batch of maximum size
+            cur_batch_size = batcher.update_batch_size(LatencyMeasurement {
+                                                           latency: latency as u64,
+                                                           batch_size: batch.len(),
+                                                       },
+                                                       slo_micros as u64);
             for r in 0..batch.len() {
                 cache.put(name.clone(), &batch[r].input, response_floats[r]);
             }
@@ -292,6 +285,7 @@ fn update_batch_size_aimd(measurement: &LatencyMeasurement, max_time_micros: u64
 
 // Making this a struct so data is labeled and because
 // we may want to measure
+#[derive(Serialize, Deserialize)]
 struct LatencyMeasurement {
     latency: u64,
     batch_size: usize,
@@ -305,10 +299,11 @@ struct LearnedBatcher {
     batch_size: usize,
     // try an intermediate period of exploration
     calibrated: bool,
+    name: String,
 }
 
 impl LearnedBatcher {
-    pub fn new(num_samples: usize) -> LearnedBatcher {
+    pub fn new(name: String, num_samples: usize) -> LearnedBatcher {
         LearnedBatcher {
             measurements: Vec::with_capacity(num_samples),
             alpha: 1.0,
@@ -316,6 +311,7 @@ impl LearnedBatcher {
             num_samples: num_samples,
             batch_size: 1,
             calibrated: false,
+            name: name,
         }
     }
 
@@ -357,24 +353,33 @@ impl Batcher for LearnedBatcher {
                 let alpha = (n * sum_xy - sum_x * sum_y) as f64 /
                             (n * sum_x_squared - (sum_x * sum_x)) as f64;
                 let beta = (sum_y as f64 - alpha * sum_x as f64) / (n as f64);
-                info!("Updated batching model: alpha = {}, beta = {}", alpha, beta);
+                info!("{} BATCHER: Updated batching model: alpha = {}, beta = {}",
+                      self.name,
+                      alpha,
+                      beta);
+                // info!("data points: {}",
+                //       serde_json::ser::to_string_pretty(&self.measurements).unwrap());
                 self.alpha = alpha;
                 self.beta = beta;
                 // lat = (alpha * batch_size) + beta;
                 let max_batch_size = ((max_latency as f64 - beta) / alpha).round() as usize;
-                info!("Updated batching model: max_batch_size: {}, alpha = {}, beta = {}",
+                info!("{} BATCHER: Updated batching model: max_batch_size: {}, alpha = {}, beta \
+                       = {}",
+                      self.name,
                       max_batch_size,
                       alpha,
                       beta);
                 let baseline_thruput = self.throughput(1);
                 let max_thruput = self.throughput(max_batch_size);
-                info!("Predicted max thruput: {}, baseline: {}, increase: {}",
-                      max_thruput,
-                      baseline_thruput,
+                info!("{} BATCHER: Predicted max thruput: {}, baseline: {}, increase: {}",
+                      self.name,
+                      max_thruput * 10.0_f64.powi(6),
+                      baseline_thruput * 10.0_f64.powi(6),
                       max_thruput / baseline_thruput);
                 // TODO TODO TODO: maximize throughput with minimal batch size, rather than
                 // taking the max batch size here
                 self.batch_size = max_batch_size;
+                self.calibrated = true;
                 // self.measurements.clear();
 
             } else {

@@ -17,12 +17,30 @@ cache_size = 49999
 mnist_path = "/mnist_data/test.data"
 # mnist_path = "/crankshaw-local/mnist/data/test.data"
 num_benchmark_requests = 500000
-target_qps = 500
-bench_batch_size = 30
+target_qps = 5000
+bench_batch_size = 100
 
 [batching]
 strategy = "learned"
 sample_size = 1000
+
+[[models]]
+name = "mw1_0"
+addresses = ["mw1_0:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw2"
+addresses = ["mw2:6001"]
+num_outputs = 1
+version = 1
+
+[[models]]
+name = "mw3"
+addresses = ["mw3:6001"]
+num_outputs = 1
+version = 1
 
 # [[models]]
 # name = "rf_d1"
@@ -49,7 +67,7 @@ sample_size = 1000
 # version = 1
 
 [[models]]
-name = "svm"
+name = "sklearn-svm"
 addresses = ["svm_r1:6001"]
 num_outputs = 1
 version = 1
