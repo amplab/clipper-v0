@@ -73,7 +73,8 @@ impl<C> PredictionBatcher<C>
                metric_register: Arc<RwLock<metrics::Registry>>,
                cache: Arc<C>,
                slo_micros: u32,
-               batch_strategy: BatchStrategy)
+               batch_strategy: BatchStrategy,
+               num_encodes: usize)
                -> PredictionBatcher<C> {
 
         let latency_hist: Arc<metrics::Histogram> = {
@@ -98,6 +99,7 @@ impl<C> PredictionBatcher<C>
 
         let mut input_queues = Vec::with_capacity(addrs.len());
         let mut join_handles = Vec::with_capacity(addrs.len());
+        info!("starting batchers encoding {} times", num_encodes);
         for a in addrs.iter() {
             let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
             input_queues.push(sender);
@@ -121,7 +123,8 @@ impl<C> PredictionBatcher<C>
                                        input_type,
                                        cache,
                                        slo_micros,
-                                       batch_strategy);
+                                       batch_strategy,
+                                       num_encodes);
             });
             join_handles.push(Some(jh));
         }
@@ -143,7 +146,8 @@ impl<C> PredictionBatcher<C>
            input_type: InputType,
            cache: Arc<C>,
            slo_micros: u32,
-           batch_strategy: BatchStrategy) {
+           batch_strategy: BatchStrategy,
+           num_encodes: usize) {
 
 
         let mut stream: TcpStream;
@@ -193,7 +197,8 @@ impl<C> PredictionBatcher<C>
             }
             assert!(batch.len() > 0);
 
-            let response_floats: Vec<f64> = rpc::send_batch(&mut stream, &batch, &input_type);
+            let response_floats: Vec<f64> =
+                rpc::send_batch(&mut stream, &batch, &input_type, num_encodes);
             let end_time = time::PreciseTime::now();
             let latency = start_time.to(end_time).num_microseconds().unwrap();
             for _ in 0..batch.len() {

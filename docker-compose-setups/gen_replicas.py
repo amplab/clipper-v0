@@ -54,9 +54,9 @@ def sklearn_linearsvm_sub_dict():
             }
     return sub_dict
 
-def sklearn_log_regression_sub_dict():
+def sklearn_log_regression_sub_dict(name_suffix=""):
     sub_dict = {
-            "model_name": "log_reg",
+            "model_name": "log_reg_%s" % name_suffix,
             "image": "clipper/sklearn-mw",
             "model_path": "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/",
             "container_model_path": "/model/log_regression_pred3.pkl"
@@ -87,7 +87,7 @@ services:
     volumes:
       - "${{MNIST_PATH}}:/mnist_data:ro"
       - "${{CLIPPER_ROOT}}/digits_bench.toml:/tmp/digits_bench.toml:ro"
-      - "${{CLIPPER_ROOT}}/benchmarking_logs/clipper_thruput_num_mws:/tmp/benchmarking_logs"
+      - "${{CLIPPER_ROOT}}/benchmarking_logs/thruput_mw_debug:/tmp/benchmarking_logs"
 
 {deps_definitions}
 """
@@ -105,6 +105,7 @@ services:
     base_toml = """
 name = "clipper-test"
 slo_micros = 20000
+num_message_encodes = 1
 # correction_policy = "hello world"
 correction_policy = "logistic_regression"
 use_lsh = false
@@ -123,8 +124,8 @@ cache_size = 49999
 mnist_path = "/mnist_data/test.data"
 # mnist_path = "/crankshaw-local/mnist/data/test.data"
 num_benchmark_requests = 500000
-target_qps = 50000
-bench_batch_size = 10000
+target_qps = 20000
+bench_batch_size = 100
 salt_cache = true
 
 [batching]
@@ -142,10 +143,23 @@ sample_size = 500
     ######################## SKLEARN ########################
 
     ### LOG REGRESSION
-    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_log_regression_sub_dict(), 2)
+    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_log_regression_sub_dict(name_suffix="xx"), 2)
     container_def_str += cur_container_def
     deps_str += cur_deps_str
     models_toml += cur_model_toml
+
+    ### LOG REGRESSION
+    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_log_regression_sub_dict(name_suffix="yy"), 2)
+    container_def_str += cur_container_def
+    deps_str += cur_deps_str
+    models_toml += cur_model_toml
+    #
+    #
+    # ### LOG REGRESSION
+    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_log_regression_sub_dict(name_suffix="zz"), 2)
+    # container_def_str += cur_container_def
+    # deps_str += cur_deps_str
+    # models_toml += cur_model_toml
 
     ### SVM
     # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_svm_sub_dict(), 5)
@@ -153,38 +167,38 @@ sample_size = 500
     # deps_str += cur_deps_str
     # models_toml += cur_model_toml
 
-    ### LINEAR SVM
-    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_linearsvm_sub_dict(), 2)
-    container_def_str += cur_container_def
-    deps_str += cur_deps_str
-    models_toml += cur_model_toml
-
-    # ### RF D4
-    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(4), 2)
+    # ### LINEAR SVM
+    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_linearsvm_sub_dict(), 2)
     # container_def_str += cur_container_def
     # deps_str += cur_deps_str
     # models_toml += cur_model_toml
-
-    ### RF D8
-    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(8), 2)
-    container_def_str += cur_container_def
-    deps_str += cur_deps_str
-    models_toml += cur_model_toml
-
-    ### RF D16
-    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(16), 2)
-    container_def_str += cur_container_def
-    deps_str += cur_deps_str
-    models_toml += cur_model_toml
-
-    #########################################################
-    ######################### SPARK #########################
-
-    ### SVM PRED 3
-    cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, spark_svm_sub_dict(3), 2)
-    container_def_str += cur_container_def
-    deps_str += cur_deps_str
-    models_toml += cur_model_toml
+    #
+    # # ### RF D4
+    # # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(4), 2)
+    # # container_def_str += cur_container_def
+    # # deps_str += cur_deps_str
+    # # models_toml += cur_model_toml
+    #
+    # ### RF D8
+    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(8), 2)
+    # container_def_str += cur_container_def
+    # deps_str += cur_deps_str
+    # models_toml += cur_model_toml
+    #
+    # ### RF D16
+    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, sklearn_rf_sub_dict(16), 2)
+    # container_def_str += cur_container_def
+    # deps_str += cur_deps_str
+    # models_toml += cur_model_toml
+    #
+    # #########################################################
+    # ######################### SPARK #########################
+    #
+    # ### SVM PRED 3
+    # cur_container_def, cur_deps_str, cur_model_toml = gen_replicas(base_text, spark_svm_sub_dict(3), 2)
+    # container_def_str += cur_container_def
+    # deps_str += cur_deps_str
+    # models_toml += cur_model_toml
 
     docker_text = prefix_text.format(additional_deps = deps_str, deps_definitions=container_def_str)
     

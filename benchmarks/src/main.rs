@@ -302,7 +302,7 @@ fn start_digits_benchmark(conf_path: &String) {
         let metrics_register = clipper.get_metrics();
         let m = metrics_register.read().unwrap();
         let final_metrics = m.report();
-        let timestamp = time::strftime("%Y%m%d-%k_%M_%S", &time::now()).unwrap();
+        let timestamp = time::strftime("%Y%m%d-%H_%M_%S", &time::now()).unwrap();
         let results_fname = format!("{}/{}_results.json", results_path, timestamp);
         info!("writing results to: {}", results_fname);
         let res_path = Path::new(&results_fname);

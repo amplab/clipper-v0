@@ -190,7 +190,8 @@ impl ModelSet {
                                            conf.metrics.clone(),
                                            cache.clone(),
                                            (conf.slo_micros.clone() as f64 * 0.8).floor() as u32,
-                                           conf.batch_strategy.clone());
+                                           conf.batch_strategy.clone(),
+                                           conf.num_message_encodes);
             batchers.insert(VersionedModel {
                                 name: m.name.clone(),
                                 version: Some(m.version),

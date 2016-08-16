@@ -21,6 +21,7 @@ pub struct ClipperConf {
     // General configuration
     pub name: String,
     pub slo_micros: u32,
+    pub num_message_encodes: usize,
     pub policy_name: String,
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
@@ -54,7 +55,9 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.num_update_workers == other.num_update_workers &&
         self.cache_size == other.cache_size && self.window_size == other.window_size &&
         self.redis_ip == other.redis_ip &&
-        self.redis_port == other.redis_port && self.batch_strategy == other.batch_strategy
+        self.redis_port == other.redis_port &&
+        self.batch_strategy == other.batch_strategy &&
+        self.num_message_encodes == other.num_message_encodes
     }
 }
 
@@ -141,6 +144,10 @@ impl ClipperConf {
                 .as_str()
                 .unwrap()
                 .to_string(),
+            num_message_encodes: pc.get("num_message_encodes")
+                .unwrap_or(&Value::Integer(1))
+                .as_integer()
+                .unwrap() as usize,
             slo_micros: pc.get("slo_micros")
                 .unwrap_or(&Value::Integer(20000))
                 .as_integer()
@@ -313,6 +320,7 @@ pub struct ClipperConfBuilder {
     // General configuration
     pub name: String,
     pub slo_micros: u32,
+    pub num_message_encodes: usize,
     pub policy_name: String,
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
@@ -334,6 +342,7 @@ impl ClipperConfBuilder {
         ClipperConfBuilder {
             name: "DEFAULT".to_string(),
             slo_micros: 20 * 1000,
+            num_message_encodes: 1,
             policy_name: "default".to_string(),
             models: Vec::new(),
             use_lsh: false,
@@ -360,6 +369,11 @@ impl ClipperConfBuilder {
 
     pub fn slo_micros(&mut self, m: u32) -> &mut ClipperConfBuilder {
         self.slo_micros = m;
+        self
+    }
+
+    pub fn num_message_encodes(&mut self, m: usize) -> &mut ClipperConfBuilder {
+        self.num_message_encodes = m;
         self
     }
 
@@ -465,6 +479,7 @@ impl ClipperConfBuilder {
         ClipperConf {
             name: self.name.clone(),
             slo_micros: self.slo_micros,
+            num_message_encodes: self.num_message_encodes,
             policy_name: self.policy_name.clone(),
             models: self.models.drain(..).collect(),
             use_lsh: self.use_lsh,
@@ -493,6 +508,7 @@ mod tests {
         let toml_string = "
 name = \"clipper-test\"
 slo_micros = 10000
+num_message_encodes = 2
 correction_policy = \"hello_world\"
 use_lsh = true
 input_type = \"int\"
@@ -532,6 +548,7 @@ version = 2
 
     let built_conf = builder_conf.cache_size(49999)
                                  .slo_micros(10000)
+                                 .num_message_encodes(2)
                                  .name("clipper-test".to_string())
                                  .policy_name("hello_world".to_string())
                                  .use_lsh(true)

@@ -54,7 +54,8 @@ const STRING_CODE: u8 = 7;
 
 pub fn send_batch(stream: &mut TcpStream,
                   inputs: &Vec<RpcPredictRequest>,
-                  input_type: &InputType)
+                  input_type: &InputType,
+                  num_encodes: usize)
                   -> Vec<Output> {
     assert!(inputs.len() > 0);
     let message = match input_type {
@@ -81,6 +82,33 @@ pub fn send_batch(stream: &mut TcpStream,
         }
         &InputType::Str => encode_strs(inputs),
     };
+    for _ in 1..num_encodes {
+        match input_type {
+            &InputType::Integer(l) => {
+                if l < 0 {
+                    encode_var_ints(inputs)
+                } else {
+                    encode_fixed_ints(inputs, l)
+                }
+            }
+            &InputType::Float(l) => {
+                if l < 0 {
+                    encode_var_floats(inputs)
+                } else {
+                    encode_fixed_floats(inputs, l)
+                }
+            }
+            &InputType::Byte(l) => {
+                if l < 0 {
+                    encode_var_bytes(inputs)
+                } else {
+                    encode_fixed_bytes(inputs, l)
+                }
+            }
+            &InputType::Str => encode_strs(inputs),
+        };
+
+    }
     stream.write_all(&message[..]).unwrap();
     stream.flush().unwrap();
 
@@ -120,7 +148,7 @@ pub fn encode_var_ints(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     for x in inputs.iter() {
         match *x.input {
             // for each input: 4 bytes length + len*sizeof(int)
-            Input::Ints {i: ref f, length: _} => content_len += f.len() * intsize,
+            Input::Ints { i: ref f, length: _ } => content_len += f.len() * intsize,
             _ => unreachable!(),
         }
     }
@@ -130,7 +158,7 @@ pub fn encode_var_ints(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     for x in inputs.iter() {
         match *x.input {
             // for each input: 4 bytes length + len*sizeof(int)
-            Input::Ints {i: ref f, length: _} => {
+            Input::Ints { i: ref f, length: _ } => {
                 message.write_u32::<LittleEndian>(f.len() as u32).unwrap();
                 for xi in f.iter() {
                     message.write_i32::<LittleEndian>(*xi).unwrap();
@@ -171,7 +199,7 @@ pub fn encode_fixed_ints(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8
     for x in inputs.iter() {
         match *x.input {
             // for each input: 4 bytes length + len*sizeof(int)
-            Input::Ints {i: ref f, length: _} => {
+            Input::Ints { i: ref f, length: _ } => {
                 for xi in f.iter() {
                     message.write_i32::<LittleEndian>(*xi).unwrap();
                 }
@@ -207,7 +235,7 @@ fn encode_fixed_floats(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> 
     // let floatsize = mem::size_of::<f64>;
     for x in inputs.iter() {
         match *x.input {
-            Input::Floats {ref f, length: _} => {
+            Input::Floats { ref f, length: _ } => {
                 for xi in f.iter() {
                     message.write_f64::<LittleEndian>(*xi).unwrap();
                 }
@@ -226,7 +254,7 @@ fn encode_var_floats(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut content_len = 0;
     for x in inputs.iter() {
         match *x.input {
-            Input::Floats {ref f, length: _} => content_len += f.len() * floatsize,
+            Input::Floats { ref f, length: _ } => content_len += f.len() * floatsize,
             _ => unreachable!(),
         }
     }
@@ -235,7 +263,7 @@ fn encode_var_floats(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     assert!(message.len() == 9);
     for x in inputs.iter() {
         match *x.input {
-            Input::Floats {ref f, length: _} => {
+            Input::Floats { ref f, length: _ } => {
                 message.write_u32::<LittleEndian>(f.len() as u32).unwrap();
                 for xi in f.iter() {
                     message.write_f64::<LittleEndian>(*xi).unwrap();
