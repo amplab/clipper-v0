@@ -5,6 +5,8 @@ import toml
 import time
 import os
 import json
+# import shutil
+import subprocess32 as subprocess
 
 
 cur_model_core_num = 0
@@ -147,8 +149,26 @@ def add_spark_svm(num_replicas=1):
     container_mp ="/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
-if __name__=='__main__':
 
+def do_docker_run():
+    """
+    alias dcstop="sudo docker-compose stop"
+    alias dcup="sudo docker-compose up clipper"
+    """
+
+    docker_compose_up = ["sudo", "docker-compose", "up", "clipper"]
+    docker_compose_stop = ["sudo", "docker-compose", "stop"]
+    print("Starting experiment: %s" % experiment_name)
+    clipper_err_code = subprocess.call(docker_compose_up)
+    if clipper_err_code > 0:
+        print("WARNING: Clipper benchmark terminated with non-zero error code: %d" % clipper_err_code)
+    print("Shutting down containers")
+    dcstop_err_code = subprocess.call(docker_compose_stop)
+    if dcstop_err_code > 0:
+        print("WARNING: Docker container shutdown terminated with non-zero error code: %d" % dcstop_err_code)
+
+
+def gen_configs():
     ## SKLEARN RF
     add_spark_svm(num_replicas=2)
     add_sklearn_linear_svm(num_replicas=2)
@@ -166,6 +186,21 @@ if __name__=='__main__':
 
     with open(os.path.join(CLIPPER_ROOT, benchmarking_logs, "%s_config.json" % experiment_name), "w") as f:
         json.dump({"clipper_conf": clipper_conf_dict, "docker_compose_conf": dc_dict}, f, indent=4)
+
+    do_docker_run()
+
+    global cur_model_core_num
+    cur_model_core_num = 0
+
+
+
+
+
+
+if __name__=='__main__':
+    gen_configs()
+
+
 
 
 
