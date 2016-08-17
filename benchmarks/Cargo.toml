@@ -3,6 +3,15 @@ name = "clipper-benchmarks"
 version = "0.1.0"
 authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
 
+[profile.release]
+opt-level = 3
+debug = true
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'unwind'
+
 [dependencies]
 rand = "0.3"
 time = "0.1"

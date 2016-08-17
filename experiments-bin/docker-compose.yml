@@ -1,0 +1,122 @@
+services:
+  clipper:
+    cpuset: 1-8
+    depends_on: [redis, spark_svm_r0, spark_svm_r1, spark_svm_r2, spark_svm_r3, spark_svm_r4,
+      linear_svm_r0, linear_svm_r1, linear_svm_r2, linear_svm_r3, linear_svm_r4, logistic_reg_r0,
+      logistic_reg_r1, logistic_reg_r2, logistic_reg_r3, logistic_reg_r4, rf_d16_r0,
+      rf_d16_r1, rf_d16_r2, rf_d16_r3, rf_d16_r4, rf_d16_r5, rf_d16_r6]
+    image: cl-dev
+    volumes: ['${MNIST_PATH}:/mnist_data:ro', '${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro',
+      '${CLIPPER_ROOT}/benchmarking_logs/thruput_mw_debug:/tmp/benchmarking_logs']
+  linear_svm_r0:
+    cpuset: 14-14
+    environment: [CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
+  linear_svm_r1:
+    cpuset: 15-15
+    environment: [CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
+  linear_svm_r2:
+    cpuset: 16-16
+    environment: [CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
+  linear_svm_r3:
+    cpuset: 17-17
+    environment: [CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
+  linear_svm_r4:
+    cpuset: 18-18
+    environment: [CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
+  logistic_reg_r0:
+    cpuset: 19-19
+    environment: [CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r1:
+    cpuset: 20-20
+    environment: [CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r2:
+    cpuset: 21-21
+    environment: [CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r3:
+    cpuset: 22-22
+    environment: [CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r4:
+    cpuset: 23-23
+    environment: [CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  redis: {cpuset: 0-0, image: 'redis:alpine'}
+  rf_d16_r0:
+    cpuset: 24-24
+    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  rf_d16_r1:
+    cpuset: 25-25
+    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  rf_d16_r2:
+    cpuset: 26-26
+    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  rf_d16_r3:
+    cpuset: 27-27
+    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  rf_d16_r4:
+    cpuset: 28-28
+    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  rf_d16_r5:
+    cpuset: 29-29
+    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  rf_d16_r6:
+    cpuset: 30-30
+    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
+    image: clipper/sklearn-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  spark_svm_r0:
+    cpuset: 9-9
+    environment: [CLIPPER_MODEL_PATH=/model]
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r1:
+    cpuset: 10-10
+    environment: [CLIPPER_MODEL_PATH=/model]
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r2:
+    cpuset: 11-11
+    environment: [CLIPPER_MODEL_PATH=/model]
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r3:
+    cpuset: 12-12
+    environment: [CLIPPER_MODEL_PATH=/model]
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r4:
+    cpuset: 13-13
+    environment: [CLIPPER_MODEL_PATH=/model]
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+version: '2'

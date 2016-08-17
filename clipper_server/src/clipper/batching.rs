@@ -345,6 +345,8 @@ impl Batcher for LearnedBatcher {
         if !self.calibrated {
             self.measurements.push(measurement);
             if self.measurements.len() >= self.num_samples {
+                // remove first measurement
+                self.measurements.remove(0);
 
                 let n = self.measurements.len() as u64;
                 let mut sum_xy: u64 = 0;

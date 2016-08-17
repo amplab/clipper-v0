@@ -1,0 +1,14 @@
+FROM continuumio/anaconda:latest
+
+MAINTAINER Dan Crankshaw <dscrankshaw@gmail.com>
+
+COPY __init__.py rpc.py noop_modelwrapper.py /tmp/
+
+ENV CLIPPER_MODEL_PATH=/model
+
+RUN mkdir -p /model \
+
+EXPOSE 6001
+
+CMD ["python", "/tmp/noop_modelwrapper.py"]
+

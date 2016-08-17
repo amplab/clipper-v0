@@ -4,14 +4,22 @@ version: '2'
 services:
   redis:
     image: redis:alpine
+    cpuset: "0"
+    # cpu_shares: 64
+
   clipper:
     image: cl-dev
     depends_on:
       - redis
-      - log_reg_xx_r0
-      - log_reg_xx_r1
-      - log_reg_yy_r0
-      - log_reg_yy_r1
+      - log_reg__r0
+      - log_reg__r1
+      - log_reg__r2
+      - log_reg__r3
+      - log_reg__r4
+      - log_reg__r5
+    cpuset: "1-5"
+    # cpu_shares: 128
+
 
     volumes:
       - "${MNIST_PATH}:/mnist_data:ro"
@@ -19,35 +27,58 @@ services:
       - "${CLIPPER_ROOT}/benchmarking_logs/thruput_mw_debug:/tmp/benchmarking_logs"
 
 
-  log_reg_xx_r0:
+
+  log_reg__r0:
     image: clipper/sklearn-mw
     volumes:
       - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
     environment:
       - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl
+    cpuset: "6"
+    # cpu_shares: 85
 
-
-  log_reg_xx_r1:
+  log_reg__r1:
     image: clipper/sklearn-mw
     volumes:
       - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
     environment:
       - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl
+    cpuset: "7"
+    # cpu_shares: 85
 
-
-  log_reg_yy_r0:
+  log_reg__r2:
     image: clipper/sklearn-mw
     volumes:
       - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
     environment:
       - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl
+    cpuset: "8"
+    # cpu_shares: 85
 
-
-  log_reg_yy_r1:
+  log_reg__r3:
     image: clipper/sklearn-mw
     volumes:
       - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
     environment:
       - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl
+    cpuset: "9"
+    # cpu_shares: 85
 
+  log_reg__r4:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl
+    cpuset: "10"
+    # cpu_shares: 85
+
+  log_reg__r5:
+    image: clipper/sklearn-mw
+    volumes:
+      - "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+    environment:
+      - CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl
+    cpuset: "11"
+    # cpu_shares: 85
 
