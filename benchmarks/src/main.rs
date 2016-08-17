@@ -157,6 +157,7 @@ fn start_digits_benchmark(conf_path: &String) {
 
 
     let config = configuration::ClipperConf::parse_from_toml(conf_path);
+    let instance_name = config.name.clone();
     let clipper = Arc::new(ClipperServer::<LogisticRegressionPolicy,
                                            LinearCorrectionState>::new(config));
     // let clipper = Arc::new(ClipperServer::<AveragePolicy,
@@ -284,7 +285,10 @@ fn start_digits_benchmark(conf_path: &String) {
                 let sender = sender.clone();
                 // let req_num = events_fired;
                 let on_pred = Box::new(move |pred_y| {
-                    sender.send((pred_y, pred_y == y)).unwrap();
+                    match sender.send((pred_y, pred_y == y)) {
+                        Ok(_) => {}
+                        Err(e) => warn!("error in on_pred: {}", e.description()),
+                    };
                     // if req_num % 100 == 0 {
                     //     info!("completed prediction {}", req_num);
                     // }
@@ -302,18 +306,19 @@ fn start_digits_benchmark(conf_path: &String) {
         let metrics_register = clipper.get_metrics();
         let m = metrics_register.read().unwrap();
         let final_metrics = m.report();
-        let timestamp = time::strftime("%Y%m%d-%H_%M_%S", &time::now()).unwrap();
-        let results_fname = format!("{}/{}_results.json", results_path, timestamp);
+        // let timestamp = time::strftime("%Y%m%d-%H_%M_%S", &time::now()).unwrap();
+        // let results_fname = format!("{}/{}_results.json", results_path, timestamp);
+        let results_fname = format!("{}/{}_results.json", results_path, instance_name);
         info!("writing results to: {}", results_fname);
         let res_path = Path::new(&results_fname);
         let mut results_writer = BufWriter::new(File::create(res_path).unwrap());
         results_writer.write(&final_metrics.into_bytes()).unwrap();
 
-        let config_fname = format!("{}/{}_config.toml", results_path, timestamp);
-        // info!("writing results to: {}", results_fname);
-        let config_path = Path::new(&config_fname);
-        let mut config_writer = BufWriter::new(File::create(config_path).unwrap());
-        config_writer.write(&toml_string.into_bytes()).unwrap();
+        // let config_fname = format!("{}/{}_config.toml", results_path, timestamp);
+        // // info!("writing results to: {}", results_fname);
+        // let config_path = Path::new(&config_fname);
+        // let mut config_writer = BufWriter::new(File::create(config_path).unwrap());
+        // config_writer.write(&toml_string.into_bytes()).unwrap();
 
     }
 

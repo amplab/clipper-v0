@@ -2,11 +2,17 @@ from __future__ import print_function
 import sys
 import yaml
 import toml
+import time
+import os
+import json
 
 
 cur_model_core_num = 0
 MAX_CORES = 47
 isolated_cores = True
+experiment_name = "clippertest_%s" % str(time.strftime("%y%m%d-%H%M%S"))
+benchmarking_logs = "benchmarking_logs/thruput_mw_debug"
+CLIPPER_ROOT = os.path.abspath("..")
 
 def reserve_cores(num_cores):
     global cur_model_core_num
@@ -22,7 +28,7 @@ def overlap_reserve_cores():
 
 
 clipper_conf_dict = {
-        "name" : "clipper-test",
+        "name" : experiment_name,
         "slo_micros" : 20000,
         "num_message_encodes" : 1,
         "correction_policy" : "logistic_regression",
@@ -33,12 +39,12 @@ clipper_conf_dict = {
         "redis_ip" : "redis",
         "redis_port" : 6379,
         "results_path" : "/tmp/benchmarking_logs",
-        "num_predict_workers" : 16,
+        "num_predict_workers" : 8,
         "num_update_workers" : 1,
         "cache_size" : 49999,
         "mnist_path" : "/mnist_data/test.data",
         "num_benchmark_requests" : 1000000,
-        "target_qps" : 40000,
+        "target_qps" : 20000,
         "bench_batch_size" : 300,
         "salt_cache" : True,
         "batching": { "strategy": "learned", "sample_size": 1000},
@@ -52,12 +58,12 @@ dc_dict = {
         "services": {
             "redis": {"image": "redis:alpine", "cpuset": reserve_cores(1)},
             "clipper": {"image": "cl-dev",
-                "cpuset": reserve_cores(8),
+                "cpuset": reserve_cores(5),
                 "depends_on": ["redis"],
                 "volumes": [
                     "${MNIST_PATH}:/mnist_data:ro",
                     "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro",
-                    "${CLIPPER_ROOT}/benchmarking_logs/thruput_mw_debug:/tmp/benchmarking_logs"
+                    "${CLIPPER_ROOT}/%s:/tmp/benchmarking_logs" % benchmarking_logs
                     ],
                 }
             }
@@ -144,10 +150,10 @@ def add_spark_svm(num_replicas=1):
 if __name__=='__main__':
 
     ## SKLEARN RF
-    add_spark_svm(num_replicas=5)
-    add_sklearn_linear_svm(num_replicas=5)
-    add_sklearn_log_regression(num_replicas=5)
-    add_sklearn_rf(depth=16, num_replicas=7)
+    add_spark_svm(num_replicas=2)
+    add_sklearn_linear_svm(num_replicas=2)
+    add_sklearn_log_regression(num_replicas=2)
+    add_sklearn_rf(depth=16, num_replicas=2)
 
     print("CORES USED: %d" % cur_model_core_num)
 
@@ -157,6 +163,9 @@ if __name__=='__main__':
 
     with open("docker-compose.yml", 'w') as f:
         yaml.dump(dc_dict, f)
+
+    with open(os.path.join(CLIPPER_ROOT, benchmarking_logs, "%s_config.json" % experiment_name), "w") as f:
+        json.dump({"clipper_conf": clipper_conf_dict, "docker_compose_conf": dc_dict}, f, indent=4)
 
 
 
