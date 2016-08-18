@@ -1,6 +1,7 @@
 
 use time::{PreciseTime, Duration};
 use std::marker::PhantomData;
+use std::net::SocketAddr;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
 use std::sync::{mpsc, RwLock, Arc};
@@ -16,7 +17,7 @@ use cmt::{CorrectionModelTable, RedisCMT, UpdateTable, RedisUpdateTable, REDIS_C
 use cache::{PredictionCache, SimplePredictionCache};
 use configuration::{ClipperConf, ModelConf};
 use hashing::EqualityHasher;
-use batching::{RpcPredictRequest, PredictionBatcher};
+use batching::{RpcPredictRequest, PredictionBatcher, BatchStrategy};
 use correction_policy::CorrectionPolicy;
 use metrics;
 
@@ -25,6 +26,8 @@ use metrics;
 pub type Output = f64;
 
 pub type OnPredict = Fn(Output) -> () + Send;
+
+// type Batcher = PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>;
 
 
 
@@ -42,10 +45,21 @@ pub enum InputType {
 // #[derive(Hash, Clone, Debug)]
 #[derive(Clone,Debug,Serialize,Deserialize, PartialEq, PartialOrd)]
 pub enum Input {
-    Str { s: String },
-    Bytes { b: Vec<u8>, length: i32 },
-    Ints { i: Vec<i32>, length: i32 },
-    Floats { f: Vec<f64>, length: i32 },
+    Str {
+        s: String,
+    },
+    Bytes {
+        b: Vec<u8>,
+        length: i32,
+    },
+    Ints {
+        i: Vec<i32>,
+        length: i32,
+    },
+    Floats {
+        f: Vec<f64>,
+        length: i32,
+    },
 }
 
 #[allow(dead_code)]
@@ -141,6 +155,7 @@ struct ModelSet {
     metrics: Arc<RwLock<metrics::Registry>>,
     cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
     slo_micros: u32,
+    batch_strategy: BatchStrategy,
 }
 
 
@@ -176,7 +191,6 @@ impl ModelSet {
         false
     }
 
-
     pub fn from_conf(conf: &ClipperConf,
                      cache: Arc<SimplePredictionCache<Output, EqualityHasher>>)
                      -> ModelSet {
@@ -189,9 +203,8 @@ impl ModelSet {
                                            conf.input_type.clone(),
                                            conf.metrics.clone(),
                                            cache.clone(),
-                                           (conf.slo_micros.clone() as f64 * 0.8).floor() as u32,
-                                           conf.batch_strategy.clone(),
-                                           conf.num_message_encodes);
+                                           conf.slo_micros - 2,
+                                           conf.batch_strategy.clone());
             batchers.insert(VersionedModel {
                                 name: m.name.clone(),
                                 version: Some(m.version),
@@ -205,6 +218,70 @@ impl ModelSet {
             metrics: conf.metrics.clone(),
             cache: cache,
             slo_micros: conf.slo_micros.clone(),
+            batch_strategy: conf.batch_strategy.clone(),
+        }
+
+        // pub fn add_model
+    }
+
+    // TODO: Uggggh this is so hacky. I really need to find a better way to manage
+    // consistent model updates.
+    pub fn add_new_replica(&mut self,
+                           model: VersionedModel,
+                           address: SocketAddr)
+                           -> Option<mpsc::Sender<RpcPredictRequest>> {
+        match self.batchers.get_mut(&model) {
+            Some(p) => Some(p.add_new_replica(address)),
+            None => {
+                warn!("Trying to add a new replica to non-existent model version: {:?}",
+                      model);
+                None
+            }
+        }
+    }
+
+    pub fn incorporate_new_replica(&mut self,
+                                   model: VersionedModel,
+                                   sender: mpsc::Sender<RpcPredictRequest>) {
+        match self.batchers.get_mut(&model) {
+            Some(p) => p.incorporate_new_replica(sender),
+            None => {
+                warn!("Trying to incorporate a new replica to non-existent model version: {:?}",
+                      model);
+            }
+        };
+    }
+
+    pub fn add_new_model(&mut self,
+                         model: VersionedModel,
+                         addresses: Vec<SocketAddr>)
+                         -> PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>> {
+
+        let new_batcher = PredictionBatcher::new(model.name.clone(),
+                                                 addresses.clone(),
+                                                 self.input_type.clone(),
+                                                 self.metrics.clone(),
+                                                 self.cache.clone(),
+                                                 self.slo_micros - 2,
+                                                 self.batch_strategy.clone());
+        if self.batchers.insert(model.clone(), new_batcher.clone()).is_some() {
+            warn!("ModelSet already contained a batcher for {:?}, did you mean to add a replica \
+                   instead?",
+                  model);
+
+        };
+        new_batcher
+    }
+
+    pub fn incorporate_new_model(&mut self,
+                                 model: VersionedModel,
+                                 new_batcher: PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>) {
+
+        let warn_string = format!("ModelSet already contained a batcher for {:?}, did you mean \
+                                   to add a replica instead?",
+                                  model);
+        if self.batchers.insert(model, new_batcher).is_some() {
+            warn!("{}", warn_string);
         }
     }
 
@@ -222,9 +299,9 @@ impl ModelSet {
                 for mv in vms.iter() {
                     let mut versions = model_versions.entry(mv.name.clone()).or_insert(Vec::new());
                     let version = mv.version
-                        .as_ref()
-                        .unwrap_or(&self.get_latest_version(&mv.name))
-                        .clone();
+                                    .as_ref()
+                                    .unwrap_or(&self.get_latest_version(&mv.name))
+                                    .clone();
                     if self.version_exists(&mv.name, &version) {
                         versions.push(version);
                     } else {
@@ -234,27 +311,29 @@ impl ModelSet {
                     }
                 }
                 model_versions.iter()
-                    .filter(|&(_, v)| v.len() > 0)
-                    .map(|(name, versions)| {
-                        let latest_version = if versions.len() > 1 {
-                            let latest_version = versions.iter()
-                                .fold(0, |acc, &x| cmp::max(acc, x));
-                            warn!("Requested multiple versions ({:?}) of model: {}. Only
-                        \
-                                   using newest one {}",
-                                  versions,
-                                  name,
-                                  latest_version);
-                            latest_version
-                        } else {
-                            versions[0]
-                        };
-                        VersionedModel {
-                            name: name.clone(),
-                            version: Some(latest_version),
-                        }
-                    })
-                    .collect::<Vec<VersionedModel>>()
+                              .filter(|&(_, v)| v.len() > 0)
+                              .map(|(name, versions)| {
+                                  let latest_version = if versions.len() > 1 {
+                                      let latest_version = versions.iter()
+                                                                   .fold(0, |acc, &x| {
+                                                                       cmp::max(acc, x)
+                                                                   });
+                                      warn!("Requested multiple versions ({:?}) of model: {}. \
+                                             Only
+                        using newest one {}",
+                                            versions,
+                                            name,
+                                            latest_version);
+                                      latest_version
+                                  } else {
+                                      versions[0]
+                                  };
+                                  VersionedModel {
+                                      name: name.clone(),
+                                      version: Some(latest_version),
+                                  }
+                              })
+                              .collect::<Vec<VersionedModel>>()
             }
             &None => {
                 let mut model_versions = HashSet::new();
@@ -275,25 +354,6 @@ impl ModelSet {
     pub fn request_prediction(&self, offline_model: &VersionedModel, request: RpcPredictRequest) {
         self.batchers.get(offline_model).unwrap().request_prediction(request);
     }
-
-    #[allow(dead_code)]
-    pub fn add_model(&self) {
-        unimplemented!();
-
-        // TODOs:
-        //   + Ensure that user_id 0 always has a valid correction policy for the current set of
-        //   models/versions because we use that as the fallback
-
-        // let new_batcher = PredictionBatcher::new(m.name.clone(),
-        //                                          m.addresses.clone(),
-        //                                          self.input_type.clone(),
-        //                                          self.metrics.clone(),
-        //                                          self.cache.clone(),
-        //                                          self.slo_micros.clone());
-    }
-
-    #[allow(dead_code)]
-    pub fn update_model() {}
 }
 
 impl Drop for ModelSet {
@@ -454,7 +514,7 @@ impl<P, S> ClipperServer<P, S>
 
         let server_metrics = ServerMetrics {
             num_queued_predictions_counter: prediction_metrics.num_queued_predictions_counter
-                .clone(),
+                                                              .clone(),
             num_queued_updates_counter: update_metrics.num_queued_updates_counter.clone(),
         };
 
@@ -516,6 +576,7 @@ impl<P, S> ClipperServer<P, S>
         self.metrics.clone()
     }
 
+
     pub fn get_input_type(&self) -> InputType {
         self.input_type.clone()
     }
@@ -527,9 +588,37 @@ impl<P, S> ClipperServer<P, S>
         self.update_workers[req.uid as usize % self.update_workers.len()].update(req);
     }
 
+
+    pub fn add_new_replica(&mut self, name: String, version: u32, address: SocketAddr) {
+        let vm = VersionedModel {
+            name: name,
+            version: Some(version),
+        };
+        let new_sender = self.models.add_new_replica(vm.clone(), address).unwrap();
+        for p in self.prediction_workers.iter() {
+            p.incorporate_new_replica(vm.clone(), new_sender.clone());
+        }
+        for u in self.update_workers.iter() {
+            u.incorporate_new_replica(vm.clone(), new_sender.clone());
+        }
+    }
+
     /// Correction-policies must be versioned
-    #[allow(dead_code, unused_variables)]
-    pub fn add_model(&mut self, mc: ModelConf) {}
+    // #[allow(dead_code, unused_variables)]
+    pub fn add_new_model(&mut self, name: String, version: u32, addresses: Vec<SocketAddr>) {
+        let vm = VersionedModel {
+            name: name,
+            version: Some(version),
+        };
+        let new_batcher = self.models.add_new_model(vm.clone(), addresses);
+        for p in self.prediction_workers.iter() {
+            p.incorporate_new_model(vm.clone(), new_batcher.clone());
+        }
+        for u in self.update_workers.iter() {
+            u.incorporate_new_model(vm.clone(), new_batcher.clone());
+        }
+
+    }
 
 
     // TODO: How does model versioning work?
@@ -574,7 +663,8 @@ struct PredictionWorker<P, S>
           S: Serialize + Deserialize
 {
     worker_id: i32,
-    input_queue: mpsc::Sender<(PredictionRequest, i32)>,
+    input_queue: mpsc::Sender<InputChannelMessage>,
+    output_queue: mpsc::Sender<OutputChannelMessage>,
     // cache: Arc<PredictionCache<Output>>,
     // models: Arc<HashMap<String, PredictionBatcher<SimplePredictionCache<Output>, Output>>>,
     _policy_marker: PhantomData<P>,
@@ -582,6 +672,16 @@ struct PredictionWorker<P, S>
     prediction_metrics: PredictionMetrics,
 }
 
+enum InputChannelMessage {
+    Request(PredictionRequest, i32),
+    IncorporateReplica(VersionedModel, mpsc::Sender<RpcPredictRequest>),
+    IncorporateModel(VersionedModel,
+                     PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>),
+}
+
+enum OutputChannelMessage {
+    Request(PredictionRequest), /* IncorporateReplica(VersionedModel, mpsc::Sender<RpcPredictRequest>), */
+}
 
 impl<P, S> PredictionWorker<P, S>
     where P: CorrectionPolicy<S>,
@@ -595,13 +695,14 @@ impl<P, S> PredictionWorker<P, S>
                redis_port: u16,
                prediction_metrics: PredictionMetrics)
                -> PredictionWorker<P, S> {
-        let (input_sender, input_receiver) = mpsc::channel::<(PredictionRequest, i32)>();
-        let (output_sender, output_receiver) = mpsc::channel::<PredictionRequest>();
+        let (input_sender, input_receiver) = mpsc::channel::<InputChannelMessage>();
+        let (output_sender, output_receiver) = mpsc::channel::<OutputChannelMessage>();
         {
             let cache = cache.clone();
             let models = models.clone();
             let redis_ip = redis_ip.clone();
             let prediction_metrics = prediction_metrics.clone();
+            let output_sender = output_sender.clone();
             thread::spawn(move || {
                 PredictionWorker::<P, S>::run_input_thread(worker_id,
                                                            input_receiver,
@@ -631,6 +732,7 @@ impl<P, S> PredictionWorker<P, S>
         PredictionWorker {
             worker_id: worker_id,
             input_queue: input_sender,
+            output_queue: output_sender,
             // cache: cache,
             // models: models,
             _policy_marker: PhantomData,
@@ -640,74 +742,89 @@ impl<P, S> PredictionWorker<P, S>
     }
 
     fn run_input_thread(worker_id: i32,
-                        request_queue: mpsc::Receiver<(PredictionRequest, i32)>,
-                        send_queue: mpsc::Sender<PredictionRequest>,
+                        request_queue: mpsc::Receiver<InputChannelMessage>,
+                        send_queue: mpsc::Sender<OutputChannelMessage>,
                         cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
-                        models: ModelSet,
+                        mut models: ModelSet,
                         redis_ip: String,
                         redis_port: u16,
                         prediction_metrics: PredictionMetrics) {
         let cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
         info!("starting input prediction worker {} ", worker_id);
-        while let Ok((mut req, max_preds)) = request_queue.recv() {
-            {
-                req.offline_models = Some(models.get_versioned_models(&req.offline_models));
-
-                // let model_names = models.get_names(&req.offline_models)
-                //                         .map(|vm| vm.name)
-                //                         .collect::<Vec<_>>();
-                // TODO: take into account model versions
-                let model_names = req.offline_models
-                    .as_ref()
-                    .unwrap()
-                    .iter()
-                    .map(|r| &r.name)
-                    .collect::<Vec<&String>>();
-                let model_req_order: Vec<String> =
-                    if max_preds < req.offline_models.as_ref().unwrap().len() as i32 {
-                        let correction_state: S =
-                            cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
-                                .unwrap_or({
-                                    info!("INPUT THREAD: creating new correction model for user: \
-                                           {}",
-                                          req.uid);
-                                    P::new(model_names.clone())
-                                });
-                        P::rank_models_desc(&correction_state, model_names.clone())
-                    } else {
-                        // models.keys().map(|r| r.clone()).collect::<Vec<String>>()
-                        model_names.iter().map(|m| (*m).clone()).collect::<Vec<String>>()
-                    };
-                let mut num_requests = 0;
-                let mut i = 0;
-                let mut model_name_version_map: HashMap<&String, &u32> = HashMap::new();
-                for vm in req.offline_models.as_ref().unwrap() {
-                    model_name_version_map.insert(&vm.name, vm.version.as_ref().unwrap());
+        // while let Ok((mut req, max_preds)) = request_queue.recv() {
+        while let Ok(message) = request_queue.recv() {
+            match message {
+                InputChannelMessage::IncorporateReplica(vm, s) => {
+                    models.incorporate_new_replica(vm, s);
                 }
-                while num_requests < max_preds && i < model_req_order.len() {
-                    // first check to see if the prediction is already cached
-                    if cache.fetch(&model_req_order[i], &req.query, req.salt.clone()).is_none() {
-                        let vm = VersionedModel {
-                            name: model_req_order[i].clone(),
-                            version: Some(**model_name_version_map.get(&model_req_order[i])
-                                .unwrap()),
-                        };
-                        models.request_prediction(&vm,
-                                                  RpcPredictRequest {
-                                                      input: req.query.clone(),
-                                                      recv_time: req.recv_time.clone(),
-                                                      salt: req.salt.clone(),
-                                                  });
-                        num_requests += 1;
-                        prediction_metrics.cache_hit_counter.incr(0, 1);
-                    } else {
-                        prediction_metrics.cache_hit_counter.incr(1, 1);
+                InputChannelMessage::IncorporateModel(vm, b) => {
+                    models.incorporate_new_model(vm, b);
+                }
+                InputChannelMessage::Request(mut req, max_preds) => {
+                    {
+                        req.offline_models = Some(models.get_versioned_models(&req.offline_models));
+
+                        // let model_names = models.get_names(&req.offline_models)
+                        //                         .map(|vm| vm.name)
+                        //                         .collect::<Vec<_>>();
+                        // TODO: take into account model versions
+                        let model_names = req.offline_models
+                                             .as_ref()
+                                             .unwrap()
+                                             .iter()
+                                             .map(|r| &r.name)
+                                             .collect::<Vec<&String>>();
+                        let model_req_order: Vec<String> =
+                            if max_preds < req.offline_models.as_ref().unwrap().len() as i32 {
+                                let correction_state: S = cmt.get(*(&req.uid) as u32,
+                                                                  req.offline_models
+                                                                     .as_ref()
+                                                                     .unwrap())
+                                                             .unwrap_or({
+                                                                 info!("INPUT THREAD: creating \
+                                                                        new correction model for \
+                                                                        user: {}",
+                                                                       req.uid);
+                                                                 P::new(model_names.clone())
+                                                             });
+                                P::rank_models_desc(&correction_state, model_names.clone())
+                            } else {
+                                // models.keys().map(|r| r.clone()).collect::<Vec<String>>()
+                                model_names.iter().map(|m| (*m).clone()).collect::<Vec<String>>()
+                            };
+                        let mut num_requests = 0;
+                        let mut i = 0;
+                        let mut model_name_version_map: HashMap<&String, &u32> = HashMap::new();
+                        for vm in req.offline_models.as_ref().unwrap() {
+                            model_name_version_map.insert(&vm.name, vm.version.as_ref().unwrap());
+                        }
+                        while num_requests < max_preds && i < model_req_order.len() {
+                            // first check to see if the prediction is already cached
+                            if cache.fetch(&model_req_order[i], &req.query, req.salt.clone())
+                                    .is_none() {
+                                let vm = VersionedModel {
+                                    name: model_req_order[i].clone(),
+                                    version: Some(**model_name_version_map.get(&model_req_order[i])
+                                                                          .unwrap()),
+                                };
+                                models.request_prediction(&vm,
+                                                          RpcPredictRequest {
+                                                              input: req.query.clone(),
+                                                              recv_time: req.recv_time.clone(),
+                                                              salt: req.salt.clone(),
+                                                          });
+                                num_requests += 1;
+                                prediction_metrics.cache_hit_counter.incr(0, 1);
+                            } else {
+                                prediction_metrics.cache_hit_counter.incr(1, 1);
+                            }
+                            i += 1;
+                        }
                     }
-                    i += 1;
+                    send_queue.send(OutputChannelMessage::Request(req)).unwrap();
+
                 }
             }
-            send_queue.send(req).unwrap();
-
         }
         info!("ending input loop: prediction worker {}", worker_id);
     }
@@ -715,7 +832,7 @@ impl<P, S> PredictionWorker<P, S>
     #[allow(unused_variables)]
     fn run_output_thread(worker_id: i32,
                          slo_micros: u32,
-                         request_queue: mpsc::Receiver<PredictionRequest>,
+                         request_queue: mpsc::Receiver<OutputChannelMessage>,
                          cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                          // models: ModelSet,
                          redis_ip: String,
@@ -731,53 +848,66 @@ impl<P, S> PredictionWorker<P, S>
               slo_micros as f64 / 1000.0);
 
 
-        while let Ok(req) = request_queue.recv() {
+        while let Ok(message) = request_queue.recv() {
+            match message {
+                // OutputChannelMessage::IncorporateReplica(_, _) => {
+                //     // NOOP for now
+                //
+                //
+                //
+                // }
+                OutputChannelMessage::Request(req) => {
 
-            let model_names = req.offline_models
-                .as_ref()
-                .unwrap()
-                .iter()
-                .map(|r| &r.name)
-                .collect::<Vec<&String>>();
-            let correction_state: S =
-                cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
-                    .unwrap_or_else(|e| {
-                        info!("OUTPUT THREAD: user: {}, error: {}", req.uid, e);
-                        P::new(model_names.clone())
-                    });
-            let elapsed_time = req.recv_time.to(PreciseTime::now());
-            // NOTE: assumes SLA less than 1 second
-            if elapsed_time < slo - epsilon {
-                let sleep_time =
+
+                    let model_names = req.offline_models
+                                         .as_ref()
+                                         .unwrap()
+                                         .iter()
+                                         .map(|r| &r.name)
+                                         .collect::<Vec<&String>>();
+                    let correction_state: S = cmt.get(*(&req.uid) as u32,
+                                                      req.offline_models.as_ref().unwrap())
+                                                 .unwrap_or_else(|e| {
+                                                     info!("OUTPUT THREAD: user: {}, error: {}",
+                                                           req.uid,
+                                                           e);
+                                                     P::new(model_names.clone())
+                                                 });
+                    let elapsed_time = req.recv_time.to(PreciseTime::now());
+                    // NOTE: assumes SLA less than 1 second
+                    if elapsed_time < slo - epsilon {
+                        let sleep_time =
                     StdDuration::new(0, (slo - elapsed_time).num_nanoseconds().unwrap() as u32);
-                debug!("prediction worker sleeping for {:?} ms",
-                       sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
-                thread::sleep(sleep_time);
-            }
-            let mut ys = HashMap::new();
-            let mut missing_ys = Vec::new();
-            for model_name in model_names {
-                match cache.fetch(model_name, &req.query, req.salt.clone()) {
-                    Some(v) => {
-                        ys.insert(model_name.clone(), v);
+                        debug!("prediction worker sleeping for {:?} ms",
+                               sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+                        thread::sleep(sleep_time);
                     }
-                    None => missing_ys.push(model_name.clone()),
+                    let mut ys = HashMap::new();
+                    let mut missing_ys = Vec::new();
+                    for model_name in model_names {
+                        match cache.fetch(model_name, &req.query, req.salt.clone()) {
+                            Some(v) => {
+                                ys.insert(model_name.clone(), v);
+                            }
+                            None => missing_ys.push(model_name.clone()),
+                        }
+                    }
+                    prediction_metrics.in_time_predictions_hist.insert(ys.len() as i64);
+
+                    // use correction policy to make the final prediction
+                    let prediction = P::predict(&correction_state, ys, missing_ys);
+                    // execute the user's callback on this thread
+                    (req.on_predict)(prediction);
+                    let end_time = PreciseTime::now();
+                    // TODO: metrics
+                    let latency = req.recv_time.to(end_time).num_microseconds().unwrap();
+                    prediction_metrics.latency_hist.insert(latency);
+                    prediction_metrics.thruput_meter.mark(1);
+                    prediction_metrics.pred_counter.incr(1);
+                    prediction_metrics.num_queued_predictions_counter.decr(1);
+
                 }
             }
-            prediction_metrics.in_time_predictions_hist.insert(ys.len() as i64);
-
-            // use correction policy to make the final prediction
-            let prediction = P::predict(&correction_state, ys, missing_ys);
-            // execute the user's callback on this thread
-            (req.on_predict)(prediction);
-            let end_time = PreciseTime::now();
-            // TODO: metrics
-            let latency = req.recv_time.to(end_time).num_microseconds().unwrap();
-            prediction_metrics.latency_hist.insert(latency);
-            prediction_metrics.thruput_meter.mark(1);
-            prediction_metrics.pred_counter.incr(1);
-            prediction_metrics.num_queued_predictions_counter.decr(1);
-
         }
         info!("ending output loop: prediction worker {}", worker_id);
     }
@@ -788,7 +918,20 @@ impl<P, S> PredictionWorker<P, S>
     /// allowing individual correction policies to rank which offline models
     /// should be evaluated.
     pub fn predict(&self, r: PredictionRequest, max_preds: i32) {
-        self.input_queue.send((r, max_preds)).unwrap();
+        self.input_queue.send(InputChannelMessage::Request(r, max_preds)).unwrap();
+    }
+
+    pub fn incorporate_new_replica(&self,
+                                   vm: VersionedModel,
+                                   sender: mpsc::Sender<RpcPredictRequest>) {
+        self.input_queue.send(InputChannelMessage::IncorporateReplica(vm, sender)).unwrap();
+    }
+
+    pub fn incorporate_new_model(&self,
+                                 vm: VersionedModel,
+                                 batcher: PredictionBatcher<SimplePredictionCache<Output,
+                                                                                  EqualityHasher>>) {
+        self.input_queue.send(InputChannelMessage::IncorporateModel(vm, batcher)).unwrap();
     }
 
     // pub fn add_model(&self) {}
@@ -878,7 +1021,7 @@ impl<P, S> UpdateWorker<P, S>
     fn run(worker_id: i32,
            request_queue: mpsc::Receiver<UpdateMessage>,
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
-           models: ModelSet,
+           mut models: ModelSet,
            window_size: isize,
            redis_ip: String,
            redis_port: u16,
@@ -886,8 +1029,9 @@ impl<P, S> UpdateWorker<P, S>
         // let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
         //                                                            REDIS_CMT_DB);
 
-        let mut cmt: RedisCMT<S> =
-            RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
+        let mut cmt: RedisCMT<S> = RedisCMT::new_tcp_connection(&redis_ip,
+                                                                redis_port,
+                                                                REDIS_CMT_DB);
         let mut update_table: RedisUpdateTable =
             RedisUpdateTable::new_tcp_connection(&redis_ip, redis_port, REDIS_UPDATE_DB);
         // RedisUpdateTable::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_UPDATE_DB);
@@ -925,6 +1069,12 @@ impl<P, S> UpdateWorker<P, S>
                             // info!("Update worker {} got shutdown message and is executing break",
                             //       worker_id);
                             break;
+                        }
+                        UpdateMessage::IncorporateReplica(vm, s) => {
+                            models.incorporate_new_replica(vm, s);
+                        }
+                        UpdateMessage::IncorporateModel(vm, b) => {
+                            models.incorporate_new_model(vm, b);
                         }
                     }
                     // models.keys().collect::<Vec<&String>>())
@@ -968,22 +1118,22 @@ impl<P, S> UpdateWorker<P, S>
         let num_new_updates = req.updates.len();
         // TODO: better error handling
         let mut old_updates = update_table.get_updates(req.uid, window_size)
-            .unwrap()
-            .into_iter()
-            .map(|u| {
-                Update {
-                    query: Arc::new(u.0),
-                    label: u.1,
-                }
-            })
-            .collect::<Vec<_>>();
+                                          .unwrap()
+                                          .into_iter()
+                                          .map(|u| {
+                                              Update {
+                                                  query: Arc::new(u.0),
+                                                  label: u.1,
+                                              }
+                                          })
+                                          .collect::<Vec<_>>();
         req.updates.append(&mut old_updates);
 
         // now write new updates to UpdateTable
         for i in 0..num_new_updates {
             // TODO: better error handling
             update_table.add_update(req.uid, &req.updates[i].query, &req.updates[i].label)
-                .unwrap();
+                        .unwrap();
 
         }
 
@@ -1075,28 +1225,28 @@ impl<P, S> UpdateWorker<P, S>
             // let mut update_deps = ready_updates.remove(&uid).unwrap();
             let correction_state: S = match cmt.get(uid,
                                                     update_dep.req
-                                                        .offline_models
-                                                        .as_ref()
-                                                        .unwrap()) {
+                                                              .offline_models
+                                                              .as_ref()
+                                                              .unwrap()) {
                 Ok(s) => s,
                 Err(e) => {
                     info!("Error in getting correction state for update: {}", e);
                     info!("Creating model state for new user: {}", uid);
                     P::new(update_dep.req
-                        .offline_models
-                        .as_ref()
-                        .unwrap()
-                        .iter()
-                        .map(|mv| &mv.name)
-                        .collect::<Vec<&String>>())
+                                     .offline_models
+                                     .as_ref()
+                                     .unwrap()
+                                     .iter()
+                                     .map(|mv| &mv.name)
+                                     .collect::<Vec<&String>>())
                 }
             };
             let mut collected_inputs: Vec<Arc<Input>> = Vec::new();
             let mut collected_predictions: Vec<HashMap<String, Output>> = Vec::new();
             let mut collected_labels: Vec<Output> = Vec::new();
             for (preds, update) in update_dep.predictions
-                .drain(..)
-                .zip(update_dep.req.updates.drain(..)) {
+                                             .drain(..)
+                                             .zip(update_dep.req.updates.drain(..)) {
                 collected_inputs.push(update.query);
                 collected_predictions.push(preds);
                 collected_labels.push(update.label);
@@ -1108,9 +1258,9 @@ impl<P, S> UpdateWorker<P, S>
             match cmt.put(uid,
                           &new_state,
                           update_dep.req
-                              .offline_models
-                              .as_ref()
-                              .unwrap()) {
+                                    .offline_models
+                                    .as_ref()
+                                    .unwrap()) {
                 Ok(_) => {
 
                     // info!("putting new state for {}", uid);
@@ -1125,6 +1275,19 @@ impl<P, S> UpdateWorker<P, S>
             update_metrics.update_counter.incr(1);
             update_metrics.num_queued_updates_counter.decr(1);
         }
+    }
+
+    pub fn incorporate_new_replica(&self,
+                                   vm: VersionedModel,
+                                   sender: mpsc::Sender<RpcPredictRequest>) {
+        self.input_queue.send(UpdateMessage::IncorporateReplica(vm, sender)).unwrap();
+    }
+
+    pub fn incorporate_new_model(&self,
+                                 vm: VersionedModel,
+                                 batcher: PredictionBatcher<SimplePredictionCache<Output,
+                                                                                  EqualityHasher>>) {
+        self.input_queue.send(UpdateMessage::IncorporateModel(vm, batcher)).unwrap();
     }
 }
 
@@ -1143,6 +1306,9 @@ impl<P, S> Drop for UpdateWorker<P, S>
 enum UpdateMessage {
     Request(UpdateRequest),
     Shutdown,
+    IncorporateReplica(VersionedModel, mpsc::Sender<RpcPredictRequest>),
+    IncorporateModel(VersionedModel,
+                     PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>),
 }
 
 struct UpdateDependencies {

@@ -54,8 +54,7 @@ const STRING_CODE: u8 = 7;
 
 pub fn send_batch(stream: &mut TcpStream,
                   inputs: &Vec<RpcPredictRequest>,
-                  input_type: &InputType,
-                  num_encodes: usize)
+                  input_type: &InputType)
                   -> Vec<Output> {
     assert!(inputs.len() > 0);
     let message = match input_type {
@@ -82,33 +81,6 @@ pub fn send_batch(stream: &mut TcpStream,
         }
         &InputType::Str => encode_strs(inputs),
     };
-    for _ in 1..num_encodes {
-        match input_type {
-            &InputType::Integer(l) => {
-                if l < 0 {
-                    encode_var_ints(inputs)
-                } else {
-                    encode_fixed_ints(inputs, l)
-                }
-            }
-            &InputType::Float(l) => {
-                if l < 0 {
-                    encode_var_floats(inputs)
-                } else {
-                    encode_fixed_floats(inputs, l)
-                }
-            }
-            &InputType::Byte(l) => {
-                if l < 0 {
-                    encode_var_bytes(inputs)
-                } else {
-                    encode_fixed_bytes(inputs, l)
-                }
-            }
-            &InputType::Str => encode_strs(inputs),
-        };
-
-    }
     stream.write_all(&message[..]).unwrap();
     stream.flush().unwrap();
 

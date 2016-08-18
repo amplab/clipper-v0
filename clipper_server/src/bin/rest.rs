@@ -52,6 +52,12 @@ enum RequestType {
     Update,
 }
 
+enum AdminCommands {
+    AddModel,
+    ChangeModelVersion,
+    AddReplica,
+}
+
 #[derive(Serialize,Deserialize)]
 struct IntsInput {
     uid: u32,
@@ -167,7 +173,7 @@ fn decode_predict_input(input_type: &InputType,
     match input_type {
         &InputType::Integer(length) => {
             let i: IntsInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                        .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -181,7 +187,7 @@ fn decode_predict_input(input_type: &InputType,
         }
         &InputType::Float(length) => {
             let i: FloatsInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                          .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -195,7 +201,7 @@ fn decode_predict_input(input_type: &InputType,
         }
         &InputType::Byte(length) => {
             let i: BytesInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                         .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -209,7 +215,7 @@ fn decode_predict_input(input_type: &InputType,
         }
         &InputType::Str => {
             let i: StrInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                       .map_err(|e| format!("{}", e.description())));
             Ok((i.uid, Input::Str { s: i.input }))
         }
     }
@@ -221,7 +227,7 @@ fn decode_update_input(input_type: &InputType,
     match input_type {
         &InputType::Integer(length) => {
             let i: IntsInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                        .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -239,7 +245,7 @@ fn decode_update_input(input_type: &InputType,
         }
         &InputType::Float(length) => {
             let i: FloatsInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                          .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -257,7 +263,7 @@ fn decode_update_input(input_type: &InputType,
         }
         &InputType::Byte(length) => {
             let i: BytesInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                         .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -275,7 +281,7 @@ fn decode_update_input(input_type: &InputType,
         }
         &InputType::Str => {
             let i: StrInput = try!(serde_json::from_str(&json_string)
-                .map_err(|e| format!("{}", e.description())));
+                                       .map_err(|e| format!("{}", e.description())));
             if i.label.is_none() {
                 return Err(format!("No label for update"));
             }
@@ -427,6 +433,8 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
 }
 
 
+
+
 #[allow(unused_variables)] // needed for metrics shutdown signal
 fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>, clipper: Arc<ClipperServer<P, S>>)
     where P: CorrectionPolicy<S>,
@@ -436,7 +444,7 @@ fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>, clipper: Arc<Clipp
     let rest_server = Server::http(&"0.0.0.0:1337".parse().unwrap()).unwrap();
 
     // TODO: add admin server to update models
-    // let admin_server = Server::http(&"127.0.0.1:1338".parse().unwrap()).unwrap();
+    let admin_server = Server::http(&"127.0.0.1:1338".parse().unwrap()).unwrap();
 
     let report_interval_secs = 15;
     let (metrics_signal_tx, metrics_signal_rx) = mpsc::channel::<()>();
@@ -445,9 +453,12 @@ fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>, clipper: Arc<Clipp
                                   metrics_signal_rx);
     let input_type = clipper.get_input_type();
 
-    let (listening, server) =
-        rest_server.handle(|ctrl| RequestHandler::new(clipper.clone(), ctrl, input_type.clone()))
-            .unwrap();
+    let (listening, server) = rest_server.handle(|ctrl| {
+                                             RequestHandler::new(clipper.clone(),
+                                                                 ctrl,
+                                                                 input_type.clone())
+                                         })
+                                         .unwrap();
 
     let jh = thread::spawn(move || {
         println!("Listening on http://{}", listening);
