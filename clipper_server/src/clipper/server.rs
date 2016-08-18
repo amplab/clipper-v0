@@ -15,7 +15,7 @@ use std::time::Duration as StdDuration;
 use cmt::{CorrectionModelTable, RedisCMT, UpdateTable, RedisUpdateTable, REDIS_CMT_DB,
           REDIS_UPDATE_DB, DEFAULT_REDIS_SOCKET, REDIS_DEFAULT_PORT};
 use cache::{PredictionCache, SimplePredictionCache};
-use configuration::{ClipperConf, ModelConf};
+use configuration::ClipperConf;
 use hashing::EqualityHasher;
 use batching::{RpcPredictRequest, PredictionBatcher, BatchStrategy};
 use correction_policy::CorrectionPolicy;
@@ -603,8 +603,6 @@ impl<P, S> ClipperServer<P, S>
         }
     }
 
-    /// Correction-policies must be versioned
-    // #[allow(dead_code, unused_variables)]
     pub fn add_new_model(&mut self, name: String, version: u32, addresses: Vec<SocketAddr>) {
         let vm = VersionedModel {
             name: name,
@@ -617,13 +615,7 @@ impl<P, S> ClipperServer<P, S>
         for u in self.update_workers.iter() {
             u.incorporate_new_model(vm.clone(), new_batcher.clone());
         }
-
     }
-
-
-    // TODO: How does model versioning work?
-    #[allow(dead_code, unused_variables)]
-    pub fn update_model(&mut self, mc: ModelConf) {}
 }
 
 impl<P, S> Drop for ClipperServer<P, S>

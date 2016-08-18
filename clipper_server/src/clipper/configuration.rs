@@ -117,92 +117,92 @@ impl ClipperConf {
         let input_type = if int_keywords.contains(&lc_input_name) {
 
             let length = pc.get("input_length")
-                .unwrap_or(&Value::Integer(-1))
-                .as_integer()
-                .unwrap() as i32;
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as i32;
             InputType::Integer(length)
         } else if float_keywords.contains(&lc_input_name) {
             let length = pc.get("input_length")
-                .unwrap_or(&Value::Integer(-1))
-                .as_integer()
-                .unwrap() as i32;
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as i32;
             InputType::Float(length)
         } else if str_keywords.contains(&lc_input_name) {
             InputType::Str
         } else if byte_keywords.contains(&lc_input_name) {
             let length = pc.get("input_length")
-                .unwrap_or(&Value::Integer(-1))
-                .as_integer()
-                .unwrap() as i32;
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as i32;
             InputType::Byte(length)
         } else {
             panic!("Invalid input type: {}", provided_input_name);
         };
         let conf = ClipperConf {
             name: pc.get("name")
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .to_string(),
+                    .unwrap()
+                    .as_str()
+                    .unwrap()
+                    .to_string(),
             num_message_encodes: pc.get("num_message_encodes")
-                .unwrap_or(&Value::Integer(1))
-                .as_integer()
-                .unwrap() as usize,
+                                   .unwrap_or(&Value::Integer(1))
+                                   .as_integer()
+                                   .unwrap() as usize,
             slo_micros: pc.get("slo_micros")
-                .unwrap_or(&Value::Integer(20000))
-                .as_integer()
-                .unwrap() as u32,
+                          .unwrap_or(&Value::Integer(20000))
+                          .as_integer()
+                          .unwrap() as u32,
             policy_name: pc.get("correction_policy")
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .to_string(),
+                           .unwrap()
+                           .as_str()
+                           .unwrap()
+                           .to_string(),
             models: ClipperConf::parse_model_confs(pc.get("models")
-                .unwrap()
-                .as_slice()
-                .unwrap()),
+                                                     .unwrap_or(&Value::Array(Vec::new()))
+                                                     .as_slice()
+                                                     .unwrap()),
 
             batch_strategy: ClipperConf::parse_batcher_toml(pc.get("batching")
-                .unwrap()
-                .as_table()
-                .unwrap()),
+                                                              .unwrap()
+                                                              .as_table()
+                                                              .unwrap()),
             use_lsh: pc.get("use_lsh")
-                .unwrap_or(&Value::Boolean(false))
-                .as_bool()
-                .unwrap(),
+                       .unwrap_or(&Value::Boolean(false))
+                       .as_bool()
+                       .unwrap(),
 
             input_type: input_type,
 
             num_predict_workers: pc.get("num_predict_workers")
-                .unwrap_or(&Value::Integer(2))
-                .as_integer()
-                .unwrap() as usize,
+                                   .unwrap_or(&Value::Integer(2))
+                                   .as_integer()
+                                   .unwrap() as usize,
             num_update_workers: pc.get("num_update_workers")
-                .unwrap_or(&Value::Integer(1))
-                .as_integer()
-                .unwrap() as usize,
+                                  .unwrap_or(&Value::Integer(1))
+                                  .as_integer()
+                                  .unwrap() as usize,
             cache_size: pc.get("cache_size")
-                .unwrap_or(&Value::Integer(49999))
-                .as_integer()
-                .unwrap() as usize,
+                          .unwrap_or(&Value::Integer(49999))
+                          .as_integer()
+                          .unwrap() as usize,
             window_size: pc.get("window_size")
-                .unwrap_or(&Value::Integer(-1))
-                .as_integer()
-                .unwrap() as isize,
+                           .unwrap_or(&Value::Integer(-1))
+                           .as_integer()
+                           .unwrap() as isize,
             redis_port: pc.get("redis_port")
-                .unwrap_or(&Value::Integer(6379))
-                .as_integer()
-                .unwrap() as u16,
+                          .unwrap_or(&Value::Integer(6379))
+                          .as_integer()
+                          .unwrap() as u16,
             redis_ip: pc.get("redis_ip")
-                .unwrap_or(&Value::String("127.0.0.1".to_string()))
-                .as_str()
-                .unwrap()
-                .to_string(),
+                        .unwrap_or(&Value::String("127.0.0.1".to_string()))
+                        .as_str()
+                        .unwrap()
+                        .to_string(),
             metrics: Arc::new(RwLock::new(metrics::Registry::new(pc.get("name")
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .to_string()))),
+                                                                   .unwrap()
+                                                                   .as_str()
+                                                                   .unwrap()
+                                                                   .to_string()))),
         };
         conf
     }
@@ -221,17 +221,17 @@ impl ClipperConf {
         match strategy {
             "learned" => {
                 let sample_size = bt.get("sample_size")
-                    .unwrap_or(&Value::Integer(1000))
-                    .as_integer()
-                    .unwrap() as usize;
+                                    .unwrap_or(&Value::Integer(1000))
+                                    .as_integer()
+                                    .unwrap() as usize;
                 BatchStrategy::Learned { sample_size: sample_size }
             }
             "static" => {
 
                 let batch_size = bt.get("batch_size")
-                    .unwrap_or(&Value::Integer(-1))
-                    .as_integer()
-                    .unwrap() as usize;
+                                   .unwrap_or(&Value::Integer(-1))
+                                   .as_integer()
+                                   .unwrap() as usize;
                 BatchStrategy::Static { size: batch_size }
             }
             "aimd" => BatchStrategy::AIMD,
@@ -264,25 +264,25 @@ impl ModelConf {
     pub fn from_toml(mt: &Table) -> ModelConf {
         ModelConf {
             name: mt.get("name")
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .to_string(),
+                    .unwrap()
+                    .as_str()
+                    .unwrap()
+                    .to_string(),
             num_outputs: mt.get("num_outputs")
-                .unwrap_or(&Value::Integer(1))
-                .as_integer()
-                .unwrap() as usize,
+                           .unwrap_or(&Value::Integer(1))
+                           .as_integer()
+                           .unwrap() as usize,
 
             addresses: get_addrs(mt.get("addresses")
-                .unwrap()
-                .as_slice()
-                .unwrap()
-                .to_vec()),
+                                   .unwrap()
+                                   .as_slice()
+                                   .unwrap()
+                                   .to_vec()),
 
             version: mt.get("version")
-                .unwrap_or(&Value::Integer(1))
-                .as_integer()
-                .unwrap() as u32,
+                       .unwrap_or(&Value::Integer(1))
+                       .as_integer()
+                       .unwrap() as u32,
         }
     }
 
