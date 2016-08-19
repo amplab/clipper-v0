@@ -8,7 +8,6 @@ import json
 # import shutil
 import subprocess32 as subprocess
 
-
 cur_model_core_num = 0
 MAX_CORES = 47
 isolated_cores = True
@@ -59,7 +58,7 @@ dc_dict = {
         "version": "2",
         "services": {
             "redis": {"image": "redis:alpine", "cpuset": reserve_cores(1)},
-            "clipper": {"image": "cl-dev",
+            "clipper": {"image": "cl-dev-digits",
                 "cpuset": reserve_cores(5),
                 "depends_on": ["redis"],
                 "volumes": [
