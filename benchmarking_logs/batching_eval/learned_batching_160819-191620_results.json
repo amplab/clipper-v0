@@ -1,0 +1,232 @@
+{
+  "name": "learned_batching_160819-191620",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1000000
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 869096
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 999942
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 1000000
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 793674
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 673598
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 805992
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 194008
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.646422
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19362,
+      "max": 38139,
+      "mean": 24938.721546692606,
+      "std": 3084.868432442568,
+      "p95": 30320.45,
+      "p99": 32846.72999999998,
+      "p50": 24595.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 2,
+      "mean": 0.6969844357976653,
+      "std": 0.8826061295439356,
+      "p95": 2.0,
+      "p99": 2.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 7624,
+      "max": 31076,
+      "mean": 17611.34727626459,
+      "std": 1821.0161811920567,
+      "p95": 21258.0,
+      "p99": 23858.0,
+      "p50": 17391.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 36,
+      "max": 184,
+      "mean": 163.08800900731846,
+      "std": 11.756377444541942,
+      "p95": 177.0,
+      "p99": 180.0,
+      "p50": 164.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 524,
+      "max": 24879,
+      "mean": 3859.6937013618678,
+      "std": 2421.9312896459789,
+      "p95": 7714.0,
+      "p99": 15874.0,
+      "p50": 3194.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 209,
+      "mean": 37.30070525291829,
+      "std": 21.278443221277674,
+      "p95": 74.0,
+      "p99": 104.0,
+      "p50": 34.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 530,
+      "max": 26298,
+      "mean": 4468.255471789883,
+      "std": 2902.9776173945936,
+      "p95": 9278.0,
+      "p99": 16660.25,
+      "p50": 3641.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 211,
+      "mean": 41.22945038910506,
+      "std": 24.7957680655946,
+      "p95": 86.0,
+      "p99": 118.0,
+      "p50": 38.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 10767,
+      "max": 29691,
+      "mean": 17688.848249027236,
+      "std": 1819.987263654773,
+      "p95": 21398.5,
+      "p99": 24347.75,
+      "p50": 17413.5
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 38,
+      "max": 172,
+      "mean": 148.87900956668543,
+      "std": 11.305156315551115,
+      "p95": 164.0,
+      "p99": 168.0,
+      "p50": 150.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 10198,
+      "max": 29453,
+      "mean": 17871.285141050583,
+      "std": 1850.053807301766,
+      "p95": 21409.0,
+      "p99": 24336.75,
+      "p50": 17616.5
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 38,
+      "max": 155,
+      "mean": 125.90616822429907,
+      "std": 10.05325970736868,
+      "p95": 141.0,
+      "p99": 146.0,
+      "p50": 126.5
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9580.5328477766,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 8326.402696099878,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 9580.53275598999,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 9580.53275598999,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7603.8197545776,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 6453.427703369346,
+      "unit": "events per second"
+    }
+  ]
+}

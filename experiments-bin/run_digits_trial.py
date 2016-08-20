@@ -11,8 +11,8 @@ import subprocess32 as subprocess
 cur_model_core_num = 0
 MAX_CORES = 47
 isolated_cores = True
-experiment_name = "clippertest_%s" % str(time.strftime("%y%m%d-%H%M%S"))
-benchmarking_logs = "benchmarking_logs/thruput_mw_debug"
+experiment_name = "learned_batching_%s" % str(time.strftime("%y%m%d-%H%M%S"))
+benchmarking_logs = "benchmarking_logs/batching_eval"
 CLIPPER_ROOT = os.path.abspath("..")
 
 def reserve_cores(num_cores):
@@ -21,6 +21,7 @@ def reserve_cores(num_cores):
     cur_model_core_num += num_cores
     if cur_model_core_num >= MAX_CORES:
         print("WARNING: Trying to reserve more than 48 cores: %d" % cur_model_core_num)
+        sys.exit(1)
     return s
 
 def overlap_reserve_cores():
@@ -45,10 +46,10 @@ clipper_conf_dict = {
         "cache_size" : 49999,
         "mnist_path" : "/mnist_data/test.data",
         "num_benchmark_requests" : 1000000,
-        "target_qps" : 20000,
-        "bench_batch_size" : 300,
+        "target_qps" : 10000,
+        "bench_batch_size" : 500,
         "salt_cache" : True,
-        "batching": { "strategy": "learned", "sample_size": 1000},
+        "batching": { "strategy": "aimd", "sample_size": 1000},
         "models": []
         }
 
@@ -169,10 +170,14 @@ def do_docker_run():
 
 def gen_configs():
     ## SKLEARN RF
-    add_spark_svm(num_replicas=2)
-    add_sklearn_linear_svm(num_replicas=2)
-    add_sklearn_log_regression(num_replicas=2)
-    add_sklearn_rf(depth=16, num_replicas=2)
+    global cur_model_core_num
+    num_reps = 1
+    add_spark_svm(num_replicas=num_reps)
+    add_sklearn_linear_svm(num_replicas=num_reps)
+    add_sklearn_log_regression(num_replicas=num_reps)
+    add_sklearn_rf(depth=16, num_replicas=num_reps)
+    add_sklearn_rf(depth=8, num_replicas=num_reps)
+    # add_sklearn_kernel_svm(num_replicas=30)
 
     print("CORES USED: %d" % cur_model_core_num)
 
@@ -188,7 +193,6 @@ def gen_configs():
 
     do_docker_run()
 
-    global cur_model_core_num
     cur_model_core_num = 0
 
 

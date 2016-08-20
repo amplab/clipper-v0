@@ -91,56 +91,28 @@ impl<C> PredictionBatcher<C>
                -> PredictionBatcher<C> {
 
         let latency_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("{}_model_latency", name);
+            let metric_name = format!("{}:model_latency", name);
             metric_register.write().unwrap().create_histogram(metric_name, 8224)
         };
 
         let thruput_meter: Arc<metrics::Meter> = {
-            let metric_name = format!("{}_model_thruput", name);
+            let metric_name = format!("{}:model_thruput", name);
             metric_register.write().unwrap().create_meter(metric_name)
         };
 
         let batch_size_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("{}_model_batch_size", name);
+            let metric_name = format!("{}:model_batch_size", name);
             metric_register.write().unwrap().create_histogram(metric_name, 8224)
         };
 
         let predictions_counter: Arc<metrics::Counter> = {
-            let metric_name = format!("{}_prediction_counter", name);
+            let metric_name = format!("{}:prediction_counter", name);
             metric_register.write().unwrap().create_counter(metric_name)
         };
 
-        let mut input_queues = Vec::with_capacity(addrs.len());
-        let mut join_handles = Vec::with_capacity(addrs.len());
-        // info!("starting batchers encoding {} times", num_encodes);
-        for a in addrs.iter() {
-            let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
-            input_queues.push(sender);
-            let name = name.clone();
-            let addr = a.clone();
-            let latency_hist = latency_hist.clone();
-            let batch_size_hist = batch_size_hist.clone();
-            let thruput_meter = thruput_meter.clone();
-            let predictions_counter = predictions_counter.clone();
-            let input_type = input_type.clone();
-            let cache = cache.clone();
-            let batch_strategy = batch_strategy.clone();
-            let jh = thread::spawn(move || {
-                PredictionBatcher::run(name,
-                                       receiver,
-                                       addr,
-                                       latency_hist,
-                                       batch_size_hist,
-                                       thruput_meter,
-                                       predictions_counter,
-                                       input_type,
-                                       cache,
-                                       slo_micros,
-                                       batch_strategy);
-            });
-            join_handles.push(Some(jh));
-        }
-        PredictionBatcher {
+        let input_queues = Vec::with_capacity(addrs.len());
+        let join_handles = Vec::with_capacity(addrs.len());
+        let mut prediction_batcher = PredictionBatcher {
             name: name,
             input_queues: input_queues,
             cache: cache,
@@ -152,7 +124,37 @@ impl<C> PredictionBatcher<C>
             slo_micros: slo_micros,
             batch_strategy: batch_strategy.clone(),
             join_handles: Some(Arc::new(Mutex::new(join_handles))),
+        };
+        // info!("starting batchers encoding {} times", num_encodes);
+        for a in addrs.into_iter() {
+            prediction_batcher.add_new_replica(a, metric_register.clone());
+            // let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
+            // input_queues.push(sender);
+            // let name = name.clone();
+            // let addr = a.clone();
+            // let latency_hist = latency_hist.clone();
+            // let batch_size_hist = batch_size_hist.clone();
+            // let thruput_meter = thruput_meter.clone();
+            // let predictions_counter = predictions_counter.clone();
+            // let input_type = input_type.clone();
+            // let cache = cache.clone();
+            // let batch_strategy = batch_strategy.clone();
+            // let jh = thread::spawn(move || {
+            //     PredictionBatcher::run(name,
+            //                            receiver,
+            //                            addr,
+            //                            latency_hist,
+            //                            batch_size_hist,
+            //                            thruput_meter,
+            //                            predictions_counter,
+            //                            input_type,
+            //                            cache,
+            //                            slo_micros,
+            //                            batch_strategy);
+            // });
+            // join_handles.push(Some(jh));
         }
+        prediction_batcher
     }
 
     fn run(name: String,
@@ -165,7 +167,8 @@ impl<C> PredictionBatcher<C>
            input_type: InputType,
            cache: Arc<C>,
            slo_micros: u32,
-           batch_strategy: BatchStrategy) {
+           batch_strategy: BatchStrategy,
+           metric_register: Arc<RwLock<metrics::Registry>>) {
 
 
         let mut stream: TcpStream;
@@ -193,7 +196,34 @@ impl<C> PredictionBatcher<C>
             }
             BatchStrategy::AIMD => Box::new(AIMDBatcher {}) as Box<Batcher>,
             BatchStrategy::Learned { sample_size } => {
-                Box::new(LearnedBatcher::new(name.clone(), sample_size)) as Box<Batcher>
+                let alpha_gauge = {
+                    let metric_name = format!("{}:{}:alpha_gauge", name, addr);
+                    metric_register.write().unwrap().create_counter(metric_name)
+                };
+                let beta_gauge = {
+                    let metric_name = format!("{}:{}:beta_gauge", name, addr);
+                    metric_register.write().unwrap().create_counter(metric_name)
+                };
+                let max_batch_size_gauge = {
+                    let metric_name = format!("{}:{}:max_batch_size_gauge", name, addr);
+                    metric_register.write().unwrap().create_counter(metric_name)
+                };
+                let max_thru_gauge = {
+                    let metric_name = format!("{}:{}:max_thru_gauge", name, addr);
+                    metric_register.write().unwrap().create_counter(metric_name)
+                };
+                let base_thru_gauge = {
+                    let metric_name = format!("{}:{}:base_thru_gauge", name, addr);
+                    metric_register.write().unwrap().create_counter(metric_name)
+                };
+                let gauges = BatcherGauges {
+                    alpha_gauge: alpha_gauge,
+                    beta_gauge: beta_gauge,
+                    max_batch_size_gauge: max_batch_size_gauge,
+                    max_thru_gauge: max_thru_gauge,
+                    base_thru_gauge: base_thru_gauge,
+                };
+                Box::new(LearnedBatcher::new(name.clone(), sample_size, gauges)) as Box<Batcher>
             }
         };
 
@@ -215,8 +245,7 @@ impl<C> PredictionBatcher<C>
             }
             assert!(batch.len() > 0);
 
-            let response_floats: Vec<f64> =
-                rpc::send_batch(&mut stream, &batch, &input_type);
+            let response_floats: Vec<f64> = rpc::send_batch(&mut stream, &batch, &input_type);
             let end_time = time::PreciseTime::now();
             let latency = start_time.to(end_time).num_microseconds().unwrap();
             for _ in 0..batch.len() {
@@ -262,7 +291,10 @@ impl<C> PredictionBatcher<C>
         self.input_queues.push(new_replica);
     }
 
-    pub fn add_new_replica(&mut self, addr: SocketAddr) -> mpsc::Sender<RpcPredictRequest> {
+    pub fn add_new_replica(&mut self,
+                           addr: SocketAddr,
+                           metric_register: Arc<RwLock<metrics::Registry>>)
+                           -> mpsc::Sender<RpcPredictRequest> {
 
         let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
         self.input_queues.push(sender.clone());
@@ -287,7 +319,8 @@ impl<C> PredictionBatcher<C>
                                    input_type,
                                    cache,
                                    slo_micros,
-                                   batch_strategy);
+                                   batch_strategy,
+                                   metric_register);
         });
         let mut lock = self.join_handles.as_ref().unwrap().lock().unwrap();
         lock.push(Some(jh));
@@ -364,10 +397,20 @@ struct LearnedBatcher {
     // try an intermediate period of exploration
     calibrated: bool,
     name: String,
+    batcher_gauges: BatcherGauges,
+}
+
+
+struct BatcherGauges {
+    alpha_gauge: Arc<metrics::Counter>,
+    beta_gauge: Arc<metrics::Counter>,
+    max_batch_size_gauge: Arc<metrics::Counter>,
+    max_thru_gauge: Arc<metrics::Counter>,
+    base_thru_gauge: Arc<metrics::Counter>,
 }
 
 impl LearnedBatcher {
-    pub fn new(name: String, num_samples: usize) -> LearnedBatcher {
+    pub fn new(name: String, num_samples: usize, batcher_gauges: BatcherGauges) -> LearnedBatcher {
         LearnedBatcher {
             measurements: Vec::with_capacity(num_samples),
             alpha: 1.0,
@@ -376,6 +419,7 @@ impl LearnedBatcher {
             batch_size: 1,
             calibrated: false,
             name: name,
+            batcher_gauges: batcher_gauges,
         }
     }
 
@@ -419,10 +463,10 @@ impl Batcher for LearnedBatcher {
                 let alpha = (n * sum_xy - sum_x * sum_y) as f64 /
                             (n * sum_x_squared - (sum_x * sum_x)) as f64;
                 let beta = (sum_y as f64 - alpha * sum_x as f64) / (n as f64);
-                info!("{} BATCHER: Updated batching model: alpha = {}, beta = {}",
-                      self.name,
-                      alpha,
-                      beta);
+                // info!("{} BATCHER: Updated batching model: alpha = {}, beta = {}",
+                //       self.name,
+                //       alpha,
+                //       beta);
                 // info!("data points: {}",
                 //       serde_json::ser::to_string_pretty(&self.measurements).unwrap());
                 self.alpha = alpha;
@@ -446,6 +490,16 @@ impl Batcher for LearnedBatcher {
                 // taking the max batch size here
                 self.batch_size = max_batch_size;
                 self.calibrated = true;
+                self.batcher_gauges.alpha_gauge.incr((alpha * 1000.0).round() as isize);
+                self.batcher_gauges.beta_gauge.incr((beta * 1000.0).round() as isize);
+                self.batcher_gauges.max_batch_size_gauge.incr(max_batch_size as isize);
+                self.batcher_gauges
+                    .max_thru_gauge
+                    .incr((max_thruput * 10.0_f64.powi(9)).round() as isize);
+                self.batcher_gauges
+                    .base_thru_gauge
+                    .incr((baseline_thruput * 10.0_f64.powi(9)).round() as isize);
+
                 // self.measurements.clear();
 
             } else {
@@ -466,4 +520,3 @@ pub fn random_features(d: usize) -> Vec<f64> {
     let mut rng = thread_rng();
     rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
 }
-

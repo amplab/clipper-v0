@@ -45,21 +45,10 @@ pub enum InputType {
 // #[derive(Hash, Clone, Debug)]
 #[derive(Clone,Debug,Serialize,Deserialize, PartialEq, PartialOrd)]
 pub enum Input {
-    Str {
-        s: String,
-    },
-    Bytes {
-        b: Vec<u8>,
-        length: i32,
-    },
-    Ints {
-        i: Vec<i32>,
-        length: i32,
-    },
-    Floats {
-        f: Vec<f64>,
-        length: i32,
-    },
+    Str { s: String },
+    Bytes { b: Vec<u8>, length: i32 },
+    Ints { i: Vec<i32>, length: i32 },
+    Floats { f: Vec<f64>, length: i32 },
 }
 
 #[allow(dead_code)]
@@ -231,7 +220,7 @@ impl ModelSet {
                            address: SocketAddr)
                            -> Option<mpsc::Sender<RpcPredictRequest>> {
         match self.batchers.get_mut(&model) {
-            Some(p) => Some(p.add_new_replica(address)),
+            Some(p) => Some(p.add_new_replica(address, self.metrics.clone())),
             None => {
                 warn!("Trying to add a new replica to non-existent model version: {:?}",
                       model);
@@ -299,9 +288,9 @@ impl ModelSet {
                 for mv in vms.iter() {
                     let mut versions = model_versions.entry(mv.name.clone()).or_insert(Vec::new());
                     let version = mv.version
-                                    .as_ref()
-                                    .unwrap_or(&self.get_latest_version(&mv.name))
-                                    .clone();
+                        .as_ref()
+                        .unwrap_or(&self.get_latest_version(&mv.name))
+                        .clone();
                     if self.version_exists(&mv.name, &version) {
                         versions.push(version);
                     } else {
@@ -311,29 +300,27 @@ impl ModelSet {
                     }
                 }
                 model_versions.iter()
-                              .filter(|&(_, v)| v.len() > 0)
-                              .map(|(name, versions)| {
-                                  let latest_version = if versions.len() > 1 {
-                                      let latest_version = versions.iter()
-                                                                   .fold(0, |acc, &x| {
-                                                                       cmp::max(acc, x)
-                                                                   });
-                                      warn!("Requested multiple versions ({:?}) of model: {}. \
-                                             Only
-                        using newest one {}",
-                                            versions,
-                                            name,
-                                            latest_version);
-                                      latest_version
-                                  } else {
-                                      versions[0]
-                                  };
-                                  VersionedModel {
-                                      name: name.clone(),
-                                      version: Some(latest_version),
-                                  }
-                              })
-                              .collect::<Vec<VersionedModel>>()
+                    .filter(|&(_, v)| v.len() > 0)
+                    .map(|(name, versions)| {
+                        let latest_version = if versions.len() > 1 {
+                            let latest_version = versions.iter()
+                                .fold(0, |acc, &x| cmp::max(acc, x));
+                            warn!("Requested multiple versions ({:?}) of model: {}. Only
+                        \
+                                   using newest one {}",
+                                  versions,
+                                  name,
+                                  latest_version);
+                            latest_version
+                        } else {
+                            versions[0]
+                        };
+                        VersionedModel {
+                            name: name.clone(),
+                            version: Some(latest_version),
+                        }
+                    })
+                    .collect::<Vec<VersionedModel>>()
             }
             &None => {
                 let mut model_versions = HashSet::new();
@@ -514,7 +501,7 @@ impl<P, S> ClipperServer<P, S>
 
         let server_metrics = ServerMetrics {
             num_queued_predictions_counter: prediction_metrics.num_queued_predictions_counter
-                                                              .clone(),
+                .clone(),
             num_queued_updates_counter: update_metrics.num_queued_updates_counter.clone(),
         };
 
@@ -761,24 +748,23 @@ impl<P, S> PredictionWorker<P, S>
                         //                         .collect::<Vec<_>>();
                         // TODO: take into account model versions
                         let model_names = req.offline_models
-                                             .as_ref()
-                                             .unwrap()
-                                             .iter()
-                                             .map(|r| &r.name)
-                                             .collect::<Vec<&String>>();
+                            .as_ref()
+                            .unwrap()
+                            .iter()
+                            .map(|r| &r.name)
+                            .collect::<Vec<&String>>();
                         let model_req_order: Vec<String> =
                             if max_preds < req.offline_models.as_ref().unwrap().len() as i32 {
                                 let correction_state: S = cmt.get(*(&req.uid) as u32,
-                                                                  req.offline_models
-                                                                     .as_ref()
-                                                                     .unwrap())
-                                                             .unwrap_or({
-                                                                 info!("INPUT THREAD: creating \
-                                                                        new correction model for \
-                                                                        user: {}",
-                                                                       req.uid);
-                                                                 P::new(model_names.clone())
-                                                             });
+                                         req.offline_models
+                                             .as_ref()
+                                             .unwrap())
+                                    .unwrap_or({
+                                        info!("INPUT THREAD: creating new correction model for \
+                                               user: {}",
+                                              req.uid);
+                                        P::new(model_names.clone())
+                                    });
                                 P::rank_models_desc(&correction_state, model_names.clone())
                             } else {
                                 // models.keys().map(|r| r.clone()).collect::<Vec<String>>()
@@ -793,11 +779,11 @@ impl<P, S> PredictionWorker<P, S>
                         while num_requests < max_preds && i < model_req_order.len() {
                             // first check to see if the prediction is already cached
                             if cache.fetch(&model_req_order[i], &req.query, req.salt.clone())
-                                    .is_none() {
+                                .is_none() {
                                 let vm = VersionedModel {
                                     name: model_req_order[i].clone(),
                                     version: Some(**model_name_version_map.get(&model_req_order[i])
-                                                                          .unwrap()),
+                                        .unwrap()),
                                 };
                                 models.request_prediction(&vm,
                                                           RpcPredictRequest {
@@ -852,19 +838,17 @@ impl<P, S> PredictionWorker<P, S>
 
 
                     let model_names = req.offline_models
-                                         .as_ref()
-                                         .unwrap()
-                                         .iter()
-                                         .map(|r| &r.name)
-                                         .collect::<Vec<&String>>();
-                    let correction_state: S = cmt.get(*(&req.uid) as u32,
-                                                      req.offline_models.as_ref().unwrap())
-                                                 .unwrap_or_else(|e| {
-                                                     info!("OUTPUT THREAD: user: {}, error: {}",
-                                                           req.uid,
-                                                           e);
-                                                     P::new(model_names.clone())
-                                                 });
+                        .as_ref()
+                        .unwrap()
+                        .iter()
+                        .map(|r| &r.name)
+                        .collect::<Vec<&String>>();
+                    let correction_state: S =
+                        cmt.get(*(&req.uid) as u32, req.offline_models.as_ref().unwrap())
+                            .unwrap_or_else(|e| {
+                                info!("OUTPUT THREAD: user: {}, error: {}", req.uid, e);
+                                P::new(model_names.clone())
+                            });
                     let elapsed_time = req.recv_time.to(PreciseTime::now());
                     // NOTE: assumes SLA less than 1 second
                     if elapsed_time < slo - epsilon {
@@ -1021,9 +1005,8 @@ impl<P, S> UpdateWorker<P, S>
         // let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
         //                                                            REDIS_CMT_DB);
 
-        let mut cmt: RedisCMT<S> = RedisCMT::new_tcp_connection(&redis_ip,
-                                                                redis_port,
-                                                                REDIS_CMT_DB);
+        let mut cmt: RedisCMT<S> =
+            RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
         let mut update_table: RedisUpdateTable =
             RedisUpdateTable::new_tcp_connection(&redis_ip, redis_port, REDIS_UPDATE_DB);
         // RedisUpdateTable::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_UPDATE_DB);
@@ -1110,22 +1093,22 @@ impl<P, S> UpdateWorker<P, S>
         let num_new_updates = req.updates.len();
         // TODO: better error handling
         let mut old_updates = update_table.get_updates(req.uid, window_size)
-                                          .unwrap()
-                                          .into_iter()
-                                          .map(|u| {
-                                              Update {
-                                                  query: Arc::new(u.0),
-                                                  label: u.1,
-                                              }
-                                          })
-                                          .collect::<Vec<_>>();
+            .unwrap()
+            .into_iter()
+            .map(|u| {
+                Update {
+                    query: Arc::new(u.0),
+                    label: u.1,
+                }
+            })
+            .collect::<Vec<_>>();
         req.updates.append(&mut old_updates);
 
         // now write new updates to UpdateTable
         for i in 0..num_new_updates {
             // TODO: better error handling
             update_table.add_update(req.uid, &req.updates[i].query, &req.updates[i].label)
-                        .unwrap();
+                .unwrap();
 
         }
 
@@ -1217,28 +1200,28 @@ impl<P, S> UpdateWorker<P, S>
             // let mut update_deps = ready_updates.remove(&uid).unwrap();
             let correction_state: S = match cmt.get(uid,
                                                     update_dep.req
-                                                              .offline_models
-                                                              .as_ref()
-                                                              .unwrap()) {
+                                                        .offline_models
+                                                        .as_ref()
+                                                        .unwrap()) {
                 Ok(s) => s,
                 Err(e) => {
                     info!("Error in getting correction state for update: {}", e);
                     info!("Creating model state for new user: {}", uid);
                     P::new(update_dep.req
-                                     .offline_models
-                                     .as_ref()
-                                     .unwrap()
-                                     .iter()
-                                     .map(|mv| &mv.name)
-                                     .collect::<Vec<&String>>())
+                        .offline_models
+                        .as_ref()
+                        .unwrap()
+                        .iter()
+                        .map(|mv| &mv.name)
+                        .collect::<Vec<&String>>())
                 }
             };
             let mut collected_inputs: Vec<Arc<Input>> = Vec::new();
             let mut collected_predictions: Vec<HashMap<String, Output>> = Vec::new();
             let mut collected_labels: Vec<Output> = Vec::new();
             for (preds, update) in update_dep.predictions
-                                             .drain(..)
-                                             .zip(update_dep.req.updates.drain(..)) {
+                .drain(..)
+                .zip(update_dep.req.updates.drain(..)) {
                 collected_inputs.push(update.query);
                 collected_predictions.push(preds);
                 collected_labels.push(update.label);
@@ -1250,9 +1233,9 @@ impl<P, S> UpdateWorker<P, S>
             match cmt.put(uid,
                           &new_state,
                           update_dep.req
-                                    .offline_models
-                                    .as_ref()
-                                    .unwrap()) {
+                              .offline_models
+                              .as_ref()
+                              .unwrap()) {
                 Ok(_) => {
 
                     // info!("putting new state for {}", uid);
