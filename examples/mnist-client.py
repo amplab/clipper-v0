@@ -37,7 +37,7 @@ def mnist_update(uid, x, y):
     print("'%s', %f ms" % (r.text, latency))
 
 def mnist_prediction(uid, x):
-    url = "http://localhost:1337/predict"
+    url = "http://ec2-52-90-82-153.compute-1.amazonaws.com:1337/predict"
     req_json = json.dumps({'uid': uid, 'input': list(x)})
     headers = {'Content-type': 'application/json'}
     # x_str = ", ".join(["%d" % a for a in x])

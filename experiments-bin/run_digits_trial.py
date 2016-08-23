@@ -93,7 +93,7 @@ def add_model(name_base, image, mp, container_mp, num_replicas=1):
         dc_entries[n] = {
                 "image": image,
                 "volumes": ["%s:/model:ro" % mp],
-                "environment": ["CLIPPER_MODEL_PATH=%s" % container_mp],
+                # "environment": ["CLIPPER_MODEL_PATH=%s" % container_mp],
                 "cpuset": core_res,
                 }
 
@@ -110,28 +110,28 @@ def add_sklearn_rf(depth, num_replicas=1):
     name_base = "rf_d%d" % depth
     image = "clipper/sklearn-mw"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth%d/" % depth
-    container_mp =  "/model/50rf_pred3_depth%d.pkl" % depth
+    container_mp =  "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
 def add_sklearn_log_regression(num_replicas=1):
     name_base = "logistic_reg"
     image = "clipper/sklearn-mw"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/",
-    container_mp = "/model/log_regression_pred3.pkl"
+    container_mp =  "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
 def add_sklearn_linear_svm(num_replicas=1):
     name_base = "linear_svm"
     image = "clipper/sklearn-mw"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
-    container_mp = "/model/linearsvm_pred3.pkl"
+    container_mp =  "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
 def add_sklearn_kernel_svm(num_replicas=1):
     name_base = "kernel_svm"
     image = "clipper/sklearn-mw"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/",
-    container_mp = "/model/svm_pred3.pkl"
+    container_mp = "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
 def add_noop(num_replicas=1):
@@ -139,7 +139,7 @@ def add_noop(num_replicas=1):
     image = "clipper/noop-mw"
     # these values don't matter
     model_path = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
-    container_mp = "/model/log_regression_pred3.pkl"
+    container_mp = "/model"
 
 
 def add_spark_svm(num_replicas=1):

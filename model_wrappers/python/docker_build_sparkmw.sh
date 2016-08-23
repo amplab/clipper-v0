@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-sudo time docker build -t clipper/spark-mw-dev ./
+time docker build -t clipper/spark-mw-dev -f SparkMW_Dockerfile ./

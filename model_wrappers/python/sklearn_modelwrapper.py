@@ -52,6 +52,9 @@ class SklearnModelWrapper(rpc.ModelWrapperBase):
 
 if __name__=='__main__':
     model_path = os.environ["CLIPPER_MODEL_PATH"]
-    print(model_path, file=sys.stderr)
-    model = SklearnModelWrapper(model_path)
+    pkl_names = [l for l in os.listdir(model_path) if os.path.splitext(l)[1] == ".pkl"]
+    assert len(pkl_names) == 1
+    pkl_path = os.path.join(model_path, pkl_names[0])
+    print(pkl_path, file=sys.stderr)
+    model = SklearnModelWrapper(pkl_path)
     rpc.start(model, 6001)

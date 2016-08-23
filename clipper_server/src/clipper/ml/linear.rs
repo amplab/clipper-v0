@@ -202,12 +202,12 @@ impl LogisticRegressionModel {
 
     pub fn new(dim: usize) -> LogisticRegressionModel {
         LogisticRegressionModel {
-        // params: Parameters::default(),
-        nr_class: 2,
-        nr_feature: dim as i32,
-        w: vec![0.0; dim],
-        label: Some(vec![1]),
-        bias: 0.0
+            // params: Parameters::default(),
+            nr_class: 2,
+            nr_feature: dim as i32,
+            w: vec![1.0 / (dim as f64); dim],
+            label: Some(vec![1]),
+            bias: 0.0,
         }
 
     }
