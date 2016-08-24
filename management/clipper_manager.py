@@ -12,6 +12,8 @@ import gevent
 import traceback
 import toml
 import subprocess32 as subprocess
+from sklearn import base
+from sklearn.externals import joblib
 
 MODEL_REPO = "/tmp/clipper-models"
 DOCKER_NW = "clipper_nw"
@@ -35,9 +37,10 @@ class Cluster:
         self.host = host
         print(env.hosts)
         # Make sure docker is running on cluster
-        sudo("docker ps")
-        nw_create_command = "docker network create --driver bridge {nw}".format(nw=DOCKER_NW)
-        sudo(nw_create_command, warn_only=True)
+        with hide("warnings", "output"):
+            sudo("docker ps")
+            nw_create_command = "docker network create --driver bridge {nw}".format(nw=DOCKER_NW)
+            sudo(nw_create_command, warn_only=True)
         run("mkdir -p {model_repo}".format(model_repo=MODEL_REPO))
         self.clipper_up = False
 
@@ -98,7 +101,20 @@ class Cluster:
         self.add_model(name, container_name, data_path, replicas=replicas)
 
 
-    def add_sklearn_model(self, name, data_path, replicas=1):
+    def add_sklearn_model(self, name, model, replicas=1):
+        if isinstance(model, base.BaseEstimator):
+            fname = name.replace("/", "_")
+            pkl_path = '/tmp/%s/%s.pkl' % (fname, fname)
+            data_path = "/tmp/%s" % fname
+            try:
+                os.mkdir(data_path)
+            except OSError:
+                pass
+                # print("directory already exists. Might overwrite existing file")
+            joblib.dump(model, pkl_path)
+        elif isinstance(model, str):
+            # assume that model is a model_path
+            data_path = model
         image_name = "dcrankshaw/clipper-sklearn-mw"
         self.add_model(name, image_name, data_path, replicas=replicas)
 
@@ -116,17 +132,23 @@ class Cluster:
         with cd(vol):
             append(CLIPPER_METADATA_FILE, json.dumps({"image_name": image_name}))
             if data_path.startswith("s3://"):
-                aws_cli_installed = run("dpkg-query -Wf'${db:Status-abbrev}' awscli 2>/dev/null | grep -q '^i'", warn_only=True).return_code
-                if not aws_cli_installed:
-                    sudo("apt-get install awscli")
-                if sudo("stat ~/.aws/config", warn_only=True).return_code != 0:
-                    run("mkdir -p ~/.aws")
-                    append("~/.aws/config", aws_cli_config.format(
-                        access_key=os.environ["AWS_ACCESS_KEY_ID"],
-                        secret_key=os.environ["AWS_SECRET_ACCESS_KEY"]))
-                run("aws s3 cp s3://clipperdbdemo/dbcloud/ . --recursive")
+                with hide("warnings", "output", "running"):
+                    aws_cli_installed = run("dpkg-query -Wf'${db:Status-abbrev}' awscli 2>/dev/null | grep -q '^i'", warn_only=True).return_code == 0
+                    if not aws_cli_installed:
+                        sudo("apt-get update -qq")
+                        sudo("apt-get install -yqq awscli")
+                    if sudo("stat ~/.aws/config", warn_only=True).return_code != 0:
+                        run("mkdir -p ~/.aws")
+                        append("~/.aws/config", aws_cli_config.format(
+                            access_key=os.environ["AWS_ACCESS_KEY_ID"],
+                            secret_key=os.environ["AWS_SECRET_ACCESS_KEY"]))
+
+                run("aws s3 cp {data_path} {dl_path} --recursive".format(
+                    data_path=data_path,
+                    dl_path=os.path.join(vol, os.path.basename(data_path))))
             else:
-                put(data_path, ".")
+                with hide("output", "running"):
+                    put(data_path, ".")
         addrs = []
         for r in range(replicas):
             container_name = "%s_v%d_r%d" % (name, version, r)
@@ -134,9 +156,12 @@ class Cluster:
                     name=container_name,
                     vol=os.path.join(vol, os.path.basename(data_path)),
                     nw=DOCKER_NW, image=image_name)
-            sudo("docker stop {name}".format(name=container_name), warn_only=True)
-            sudo("docker rm {name}".format(name=container_name), warn_only=True)
-            sudo(run_mw_command)
+
+            with hide("output", "warnings"):
+                sudo("docker stop {name}".format(name=container_name), warn_only=True)
+                sudo("docker rm {name}".format(name=container_name), warn_only=True)
+            with hide("output"):
+                sudo(run_mw_command)
             addrs.append("{cn}:6001".format(cn=container_name))
         if self.clipper_up:
             new_model_data = {
@@ -177,17 +202,19 @@ class Cluster:
                     "num_predict_workers" : 1,
                     "num_update_workers" : 1,
                     "cache_size" : 49999,
-                    "batching": { "strategy": "learned", "sample_size": 1000},
+                    "batching": { "strategy": "aimd", "sample_size": 1000},
                     "models": []
                     }
-            run("rm ~/conf.toml", warn_only=True)
+            with hide("output", "warnings"):
+                run("rm ~/conf.toml", warn_only=True)
             append("~/conf.toml", toml.dumps(clipper_conf_dict))
-        sudo("docker run -d --network={nw} -p 6379:6379 "
-                "--cpuset-cpus=\"0\" --name redis-clipper redis:alpine".format(nw=DOCKER_NW))
+        with hide("output"):
+            sudo("docker run -d --network={nw} -p 6379:6379 "
+                    "--cpuset-cpus=\"0\" --name redis-clipper redis:alpine".format(nw=DOCKER_NW))
 
-        sudo("docker run -d --network={nw} -p 1337:1337 "
-                "--cpuset-cpus=\"{min_core}-{max_core}\" --name clipper "
-                "-v ~/conf.toml:/tmp/conf.toml dcrankshaw/clipper".format(nw=DOCKER_NW, min_core=1, max_core=4))
+            sudo("docker run -d --network={nw} -p 1337:1337 "
+                    "--cpuset-cpus=\"{min_core}-{max_core}\" --name clipper "
+                    "-v ~/conf.toml:/tmp/conf.toml dcrankshaw/clipper".format(nw=DOCKER_NW, min_core=1, max_core=4))
         self.clipper_up = True
 
     def get_metrics(self):
@@ -195,6 +222,7 @@ class Cluster:
         url = "http://%s:1337/metrics" % self.host
         r = requests.get(url)
         print(json.dumps(r.json(), indent=4))
+        return r.json()
 
 
 

@@ -5,6 +5,7 @@ import os
 import requests
 import random
 from datetime import datetime
+import time
 
 import pandas as pd
 import numpy as np
@@ -36,8 +37,8 @@ def mnist_update(uid, x, y):
     latency = (end - start).total_seconds() * 1000.0
     print("'%s', %f ms" % (r.text, latency))
 
-def mnist_prediction(uid, x):
-    url = "http://ec2-52-90-82-153.compute-1.amazonaws.com:1337/predict"
+def mnist_prediction(host, uid, x):
+    url = "http://%s:1337/predict" % host
     req_json = json.dumps({'uid': uid, 'input': list(x)})
     headers = {'Content-type': 'application/json'}
     # x_str = ", ".join(["%d" % a for a in x])
@@ -52,12 +53,14 @@ if __name__=='__main__':
     x, y = load_digits(os.path.expanduser("~/model-serving/data/mnist_data"), digits_filename = "test.data")
     # z = normalize_digits(x)
     # inputs = args[2:]
-    uid = int(args[1])
-    num_inputs = int(args[2])
-    for i in range(num_inputs):
+    # uid = int(args[1])
+    uid = 4
+    # num_inputs = int(args[2])
+    while True:
         # mnist_update(uid, x[int(i)], float(y[int(i)]))
         example_num = np.random.randint(0,len(x))
         # mnist_update(uid, x[example_num], float(y[example_num]))
-        mnist_prediction(uid, x[example_num])
+        mnist_prediction("localhost", uid, x[example_num])
+        time.sleep(0.2)
 
 

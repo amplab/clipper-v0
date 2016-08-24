@@ -4,6 +4,7 @@ use std::marker::PhantomData;
 use std::net::SocketAddr;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
+use serde_json;
 use std::sync::{mpsc, RwLock, Arc};
 use std::collections::{HashMap, HashSet};
 use rand::{thread_rng, Rng};
@@ -339,7 +340,10 @@ impl ModelSet {
     }
 
     pub fn request_prediction(&self, offline_model: &VersionedModel, request: RpcPredictRequest) {
-        self.batchers.get(offline_model).unwrap().request_prediction(request);
+        match self.batchers.get(offline_model) {
+            Some(b) => b.request_prediction(request),
+            None => warn!("No batcher found for model {:?}", offline_model),
+        }
     }
 }
 
@@ -349,22 +353,6 @@ impl Drop for ModelSet {
     }
 }
 
-pub struct ClipperServer<P, S>
-    where P: CorrectionPolicy<S>,
-          S: Serialize + Deserialize
-{
-    prediction_workers: Vec<PredictionWorker<P, S>>,
-    update_workers: Vec<UpdateWorker<P, S>>,
-    // model_names: Vec<String>,
-    // TODO(#13): Change cache type signature to be a trait object once LSH
-    // is implemented
-    // cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
-    metrics: Arc<RwLock<metrics::Registry>>,
-    input_type: InputType,
-    // models: HashMap<String, PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
-    models: ModelSet,
-    server_metrics: ServerMetrics,
-}
 
 
 #[derive(Clone)]
@@ -474,6 +462,23 @@ impl UpdateMetrics {
     }
 }
 
+pub struct ClipperServer<P, S>
+    where P: CorrectionPolicy<S>,
+          S: Serialize + Deserialize
+{
+    prediction_workers: Vec<PredictionWorker<P, S>>,
+    update_workers: Vec<UpdateWorker<P, S>>,
+    // model_names: Vec<String>,
+    // TODO(#13): Change cache type signature to be a trait object once LSH
+    // is implemented
+    // cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
+    metrics: Arc<RwLock<metrics::Registry>>,
+    input_type: InputType,
+    // models: HashMap<String, PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+    models: ModelSet,
+    server_metrics: ServerMetrics,
+    cmt: RedisCMT<S>,
+}
 
 impl<P, S> ClipperServer<P, S>
     where P: CorrectionPolicy<S>,
@@ -536,6 +541,7 @@ impl<P, S> ClipperServer<P, S>
             input_type: conf.input_type,
             models: models,
             server_metrics: server_metrics,
+            cmt: RedisCMT::new_tcp_connection(&conf.redis_ip, conf.redis_port, REDIS_CMT_DB),
         }
     }
 
@@ -561,6 +567,16 @@ impl<P, S> ClipperServer<P, S>
 
     pub fn get_metrics(&self) -> Arc<RwLock<metrics::Registry>> {
         self.metrics.clone()
+    }
+
+    /// For now, this only returns the correction model for
+    /// the latest set of model versions.
+    pub fn get_correction_model(&self, uid: u32) -> String {
+        let vms = self.models.get_versioned_models(&None);
+
+        let model_names = vms.iter().map(|r| &r.name).collect::<Vec<&String>>();
+        let correction_state: S = self.cmt.get(uid, &vms).unwrap_or(P::new(model_names));
+        serde_json::ser::to_string_pretty(&correction_state).unwrap()
     }
 
 

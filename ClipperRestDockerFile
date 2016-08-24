@@ -13,10 +13,10 @@ RUN apt-get update \
 # && git clone --recursive git@github.com:amplab/clipper.git \
 && cd /rust/clipper/clipper_server \
 && cargo build --release \
-&& rm -rf /var/lib/apt/lists/* \
+&& rm -rf /var/lib/apt/lists/*
 # && mkdir /mnist_data
 
-ENV RUST_LOG=info
+ENV RUST_LOG="info"
 ENV RUST_BACKTRACE=1
 EXPOSE 1337
 

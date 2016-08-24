@@ -23,6 +23,8 @@ use std::thread;
 // use std::time::Duration;
 
 pub mod rest;
+use log::{LogLevelFilter};
+use env_logger::LogBuilder;
 
 
 #[cfg_attr(rustfmt, rustfmt_skip)]
@@ -72,7 +74,12 @@ struct Args {
 
 pub fn main() {
 
-    env_logger::init().unwrap();
+    // env_logger::init().unwrap();
+    let mut builder = LogBuilder::new();
+    builder.filter(None, LogLevelFilter::Info);
+    builder.init().unwrap();
+    error!("TEST ERROR MESSAGE!");
+    info!("TEST INFO MESSAGE!");
 
     let args: Args = Docopt::new(USAGE)
                          .and_then(|d| d.decode())

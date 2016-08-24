@@ -1,7 +1,9 @@
 
 // use std::io::{Read, Write};
-use std::io::Read;
+// use std::io::{self, Read};
+use std::io;
 use std::thread;
+use std::str;
 use std::sync::{mpsc, RwLock, Arc};
 use std::boxed::Box;
 use serde::ser::Serialize;
@@ -39,6 +41,7 @@ const UPDATE: &'static str = "/update";
 const ADDMODEL: &'static str = "/addmodel";
 const ADDREPLICA: &'static str = "/addreplica";
 const GETMETRICS: &'static str = "/metrics";
+const GETCORRECTIONMODEL: &'static str = "/correctionmodel";
 
 
 
@@ -55,8 +58,13 @@ struct RequestHandler<P, S>
     input_type: InputType,
     request_type: Option<RequestType>,
     command: Option<AdminCommand>,
+    // input_string: String,
+    read_buffer: Vec<u8>,
+    content_length: usize,
+    recv_bytes: usize,
 }
 
+#[derive(Debug)]
 enum RequestType {
     Predict,
     Update,
@@ -70,11 +78,17 @@ struct NewModelWrapperData {
     addrs: Vec<String>,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct GetCorrectionModelData {
+    uid: u32,
+}
 
+#[derive(PartialEq, Debug)]
 enum AdminCommand {
     AddModel,
     AddReplica,
     GetMetrics,
+    GetCorrectionModel,
 }
 
 #[derive(Serialize,Deserialize)]
@@ -121,18 +135,20 @@ impl<P, S> RequestHandler<P, S>
             input_type: input_type,
             request_type: None,
             command: None,
+            // input_string: String::new(),
+            read_buffer: Vec::new(),
+            content_length: 0,
+            recv_bytes: 0,
         }
     }
 }
 
 
-fn decode_predict_input(input_type: &InputType,
-                        json_string: &String)
-                        -> Result<(u32, Input), String> {
+fn decode_predict_input(input_type: &InputType, json_string: &str) -> Result<(u32, Input), String> {
     match input_type {
         &InputType::Integer(length) => {
-            let i: IntsInput = try!(serde_json::from_str(&json_string)
-                                        .map_err(|e| format!("{}", e.description())));
+            let i: IntsInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -145,8 +161,8 @@ fn decode_predict_input(input_type: &InputType,
             }))
         }
         &InputType::Float(length) => {
-            let i: FloatsInput = try!(serde_json::from_str(&json_string)
-                                          .map_err(|e| format!("{}", e.description())));
+            let i: FloatsInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -159,8 +175,8 @@ fn decode_predict_input(input_type: &InputType,
             }))
         }
         &InputType::Byte(length) => {
-            let i: BytesInput = try!(serde_json::from_str(&json_string)
-                                         .map_err(|e| format!("{}", e.description())));
+            let i: BytesInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -173,20 +189,20 @@ fn decode_predict_input(input_type: &InputType,
             }))
         }
         &InputType::Str => {
-            let i: StrInput = try!(serde_json::from_str(&json_string)
-                                       .map_err(|e| format!("{}", e.description())));
+            let i: StrInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             Ok((i.uid, Input::Str { s: i.input }))
         }
     }
 }
 
 fn decode_update_input(input_type: &InputType,
-                       json_string: &String)
+                       json_string: &str)
                        -> Result<(u32, Input, Output), String> {
     match input_type {
         &InputType::Integer(length) => {
-            let i: IntsInput = try!(serde_json::from_str(&json_string)
-                                        .map_err(|e| format!("{}", e.description())));
+            let i: IntsInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -203,8 +219,8 @@ fn decode_update_input(input_type: &InputType,
                 i.label.unwrap()))
         }
         &InputType::Float(length) => {
-            let i: FloatsInput = try!(serde_json::from_str(&json_string)
-                                          .map_err(|e| format!("{}", e.description())));
+            let i: FloatsInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -221,8 +237,8 @@ fn decode_update_input(input_type: &InputType,
                 i.label.unwrap()))
         }
         &InputType::Byte(length) => {
-            let i: BytesInput = try!(serde_json::from_str(&json_string)
-                                         .map_err(|e| format!("{}", e.description())));
+            let i: BytesInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -239,8 +255,8 @@ fn decode_update_input(input_type: &InputType,
                 i.label.unwrap()))
         }
         &InputType::Str => {
-            let i: StrInput = try!(serde_json::from_str(&json_string)
-                                       .map_err(|e| format!("{}", e.description())));
+            let i: StrInput = try!(serde_json::from_str(json_string)
+                .map_err(|e| format!("{}", e.description())));
             if i.label.is_none() {
                 return Err(format!("No label for update"));
             }
@@ -254,50 +270,63 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
           S: Serialize + Deserialize
 {
     fn on_request(&mut self, req: Request<HttpStream>) -> Next {
-
-        // // check content type
-        // let headers = req.headers();
-        // match headers.get::<ContentType>() {
-        //     Some(&ContentType(ref mime)) => {
-        //         match mime {
-        //             &Mime(TopLevel::Application, SubLevel::Json, _) => {}
-        //             _ => {
-        //                 self.result_string = format!("Incorrect mime type. Expected \
-        //                                               application/json, found: {}",
-        //                                              mime)
-        //             }
-        //         }
-        //     }
-        //     None => warn!("no ContentType header found. Assuming application/json."),
-        // }
-
         match *req.uri() {
             RequestUri::AbsolutePath(ref path) => {
-                match (req.method(), &path[..]) {
-                    (&Post, PREDICT) => {
-                        // self.uid = extract_uid_from_path(path);
-                        self.request_type = Some(RequestType::Predict);
-                        Next::read()
+                match req.method() {
+                    &Post => {
+                        let headers = req.headers();
+                        match headers.get::<ContentLength>() {
+                            Some(&ContentLength(l)) => {
+                                self.content_length = l as usize;
+                                self.recv_bytes = 0;
+                                self.read_buffer = vec![0; l as usize];
+                            }
+                            None => {
+                                self.result_string = "Error: No Content-Length header provided"
+                                    .to_string();
+                                warn!("{}", self.result_string);
+                                return Next::write();
+                            }
+                        };
+                        match &path[..] {
+                            PREDICT => {
+                                // self.uid = extract_uid_from_path(path);
+                                self.request_type = Some(RequestType::Predict);
+                                Next::read()
+                            }
+                            UPDATE => {
+                                // self.uid = extract_uid_from_path(path);
+                                self.request_type = Some(RequestType::Update);
+                                Next::read()
+                            }
+                            ADDMODEL => {
+                                // self.uid = extract_uid_from_path(path);
+                                self.command = Some(AdminCommand::AddModel);
+                                Next::read()
+                            }
+                            ADDREPLICA => {
+                                // self.uid = extract_uid_from_path(path);
+                                self.command = Some(AdminCommand::AddReplica);
+                                Next::read()
+                            }
+                            GETCORRECTIONMODEL => {
+                                // self.uid = extract_uid_from_path(path);
+                                self.command = Some(AdminCommand::GetCorrectionModel);
+                                Next::read()
+                            }
+
+                            _ => Next::write(),
+                        }
                     }
-                    (&Post, UPDATE) => {
-                        // self.uid = extract_uid_from_path(path);
-                        self.request_type = Some(RequestType::Update);
-                        Next::read()
-                    }
-                    (&Post, ADDMODEL) => {
-                        // self.uid = extract_uid_from_path(path);
-                        self.command = Some(AdminCommand::AddModel);
-                        Next::read()
-                    }
-                    (&Post, ADDREPLICA) => {
-                        // self.uid = extract_uid_from_path(path);
-                        self.command = Some(AdminCommand::AddReplica);
-                        Next::read()
-                    }
-                    (&Get, GETMETRICS) => {
-                        // self.uid = extract_uid_from_path(path);
-                        self.command = Some(AdminCommand::GetMetrics);
-                        Next::write()
+                    &Get => {
+                        match &path[..] {
+                            GETMETRICS => {
+                                // self.uid = extract_uid_from_path(path);
+                                self.command = Some(AdminCommand::GetMetrics);
+                                Next::write()
+                            }
+                            _ => Next::write(),
+                        }
                     }
                     _ => Next::write(),
                 }
@@ -307,12 +336,55 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
     }
 
     fn on_request_readable(&mut self, transport: &mut Decoder<HttpStream>) -> Next {
-        let mut json_string = String::new();
-        transport.read_to_string(&mut json_string).unwrap();
+        match transport.read(&mut self.read_buffer[self.recv_bytes..self.content_length]) {
+            Ok(len) => {
+                self.recv_bytes += len;
+                if len == 0 {
+                    println!("(PRINTLN) READ 0 BYTES. AM I DONE READING???? recv_byte: {}, \
+                              content_len: {}",
+                             self.recv_bytes,
+                             self.content_length);
+                    warn!("(WARN) READ 0 BYTES. AM I DONE READING???? recv_byte: {}, \
+                           content_len: {}",
+                          self.recv_bytes,
+                          self.content_length);
+                }
+                if self.recv_bytes < self.content_length {
+                    return Next::read();
+                }
+            }
+            Err(e) => {
+                match e.kind() {
+                    io::ErrorKind::WouldBlock => {
+                        warn!("Read from socket would block: {}", e.description());
+                        return Next::read();
+                    }
+                    _ => {
+                        self.result_string =
+                            format!("ERROR reading request body: {}", e.description()).to_string();
+                        warn!("{}", self.result_string);
+                        return Next::write();
+                    }
+                }
+            }
+        }
+        let json_string = match str::from_utf8(&self.read_buffer[..]) {
+            Ok(s) => s,
+            Err(e) => {
+                self.result_string = format!("ERROR decoding request body: {}", e.description())
+                    .to_string();
+                warn!("{}", self.result_string);
+                return Next::write();
+            }
+        };
+
+        // NOTE: transport.read_to_string() reads to EOF which can block, causing a WouldBlock
+        // error
+        // transport.read_to_string(&mut json_string).unwrap();
         if self.request_type.is_some() {
             match self.request_type {
                 Some(RequestType::Predict) => {
-                    match decode_predict_input(&self.input_type, &json_string) {
+                    match decode_predict_input(&self.input_type, json_string) {
                         Ok((uid, input)) => {
                             self.uid = uid;
                             info!("/predict for user: {}", self.uid);
@@ -336,7 +408,7 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
                     }
                 }
                 Some(RequestType::Update) => {
-                    match decode_update_input(&self.input_type, &json_string) {
+                    match decode_update_input(&self.input_type, json_string) {
                         Ok((uid, input, label)) => {
                             self.uid = uid;
                             info!("/update for user: {}", self.uid);
@@ -360,7 +432,7 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
         } else if self.command.is_some() {
             match self.command {
                 Some(AdminCommand::AddModel) => {
-                    match serde_json::from_str::<NewModelWrapperData>(&json_string) {
+                    match serde_json::from_str::<NewModelWrapperData>(json_string) {
                         Ok(add_model_data) => {
                             let resolved_addrs = get_addrs_str(add_model_data.addrs);
                             let mut clipper_lock = self.clipper.write().unwrap();
@@ -377,7 +449,7 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
                     }
                 }
                 Some(AdminCommand::AddReplica) => {
-                    match serde_json::from_str::<NewModelWrapperData>(&json_string) {
+                    match serde_json::from_str::<NewModelWrapperData>(json_string) {
                         Ok(add_model_data) => {
                             let resolved_addrs = get_addrs_str(add_model_data.addrs);
                             let mut clipper_lock = self.clipper.write().unwrap();
@@ -387,6 +459,20 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
                                                              a);
                             }
                             self.result_string = "Success!".to_string();
+                            Next::write()
+                        }
+                        Err(e) => {
+                            self.result_string = e.description().to_string();
+                            Next::write()
+                        }
+                    }
+                }
+                Some(AdminCommand::GetCorrectionModel) => {
+                    match serde_json::from_str::<GetCorrectionModelData>(json_string) {
+                        Ok(get_model_data) => {
+                            let clipper_lock = self.clipper.read().unwrap();
+                            self.result_string =
+                                clipper_lock.get_correction_model(get_model_data.uid);
                             Next::write()
                         }
                         Err(e) => {
@@ -440,132 +526,6 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
 }
 
 
-// struct AdminHandler<P, S>
-//     where P: CorrectionPolicy<S>,
-//           S: Serialize + Deserialize
-// {
-//     clipper: Arc<RwLock<ClipperServer<P, S>>>,
-//     command: Option<AdminCommand>,
-//     result_string: String,
-// }
-//
-// impl<P, S> AdminHandler<P, S>
-//     where P: CorrectionPolicy<S>,
-//           S: Serialize + Deserialize
-// {
-//     fn new(clipper: Arc<RwLock<ClipperServer<P, S>>>) -> AdminHandler<P, S> {
-//         AdminHandler {
-//             clipper: clipper,
-//             command: None,
-//             result_string: "NO RESULT YET".to_string(),
-//         }
-//     }
-// }
-
-
-// impl<P, S> Handler<HttpStream> for AdminHandler<P, S>
-//     where P: CorrectionPolicy<S>,
-//           S: Serialize + Deserialize
-// {
-// fn on_request(&mut self, req: Request<HttpStream>) -> Next {
-//     // let headers = req.headers();
-//     // match headers.get::<ContentType>() {
-//     //     Some(&ContentType(ref mime)) => {
-//     //         match mime {
-//     //             &Mime(TopLevel::Application, SubLevel::Json, _) => {}
-//     //             _ => {
-//     //                 self.result_string = format!("Incorrect mime type. Expected \
-//     //                                               application/json, found: {}",
-//     //                                              mime)
-//     //             }
-//     //         }
-//     //     }
-//     //     None => warn!("no ContentType header found. Assuming application/json."),
-//     // }
-//
-//     match *req.uri() {
-//         RequestUri::AbsolutePath(ref path) => {
-//             match (req.method(), &path[..]) {
-//                 (&Post, ADDMODEL) => {
-//                     // self.uid = extract_uid_from_path(path);
-//                     self.command = Some(AdminCommand::AddModel);
-//                     Next::read()
-//                 }
-//                 (&Post, ADDREPLICA) => {
-//                     // self.uid = extract_uid_from_path(path);
-//                     self.command = Some(AdminCommand::AddReplica);
-//                     Next::read()
-//                 }
-//                 (&Get, GETMETRICS) => {
-//                     // self.uid = extract_uid_from_path(path);
-//                     self.command = Some(AdminCommand::GetMetrics);
-//                     Next::write()
-//                 }
-//                 _ => Next::write(),
-//             }
-//         }
-//         _ => Next::write(),
-//     }
-// }
-
-// fn on_request_readable(&mut self, transport: &mut Decoder<HttpStream>) -> Next {
-//     let mut json_string = String::new();
-//     transport.read_to_string(&mut json_string).unwrap();
-//     match self.command {
-//         Some(AdminCommand::AddModel) => {
-//             match serde_json::from_str::<NewModelWrapperData>(&json_string) {
-//                 Ok(add_model_data) => {
-//                     let resolved_addrs = get_addrs_str(add_model_data.addrs);
-//                     let mut clipper_lock = self.clipper.write().unwrap();
-//                     clipper_lock.add_new_model(add_model_data.name,
-//                                                add_model_data.version,
-//                                                resolved_addrs);
-//                     self.result_string = "Success!".to_string();
-//                     Next::write()
-//                 }
-//                 Err(e) => {
-//                     self.result_string = e.description().to_string();
-//                     Next::write()
-//                 }
-//             }
-//         }
-//         Some(AdminCommand::AddReplica) => {
-//             match serde_json::from_str::<NewModelWrapperData>(&json_string) {
-//                 Ok(add_model_data) => {
-//                     let resolved_addrs = get_addrs_str(add_model_data.addrs);
-//                     let mut clipper_lock = self.clipper.write().unwrap();
-//                     for a in resolved_addrs {
-//                         clipper_lock.add_new_replica(add_model_data.name.clone(),
-//                                                      add_model_data.version,
-//                                                      a);
-//                     }
-//                     self.result_string = "Success!".to_string();
-//                     Next::write()
-//                 }
-//                 Err(e) => {
-//                     self.result_string = e.description().to_string();
-//                     Next::write()
-//                 }
-//             }
-//         }
-//         _ => Next::write(),
-//     }
-// }
-
-//     fn on_response(&mut self, res: &mut Response) -> Next {
-//         match self.command {
-//             Some(AdminCommand::GetMetrics) => {
-//                 let clipper_read_lock = self.clipper.read().unwrap();
-//                 let metrics_register = clipper_read_lock.get_metrics();
-//                 let m = metrics_register.read().unwrap();
-//                 self.result_string = m.report();
-//             }
-//             _ => {}
-//         }
-//         res.headers_mut().set(ContentLength(self.result_string.as_bytes().len() as u64));
-//         Next::write()
-//     }
-// }
 
 #[allow(dead_code)]
 fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
@@ -608,12 +568,9 @@ fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>,
                                   metrics_signal_rx);
     let input_type = clipper.read().unwrap().get_input_type();
 
-    let (listening, server) = rest_server.handle(|ctrl| {
-                                             RequestHandler::new(clipper.clone(),
-                                                                 ctrl,
-                                                                 input_type.clone())
-                                         })
-                                         .unwrap();
+    let (listening, server) =
+        rest_server.handle(|ctrl| RequestHandler::new(clipper.clone(), ctrl, input_type.clone()))
+            .unwrap();
 
     let jh = thread::spawn(move || {
         println!("Listening on http://{}", listening);
