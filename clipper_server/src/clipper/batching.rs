@@ -12,7 +12,7 @@ use metrics;
 use rpc;
 use cache::PredictionCache;
 // use serde::ser::Serialize;
-// use serde_json;
+use serde_json;
 
 
 #[derive(Clone)]
@@ -382,22 +382,43 @@ fn update_batch_size_aimd(measurement: &LatencyMeasurement, max_time_micros: u64
 
 // Making this a struct so data is labeled and because
 // we may want to measure
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct LatencyMeasurement {
     latency: u64,
     batch_size: usize,
 }
 
 struct LearnedBatcher {
+    pub measurements: Vec<LatencyMeasurement>,
+    pub alpha: f64,
+    pub beta: f64,
+    pub num_samples: usize,
+    pub batch_size: usize,
+    // try an intermediate period of exploration
+    pub calibrated: bool,
+    pub name: String,
+    batcher_gauges: BatcherGauges,
+}
+
+#[derive(Serialize, Deserialize)]
+struct SerializeBatcher {
     measurements: Vec<LatencyMeasurement>,
     alpha: f64,
     beta: f64,
-    num_samples: usize,
     batch_size: usize,
-    // try an intermediate period of exploration
-    calibrated: bool,
     name: String,
-    batcher_gauges: BatcherGauges,
+}
+
+impl SerializeBatcher {
+    pub fn from_learned_batcher(lb: &LearnedBatcher) -> SerializeBatcher {
+        SerializeBatcher {
+            measurements: lb.measurements.clone(),
+            alpha: lb.alpha,
+            beta: lb.beta,
+            batch_size: lb.batch_size,
+            name: lb.name.clone(),
+        }
+    }
 }
 
 
@@ -499,6 +520,10 @@ impl Batcher for LearnedBatcher {
                 self.batcher_gauges
                     .base_thru_gauge
                     .incr((baseline_thruput * 10.0_f64.powi(9)).round() as isize);
+                let sb = SerializeBatcher::from_learned_batcher(&self);
+                let measurements_string = serde_json::ser::to_string(&sb).unwrap();
+                info!("GREPTHIS{}: XXXXXX {}", self.name, measurements_string);
+
 
                 // self.measurements.clear();
 
@@ -512,7 +537,6 @@ impl Batcher for LearnedBatcher {
         self.batch_size
     }
 }
-
 
 
 

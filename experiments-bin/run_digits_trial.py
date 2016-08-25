@@ -31,7 +31,7 @@ def overlap_reserve_cores():
 
 clipper_conf_dict = {
         "name" : experiment_name,
-        "slo_micros" : 20000,
+        "slo_micros" : 50000,
         "num_message_encodes" : 1,
         "correction_policy" : "logistic_regression",
         "use_lsh" : False,
@@ -49,7 +49,7 @@ clipper_conf_dict = {
         "target_qps" : 10000,
         "bench_batch_size" : 500,
         "salt_cache" : True,
-        "batching": { "strategy": "aimd", "sample_size": 1000},
+        "batching": { "strategy": "learned", "sample_size": 1000},
         "models": []
         }
 
