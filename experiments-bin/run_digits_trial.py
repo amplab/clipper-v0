@@ -195,7 +195,7 @@ def gen_configs():
 
     print("Finished running. Saving Clipper log")
 
-    with open(os.path.join(CLIPPER_ROOT, benchmarking_logs, "%s_logs.text" % experiment_name), "w") as f:
+    with open(os.path.join(CLIPPER_ROOT, benchmarking_logs, "%s_logs.txt" % experiment_name), "w") as f:
         subprocess.call(["sudo", "docker", "logs", "experimentsbin_clipper_1"], stdout=f, stderr=subprocess.STDOUT, universal_newlines=True)
 
     cur_model_core_num = 0

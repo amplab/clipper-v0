@@ -1,0 +1,142 @@
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 1000000
+num_message_encodes = 1
+name = "gather_batch_size_samples_160825-192429"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 10000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 50000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 10000
+strategy = "learned"
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 1000000
+num_message_encodes = 1
+name = "gather_batch_size_samples_160825-192429"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 10000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 50000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+INFO:clipper::configuration: spark_svm_r0:6001
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 10000
+strategy = "learned"
+INFO:clipper::configuration: linear_svm_r0:6001
+thread '<main>' panicked at 'called `Result::unwrap()` on an `Err` value: Error { repr: Custom(Custom { kind: Other, error: StringError("failed to lookup address information: Name or service not known") }) }', ../src/libcore/result.rs:785
+stack backtrace:
+   1:     0x559f51f32eff - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x559f51f365bb - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x559f51f36243 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x559f51f2803d - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x559f51f36801 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x559f51f290da - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x559f51f3679e - rust_begin_unwind
+   8:     0x559f51f6c86f - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x559f51e4ca2a - core::result::unwrap_failed::hde0fdea497c160b2
+                        at ../src/libcore/macros.rs:29
+  10:     0x559f51e7e942 - clipper::configuration::get_addr::he1ea5bb59b2df3a4
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:5986
+  11:     0x559f51e7eeeb - _<std..iter..Map<I, F> as std..iter..Iterator>::next::he60400026364573a
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:5990
+                        at ../src/libcore/ops.rs:1998
+                        at ../src/libcore/option.rs:385
+                        at ../src/libcore/iter/mod.rs:761
+  12:     0x559f51e7d5c5 - clipper::configuration::get_addrs::ha8b090e9379fd96f
+                        at ../src/libcollections/vec.rs:1313
+                        at ../src/libcore/iter/iterator.rs:1208
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:5989
+  13:     0x559f51e7d2ca - clipper::configuration::ModelConf::from_toml::ha764af55ea9d8d6f
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:5971
+  14:     0x559f51e78d8f - clipper::configuration::ClipperConf::parse_toml_string::h2cecd479e56ef95a
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:5898
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:5867
+  15:     0x559f51e7770c - clipper::configuration::ClipperConf::parse_from_toml::h9a8992cf5a0bf13d
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:5810
+  16:     0x559f51db3a62 - clipper_benchmarks::start_digits_benchmark::h622df18a7c26bc87
+                        at src/main.rs:159
+  17:     0x559f51daf660 - clipper_benchmarks::main::h9f6dd2a1d9657bfb
+                        at src/main.rs:66
+  18:     0x559f51f35e58 - std::panicking::try::call::hbbf4746cba890ca7
+  19:     0x559f51f4087b - __rust_try
+  20:     0x559f51f4081e - __rust_maybe_catch_panic
+  21:     0x559f51f358fe - std::rt::lang_start::hbcefdc316c2fbd45
+  22:     0x7f3b8c67eb44 - __libc_start_main
+  23:     0x559f51daea48 - <unknown>
+  24:                0x0 - <unknown>
