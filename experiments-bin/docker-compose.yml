@@ -7,28 +7,23 @@ services:
       '${CLIPPER_ROOT}/benchmarking_logs/batching_eval:/tmp/benchmarking_logs']
   linear_svm_r0:
     cpuset: 7-7
-    environment: [CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl]
-    image: clipper/sklearn-mw
+    image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
   logistic_reg_r0:
     cpuset: 8-8
-    environment: [CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl]
-    image: clipper/sklearn-mw
+    image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
   redis: {cpuset: 0-0, image: 'redis:alpine'}
   rf_d16_r0:
     cpuset: 9-9
-    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl]
-    image: clipper/sklearn-mw
+    image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
   rf_d8_r0:
     cpuset: 10-10
-    environment: [CLIPPER_MODEL_PATH=/model/50rf_pred3_depth8.pkl]
-    image: clipper/sklearn-mw
+    image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth8/:/model:ro']
   spark_svm_r0:
     cpuset: 6-6
-    environment: [CLIPPER_MODEL_PATH=/model]
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
 version: '2'

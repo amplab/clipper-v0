@@ -21,7 +21,7 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/ap
 && apk update \
 && apk add --no-cache --virtual .build_deps git python \
 python-dev gfortran build-base  \
-&& apk add --no-cache openjdk7 py-pip openblas@community py-numpy@testing bash \
+&& apk add --no-cache openjdk7 py-pip openblas@community py-numpy@community bash \
 && ln -sf "${JAVA_HOME}/bin/"* "/usr/bin/" \
 && tar zxvf /tmp/spark-1.6.2-bin-hadoop2.6.tgz -C /tmp/ \
 && pip install findspark \

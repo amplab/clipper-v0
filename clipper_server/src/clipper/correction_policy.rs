@@ -11,8 +11,9 @@ use rand::{thread_rng, Rng};
 
 /// Correction policies are stateless, any required state is tracked separately
 /// and stored in the `CorrectionModelTable`
-pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
-
+pub trait CorrectionPolicy<S>
+    where S: Serialize + Deserialize
+{
     /// Initialize new correction state without any training data.
     /// `models` is a list of the new model IDs.
     fn new(models: Vec<&String>) -> S;
@@ -52,9 +53,10 @@ pub trait CorrectionPolicy<S> where S: Serialize + Deserialize {
 pub struct AveragePolicy {}
 
 impl CorrectionPolicy<()> for AveragePolicy {
-
     #[allow(unused_variables)]
-    fn new(models: Vec<&String>) -> () { () }
+    fn new(models: Vec<&String>) -> () {
+        ()
+    }
 
     #[allow(unused_variables)]
     fn accepts_input_type(input_type: &InputType) -> bool {
@@ -81,11 +83,7 @@ impl CorrectionPolicy<()> for AveragePolicy {
             sum / (predictions.len() as f64)
         };
 
-        if pred > 0_f64 {
-            1.0
-        } else {
-            -1.0
-        }
+        if pred > 0_f64 { 1.0 } else { -1.0 }
 
     }
 
@@ -170,12 +168,13 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
 
     #[allow(unused_variables)]
     fn rank_models_desc(state: &LinearCorrectionState, model_names: Vec<&String>) -> Vec<String> {
-        let mut weight_magnitudes = state.linear_model.w
-                                         .iter()
-                                         .map(|w| w.abs())
-                                         .zip(state.offline_model_order
-                                                   .iter())
-                                         .collect::<Vec<_>>();
+        let mut weight_magnitudes = state.linear_model
+            .w
+            .iter()
+            .map(|w| w.abs())
+            .zip(state.offline_model_order
+                .iter())
+            .collect::<Vec<_>>();
         weight_magnitudes.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
         let ordered_names = weight_magnitudes.iter().map(|pair| pair.1.clone()).collect::<Vec<_>>();
         ordered_names
@@ -217,6 +216,12 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
               model.w,
               state.offline_model_order,
               model.label);
+        if state.offline_model_order.len() > model.w.len() {
+            warn!("Correction model has {} weights, expected {}. Offline model state: {:?}",
+                  model.w.len(),
+                  state.offline_model_order.len(),
+                  state.offline_model_order);
+        }
         // assert_eq!(model.w.len(), state.offline_model_order.len());
         LinearCorrectionState {
             linear_model: model,

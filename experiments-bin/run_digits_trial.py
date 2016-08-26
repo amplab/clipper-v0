@@ -11,7 +11,7 @@ import subprocess32 as subprocess
 cur_model_core_num = 0
 MAX_CORES = 47
 isolated_cores = True
-experiment_name = "learned_batching_%s" % str(time.strftime("%y%m%d-%H%M%S"))
+experiment_name = "gather_batch_size_samples_%s" % str(time.strftime("%y%m%d-%H%M%S"))
 benchmarking_logs = "benchmarking_logs/batching_eval"
 CLIPPER_ROOT = os.path.abspath("..")
 
@@ -45,11 +45,11 @@ clipper_conf_dict = {
         "num_update_workers" : 1,
         "cache_size" : 49999,
         "mnist_path" : "/mnist_data/test.data",
-        "num_benchmark_requests" : 1000000,
+        "num_benchmark_requests" : 5000000,
         "target_qps" : 10000,
         "bench_batch_size" : 500,
         "salt_cache" : True,
-        "batching": { "strategy": "learned", "sample_size": 1000},
+        "batching": { "strategy": "learned", "sample_size": 10000},
         "models": []
         }
 
@@ -108,28 +108,28 @@ def add_model(name_base, image, mp, container_mp, num_replicas=1):
 
 def add_sklearn_rf(depth, num_replicas=1):
     name_base = "rf_d%d" % depth
-    image = "clipper/sklearn-mw"
+    image = "clipper/sklearn-mw-dev"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth%d/" % depth
     container_mp =  "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
 def add_sklearn_log_regression(num_replicas=1):
     name_base = "logistic_reg"
-    image = "clipper/sklearn-mw"
+    image = "clipper/sklearn-mw-dev"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/",
     container_mp =  "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
 def add_sklearn_linear_svm(num_replicas=1):
     name_base = "linear_svm"
-    image = "clipper/sklearn-mw"
+    image = "clipper/sklearn-mw-dev"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
     container_mp =  "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
 
 def add_sklearn_kernel_svm(num_replicas=1):
     name_base = "kernel_svm"
-    image = "clipper/sklearn-mw"
+    image = "clipper/sklearn-mw-dev"
     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/",
     container_mp = "/model"
     add_model(name_base, image, mp, container_mp, num_replicas)
@@ -193,11 +193,12 @@ def gen_configs():
 
     do_docker_run()
 
+    print("Finished running. Saving Clipper log")
+
+    with open(os.path.join(CLIPPER_ROOT, benchmarking_logs, "%s_logs.text" % experiment_name), "w") as f:
+        subprocess.call(["sudo", "docker", "logs", "experimentsbin_clipper_1"], stdout=f, stderr=subprocess.STDOUT, universal_newlines=True)
+
     cur_model_core_num = 0
-
-
-
-
 
 
 if __name__=='__main__':

@@ -8,7 +8,7 @@ build = "build.rs"
 opt-level = 3
 debug = true
 rpath = false
-lto = true
+lto = false
 debug-assertions = false
 codegen-units = 1
 panic = 'unwind'
@@ -39,14 +39,14 @@ panic = 'unwind'
 # clean it. This is only for sanitary reasons, it will be
 # cleaned and rebuilt at the appropriate optimization level
 # with every invocation of cargo build.
-[package.metadata]
-cln = [
-    ["rm", "liblinear-sys/liblinear/blas/blas.a",
-      "liblinear-sys/liblinear/blas/daxpy.o",
-      "liblinear-sys/liblinear/blas/ddot.o",
-      "liblinear-sys/liblinear/blas/dnrm2.o",
-      "liblinear-sys/liblinear/blas/dscal.o"]
-]
+# [package.metadata]
+# cln = [
+#     ["rm", "liblinear-sys/liblinear/blas/blas.a",
+#       "liblinear-sys/liblinear/blas/daxpy.o",
+#       "liblinear-sys/liblinear/blas/ddot.o",
+#       "liblinear-sys/liblinear/blas/dnrm2.o",
+#       "liblinear-sys/liblinear/blas/dscal.o"]
+# ]
 
 [features]
 default = ["serde_codegen"]

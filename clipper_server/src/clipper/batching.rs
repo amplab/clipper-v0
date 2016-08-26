@@ -364,7 +364,9 @@ fn update_batch_size_aimd(measurement: &LatencyMeasurement, max_time_micros: u64
     let cur_batch = measurement.batch_size;
     let cur_time_micros = measurement.latency;
     let batch_increment = 2;
-    let backoff = 0.9;
+    // let backoff = 0.9;
+    // TODO TODO TODO: change back to 0.9
+    let backoff = 0.05;
     let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;
     if cur_time_micros < (max_time_micros - epsilon) {
         let new_batch = cur_batch + batch_increment;
@@ -532,6 +534,9 @@ impl Batcher for LearnedBatcher {
                 // without wildly exceeding latency SLOs
                 self.batch_size = update_batch_size_aimd(self.measurements.last().unwrap(),
                                                          max_latency);
+
+                // let mut rng = thread_rng();
+                // self.batch_size = rng.gen_range::<usize>(500);
             }
         }
         self.batch_size
