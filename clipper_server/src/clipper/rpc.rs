@@ -1,4 +1,6 @@
 #![allow(dead_code, unused_variables)]
+extern crate lz4;
+
 use std::net::TcpStream;
 use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
 use std::io::{Read, Write, Cursor};
@@ -297,8 +299,19 @@ fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
 
 fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut message = Vec::new();
-    message.put(STRING_CODE);
+    message.push(STRING_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
+    let mut concat_string: &str = "";
+    for x in inputs.iter() {
+        match x.input {
+            Input::Str {ref s} => {
+                message.write_u32::<LittleEndian>(s.len() as u32).unwrap();
+                concat_string = &format!("{}{}", concat_string, s);
+            }
+        }
+    }
+    let mut compressed_out = try!(lz4::EncoderBuilder::new().build(message));
+    try!(compressed_out.write_all(concat_string.as_bytes()));
     message
 }
 
