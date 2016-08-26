@@ -289,10 +289,9 @@ fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
                     message.write_u8::<LittleEndian>(*xi).unwrap();
                 }
             }
-            _ => unreachable!(),
+            _ => u
         }
     }
-    message
 }
 
 fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {

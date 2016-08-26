@@ -286,13 +286,11 @@ fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
             Input::Bytes {ref b, length: _} => {
                 message.write_u32::<LittleEndian>(b.len() as u32).unwrap();
                 for xi in b.iter() {
-                    message.write_u8::<LittleEndian>(*xi).unwrap();
+                    message.write_u8::<LittleEndian>(*xi)
                 }
             }
-            _ => unreachable!(),
         }
     }
-    message
 }
 
 fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {

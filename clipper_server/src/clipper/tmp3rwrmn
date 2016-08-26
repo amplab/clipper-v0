@@ -249,50 +249,12 @@ fn encode_var_floats(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
 
 fn encode_fixed_bytes(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
     let mut message = Vec::new();
-    message.push(FIXEDBYTE_CODE);
-    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
-    message.write_u32::<LittleEndian>(length as u32).unwrap();
-    assert!(message.len() == 9);
-    for x in inputs.iter() {
-        match x.input {
-            Input::Bytes {ref b, length: _} => {
-                for xi in b.iter() {
-                    message.write_u8::<LittleEndian>(*xi).unwrap();
-                }
-            }
-            _ => unreachable!(),
-        }
-    }
-    message
+    message.push
+    unimplemented!()
 }
 
 fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
-    let mut message = Vec::new();
-    message.push(VARBYTE_CODE);
-    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
-    let bytesize = 8;
-    let mut content_len = 0;
-    for x in inputs.iter() {
-        match x.input() {
-            Input::Bytes {ref b, length: _} => content_len += b.len() * bytesize,
-            _ => unreachable!(),
-        }
-    }
-    content_len += mem::size_of::<u32>() * inputs.len();
-    message.write_u32::<LittleEndian>(content_len as u32).unwrap();
-    assert!(message.len() == 9);
-    for x in inputs.iter() {
-        match x {
-            Input::Bytes {ref b, length: _} => {
-                message.write_u32::<LittleEndian>(b.len() as u32).unwrap();
-                for xi in b.iter() {
-                    message.write_u8::<LittleEndian>(*xi).unwrap();
-                }
-            }
-            _ => unreachable!(),
-        }
-    }
-    message
+    unimplemented!()
 }
 
 fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
