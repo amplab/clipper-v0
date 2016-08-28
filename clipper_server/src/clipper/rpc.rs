@@ -301,22 +301,21 @@ fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(STRING_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
-    let mut concat_string: &str = "";
+    let mut concat_string = String::new();
     for x in inputs.iter() {
         match x.input {
             Input::Str {ref s} => {
                 message.write_u32::<LittleEndian>(s.len() as u32).unwrap();
-                concat_string = &format!("{}{}", concat_string, s);
-            }
+                concat_string = format!("{}{}", concat_string, s);
+            },
+            _ => unreachable!(),
         }
     }
-    let mut compressed_out = try!(lz4::EncoderBuilder::new().build(message));
-    try!(compressed_out.write_all(concat_string.as_bytes()));
-    message
+    let mut compressor = lz4::EncoderBuilder::new().build(message).unwrap();
+    compressor.write_all(concat_string.as_bytes()).unwrap();
+    let (result, _) = compressor.finish();
+    result
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
