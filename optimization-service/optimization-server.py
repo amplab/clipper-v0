@@ -17,7 +17,7 @@ class QuantileRegressionHandler(SocketServer.BaseRequestHandler):
     allow_reuse_address = True
 
     def handle(self):
-        print("Handling")
+        print("Handling", file=sys.stderr)
         header_bytes = 4
         data = ""
         while len(data) < header_bytes:
@@ -25,16 +25,17 @@ class QuantileRegressionHandler(SocketServer.BaseRequestHandler):
 
         header, data = (data[:header_bytes], data[header_bytes:])
         num_bytes = struct.unpack("<I", header)[0]
+        print("Trying to read %d bytes" % num_bytes, file=sys.stderr)
 
         while len(data) < num_bytes:
             data += self.request.recv(4096)
 
         parsed_data = json.loads(data)
-        alpha, beta = fit_quantile_regression(parsed_data["batch_sizes"], parsed_data["latencies"])
+        print(parsed_data, file=sys.stderr)
+        alpha, beta = fit_quantile_regression(parsed_data["batch_size"], parsed_data["latencies"])
         encoded = json.dumps({"alpha": alpha, "beta": beta}).encode('utf-8')
-        print(encoded)
-        header = struct.pack("<I", len(encoded))
-        message = header + encoded
+        print(encoded, file=sys.stderr)
+        message = struct.pack("<dd", alpha, beta)
         self.request.sendall(message)
 
 
@@ -60,4 +61,4 @@ def start(port):
 
 
 if __name__=='__main__':
-    start(7003)
+    start(7777)

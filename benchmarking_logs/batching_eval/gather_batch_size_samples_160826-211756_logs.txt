@@ -1,0 +1,137 @@
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 5000000
+num_message_encodes = 1
+name = "gather_batch_size_samples_160826-211756"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 10000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 1000
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+INFO:clipper::configuration: spark_svm_r0:6001
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 5000000
+num_message_encodes = 1
+name = "gather_batch_size_samples_160826-211756"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 10000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 1000
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper::configuration: linear_svm_r0:6001
+INFO:clipper::configuration: logistic_reg_r0:6001
+INFO:clipper::configuration: rf_d16_r0:6001
+INFO:clipper::configuration: rf_d8_r0:6001
+INFO:clipper::configuration: quantilereg:7777
+thread '<main>' panicked at 'called `Result::unwrap()` on an `Err` value: Error { repr: Custom(Custom { kind: Other, error: StringError("failed to lookup address information: Name or service not known") }) }', ../src/libcore/result.rs:785
+stack backtrace:
+   1:     0x561a5521298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x561a5521604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x561a55215cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x561a55207acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x561a55216291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x561a55208b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x561a5521622e - rust_begin_unwind
+   8:     0x561a5524c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x561a55129f3a - core::result::unwrap_failed::hde0fdea497c160b2
+                        at ../src/libcore/macros.rs:29
+  10:     0x561a5515d0e2 - clipper::configuration::get_addr::he1ea5bb59b2df3a4
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:6246
+  11:     0x561a55158ff5 - clipper::configuration::ClipperConf::parse_toml_string::h2cecd479e56ef95a
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:6167
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:6126
+  12:     0x561a55156ffc - clipper::configuration::ClipperConf::parse_from_toml::h9a8992cf5a0bf13d
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:6067
+  13:     0x561a55090b02 - clipper_benchmarks::start_digits_benchmark::h622df18a7c26bc87
+                        at src/main.rs:159
+  14:     0x561a5508c700 - clipper_benchmarks::main::h9f6dd2a1d9657bfb
+                        at src/main.rs:66
+  15:     0x561a552158e8 - std::panicking::try::call::hbbf4746cba890ca7
+  16:     0x561a5522030b - __rust_try
+  17:     0x561a552202ae - __rust_maybe_catch_panic
+  18:     0x561a5521538e - std::rt::lang_start::hbcefdc316c2fbd45
+  19:     0x7f33f54edb44 - __libc_start_main
+  20:     0x561a5508bae8 - <unknown>
+  21:                0x0 - <unknown>

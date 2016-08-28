@@ -11,7 +11,7 @@ import subprocess32 as subprocess
 cur_model_core_num = 0
 MAX_CORES = 47
 isolated_cores = True
-experiment_name = "gather_batch_size_samples_%s" % str(time.strftime("%y%m%d-%H%M%S"))
+experiment_name = "quant_reg_aimd_%s" % str(time.strftime("%y%m%d-%H%M%S"))
 benchmarking_logs = "benchmarking_logs/batching_eval"
 CLIPPER_ROOT = os.path.abspath("..")
 
@@ -31,7 +31,7 @@ def overlap_reserve_cores():
 
 clipper_conf_dict = {
         "name" : experiment_name,
-        "slo_micros" : 50000,
+        "slo_micros" : 20000,
         "num_message_encodes" : 1,
         "correction_policy" : "logistic_regression",
         "use_lsh" : False,
@@ -45,11 +45,12 @@ clipper_conf_dict = {
         "num_update_workers" : 1,
         "cache_size" : 49999,
         "mnist_path" : "/mnist_data/test.data",
-        "num_benchmark_requests" : 5000000,
-        "target_qps" : 10000,
+        "num_benchmark_requests" : 1000000,
+        "target_qps" : 15000,
         "bench_batch_size" : 500,
         "salt_cache" : True,
-        "batching": { "strategy": "learned", "sample_size": 10000},
+        "batching": { "strategy": "aimd" },
+        # "batching": { "strategy": "learned", "sample_size": 1000, "opt_addr": "quantilereg:7777"},
         "models": []
         }
 
@@ -59,9 +60,10 @@ dc_dict = {
         "version": "2",
         "services": {
             "redis": {"image": "redis:alpine", "cpuset": reserve_cores(1)},
+            "quantilereg": {"image": "clipper/quantile-reg", "cpuset": reserve_cores(1)},
             "clipper": {"image": "cl-dev-digits",
                 "cpuset": reserve_cores(5),
-                "depends_on": ["redis"],
+                "depends_on": ["redis", "quantilereg"],
                 "volumes": [
                     "${MNIST_PATH}:/mnist_data:ro",
                     "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro",

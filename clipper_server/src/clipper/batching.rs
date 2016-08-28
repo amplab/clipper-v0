@@ -13,6 +13,9 @@ use rpc;
 use cache::PredictionCache;
 // use serde::ser::Serialize;
 use serde_json;
+use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
+use std::io::{Read, Write, Cursor};
+use std::mem;
 
 
 #[derive(Clone)]
@@ -128,31 +131,6 @@ impl<C> PredictionBatcher<C>
         // info!("starting batchers encoding {} times", num_encodes);
         for a in addrs.into_iter() {
             prediction_batcher.add_new_replica(a, metric_register.clone());
-            // let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
-            // input_queues.push(sender);
-            // let name = name.clone();
-            // let addr = a.clone();
-            // let latency_hist = latency_hist.clone();
-            // let batch_size_hist = batch_size_hist.clone();
-            // let thruput_meter = thruput_meter.clone();
-            // let predictions_counter = predictions_counter.clone();
-            // let input_type = input_type.clone();
-            // let cache = cache.clone();
-            // let batch_strategy = batch_strategy.clone();
-            // let jh = thread::spawn(move || {
-            //     PredictionBatcher::run(name,
-            //                            receiver,
-            //                            addr,
-            //                            latency_hist,
-            //                            batch_size_hist,
-            //                            thruput_meter,
-            //                            predictions_counter,
-            //                            input_type,
-            //                            cache,
-            //                            slo_micros,
-            //                            batch_strategy);
-            // });
-            // join_handles.push(Some(jh));
         }
         prediction_batcher
     }
@@ -195,7 +173,7 @@ impl<C> PredictionBatcher<C>
                 Box::new(StaticBatcher { batch_size: s }) as Box<Batcher>
             }
             BatchStrategy::AIMD => Box::new(AIMDBatcher {}) as Box<Batcher>,
-            BatchStrategy::Learned { sample_size } => {
+            BatchStrategy::Learned { sample_size, opt_addr } => {
                 let alpha_gauge = {
                     let metric_name = format!("{}:{}:alpha_gauge", name, addr);
                     metric_register.write().unwrap().create_counter(metric_name)
@@ -223,7 +201,10 @@ impl<C> PredictionBatcher<C>
                     max_thru_gauge: max_thru_gauge,
                     base_thru_gauge: base_thru_gauge,
                 };
-                Box::new(LearnedBatcher::new(name.clone(), sample_size, gauges)) as Box<Batcher>
+                Box::new(LearnedBatcher::new(name.clone(),
+                                             sample_size,
+                                             gauges,
+                                             opt_addr)) as Box<Batcher>
             }
         };
 
@@ -334,7 +315,10 @@ impl<C> PredictionBatcher<C>
 pub enum BatchStrategy {
     Static { size: usize },
     AIMD,
-    Learned { sample_size: usize },
+    Learned {
+        sample_size: usize,
+        opt_addr: SocketAddr,
+    },
 }
 
 trait Batcher {
@@ -364,9 +348,9 @@ fn update_batch_size_aimd(measurement: &LatencyMeasurement, max_time_micros: u64
     let cur_batch = measurement.batch_size;
     let cur_time_micros = measurement.latency;
     let batch_increment = 2;
-    // let backoff = 0.9;
+    let backoff = 0.9;
     // TODO TODO TODO: change back to 0.9
-    let backoff = 0.05;
+    // let backoff = 0.05;
     let epsilon = (0.1 * max_time_micros as f64).ceil() as u64;
     if cur_time_micros < (max_time_micros - epsilon) {
         let new_batch = cur_batch + batch_increment;
@@ -400,6 +384,7 @@ struct LearnedBatcher {
     pub calibrated: bool,
     pub name: String,
     batcher_gauges: BatcherGauges,
+    opt_addr: SocketAddr,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -433,7 +418,11 @@ struct BatcherGauges {
 }
 
 impl LearnedBatcher {
-    pub fn new(name: String, num_samples: usize, batcher_gauges: BatcherGauges) -> LearnedBatcher {
+    pub fn new(name: String,
+               num_samples: usize,
+               batcher_gauges: BatcherGauges,
+               opt_addr: SocketAddr)
+               -> LearnedBatcher {
         LearnedBatcher {
             measurements: Vec::with_capacity(num_samples),
             alpha: 1.0,
@@ -443,6 +432,7 @@ impl LearnedBatcher {
             calibrated: false,
             name: name,
             batcher_gauges: batcher_gauges,
+            opt_addr: opt_addr,
         }
     }
 
@@ -461,6 +451,91 @@ impl LearnedBatcher {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct OptimizationBatch {
+    batch_size: Vec<usize>,
+    latencies: Vec<u64>,
+}
+
+impl OptimizationBatch {
+    fn from_latency_measurements(measurements: &Vec<LatencyMeasurement>) -> OptimizationBatch {
+        let mut batch_size = Vec::with_capacity(measurements.len());
+        let mut latencies = Vec::with_capacity(measurements.len());
+        for m in measurements.iter() {
+            batch_size.push(m.batch_size);
+            latencies.push(m.latency);
+        }
+        OptimizationBatch {
+            batch_size: batch_size,
+            latencies: latencies,
+        }
+    }
+}
+
+#[allow(dead_code)]
+fn ols_estimator(measurements: &Vec<LatencyMeasurement>) -> (f64, f64) {
+
+    let n = measurements.len() as u64;
+    let mut sum_xy: u64 = 0;
+    let mut sum_x: u64 = 0;
+    let mut sum_y: u64 = 0;
+    let mut sum_x_squared: u64 = 0;
+    for m in measurements.iter() {
+        sum_xy += m.latency * m.batch_size as u64;
+        sum_x += m.batch_size as u64;
+        sum_x_squared += (m.batch_size * m.batch_size) as u64;
+        sum_y += m.latency;
+    }
+    // NOTE: y = alpha * x + beta
+    let alpha = (n * sum_xy - sum_x * sum_y) as f64 / (n * sum_x_squared - (sum_x * sum_x)) as f64;
+    let beta = (sum_y as f64 - alpha * sum_x as f64) / (n as f64);
+    (alpha, beta)
+}
+
+
+fn quantile_estimator(opt_server_addr: &SocketAddr,
+                      measurements: &Vec<LatencyMeasurement>)
+                      -> (f64, f64) {
+
+    let optimization_batch = OptimizationBatch::from_latency_measurements(measurements);
+    let json_string = serde_json::ser::to_string(&optimization_batch).unwrap();
+
+    let mut stream: TcpStream;
+    loop {
+        match TcpStream::connect(opt_server_addr.clone()) {
+            Ok(s) => {
+                info!("Connected to opt server at {:?}", opt_server_addr);
+                stream = s;
+                break;
+            }
+            Err(_) => {
+                info!("Couldn't connect to opt server at {:?}. Sleeping 1 second",
+                      opt_server_addr);
+                thread::sleep(StdDuration::from_millis(500));
+            }
+        }
+    }
+    stream.set_nodelay(true).unwrap();
+    stream.set_read_timeout(None).unwrap();
+    let mut message = Vec::new();
+    let mut bytes = json_string.into_bytes();
+    message.write_u32::<LittleEndian>(bytes.len() as u32).unwrap();
+    message.append(&mut bytes);
+    stream.write_all(&message[..]).unwrap();
+    stream.flush().unwrap();
+
+    let floatsize = mem::size_of::<f64>();
+    let num_response_bytes = floatsize * 2; // alpha and beta
+    let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
+    stream.read_exact(&mut response_buffer).unwrap();
+    let mut cursor = Cursor::new(response_buffer);
+    // let mut responses: Vec<f64> = Vec::with_capacity(inputs.len());
+    // alpha
+    let alpha = cursor.read_f64::<LittleEndian>().unwrap();
+    // beta
+    let beta = cursor.read_f64::<LittleEndian>().unwrap();
+    (alpha, beta)
+}
 
 impl Batcher for LearnedBatcher {
     fn update_batch_size(&mut self, measurement: LatencyMeasurement, max_latency: u64) -> usize {
@@ -469,29 +544,8 @@ impl Batcher for LearnedBatcher {
             if self.measurements.len() >= self.num_samples {
                 // remove first measurement
                 self.measurements.remove(0);
-
-                let n = self.measurements.len() as u64;
-                let mut sum_xy: u64 = 0;
-                let mut sum_x: u64 = 0;
-                let mut sum_y: u64 = 0;
-                let mut sum_x_squared: u64 = 0;
-                for m in self.measurements.iter() {
-                    sum_xy += m.latency * m.batch_size as u64;
-                    sum_x += m.batch_size as u64;
-                    sum_x_squared += (m.batch_size * m.batch_size) as u64;
-                    sum_y += m.latency;
-                }
-
-                // NOTE: y = alpha * x + beta
-                let alpha = (n * sum_xy - sum_x * sum_y) as f64 /
-                            (n * sum_x_squared - (sum_x * sum_x)) as f64;
-                let beta = (sum_y as f64 - alpha * sum_x as f64) / (n as f64);
-                // info!("{} BATCHER: Updated batching model: alpha = {}, beta = {}",
-                //       self.name,
-                //       alpha,
-                //       beta);
-                // info!("data points: {}",
-                //       serde_json::ser::to_string_pretty(&self.measurements).unwrap());
+                // let (alpha, beta) = ols_estimator(&self.measurements);
+                let (alpha, beta) = quantile_estimator(&self.opt_addr, &self.measurements);
                 self.alpha = alpha;
                 self.beta = beta;
                 // lat = (alpha * batch_size) + beta;

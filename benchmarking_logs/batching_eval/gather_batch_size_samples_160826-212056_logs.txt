@@ -1,0 +1,1350 @@
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 5000000
+num_message_encodes = 1
+name = "gather_batch_size_samples_160826-212056"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 10000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 1000
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 5000000
+num_message_encodes = 1
+name = "gather_batch_size_samples_160826-212056"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 10000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+INFO:clipper::configuration: spark_svm_r0:6001
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 1000
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper::configuration: linear_svm_r0:6001
+INFO:clipper::configuration: logistic_reg_r0:6001
+INFO:clipper::configuration: rf_d16_r0:6001
+INFO:clipper::configuration: rf_d8_r0:6001
+INFO:clipper::configuration: quantilereg:7777
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.5:6001)
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.7:6001)
+INFO:clipper::batching: Connected to rf_d16 model wrapper at V4(172.21.0.8:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::batching: Connected to rf_d8 model wrapper at V4(172.21.0.4:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting update worker 0
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to spark_svm model wrapper at V4(172.21.0.6:6001)
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper::correction_policy: OLD correction state: [0.2, 0.2, 0.2, 0.2, 0.2], offline_model_order: ["linear_svm", "rf_d8", "spark_svm", "logistic_reg", "rf_d16"]
+INFO:clipper::correction_policy: New correction state: [0.5671321151789853, 0.08327485984142866, 1.3326175568427177, 1.2786021957235805, 1.2195453533278173], offline_model_order: ["linear_svm", "rf_d8", "spark_svm", "logistic_reg", "rf_d16"], labels: Some([1, -1])
+INFO:clipper_benchmarks: {
+  "name": "gather_batch_size_samples_160826-212056",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 382
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 385
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 385
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 398
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 398
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 214220,
+      "max": 214220,
+      "mean": 214220.0,
+      "std": null,
+      "p95": 214220.0,
+      "p99": 214220.0,
+      "p50": 214220.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 889,
+      "max": 6411,
+      "mean": 4601.748691099477,
+      "std": 1366.8096959990517,
+      "p95": 6411.0,
+      "p99": 6411.0,
+      "p50": 5151.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.1,
+      "std": 10.963576058932598,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1307,
+      "max": 5401,
+      "mean": 3711.935064935065,
+      "std": 970.1282901855248,
+      "p95": 5401.0,
+      "p99": 5401.0,
+      "p50": 3813.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.25,
+      "std": 11.01135777277262,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 1243,
+      "max": 5771,
+      "mean": 3724.779220779221,
+      "std": 1096.4190151847802,
+      "p95": 5771.0,
+      "p99": 5771.0,
+      "p50": 3726.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.25,
+      "std": 11.01135777277262,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7214,
+      "max": 8291,
+      "mean": 7875.150753768844,
+      "std": 274.2818925141492,
+      "p95": 8291.0,
+      "p99": 8291.0,
+      "p50": 7931.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.9,
+      "std": 11.670475568716127,
+      "p95": 37.0,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7245,
+      "max": 9252,
+      "mean": 8248.74623115578,
+      "std": 550.9994934084691,
+      "p95": 9252.0,
+      "p99": 9252.0,
+      "p50": 8170.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.9,
+      "std": 11.670475568716127,
+      "p95": 37.0,
+      "p99": 37.0,
+      "p50": 20.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.049950616323172099,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 19.081139247910405,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 19.231509864840448,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 19.231529077897134,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 19.8809480874478,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 19.881053356151587,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+thread '<unnamed>' panicked at 'called `Result::unwrap()` on an `Err` value: Error { repr: Custom(Custom { kind: UnexpectedEof, error: StringError("failed to fill whole buffer") }) }', ../src/libcore/result.rs:785
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d619f3a - core::result::unwrap_failed::hde0fdea497c160b2
+INFO:clipper_benchmarks: {
+  "name": "gather_batch_size_samples_160826-212056",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 95500
+    },
+    {
+      "name": "queued_predictions",
+      "count": 500
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 84862
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 89744
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 92638
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 61809
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 63388
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.8:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.4:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 95468
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 32
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5002094240837697
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 20100,
+      "max": 35542,
+      "mean": 25190.52602140078,
+      "std": 3165.2685582401088,
+      "p95": 30728.0,
+      "p99": 32661.459999999992,
+      "p50": 24889.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 5,
+      "mean": 0.0024319066147859924,
+      "std": 0.0961123168952681,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 1011,
+      "max": 23399,
+      "mean": 11829.62852626459,
+      "std": 4575.384528099967,
+      "p95": 18355.0,
+      "p99": 21615.0,
+      "p50": 12047.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 7,
+      "max": 175,
+      "mean": 88.39791666666666,
+      "std": 47.022524674130718,
+      "p95": 164.0,
+      "p99": 172.39,
+      "p50": 88.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 773,
+      "max": 25831,
+      "mean": 11687.794017509728,
+      "std": 4812.345796346081,
+      "p95": 18927.0,
+      "p99": 20954.0,
+      "p50": 12465.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 6,
+      "max": 186,
+      "mean": 91.57551020408164,
+      "std": 49.37227423329013,
+      "p95": 172.0,
+      "p99": 183.0,
+      "p50": 90.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 1048,
+      "max": 27144,
+      "mean": 11837.68093385214,
+      "std": 4807.8612019607,
+      "p95": 18790.0,
+      "p99": 21272.0,
+      "p50": 12129.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 7,
+      "max": 199,
+      "mean": 96.5985401459854,
+      "std": 51.61494699801338,
+      "p95": 178.0,
+      "p99": 195.0,
+      "p50": 96.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 3985,
+      "max": 24351,
+      "mean": 13924.670598249028,
+      "std": 3694.6075331306626,
+      "p95": 19040.0,
+      "p99": 21759.0,
+      "p50": 14431.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 5,
+      "max": 164,
+      "mean": 79.44601542416453,
+      "std": 42.52806224193402,
+      "p95": 150.0,
+      "p99": 158.0,
+      "p50": 79.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 3859,
+      "max": 27239,
+      "mean": 13390.674124513618,
+      "std": 4027.7599034145439,
+      "p95": 19050.0,
+      "p99": 21593.5,
+      "p50": 13747.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 5,
+      "max": 157,
+      "mean": 77.51770451770452,
+      "std": 41.96826856522037,
+      "p95": 147.0,
+      "p99": 157.0,
+      "p50": 77.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9543.78890218246,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 8480.678230404184,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 8968.560570212736,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 9257.772264478597,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 6176.878234581464,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 6344.569051090835,
+      "unit": "events per second"
+    }
+  ]
+}
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d624500 - _<batching..LearnedBatcher as batching..Batcher>::update_batch_size::hcd6a5b3e23dbd97f
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3265
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3279
+  11:     0x55f91d61cf5f - _<batching..PredictionBatcher<C>>::run::h2cc1ad12a0640ec4
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2313
+  12:     0x55f91d61a3ae - std::panicking::try::call::h2e55bee03794e173
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2357
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d61a8ab - _<F as std..boxed..FnBox<A>>::call_box::h570d8734a8d93619
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+thread '<unnamed>thread '' panicked at 'called `Result::unwrap()` on an `Err` value: "SendError(..)"<unnamed>', ../src/libcore/result.rs' panicked at ':called `Result::unwrap()` on an `Err` value: "SendError(..)"785', 
+../src/libcore/result.rsstack backtrace:
+:785
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+thread '   2:  <unnamed>  ' panicked at ' called `Result::unwrap()` on an `Err` value: "SendError(..)"0x55f91d70604b',  - ../src/libcore/result.rs:std785::thread 'panicking
+::default_hook<unnamed>::' panicked at '_called `Result::unwrap()` on an `Err` value: "SendError(..)"$u7b$$u7b$closure$u7d$$u7d$', ::../src/libcore/result.rsh0ef6c8db532f55dc
+:785
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+  thread ' 4<unnamed>: ' panicked at '  called `Result::unwrap()` on an `Err` value: "SendError(..)" thread '',  0x../src/libcore/result.rs<unnamed>55f91d6f7acd:' panicked at ' - 785called `Result::unwrap()` on an `Err` value: "SendError(..)"std
+', ::thread '../src/libcore/result.rspanicking:::<unnamed>rust_panic_with_hook' panicked at '785::called `Result::unwrap()` on an `Err` value: "SendError(..)"
+h5dd7da6bb3d06020', 
+../src/libcore/result.rs:   5:   785  
+0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+  thread ' <unnamed>8' panicked at ': called `Result::unwrap()` on an `Err` value: "SendError(..)" ',  ../src/libcore/result.rs : 7850x
+55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+thread '<unnamed>' panicked at 'called `Result::unwrap()` on an `Err` value: Error { repr: Custom(Custom { kind: UnexpectedEof, error: StringError("failed to fill whole buffer") }) }', ../src/libcore/result.rs:785
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2: thread ' <main> ' panicked at ' called `Result::unwrap()` on an `Err` value: "SendError(..)"',  ../src/libcore/result.rs:0x785
+55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d62e5a5 - core::result::unwrap_failed::hd22ee6611ee3a11a
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d62e134 - clipper::server::ModelSet::request_prediction::h97b1235a817fd4be
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2333
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1300
+  11:     0x55f91d5af109 - _<clipper..server..PredictionWorker<P, S>>::run_input_thread::h1f458599d0cab72c
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1678
+  12:     0x55f91d5ab7bd - std::panicking::try::call::hc0a3c08d451dfe1b
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d5abe0b - _<F as std..boxed..FnBox<A>>::call_box::hfb70d3d1bd6ec71b
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d619f3a - core::result::unwrap_failed::hde0fdea497c160b2
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d624500 - _<batching..LearnedBatcher as batching..Batcher>::update_batch_size::hcd6a5b3e23dbd97f
+                        at ../src/libcore/result.rs:723
+                        INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)at 
+target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3265
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3279
+  11:     0x55f91d61cf5f - _<batching..PredictionBatcher<C>>::run::h2cc1ad12a0640ec4
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2313
+  12:     0x55f91d61a3ae - std::panicking::try::call::h2e55bee03794e173
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2357
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d61a8ab - _<F as std..boxed..FnBox<A>>::call_box::h570d8734a8d93619
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d5d8a83 - core::result::unwrap_failed::h04c2c3f52af0afe9
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d588bea - clipper_benchmarks::start_digits_benchmark::h622df18a7c26bc87
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1784
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1489
+                        at src/main.rs:297
+  11:     0x55f91d57c700 - clipper_benchmarks::main::h9f6dd2a1d9657bfb
+                        at src/main.rs:66
+  12:     0x55f91d7058e8 - std::panicking::try::call::hbbf4746cba890ca7
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d70538e - std::rt::lang_start::hbcefdc316c2fbd45
+  16:     0x7fe127cb5b44 - __libc_start_main
+  17:     0x55f91d57bae8 - <unknown>
+  18:                0x0 - <unknown>
+thread '<unnamed>' panicked at 'called `Result::unwrap()` on an `Err` value: RecvError', ../src/libcore/result.rs:785
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0xINFO:clipper::server: ending output loop: prediction worker 655f91d705cd3 - std
+::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwindINFO:clipper::server: ending output loop: prediction worker 2
+
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d5d6915 - core::result::unwrap_failed::h869b7b4f7fcd011d
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d5d5277 - std::panicking::try::call::hc35d925400415483
+       thread '  <unnamed> ' panicked at ' called `Result::unwrap()` on an `Err` value: Error { repr: Custom(Custom { kind: UnexpectedEof, error: StringError("failed to fill whole buffer") }) } ',  ../src/libcore/result.rs : 785 
+        at ../src/libcore/result.rs:723
+           INFO:clipper::server: ending output loop: prediction worker 5  
+           at src/main.rs:196INFO:clipper::server: ending output loop: prediction worker 1
+      
+                  at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+INFO:clipper::server: ending output loop: prediction worker 0  11
+:     0x55f91d71030b - __rust_try
+  INFO:clipper::server: ending output loop: prediction worker 312: 
+    0x55f91d7102ae - __rust_maybe_catch_panic
+  13:     0x55f91d5d60d3 - _<F as std..boxed..FnBox<A>>::call_box::h9c3fc132f3e58b5c
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  14:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  15:     0x7fe12825d0a3 - start_thread
+  16:     0x7fe127d7c87c - clone
+  17:                0x0 - <unknown>
+stack backtrace:
+  INFO:clipper::server: ending output loop: prediction worker 7 
+1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::INFO:clipper::server: ending output loop: prediction worker 4rust_panic_with_hook
+::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d619f3a - core::result::unwrap_failed::hde0fdea497c160b2
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d624500 - _<batching..LearnedBatcher as batching..Batcher>::update_batch_size::hcd6a5b3e23dbd97f
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3265
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3279
+  11:     0x55f91d61cf5f - _<batching..PredictionBatcher<C>>::run::h2cc1ad12a0640ec4
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2313
+  12:     0x55f91d61a3ae - std::panicking::try::call::h2e55bee03794e173
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2357
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d61a8ab - _<F as std..boxed..FnBox<A>>::call_box::h570d8734a8d93619
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+INFO:clipper::server: Ending loop: update worker 0
+INFO:clipper::server: Dropping ClipperServer
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+thread '<unnamed>' panicked at 'called `Result::unwrap()` on an `Err` value: Error { repr: Custom(Custom { kind: UnexpectedEof, error: StringError("failed to fill whole buffer") }) }', ../src/libcore/result.rs:785
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d619f3a - core::result::unwrap_failed::hde0fdea497c160b2
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d624500 - _<batching..LearnedBatcher as batching..Batcher>::update_batch_size::hcd6a5b3e23dbd97f
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3265
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:3279
+  11:     0x55f91d61cf5f - _<batching..PredictionBatcher<C>>::run::h2cc1ad12a0640ec4
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2313
+  12:     0x55f91d61a3ae - std::panicking::try::call::h2e55bee03794e173
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2357
+                        at ../src/libstd/panic.rs:284
+                        at ../src/libstd/panicking.rs:272
+  13:     0x55f91d71030b - __rust_try
+  14:     0x55f91d7102ae - __rust_maybe_catch_panic
+  15:     0x55f91d61a8ab - _<F as std..boxed..FnBox<A>>::call_box::h570d8734a8d93619
+                        at ../src/libstd/thread/local.rs:211
+                        at ../src/libstd/panicking.rs:235
+                        at ../src/libstd/panic.rs:387
+                        at ../src/liballoc/boxed.rs:543
+  16:     0x55f91d704884 - std::sys::thread::Thread::new::thread_start::h9e5bde00f3b3e2e2
+  17:     0x7fe12825d0a3 - start_thread
+  18:     0x7fe127d7c87c - clone
+  19:                0x0 - <unknown>
+thread '<main>' panicked at 'called `Result::unwrap()` on an `Err` value: Any', ../src/libcore/result.rs:785
+stack backtrace:
+   1:     0x55f91d70298f - std::sys::backtrace::tracing::imp::write::h3800f45f421043b8
+   2:     0x55f91d70604b - std::panicking::default_hook::_$u7b$$u7b$closure$u7d$$u7d$::h0ef6c8db532f55dc
+   3:     0x55f91d705cd3 - std::panicking::default_hook::hf3839060ccbb8764
+   4:     0x55f91d6f7acd - std::panicking::rust_panic_with_hook::h5dd7da6bb3d06020
+   5:     0x55f91d706291 - std::panicking::begin_panic::h9bf160aee246b9f6
+   6:     0x55f91d6f8b6a - std::panicking::begin_panic_fmt::haf08a9a70a097ee1
+   7:     0x55f91d70622e - rust_begin_unwind
+   8:     0x55f91d73c2ff - core::panicking::panic_fmt::h93df64e7370b5253
+   9:     0x55f91d6136a0 - core::result::unwrap_failed::h039c52f7586f0a3b
+                        at ../src/libcore/macros.rs:29
+  10:     0x55f91d6133a6 - _<std..iter..Map<I, F> as std..iter..Iterator>::next::h68d1bf0ffc60af1f
+                        at ../src/libcore/result.rs:723
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:2131
+                        at ../src/libcore/ops.rs:1998
+                        at ../src/libcore/option.rs:385
+                        at ../src/libcore/iter/mod.rs:761
+  11:     0x55f91d6106c5 - batching..PredictionBatcher<cache..SimplePredictionCache<f64, hashing..EqualityHasher>>::drop.18078::h3028ce8058120423
+  12:     0x55f91d62e924 - _<server..ModelSet as std..ops..Drop>::drop::h79fe3e6767c9531e
+                        at ../src/libstd/collections/hash/table.rs:990
+                        at ../src/libstd/collections/hash/map.rs:1038
+                        at target/release/build/clipper-ce8ce541f46a6e1e/out/lib.rs:1307
+  13:     0x55f91d5a0314 - clipper..server..ModelSet::drop.17965::h6ffef95c2a839f0b
+  14:     0x55f91d5a01bd - clipper..server..ClipperServer<clipper..correction_policy..LogisticRegressionPolicy, clipper..correction_policy..LinearCorrectionState>::drop_contents.17936::hf7c953ec5c2f5b77
+  15:     0x55f91d58ead7 - clipper..server..ClipperServer<clipper..correction_policy..LogisticRegressionPolicy, clipper..correction_policy..LinearCorrectionState>::drop.16755::hf7c953ec5c2f5b77
+  16:     0x55f91d5d1b55 - _<std..sync..Arc<T>>::drop_slow::hd3362288e7dabe99
+                        at ../src/liballoc/arc.rs:313
+  17:     0x55f91d5821e6 - clipper_benchmarks::start_digits_benchmark::h622df18a7c26bc87
+                        at ../src/liballoc/arc.rs:590
+                        at src/main.rs:334
+  18:     0x55f91d57c700 - clipper_benchmarks::main::h9f6dd2a1d9657bfb
+                        at src/main.rs:66
+  19:     0x55f91d7058e8 - std::panicking::try::call::hbbf4746cba890ca7
+  20:     0x55f91d71030b - __rust_try
+  21:     0x55f91d7102ae - __rust_maybe_catch_panic
+  22:     0x55f91d70538e - std::rt::lang_start::hbcefdc316c2fbd45
+  23:     0x7fe127cb5b44 - __libc_start_main
+  24:     0x55f91d57bae8 - <unknown>
+  25:                0x0 - <unknown>
+thread panicked while panicking. aborting.

@@ -1,29 +1,31 @@
 services:
   clipper:
-    cpuset: 1-5
-    depends_on: [redis, spark_svm_r0, linear_svm_r0, logistic_reg_r0, rf_d16_r0, rf_d8_r0]
+    cpuset: 2-6
+    depends_on: [redis, quantilereg, spark_svm_r0, linear_svm_r0, logistic_reg_r0,
+      rf_d16_r0, rf_d8_r0]
     image: cl-dev-digits
     volumes: ['${MNIST_PATH}:/mnist_data:ro', '${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro',
       '${CLIPPER_ROOT}/benchmarking_logs/batching_eval:/tmp/benchmarking_logs']
   linear_svm_r0:
-    cpuset: 7-7
+    cpuset: 8-8
     image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
   logistic_reg_r0:
-    cpuset: 8-8
+    cpuset: 9-9
     image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  quantilereg: {cpuset: 1-1, image: clipper/quantile-reg}
   redis: {cpuset: 0-0, image: 'redis:alpine'}
   rf_d16_r0:
-    cpuset: 9-9
+    cpuset: 10-10
     image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
   rf_d8_r0:
-    cpuset: 10-10
+    cpuset: 11-11
     image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth8/:/model:ro']
   spark_svm_r0:
-    cpuset: 6-6
+    cpuset: 7-7
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
 version: '2'

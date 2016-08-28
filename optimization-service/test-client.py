@@ -19,31 +19,23 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 # Connect the socket to the port on the server given by the caller
-server_address = ("localhost", 7003)
+server_address = ("localhost", 7777)
 sock.connect(server_address)
 try:
     print(sock.sendall(message))
 
 
-    header_bytes = 4
+    header_bytes = 8*2
     data = ""
     # self.request.settimeout(0.5)
     # self.request.setblocking(1)
     # wait for header
     while len(data) < header_bytes:
-        data += sock.recv(4096)
-        print(data)
+        data += sock.recv(16)
 
-    header, data = (data[:header_bytes], data[header_bytes:])
-    num_bytes = struct.unpack("<I", header)[0]
-    print("NUM BYTES: %d" % num_bytes)
-    # print("LEN DATA: %d" % len(data))
+    alpha, beta = struct.unpack("<dd", data)
 
-    # while len(data) < num_bytes:
-    #     data += sock.recv(4096*2)
-    #     print("LEN DATA: %d" % len(data))
-
-    print(json.loads(data))
+    print("ALPHA: %f, BETA: %f" % (alpha, beta))
 
 finally:
     sock.close()
