@@ -304,17 +304,25 @@ fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut concat_string = String::new();
     for x in inputs.iter() {
         match x.input {
-            Input::Str {ref s} => {
-                message.write_u32::<LittleEndian>(s.len() as u32).unwrap();
-                concat_string = format!("{}{}", concat_string, s);
-            },
+            Input::Str {ref s} => concat_string = format!("{}{}", concat_string, s),
             _ => unreachable!(),
         }
     }
-    let mut compressor = lz4::EncoderBuilder::new().build(message).unwrap();
+    // Compress the string content and write the compressed length to the output vector
+    let mut compressor = lz4::EncoderBuilder::new().build(Vec::new()).unwrap();
     compressor.write_all(concat_string.as_bytes()).unwrap();
-    let (result, _) = compressor.finish();
-    result
+    let (compressed_str, _) = compressor.finish();
+    let content_len = compressed_str.len() + (mem::size_of::<u32>() * inputs.len());
+    message.write_u32::<LittleEndian>(content_len as u32).unwrap();
+    // Write the length of each uncompressed string to the output vector
+    for x in inputs.iter() {
+        match x.input {
+            Input::Str {ref s} => message.write_u32::<LittleEndian>(s.len() as u32).unwrap(),
+            _ => unreachable!(),
+        }
+    }
+    message.append(&mut compressed_str.to_owned());
+    message
 }
 
 #[cfg(test)]
