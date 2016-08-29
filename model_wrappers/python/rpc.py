@@ -154,7 +154,9 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                 while len(data) < content_len - input_lengths_bytes:
                     data += self.request.recv(4096)
                 decompressed_strs = lz4.loads(data.decode())
-                inputs = np.split(decompressed_strs, input_lengths)
+                for length in input_lengths:
+                    inputs.append(decompressed_strs[:length])
+                    decompressed_strs = decompressed_strs[length:]
                 for i in range(0, len(inputs)):
                     assert len(inputs[i]) == input_lengths[i]
             else:
