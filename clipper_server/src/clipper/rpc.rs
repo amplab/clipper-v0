@@ -272,11 +272,10 @@ fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(VARBYTE_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
-    let bytesize = 8;
     let mut content_len = 0;
     for x in inputs.iter() {
         match x.input {
-            Input::Bytes {ref b, length: _} => content_len += b.len() * bytesize,
+            Input::Bytes {ref b, length: _} => content_len += b.len(),
             _ => unreachable!(),
         }
     }
@@ -301,17 +300,18 @@ fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(STRING_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
-    let mut concat_string = String::new();
+    // Compress the string content and write the compressed length to the output vector
+    let mut compressor = lz4::EncoderBuilder::new().build(Vec::new()).unwrap();
     for x in inputs.iter() {
         match x.input {
-            Input::Str {ref s} => concat_string = format!("{}{}", concat_string, s),
+            Input::Str {ref s} => compressor.write_all(s.as_bytes()).unwrap(),
             _ => unreachable!(),
         }
     }
-    // Compress the string content and write the compressed length to the output vector
-    let mut compressor = lz4::EncoderBuilder::new().build(Vec::new()).unwrap();
-    compressor.write_all(concat_string.as_bytes()).unwrap();
-    let (compressed_str, _) = compressor.finish();
+    let (compressed_str, result) = compressor.finish();
+    if let Err(_) = result {
+        panic!("Failed to compress string!");
+    }
     let content_len = compressed_str.len() + (mem::size_of::<u32>() * inputs.len());
     message.write_u32::<LittleEndian>(content_len as u32).unwrap();
     // Write the length of each uncompressed string to the output vector
