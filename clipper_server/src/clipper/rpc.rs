@@ -5,6 +5,7 @@ use std::io::{Read, Write, Cursor};
 use std::mem;
 use server::{Input, Output, InputType};
 use batching::RpcPredictRequest;
+use lz4::EncoderBuilder;
 
 
 
@@ -299,7 +300,7 @@ fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     message.push(STRING_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
     // Compress the string content and write the compressed length to the output vector
-    let mut compressor = lz4::EncoderBuilder::new().build(Vec::new()).unwrap();
+    let mut compressor = EncoderBuilder::new().build(Vec::new()).unwrap();
     for x in inputs.iter() {
         match x.input {
             Input::Str {ref s} => compressor.write_all(s.as_bytes()).unwrap(),
