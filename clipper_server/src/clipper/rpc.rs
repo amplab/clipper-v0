@@ -1,6 +1,4 @@
 #![allow(dead_code, unused_variables)]
-extern crate lz4;
-
 use std::net::TcpStream;
 use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
 use std::io::{Read, Write, Cursor};

@@ -6,6 +6,7 @@ extern crate serde;
 extern crate bincode;
 #[macro_use]
 extern crate log;
+extern crate lz4;
 
 #[cfg(feature = "serde_macros")]
 include!("lib.rs.in");
