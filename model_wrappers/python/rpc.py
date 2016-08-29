@@ -7,6 +7,7 @@ import time
 import datetime
 import sys
 import os
+import lz4
 
 SHUTDOWN_CODE = 0
 FIXEDINT_CODE = 1
@@ -114,7 +115,24 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
             elif is_var_format(input_type):
                 raise NotImplementedError
             elif input_type == STRING_CODE:
-                raise NotImplementedError
+                additional_header_bytes = 4
+                while len(data) < additional_header_bytes:
+                    data += self.request.recv(4096)
+                content_len = struct.unpack("<I", data[:additional_header_bytes])[0]
+                data = data[additional_header_bytes:]
+
+                input_lengths_bytes = 4 * num_inputs
+                while len(data) < input_lengths_bytes:
+                    data += self.request.recv(4096)
+                input_lengths = np.array(array.array('i', bytes(data)))
+                data = data[input_lengths_bytes:]
+                while len(data) < content_len - input_lengths_bytes:
+                    data += self.request.recv(4096)
+                    
+                decompressed_strs = lz4.loads(data.decode())
+                inputs = np.split(decompressed_strs, input_lengths)
+                for i in range(0, len(inputs)):
+                    assert len(inputs[i]) == input_lengths[i]
             else:
                 raise RuntimeError("Invalid input type: " + input)
 
