@@ -113,14 +113,39 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                         assert len(i) == input_len
 
             elif is_var_format(input_type):
-                raise NotImplementedError
+                additional_header_bytes = 4
+                while len(data) < additional_header_bytes:
+                    data += self.request.recv(4096)
+                content_len = struct.unpack("<I", data[:additional_header_bytes])[0]
+                data = data[additional_header_bytes:]
+                inputs = []
+                while content_len > 0:
+                    while len(data) < 4:
+                        data += self.request.recv(4096)
+                    input_len = struct.unpack("<I", data[:4])[0]
+                    data = data[4:]
+                    while len(data) < input_len:
+                        data += self.request.recv(4096)
+                    if input_type == VARBYTE_CODE:
+                        inputs.append(data)
+                    elif input_type == VARFLOAT_CODE:
+                        inputs.append(struct.unpack("<f", data)[0])
+                    else:
+                        assert input_type == VARINT_CODE
+                        inputs.append(struct.unpack("<I", data)[0])
+                    data = data[input_len:]
+                    # Decrement remaining content length in accordance with the fact that we just
+                    # read an encoded value and its associated integer length from the stream
+                    content_len = content_len - 4 - input_len
+                assert len(inputs) == num_inputs
+
             elif input_type == STRING_CODE:
                 additional_header_bytes = 4
                 while len(data) < additional_header_bytes:
                     data += self.request.recv(4096)
                 content_len = struct.unpack("<I", data[:additional_header_bytes])[0]
                 data = data[additional_header_bytes:]
-
+                inputs = []
                 input_lengths_bytes = 4 * num_inputs
                 while len(data) < input_lengths_bytes:
                     data += self.request.recv(4096)
@@ -128,7 +153,6 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                 data = data[input_lengths_bytes:]
                 while len(data) < content_len - input_lengths_bytes:
                     data += self.request.recv(4096)
-                    
                 decompressed_strs = lz4.loads(data.decode())
                 inputs = np.split(decompressed_strs, input_lengths)
                 for i in range(0, len(inputs)):
