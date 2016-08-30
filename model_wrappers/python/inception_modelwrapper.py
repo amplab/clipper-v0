@@ -15,6 +15,7 @@ ROSES_PATH = '../../clipper_server/models/inception/raw-data/train/roses/'
 class InceptionModelWrapper(rpc.ModelWrapperBase):
 
     def __init__(self, batch_size, image_size, num_classes, checkpoint_path):
+        self.batch_size = batch_size
         self.image_size = image_size
         self.num_classes = num_classes
         self.checkpoint_path = checkpoint_path
@@ -38,6 +39,11 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
     def predict_floats(self, inputs):
         inputs = inputs.reshape(
             (len(inputs), self.image_size, self.image_size, 3))
+        # Pad the inputs ndarray with the first image if necessary
+        if len(inputs) < self.batch_size:
+            top_img = inputs[0].reshape((1,) + inputs[0].shape)
+            pad_imgs = np.repeat(top_img, self.batch_size - len(inputs), axis=0)
+            inputs = np.concatenate((inputs, pad_imgs), axis=0)
         with tf.variable_scope("", reuse=self.reuse_scope) as scope:
             top_1 = self.sess.run([self.top_1_op],
                                   feed_dict={self.jpegs: inputs})
