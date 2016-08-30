@@ -145,15 +145,13 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                     data += self.request.recv(4096)
                 content_len = struct.unpack("<I", data[:additional_header_bytes])[0]
                 data = data[additional_header_bytes:]
+                while len(data) < content_len:
+                    data += self.request.recv(4096)
                 inputs = []
                 input_lengths_bytes = 4 * num_inputs
-                while len(data) < input_lengths_bytes:
-                    data += self.request.recv(4096)
-                input_lengths = np.array(array.array('i', bytes(data)))
+                input_lengths = np.array(array.array('i', bytes(data[:input_lengths_bytes])))
                 data = data[input_lengths_bytes:]
-                while len(data) < content_len - input_lengths_bytes:
-                    data += self.request.recv(4096)
-                decompressed_strs = lz4.loads(data.decode())
+                decompressed_strs = lz4.loads(data)
                 for length in input_lengths:
                     inputs.append(decompressed_strs[:length])
                     decompressed_strs = decompressed_strs[length:]
