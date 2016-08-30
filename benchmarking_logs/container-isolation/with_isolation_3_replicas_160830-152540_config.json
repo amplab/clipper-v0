@@ -1,0 +1,226 @@
+{
+    "clipper_conf": {
+        "batching": {
+            "sample_size": 500, 
+            "opt_addr": "quantilereg:7777", 
+            "strategy": "learned"
+        }, 
+        "num_benchmark_requests": 1000000, 
+        "num_message_encodes": 1, 
+        "name": "with_isolation_3_replicas_160830-152540", 
+        "bench_batch_size": 1500, 
+        "models": [
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "spark_svm", 
+                "addresses": [
+                    "spark_svm_r0:6001", 
+                    "spark_svm_r1:6001", 
+                    "spark_svm_r2:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "logistic_reg", 
+                "addresses": [
+                    "logistic_reg_r0:6001", 
+                    "logistic_reg_r1:6001", 
+                    "logistic_reg_r2:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "rf_d16", 
+                "addresses": [
+                    "rf_d16_r0:6001", 
+                    "rf_d16_r1:6001", 
+                    "rf_d16_r2:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "linear_svm", 
+                "addresses": [
+                    "linear_svm_r0:6001", 
+                    "linear_svm_r1:6001", 
+                    "linear_svm_r2:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "rf_d8", 
+                "addresses": [
+                    "rf_d8_r0:6001", 
+                    "rf_d8_r1:6001", 
+                    "rf_d8_r2:6001"
+                ]
+            }
+        ], 
+        "input_type": "float", 
+        "redis_port": 6379, 
+        "target_qps": 50000, 
+        "results_path": "/tmp/benchmarking_logs", 
+        "mnist_path": "/mnist_data/test.data", 
+        "num_update_workers": 1, 
+        "window_size": -1, 
+        "num_predict_workers": 8, 
+        "redis_ip": "redis", 
+        "cache_size": 49999, 
+        "slo_micros": 20000, 
+        "correction_policy": "logistic_regression", 
+        "salt_cache": true, 
+        "use_lsh": false, 
+        "input_length": 784
+    }, 
+    "docker_compose_conf": {
+        "services": {
+            "clipper": {
+                "cpuset": "2-9", 
+                "depends_on": [
+                    "redis", 
+                    "quantilereg", 
+                    "spark_svm_r0", 
+                    "spark_svm_r1", 
+                    "spark_svm_r2", 
+                    "logistic_reg_r0", 
+                    "logistic_reg_r1", 
+                    "logistic_reg_r2", 
+                    "rf_d16_r0", 
+                    "rf_d16_r1", 
+                    "rf_d16_r2", 
+                    "linear_svm_r0", 
+                    "linear_svm_r1", 
+                    "linear_svm_r2", 
+                    "rf_d8_r0", 
+                    "rf_d8_r1", 
+                    "rf_d8_r2"
+                ], 
+                "image": "cl-dev-digits", 
+                "volumes": [
+                    "${MNIST_PATH}:/mnist_data:ro", 
+                    "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro", 
+                    "${CLIPPER_ROOT}/benchmarking_logs/container-isolation:/tmp/benchmarking_logs"
+                ]
+            }, 
+            "rf_d8_r1": {
+                "cpuset": "23-23", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth8/:/model:ro"
+                ]
+            }, 
+            "rf_d8_r0": {
+                "cpuset": "22-22", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth8/:/model:ro"
+                ]
+            }, 
+            "rf_d16_r0": {
+                "cpuset": "16-16", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "rf_d8_r2": {
+                "cpuset": "24-24", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth8/:/model:ro"
+                ]
+            }, 
+            "redis": {
+                "cpuset": "0-0", 
+                "image": "redis:alpine"
+            }, 
+            "rf_d16_r1": {
+                "cpuset": "17-17", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "rf_d16_r2": {
+                "cpuset": "18-18", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "quantilereg": {
+                "cpuset": "1-1", 
+                "image": "clipper/quantile-reg"
+            }, 
+            "spark_svm_r2": {
+                "cpuset": "12-12", 
+                "image": "clipper/spark-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+                ]
+            }, 
+            "spark_svm_r1": {
+                "cpuset": "11-11", 
+                "image": "clipper/spark-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+                ]
+            }, 
+            "spark_svm_r0": {
+                "cpuset": "10-10", 
+                "image": "clipper/spark-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+                ]
+            }, 
+            "linear_svm_r2": {
+                "cpuset": "21-21", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "linear_svm_r0": {
+                "cpuset": "19-19", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "linear_svm_r1": {
+                "cpuset": "20-20", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r1": {
+                "cpuset": "14-14", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r0": {
+                "cpuset": "13-13", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r2": {
+                "cpuset": "15-15", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }
+        }, 
+        "version": "2"
+    }
+}

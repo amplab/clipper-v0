@@ -11,8 +11,8 @@ import subprocess32 as subprocess
 cur_model_core_num = 0
 MAX_CORES = 47
 isolated_cores = True
-experiment_name = "quant_reg_aimd_%s" % str(time.strftime("%y%m%d-%H%M%S"))
-benchmarking_logs = "benchmarking_logs/batching_eval"
+experiment_name = "with_isolation_6_replicas_%s" % str(time.strftime("%y%m%d-%H%M%S"))
+benchmarking_logs = "benchmarking_logs/container-isolation"
 CLIPPER_ROOT = os.path.abspath("..")
 
 def reserve_cores(num_cores):
@@ -20,7 +20,7 @@ def reserve_cores(num_cores):
     s = "%d-%d" % (cur_model_core_num, cur_model_core_num + num_cores - 1)
     cur_model_core_num += num_cores
     if cur_model_core_num >= MAX_CORES:
-        print("WARNING: Trying to reserve more than 48 cores: %d" % cur_model_core_num)
+        print("WARNING: Trying to reserve more than %d cores: %d" % (MAX_CORES, cur_model_core_num))
         sys.exit(1)
     return s
 
@@ -41,16 +41,17 @@ clipper_conf_dict = {
         "redis_ip" : "redis",
         "redis_port" : 6379,
         "results_path" : "/tmp/benchmarking_logs",
-        "num_predict_workers" : 8,
+        "num_predict_workers" : 10,
         "num_update_workers" : 1,
         "cache_size" : 49999,
         "mnist_path" : "/mnist_data/test.data",
-        "num_benchmark_requests" : 1000000,
-        "target_qps" : 15000,
-        "bench_batch_size" : 500,
+        "num_benchmark_requests" : 5000000,
+        "target_qps" : 100000,
+        "bench_batch_size" : 10000,
         "salt_cache" : True,
-        "batching": { "strategy": "aimd" },
-        # "batching": { "strategy": "learned", "sample_size": 1000, "opt_addr": "quantilereg:7777"},
+        # "batching": { "strategy": "aimd" },
+        # "batching": { "strategy": "static", "batch_size": 1 },
+        "batching": { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
         "models": []
         }
 
@@ -62,7 +63,7 @@ dc_dict = {
             "redis": {"image": "redis:alpine", "cpuset": reserve_cores(1)},
             "quantilereg": {"image": "clipper/quantile-reg", "cpuset": reserve_cores(1)},
             "clipper": {"image": "cl-dev-digits",
-                "cpuset": reserve_cores(5),
+                "cpuset": reserve_cores(10),
                 "depends_on": ["redis", "quantilereg"],
                 "volumes": [
                     "${MNIST_PATH}:/mnist_data:ro",
@@ -173,13 +174,13 @@ def do_docker_run():
 def gen_configs():
     ## SKLEARN RF
     global cur_model_core_num
-    num_reps = 1
+    num_reps = 6
     add_spark_svm(num_replicas=num_reps)
-    add_sklearn_linear_svm(num_replicas=num_reps)
     add_sklearn_log_regression(num_replicas=num_reps)
     add_sklearn_rf(depth=16, num_replicas=num_reps)
+    add_sklearn_linear_svm(num_replicas=num_reps)
     add_sklearn_rf(depth=8, num_replicas=num_reps)
-    # add_sklearn_kernel_svm(num_replicas=30)
+    # add_sklearn_kernel_svm(num_replicas=num_reps)
 
     print("CORES USED: %d" % cur_model_core_num)
 

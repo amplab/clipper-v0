@@ -578,7 +578,7 @@ impl Batcher for LearnedBatcher {
                     .incr((baseline_thruput * 10.0_f64.powi(9)).round() as isize);
                 let sb = SerializeBatcher::from_learned_batcher(&self);
                 let measurements_string = serde_json::ser::to_string(&sb).unwrap();
-                info!("GREPTHIS{}: XXXXXX {}", self.name, measurements_string);
+                debug!("GREPTHIS{}: XXXXXX {}", self.name, measurements_string);
 
 
                 // self.measurements.clear();

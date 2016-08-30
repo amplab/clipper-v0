@@ -1,0 +1,3266 @@
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 1000000
+num_message_encodes = 1
+name = "with_isolation_160830-151625"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 15000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+INFO:clipper::configuration: spark_svm_r0:6001
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 1000000
+num_message_encodes = 1
+name = "with_isolation_160830-151625"
+bench_batch_size = 500
+input_type = "float"
+redis_port = 6379
+target_qps = 15000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d8"
+addresses = [ "rf_d8_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper::configuration: logistic_reg_r0:6001
+INFO:clipper::configuration: rf_d16_r0:6001
+INFO:clipper::configuration: linear_svm_r0:6001
+INFO:clipper::configuration: rf_d8_r0:6001
+INFO:clipper::configuration: quantilereg:7777
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to rf_d16 model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to logistic_reg model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to linear_svm model wrapper. Sleeping 1 second
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::batching: Couldn't connect to rf_d8 model wrapper. Sleeping 1 second
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: starting update worker 0
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to rf_d16 model wrapper at V4(172.21.0.5:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.7:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.6:6001)
+INFO:clipper::batching: Connected to rf_d8 model wrapper at V4(172.21.0.8:6001)
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to spark_svm model wrapper at V4(172.21.0.4:6001)
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper::correction_policy: OLD correction state: [0.2, 0.2, 0.2, 0.2, 0.2], offline_model_order: ["rf_d8", "linear_svm", "logistic_reg", "spark_svm", "rf_d16"]
+INFO:clipper::correction_policy: New correction state: [0.20369389100546126, 0.462743107954931, 1.159203306569825, 1.679184097218434, 1.4461733779246084], offline_model_order: ["rf_d8", "linear_svm", "logistic_reg", "spark_svm", "rf_d16"], labels: Some([1, -1])
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 385
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 387
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 398
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 387
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 398
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 240073,
+      "max": 240073,
+      "mean": 240073.0,
+      "std": null,
+      "p95": 240073.0,
+      "p99": 240073.0,
+      "p50": 240073.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 926,
+      "max": 6850,
+      "mean": 4936.353246753247,
+      "std": 1466.8235539537282,
+      "p95": 6850.0,
+      "p99": 6850.0,
+      "p50": 4805.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.25,
+      "std": 11.01135777277262,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 1305,
+      "max": 6414,
+      "mean": 4184.031007751938,
+      "std": 1288.8590665144719,
+      "p95": 6414.0,
+      "p99": 6414.0,
+      "p50": 4171.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.35,
+      "std": 11.065712810298305,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 8409,
+      "max": 10285,
+      "mean": 9588.638190954774,
+      "std": 564.7442788577074,
+      "p95": 10285.0,
+      "p99": 10285.0,
+      "p50": 9802.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.9,
+      "std": 11.670475568716127,
+      "p95": 37.0,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1373,
+      "max": 5223,
+      "mean": 3970.498708010336,
+      "std": 1001.7044835717044,
+      "p95": 5223.0,
+      "p99": 5223.0,
+      "p50": 4020.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.35,
+      "std": 11.065712810298305,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7351,
+      "max": 8106,
+      "mean": 7842.020100502513,
+      "std": 199.88012679137496,
+      "p95": 8106.0,
+      "p99": 8106.0,
+      "p50": 7916.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.9,
+      "std": 11.670475568716127,
+      "p95": 37.0,
+      "p99": 37.0,
+      "p50": 20.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.049957653395099648,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 19.23370520495037,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 19.334053272860545,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 19.88362086731055,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 19.334107363747003,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 19.883715237220718,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.2:7777)
+INFO:clipper::batching: linear_svm BATCHER: Updated batching model: max_batch_size: 147, alpha = 108.5802469241956, beta = 4087.4197511003895
+INFO:clipper::batching: linear_svm BATCHER: Predicted max thruput: 7332.140354576291, baseline: 238.32221174232254, increase: 30.765660913318097
+INFO:clipper::batching: GREPTHISlinear_svm: XXXXXX {"measurements":[{"latency":3859,"batch_size":3},{"latency":1373,"batch_size":5},{"latency":1621,"batch_size":7},{"latency":1925,"batch_size":9},{"latency":2256,"batch_size":11},{"latency":2444,"batch_size":13},{"latency":2785,"batch_size":15},{"latency":2933,"batch_size":17},{"latency":3328,"batch_size":19},{"latency":3297,"batch_size":21},{"latency":3701,"batch_size":23},{"latency":4189,"batch_size":25},{"latency":4020,"batch_size":27},{"latency":4440,"batch_size":29},{"latency":4343,"batch_size":31},{"latency":5184,"batch_size":33},{"latency":5004,"batch_size":35},{"latency":5223,"batch_size":37},{"latency":3965,"batch_size":26},{"latency":4196,"batch_size":1},{"latency":1090,"batch_size":3},{"latency":1254,"batch_size":5},{"latency":1504,"batch_size":7},{"latency":1820,"batch_size":9},{"latency":2102,"batch_size":11},{"latency":2296,"batch_size":13},{"latency":2696,"batch_size":15},{"latency":2966,"batch_size":17},{"latency":2935,"batch_size":19},{"latency":3184,"batch_size":21},{"latency":3427,"batch_size":23},{"latency":3620,"batch_size":25},{"latency":4279,"batch_size":27},{"latency":4111,"batch_size":29},{"latency":4590,"batch_size":31},{"latency":4671,"batch_size":33},{"latency":4879,"batch_size":35},{"latency":5863,"batch_size":37},{"latency":5245,"batch_size":39},{"latency":5874,"batch_size":41},{"latency":5423,"batch_size":43},{"latency":5653,"batch_size":45},{"latency":5612,"batch_size":47},{"latency":5617,"batch_size":49},{"latency":6589,"batch_size":51},{"latency":5912,"batch_size":53},{"latency":6329,"batch_size":55},{"latency":5932,"batch_size":57},{"latency":6248,"batch_size":59},{"latency":9019,"batch_size":61},{"latency":6490,"batch_size":63},{"latency":6530,"batch_size":65},{"latency":6481,"batch_size":67},{"latency":6820,"batch_size":69},{"latency":6761,"batch_size":71},{"latency":7195,"batch_size":73},{"latency":7359,"batch_size":75},{"latency":7137,"batch_size":77},{"latency":9367,"batch_size":79},{"latency":7392,"batch_size":81},{"latency":8251,"batch_size":83},{"latency":8543,"batch_size":85},{"latency":9126,"batch_size":87},{"latency":8139,"batch_size":89},{"latency":8779,"batch_size":91},{"latency":8749,"batch_size":93},{"latency":8214,"batch_size":95},{"latency":8809,"batch_size":97},{"latency":8325,"batch_size":99},{"latency":11527,"batch_size":101},{"latency":9004,"batch_size":103},{"latency":9371,"batch_size":105},{"latency":8854,"batch_size":107},{"latency":11703,"batch_size":109},{"latency":9008,"batch_size":111},{"latency":9710,"batch_size":113},{"latency":11154,"batch_size":115},{"latency":9749,"batch_size":117},{"latency":9638,"batch_size":119},{"latency":10467,"batch_size":121},{"latency":9820,"batch_size":123},{"latency":10373,"batch_size":125},{"latency":9685,"batch_size":127},{"latency":11068,"batch_size":129},{"latency":10994,"batch_size":131},{"latency":10244,"batch_size":133},{"latency":11163,"batch_size":135},{"latency":10711,"batch_size":137},{"latency":11800,"batch_size":139},{"latency":10841,"batch_size":141},{"latency":12056,"batch_size":143},{"latency":11544,"batch_size":145},{"latency":11668,"batch_size":147},{"latency":12775,"batch_size":149},{"latency":11944,"batch_size":151},{"latency":11519,"batch_size":153},{"latency":12485,"batch_size":155},{"latency":12821,"batch_size":157},{"latency":17018,"batch_size":159},{"latency":15279,"batch_size":161},{"latency":19397,"batch_size":163},{"latency":18291,"batch_size":163},{"latency":17204,"batch_size":163},{"latency":21651,"batch_size":165},{"latency":12551,"batch_size":148},{"latency":12633,"batch_size":150},{"latency":14608,"batch_size":152},{"latency":13744,"batch_size":154},{"latency":14709,"batch_size":156},{"latency":14811,"batch_size":158},{"latency":13753,"batch_size":160},{"latency":14018,"batch_size":162},{"latency":19066,"batch_size":164},{"latency":16493,"batch_size":164},{"latency":18693,"batch_size":166},{"latency":19529,"batch_size":166},{"latency":19807,"batch_size":166},{"latency":19973,"batch_size":166},{"latency":22231,"batch_size":166},{"latency":14706,"batch_size":149},{"latency":13332,"batch_size":151},{"latency":14038,"batch_size":153},{"latency":13963,"batch_size":155},{"latency":13276,"batch_size":157},{"latency":15560,"batch_size":159},{"latency":14879,"batch_size":161},{"latency":15679,"batch_size":163},{"latency":15757,"batch_size":165},{"latency":19840,"batch_size":167},{"latency":20616,"batch_size":167},{"latency":14818,"batch_size":150},{"latency":12983,"batch_size":152},{"latency":13625,"batch_size":154},{"latency":14274,"batch_size":156},{"latency":13739,"batch_size":158},{"latency":18039,"batch_size":160},{"latency":13789,"batch_size":160},{"latency":19088,"batch_size":162},{"latency":15453,"batch_size":162},{"latency":19760,"batch_size":164},{"latency":19825,"batch_size":164},{"latency":18809,"batch_size":164},{"latency":20489,"batch_size":164},{"latency":11676,"batch_size":147},{"latency":12792,"batch_size":149},{"latency":16254,"batch_size":151},{"latency":13025,"batch_size":153},{"latency":13585,"batch_size":155},{"latency":14672,"batch_size":157},{"latency":12815,"batch_size":159},{"latency":18434,"batch_size":161},{"latency":14787,"batch_size":161},{"latency":20065,"batch_size":163},{"latency":13882,"batch_size":146},{"latency":13944,"batch_size":148},{"latency":12344,"batch_size":150},{"latency":13643,"batch_size":152},{"latency":13627,"batch_size":154},{"latency":14299,"batch_size":156},{"latency":13887,"batch_size":158},{"latency":18252,"batch_size":160},{"latency":13463,"batch_size":160},{"latency":19313,"batch_size":162},{"latency":15442,"batch_size":162},{"latency":20280,"batch_size":164},{"latency":14521,"batch_size":147},{"latency":13001,"batch_size":149},{"latency":12709,"batch_size":151},{"latency":13588,"batch_size":153},{"latency":13402,"batch_size":155},{"latency":14364,"batch_size":157},{"latency":13394,"batch_size":159},{"latency":18317,"batch_size":161},{"latency":14495,"batch_size":161},{"latency":19914,"batch_size":163},{"latency":19565,"batch_size":163},{"latency":19614,"batch_size":163},{"latency":19966,"batch_size":163},{"latency":22426,"batch_size":163},{"latency":14563,"batch_size":146},{"latency":12493,"batch_size":148},{"latency":13446,"batch_size":150},{"latency":14501,"batch_size":152},{"latency":13995,"batch_size":154},{"latency":14510,"batch_size":156},{"latency":13687,"batch_size":158},{"latency":18723,"batch_size":160},{"latency":13882,"batch_size":160},{"latency":19587,"batch_size":162},{"latency":15522,"batch_size":162},{"latency":23360,"batch_size":164},{"latency":14512,"batch_size":147},{"latency":12948,"batch_size":149},{"latency":19522,"batch_size":151},{"latency":13754,"batch_size":151},{"latency":12503,"batch_size":153},{"latency":13809,"batch_size":155},{"latency":13010,"batch_size":157},{"latency":14991,"batch_size":159},{"latency":14444,"batch_size":161},{"latency":15698,"batch_size":163},{"latency":15617,"batch_size":165},{"latency":20361,"batch_size":167},{"latency":14859,"batch_size":150},{"latency":13235,"batch_size":152},{"latency":14290,"batch_size":154},{"latency":14580,"batch_size":156},{"latency":13781,"batch_size":158},{"latency":18945,"batch_size":160},{"latency":13949,"batch_size":160},{"latency":18979,"batch_size":162},{"latency":15047,"batch_size":162},{"latency":20749,"batch_size":164},{"latency":14976,"batch_size":147},{"latency":13426,"batch_size":149},{"latency":12909,"batch_size":151},{"latency":13900,"batch_size":153},{"latency":13508,"batch_size":155},{"latency":14881,"batch_size":157},{"latency":13433,"batch_size":159},{"latency":18313,"batch_size":161},{"latency":14370,"batch_size":161},{"latency":19719,"batch_size":163},{"latency":19119,"batch_size":163},{"latency":19106,"batch_size":163},{"latency":19752,"batch_size":163},{"latency":19557,"batch_size":163},{"latency":20213,"batch_size":163},{"latency":13847,"batch_size":146},{"latency":13809,"batch_size":148},{"latency":13211,"batch_size":150},{"latency":13154,"batch_size":152},{"latency":13432,"batch_size":154},{"latency":14081,"batch_size":156},{"latency":17695,"batch_size":158},{"latency":13513,"batch_size":160},{"latency":16310,"batch_size":162},{"latency":20040,"batch_size":164},{"latency":14808,"batch_size":147},{"latency":12727,"batch_size":149},{"latency":12954,"batch_size":151},{"latency":15007,"batch_size":153},{"latency":13638,"batch_size":155},{"latency":14330,"batch_size":157},{"latency":13915,"batch_size":159},{"latency":18528,"batch_size":161},{"latency":15012,"batch_size":161},{"latency":20043,"batch_size":163},{"latency":14206,"batch_size":146},{"latency":13585,"batch_size":148},{"latency":12493,"batch_size":150},{"latency":13303,"batch_size":152},{"latency":13046,"batch_size":154},{"latency":14266,"batch_size":156},{"latency":14226,"batch_size":158},{"latency":18193,"batch_size":160},{"latency":13574,"batch_size":160},{"latency":18906,"batch_size":162},{"latency":15252,"batch_size":162},{"latency":19620,"batch_size":164},{"latency":19691,"batch_size":164},{"latency":16807,"batch_size":164},{"latency":20780,"batch_size":166},{"latency":15430,"batch_size":149},{"latency":13426,"batch_size":151},{"latency":13722,"batch_size":153},{"latency":13978,"batch_size":155},{"latency":14563,"batch_size":157},{"latency":13817,"batch_size":159},{"latency":18157,"batch_size":161},{"latency":14851,"batch_size":161},{"latency":19534,"batch_size":163},{"latency":19581,"batch_size":163},{"latency":19556,"batch_size":163},{"latency":19837,"batch_size":163},{"latency":19375,"batch_size":163},{"latency":19653,"batch_size":163},{"latency":18976,"batch_size":163},{"latency":15092,"batch_size":163},{"latency":20327,"batch_size":165},{"latency":15170,"batch_size":148},{"latency":13040,"batch_size":150},{"latency":14010,"batch_size":152},{"latency":13735,"batch_size":154},{"latency":14396,"batch_size":156},{"latency":17778,"batch_size":158},{"latency":13987,"batch_size":160},{"latency":14406,"batch_size":162},{"latency":19798,"batch_size":164},{"latency":20778,"batch_size":164},{"latency":11902,"batch_size":147},{"latency":12066,"batch_size":149},{"latency":13432,"batch_size":151},{"latency":13265,"batch_size":153},{"latency":14287,"batch_size":155},{"latency":12926,"batch_size":157},{"latency":17287,"batch_size":159},{"latency":13978,"batch_size":161},{"latency":15488,"batch_size":163},{"latency":16144,"batch_size":165},{"latency":20003,"batch_size":167},{"latency":14866,"batch_size":150},{"latency":12575,"batch_size":152},{"latency":13787,"batch_size":154},{"latency":14128,"batch_size":156},{"latency":13601,"batch_size":158},{"latency":18278,"batch_size":160},{"latency":15385,"batch_size":160},{"latency":22928,"batch_size":162},{"latency":11451,"batch_size":145},{"latency":13864,"batch_size":147},{"latency":13008,"batch_size":149},{"latency":13416,"batch_size":151},{"latency":13775,"batch_size":153},{"latency":14044,"batch_size":155},{"latency":13308,"batch_size":157},{"latency":14716,"batch_size":159},{"latency":14203,"batch_size":161},{"latency":15980,"batch_size":163},{"latency":15559,"batch_size":165},{"latency":21925,"batch_size":167},{"latency":15093,"batch_size":150},{"latency":12789,"batch_size":152},{"latency":13859,"batch_size":154},{"latency":14414,"batch_size":156},{"latency":13669,"batch_size":158},{"latency":18385,"batch_size":160},{"latency":13423,"batch_size":160},{"latency":19144,"batch_size":162},{"latency":15096,"batch_size":162},{"latency":19931,"batch_size":164},{"latency":19427,"batch_size":164},{"latency":18023,"batch_size":164},{"latency":20869,"batch_size":164},{"latency":11996,"batch_size":147},{"latency":12854,"batch_size":149},{"latency":13513,"batch_size":151},{"latency":12584,"batch_size":153},{"latency":16485,"batch_size":155},{"latency":13983,"batch_size":157},{"latency":13238,"batch_size":159},{"latency":17709,"batch_size":161},{"latency":15096,"batch_size":163},{"latency":16293,"batch_size":165},{"latency":20189,"batch_size":167},{"latency":14963,"batch_size":150},{"latency":12659,"batch_size":152},{"latency":14155,"batch_size":154},{"latency":14507,"batch_size":156},{"latency":13967,"batch_size":158},{"latency":18402,"batch_size":160},{"latency":13782,"batch_size":160},{"latency":19147,"batch_size":162},{"latency":15110,"batch_size":162},{"latency":19905,"batch_size":164},{"latency":19470,"batch_size":164},{"latency":17211,"batch_size":164},{"latency":20514,"batch_size":166},{"latency":12630,"batch_size":149},{"latency":15242,"batch_size":151},{"latency":14248,"batch_size":153},{"latency":17487,"batch_size":155},{"latency":14899,"batch_size":157},{"latency":15427,"batch_size":159},{"latency":18208,"batch_size":161},{"latency":14298,"batch_size":161},{"latency":19921,"batch_size":163},{"latency":19098,"batch_size":163},{"latency":19387,"batch_size":163},{"latency":19558,"batch_size":163},{"latency":19592,"batch_size":163},{"latency":21786,"batch_size":163},{"latency":14391,"batch_size":146},{"latency":13783,"batch_size":148},{"latency":13321,"batch_size":150},{"latency":13137,"batch_size":152},{"latency":13821,"batch_size":154},{"latency":13677,"batch_size":156},{"latency":17935,"batch_size":158},{"latency":14062,"batch_size":160},{"latency":14873,"batch_size":162},{"latency":20184,"batch_size":164},{"latency":14622,"batch_size":147},{"latency":12939,"batch_size":149},{"latency":12905,"batch_size":151},{"latency":13849,"batch_size":153},{"latency":13577,"batch_size":155},{"latency":14728,"batch_size":157},{"latency":19297,"batch_size":159},{"latency":17691,"batch_size":159},{"latency":14333,"batch_size":161},{"latency":15733,"batch_size":163},{"latency":15815,"batch_size":165},{"latency":20019,"batch_size":167},{"latency":15335,"batch_size":150},{"latency":12748,"batch_size":152},{"latency":14571,"batch_size":154},{"latency":14628,"batch_size":156},{"latency":14135,"batch_size":158},{"latency":18987,"batch_size":160},{"latency":13668,"batch_size":160},{"latency":19471,"batch_size":162},{"latency":15414,"batch_size":162},{"latency":19936,"batch_size":164},{"latency":19831,"batch_size":164},{"latency":16954,"batch_size":164},{"latency":20493,"batch_size":166},{"latency":15359,"batch_size":149},{"latency":12653,"batch_size":151},{"latency":13496,"batch_size":153},{"latency":13843,"batch_size":155},{"latency":14557,"batch_size":157},{"latency":13736,"batch_size":159},{"latency":18333,"batch_size":161},{"latency":14717,"batch_size":161},{"latency":20032,"batch_size":163},{"latency":14215,"batch_size":146},{"latency":13892,"batch_size":148},{"latency":12742,"batch_size":150},{"latency":13398,"batch_size":152},{"latency":13718,"batch_size":154},{"latency":14238,"batch_size":156},{"latency":14102,"batch_size":158},{"latency":18058,"batch_size":160},{"latency":13422,"batch_size":160},{"latency":18861,"batch_size":162},{"latency":15351,"batch_size":162},{"latency":19658,"batch_size":164},{"latency":19869,"batch_size":164},{"latency":16631,"batch_size":164},{"latency":20757,"batch_size":166},{"latency":12014,"batch_size":149},{"latency":12852,"batch_size":151},{"latency":13946,"batch_size":153},{"latency":13859,"batch_size":155},{"latency":16392,"batch_size":157},{"latency":14266,"batch_size":159},{"latency":18095,"batch_size":161},{"latency":14579,"batch_size":161},{"latency":19814,"batch_size":163},{"latency":19643,"batch_size":163},{"latency":19226,"batch_size":163},{"latency":21124,"batch_size":163},{"latency":13889,"batch_size":146},{"latency":13935,"batch_size":148},{"latency":13212,"batch_size":150},{"latency":13268,"batch_size":152},{"latency":13563,"batch_size":154},{"latency":14208,"batch_size":156},{"latency":17826,"batch_size":158},{"latency":13689,"batch_size":160},{"latency":15343,"batch_size":162},{"latency":20059,"batch_size":164},{"latency":14303,"batch_size":147},{"latency":12688,"batch_size":149},{"latency":15154,"batch_size":151},{"latency":14517,"batch_size":153},{"latency":13500,"batch_size":155},{"latency":14302,"batch_size":157},{"latency":13255,"batch_size":159},{"latency":18203,"batch_size":161},{"latency":14303,"batch_size":161},{"latency":19901,"batch_size":163},{"latency":19400,"batch_size":163},{"latency":19908,"batch_size":163},{"latency":19858,"batch_size":163},{"latency":19715,"batch_size":163},{"latency":19301,"batch_size":163},{"latency":19249,"batch_size":163},{"latency":14529,"batch_size":163},{"latency":19613,"batch_size":165},{"latency":19585,"batch_size":165},{"latency":20197,"batch_size":165},{"latency":11907,"batch_size":148},{"latency":13188,"batch_size":150},{"latency":13759,"batch_size":152},{"latency":13483,"batch_size":154},{"latency":14258,"batch_size":156},{"latency":17787,"batch_size":158},{"latency":13398,"batch_size":160},{"latency":14250,"batch_size":162},{"latency":19626,"batch_size":164},{"latency":19519,"batch_size":164},{"latency":16691,"batch_size":164},{"latency":20442,"batch_size":166},{"latency":12106,"batch_size":149},{"latency":12440,"batch_size":151},{"latency":13499,"batch_size":153},{"latency":13292,"batch_size":155},{"latency":14368,"batch_size":157},{"latency":13254,"batch_size":159},{"latency":17954,"batch_size":161},{"latency":15007,"batch_size":163},{"latency":16545,"batch_size":165},{"latency":20242,"batch_size":167},{"latency":17605,"batch_size":150},{"latency":13412,"batch_size":152},{"latency":14180,"batch_size":154},{"latency":15014,"batch_size":156}],"alpha":108.5802469241956,"beta":4087.4197511003897,"batch_size":147,"name":"linear_svm"}
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.2:7777)
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 167, alpha = 64.45679011384972, beta = 9219.35802558172
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 8356.835066015921, baseline: 107.71434155594768, increase: 77.58330919820287
+INFO:clipper::batching: GREPTHISlogistic_reg: XXXXXX {"measurements":[{"latency":4558,"batch_size":3},{"latency":1305,"batch_size":5},{"latency":1574,"batch_size":7},{"latency":1812,"batch_size":9},{"latency":2130,"batch_size":11},{"latency":2355,"batch_size":13},{"latency":2675,"batch_size":15},{"latency":2847,"batch_size":17},{"latency":3250,"batch_size":19},{"latency":3335,"batch_size":21},{"latency":3701,"batch_size":23},{"latency":4163,"batch_size":25},{"latency":4089,"batch_size":27},{"latency":4345,"batch_size":29},{"latency":5000,"batch_size":31},{"latency":5667,"batch_size":33},{"latency":5128,"batch_size":35},{"latency":6414,"batch_size":37},{"latency":4171,"batch_size":26},{"latency":2062,"batch_size":8},{"latency":4705,"batch_size":10},{"latency":2201,"batch_size":12},{"latency":2599,"batch_size":14},{"latency":2886,"batch_size":16},{"latency":3098,"batch_size":18},{"latency":3476,"batch_size":20},{"latency":3747,"batch_size":22},{"latency":3948,"batch_size":24},{"latency":4280,"batch_size":26},{"latency":5303,"batch_size":28},{"latency":4801,"batch_size":30},{"latency":5116,"batch_size":32},{"latency":5270,"batch_size":34},{"latency":6183,"batch_size":36},{"latency":5653,"batch_size":38},{"latency":6215,"batch_size":40},{"latency":6107,"batch_size":42},{"latency":6310,"batch_size":44},{"latency":5904,"batch_size":46},{"latency":6424,"batch_size":48},{"latency":6123,"batch_size":50},{"latency":6616,"batch_size":52},{"latency":6088,"batch_size":54},{"latency":6316,"batch_size":56},{"latency":6364,"batch_size":58},{"latency":8728,"batch_size":60},{"latency":6146,"batch_size":62},{"latency":6309,"batch_size":64},{"latency":6323,"batch_size":66},{"latency":6923,"batch_size":68},{"latency":6587,"batch_size":70},{"latency":6797,"batch_size":72},{"latency":6676,"batch_size":74},{"latency":7194,"batch_size":76},{"latency":6721,"batch_size":78},{"latency":6896,"batch_size":80},{"latency":6976,"batch_size":82},{"latency":7720,"batch_size":84},{"latency":10636,"batch_size":86},{"latency":8424,"batch_size":88},{"latency":8487,"batch_size":90},{"latency":9122,"batch_size":92},{"latency":10026,"batch_size":94},{"latency":10230,"batch_size":96},{"latency":9827,"batch_size":98},{"latency":13302,"batch_size":100},{"latency":11778,"batch_size":102},{"latency":11665,"batch_size":104},{"latency":12303,"batch_size":106},{"latency":13440,"batch_size":108},{"latency":13310,"batch_size":110},{"latency":13570,"batch_size":112},{"latency":12719,"batch_size":114},{"latency":13220,"batch_size":116},{"latency":11833,"batch_size":118},{"latency":12428,"batch_size":120},{"latency":10492,"batch_size":122},{"latency":17212,"batch_size":124},{"latency":13802,"batch_size":126},{"latency":17444,"batch_size":128},{"latency":15054,"batch_size":130},{"latency":15312,"batch_size":132},{"latency":16479,"batch_size":134},{"latency":14901,"batch_size":136},{"latency":14852,"batch_size":138},{"latency":15789,"batch_size":140},{"latency":13631,"batch_size":142},{"latency":13774,"batch_size":144},{"latency":13451,"batch_size":146},{"latency":13485,"batch_size":148},{"latency":15481,"batch_size":150},{"latency":14298,"batch_size":152},{"latency":16464,"batch_size":154},{"latency":17766,"batch_size":156},{"latency":17227,"batch_size":158},{"latency":18161,"batch_size":160},{"latency":17375,"batch_size":160},{"latency":16835,"batch_size":162},{"latency":21900,"batch_size":164},{"latency":15733,"batch_size":147},{"latency":16014,"batch_size":149},{"latency":14974,"batch_size":151},{"latency":16265,"batch_size":153},{"latency":15525,"batch_size":155},{"latency":17111,"batch_size":157},{"latency":15946,"batch_size":159},{"latency":17075,"batch_size":161},{"latency":16287,"batch_size":163},{"latency":17417,"batch_size":165},{"latency":16126,"batch_size":167},{"latency":17647,"batch_size":169},{"latency":16480,"batch_size":171},{"latency":17053,"batch_size":173},{"latency":16391,"batch_size":175},{"latency":19722,"batch_size":177},{"latency":18800,"batch_size":177},{"latency":19186,"batch_size":177},{"latency":18711,"batch_size":177},{"latency":19289,"batch_size":177},{"latency":21350,"batch_size":177},{"latency":17276,"batch_size":159},{"latency":15324,"batch_size":161},{"latency":17736,"batch_size":163},{"latency":15307,"batch_size":165},{"latency":16227,"batch_size":167},{"latency":16156,"batch_size":169},{"latency":17673,"batch_size":171},{"latency":16620,"batch_size":173},{"latency":20391,"batch_size":175},{"latency":16606,"batch_size":157},{"latency":15731,"batch_size":159},{"latency":14682,"batch_size":161},{"latency":16145,"batch_size":163},{"latency":15421,"batch_size":165},{"latency":16460,"batch_size":167},{"latency":16494,"batch_size":169},{"latency":21170,"batch_size":171},{"latency":14549,"batch_size":153},{"latency":17913,"batch_size":155},{"latency":14067,"batch_size":157},{"latency":17751,"batch_size":159},{"latency":15761,"batch_size":161},{"latency":15552,"batch_size":163},{"latency":14098,"batch_size":165},{"latency":16121,"batch_size":167},{"latency":15485,"batch_size":169},{"latency":17334,"batch_size":171},{"latency":17627,"batch_size":173},{"latency":17353,"batch_size":175},{"latency":18000,"batch_size":177},{"latency":18951,"batch_size":177},{"latency":18376,"batch_size":177},{"latency":18775,"batch_size":177},{"latency":18200,"batch_size":177},{"latency":18406,"batch_size":177},{"latency":18182,"batch_size":177},{"latency":18204,"batch_size":177},{"latency":18003,"batch_size":177},{"latency":18114,"batch_size":177},{"latency":18160,"batch_size":177},{"latency":19051,"batch_size":177},{"latency":17734,"batch_size":177},{"latency":20492,"batch_size":179},{"latency":16142,"batch_size":161},{"latency":17685,"batch_size":163},{"latency":16659,"batch_size":165},{"latency":17853,"batch_size":167},{"latency":15951,"batch_size":169},{"latency":19670,"batch_size":171},{"latency":18231,"batch_size":171},{"latency":18089,"batch_size":171},{"latency":15622,"batch_size":171},{"latency":22812,"batch_size":173},{"latency":16294,"batch_size":155},{"latency":17675,"batch_size":157},{"latency":16702,"batch_size":159},{"latency":17394,"batch_size":161},{"latency":14010,"batch_size":163},{"latency":16688,"batch_size":165},{"latency":14041,"batch_size":167},{"latency":15105,"batch_size":169},{"latency":15701,"batch_size":171},{"latency":17082,"batch_size":173},{"latency":15615,"batch_size":175},{"latency":17501,"batch_size":177},{"latency":16042,"batch_size":179},{"latency":17649,"batch_size":181},{"latency":16551,"batch_size":183},{"latency":16006,"batch_size":185},{"latency":16809,"batch_size":187},{"latency":18207,"batch_size":189},{"latency":16366,"batch_size":189},{"latency":17456,"batch_size":191},{"latency":17177,"batch_size":193},{"latency":17293,"batch_size":195},{"latency":16160,"batch_size":197},{"latency":16493,"batch_size":199},{"latency":15627,"batch_size":201},{"latency":16873,"batch_size":203},{"latency":17507,"batch_size":205},{"latency":19412,"batch_size":207},{"latency":18312,"batch_size":207},{"latency":16285,"batch_size":207},{"latency":18986,"batch_size":209},{"latency":16203,"batch_size":209},{"latency":20122,"batch_size":211},{"latency":17281,"batch_size":189},{"latency":20267,"batch_size":191},{"latency":12996,"batch_size":171},{"latency":18328,"batch_size":173},{"latency":12709,"batch_size":173},{"latency":18134,"batch_size":175},{"latency":16033,"batch_size":175},{"latency":17665,"batch_size":177},{"latency":15551,"batch_size":179},{"latency":17930,"batch_size":181},{"latency":16602,"batch_size":183},{"latency":17920,"batch_size":185},{"latency":16365,"batch_size":187},{"latency":18089,"batch_size":189},{"latency":16980,"batch_size":189},{"latency":18304,"batch_size":191},{"latency":16982,"batch_size":191},{"latency":18335,"batch_size":193},{"latency":17221,"batch_size":193},{"latency":18844,"batch_size":195},{"latency":17387,"batch_size":195},{"latency":18404,"batch_size":197},{"latency":18082,"batch_size":197},{"latency":18129,"batch_size":197},{"latency":17484,"batch_size":197},{"latency":19431,"batch_size":199},{"latency":17340,"batch_size":199},{"latency":18779,"batch_size":201},{"latency":17725,"batch_size":201},{"latency":17917,"batch_size":203},{"latency":18505,"batch_size":205},{"latency":17394,"batch_size":205},{"latency":18224,"batch_size":207},{"latency":17646,"batch_size":207},{"latency":19592,"batch_size":209},{"latency":15016,"batch_size":209},{"latency":16938,"batch_size":211},{"latency":15235,"batch_size":213},{"latency":19469,"batch_size":215},{"latency":18073,"batch_size":215},{"latency":18210,"batch_size":215},{"latency":18263,"batch_size":215},{"latency":18346,"batch_size":215},{"latency":17210,"batch_size":215},{"latency":19827,"batch_size":217},{"latency":17059,"batch_size":217},{"latency":19586,"batch_size":219},{"latency":17422,"batch_size":219},{"latency":18383,"batch_size":221},{"latency":16987,"batch_size":221},{"latency":18290,"batch_size":223},{"latency":16819,"batch_size":223},{"latency":18525,"batch_size":225},{"latency":17200,"batch_size":225},{"latency":17906,"batch_size":227},{"latency":18170,"batch_size":229},{"latency":21702,"batch_size":229},{"latency":15371,"batch_size":206},{"latency":18248,"batch_size":208},{"latency":15939,"batch_size":208},{"latency":18136,"batch_size":210},{"latency":16033,"batch_size":210},{"latency":18529,"batch_size":212},{"latency":16090,"batch_size":212},{"latency":21595,"batch_size":214},{"latency":14656,"batch_size":192},{"latency":16609,"batch_size":194},{"latency":14893,"batch_size":196},{"latency":16796,"batch_size":198},{"latency":16193,"batch_size":200},{"latency":18538,"batch_size":202},{"latency":17463,"batch_size":202},{"latency":17079,"batch_size":204},{"latency":16078,"batch_size":206},{"latency":17080,"batch_size":208},{"latency":17110,"batch_size":210},{"latency":19739,"batch_size":212},{"latency":16876,"batch_size":212},{"latency":17887,"batch_size":214},{"latency":17092,"batch_size":216},{"latency":18013,"batch_size":218},{"latency":16815,"batch_size":218},{"latency":17542,"batch_size":220},{"latency":16974,"batch_size":222},{"latency":17758,"batch_size":224},{"latency":18937,"batch_size":226},{"latency":17891,"batch_size":226},{"latency":17573,"batch_size":228},{"latency":17909,"batch_size":230},{"latency":19201,"batch_size":232},{"latency":17620,"batch_size":232},{"latency":20249,"batch_size":234},{"latency":15822,"batch_size":210},{"latency":18614,"batch_size":212},{"latency":17725,"batch_size":212},{"latency":19126,"batch_size":214},{"latency":15998,"batch_size":214},{"latency":19666,"batch_size":216},{"latency":16062,"batch_size":216},{"latency":20148,"batch_size":218},{"latency":13807,"batch_size":196},{"latency":18479,"batch_size":198},{"latency":14718,"batch_size":198},{"latency":18600,"batch_size":200},{"latency":15649,"batch_size":200},{"latency":19203,"batch_size":202},{"latency":15312,"batch_size":202},{"latency":18661,"batch_size":204},{"latency":15384,"batch_size":204},{"latency":17966,"batch_size":206},{"latency":18362,"batch_size":208},{"latency":17602,"batch_size":208},{"latency":16550,"batch_size":210},{"latency":17439,"batch_size":212},{"latency":19312,"batch_size":214},{"latency":17626,"batch_size":214},{"latency":17202,"batch_size":216},{"latency":18489,"batch_size":218},{"latency":16713,"batch_size":218},{"latency":18887,"batch_size":220},{"latency":16135,"batch_size":220},{"latency":20168,"batch_size":222},{"latency":14811,"batch_size":199},{"latency":17717,"batch_size":201},{"latency":15329,"batch_size":203},{"latency":22433,"batch_size":205},{"latency":16314,"batch_size":184},{"latency":17228,"batch_size":186},{"latency":16528,"batch_size":188},{"latency":16615,"batch_size":190},{"latency":16817,"batch_size":192},{"latency":18316,"batch_size":194},{"latency":17054,"batch_size":194},{"latency":18459,"batch_size":196},{"latency":15419,"batch_size":196},{"latency":18356,"batch_size":198},{"latency":14068,"batch_size":198},{"latency":18873,"batch_size":200},{"latency":14700,"batch_size":200},{"latency":18883,"batch_size":202},{"latency":15565,"batch_size":202},{"latency":18779,"batch_size":204},{"latency":15146,"batch_size":204},{"latency":17973,"batch_size":206},{"latency":15701,"batch_size":208},{"latency":18620,"batch_size":210},{"latency":15883,"batch_size":210},{"latency":18375,"batch_size":212},{"latency":18037,"batch_size":212},{"latency":17719,"batch_size":212},{"latency":18762,"batch_size":214},{"latency":17660,"batch_size":214},{"latency":17482,"batch_size":216},{"latency":18146,"batch_size":218},{"latency":16001,"batch_size":218},{"latency":20361,"batch_size":220},{"latency":14540,"batch_size":198},{"latency":18454,"batch_size":200},{"latency":14974,"batch_size":200},{"latency":18157,"batch_size":202},{"latency":14966,"batch_size":202},{"latency":18611,"batch_size":204},{"latency":14942,"batch_size":204},{"latency":19727,"batch_size":206},{"latency":15663,"batch_size":206},{"latency":18598,"batch_size":208},{"latency":15349,"batch_size":208},{"latency":18785,"batch_size":210},{"latency":18058,"batch_size":210},{"latency":17789,"batch_size":210},{"latency":16635,"batch_size":212},{"latency":18139,"batch_size":214},{"latency":16650,"batch_size":214},{"latency":18927,"batch_size":216},{"latency":16526,"batch_size":216},{"latency":20013,"batch_size":218},{"latency":14364,"batch_size":196},{"latency":18946,"batch_size":198},{"latency":15631,"batch_size":198},{"latency":18363,"batch_size":200},{"latency":15324,"batch_size":200},{"latency":18538,"batch_size":202},{"latency":16652,"batch_size":202},{"latency":18282,"batch_size":204},{"latency":15712,"batch_size":204},{"latency":18282,"batch_size":206},{"latency":16004,"batch_size":206},{"latency":19272,"batch_size":208},{"latency":15387,"batch_size":208},{"latency":18957,"batch_size":210},{"latency":15038,"batch_size":210},{"latency":19571,"batch_size":212},{"latency":17690,"batch_size":212},{"latency":19611,"batch_size":214},{"latency":15815,"batch_size":214},{"latency":18951,"batch_size":216},{"latency":16116,"batch_size":216},{"latency":18558,"batch_size":218},{"latency":17575,"batch_size":218},{"latency":19532,"batch_size":220},{"latency":16398,"batch_size":220},{"latency":19555,"batch_size":222},{"latency":19483,"batch_size":222},{"latency":20561,"batch_size":222},{"latency":15000,"batch_size":199},{"latency":18590,"batch_size":201},{"latency":14368,"batch_size":201},{"latency":18874,"batch_size":203},{"latency":16866,"batch_size":203},{"latency":19074,"batch_size":205},{"latency":17446,"batch_size":205},{"latency":18195,"batch_size":207},{"latency":17501,"batch_size":207},{"latency":18668,"batch_size":209},{"latency":17976,"batch_size":209},{"latency":18879,"batch_size":211},{"latency":17801,"batch_size":211},{"latency":19213,"batch_size":213},{"latency":17220,"batch_size":213},{"latency":21751,"batch_size":215},{"latency":16018,"batch_size":193},{"latency":18053,"batch_size":195},{"latency":16313,"batch_size":195},{"latency":18358,"batch_size":197},{"latency":16951,"batch_size":197},{"latency":18064,"batch_size":199},{"latency":17007,"batch_size":199},{"latency":17610,"batch_size":201},{"latency":14976,"batch_size":203},{"latency":17900,"batch_size":205},{"latency":17256,"batch_size":207},{"latency":18928,"batch_size":209},{"latency":17077,"batch_size":209},{"latency":18834,"batch_size":211},{"latency":17677,"batch_size":211},{"latency":19560,"batch_size":213},{"latency":17091,"batch_size":213},{"latency":19997,"batch_size":215},{"latency":18146,"batch_size":215},{"latency":19336,"batch_size":215},{"latency":17861,"batch_size":215},{"latency":19008,"batch_size":217},{"latency":18045,"batch_size":217},{"latency":18853,"batch_size":217},{"latency":21515,"batch_size":217},{"latency":17234,"batch_size":195},{"latency":15849,"batch_size":197},{"latency":18093,"batch_size":199},{"latency":16026,"batch_size":199},{"latency":15960,"batch_size":201},{"latency":16622,"batch_size":203},{"latency":18224,"batch_size":205},{"latency":17266,"batch_size":205},{"latency":17915,"batch_size":207},{"latency":17369,"batch_size":209},{"latency":21293,"batch_size":211},{"latency":16852,"batch_size":189},{"latency":17907,"batch_size":191},{"latency":16767,"batch_size":193},{"latency":17511,"batch_size":195},{"latency":16434,"batch_size":197},{"latency":18439,"batch_size":199},{"latency":17519,"batch_size":199},{"latency":18985,"batch_size":201},{"latency":14008,"batch_size":201},{"latency":18823,"batch_size":203},{"latency":16943,"batch_size":203},{"latency":19270,"batch_size":205},{"latency":18068,"batch_size":205},{"latency":20941,"batch_size":205},{"latency":16568,"batch_size":184},{"latency":16892,"batch_size":186},{"latency":15817,"batch_size":188},{"latency":17161,"batch_size":190},{"latency":16184,"batch_size":192},{"latency":17486,"batch_size":194},{"latency":16627,"batch_size":196},{"latency":16250,"batch_size":198},{"latency":16100,"batch_size":200},{"latency":16823,"batch_size":202},{"latency":16745,"batch_size":204},{"latency":16999,"batch_size":206},{"latency":17521,"batch_size":208},{"latency":18062,"batch_size":210},{"latency":18291,"batch_size":210},{"latency":15966,"batch_size":210},{"latency":18874,"batch_size":212},{"latency":17090,"batch_size":212},{"latency":19264,"batch_size":214},{"latency":16108,"batch_size":214},{"latency":19503,"batch_size":216},{"latency":16627,"batch_size":216},{"latency":19555,"batch_size":218}],"alpha":64.45679011384972,"beta":9219.35802558172,"batch_size":167,"name":"logistic_reg"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.2:7777)
+INFO:clipper::batching: spark_svm BATCHER: Updated batching model: max_batch_size: 147, alpha = 46.17177914622698, beta = 13225.141103082364
+INFO:clipper::batching: spark_svm BATCHER: Predicted max thruput: 7345.448525928615, baseline: 75.35049537857587, increase: 97.48374564790345
+INFO:clipper::batching: GREPTHISspark_svm: XXXXXX {"measurements":[{"latency":926,"batch_size":3},{"latency":1317,"batch_size":5},{"latency":1697,"batch_size":7},{"latency":2168,"batch_size":9},{"latency":2540,"batch_size":11},{"latency":3108,"batch_size":13},{"latency":3396,"batch_size":15},{"latency":3363,"batch_size":17},{"latency":4035,"batch_size":19},{"latency":4186,"batch_size":21},{"latency":4797,"batch_size":23},{"latency":4805,"batch_size":25},{"latency":5313,"batch_size":27},{"latency":5656,"batch_size":29},{"latency":5763,"batch_size":31},{"latency":6233,"batch_size":33},{"latency":6679,"batch_size":35},{"latency":6850,"batch_size":37},{"latency":4512,"batch_size":24},{"latency":13456,"batch_size":5},{"latency":1451,"batch_size":7},{"latency":1675,"batch_size":9},{"latency":2206,"batch_size":11},{"latency":2796,"batch_size":13},{"latency":2974,"batch_size":15},{"latency":3100,"batch_size":17},{"latency":3427,"batch_size":19},{"latency":4159,"batch_size":21},{"latency":4249,"batch_size":23},{"latency":4147,"batch_size":25},{"latency":4352,"batch_size":27},{"latency":4859,"batch_size":29},{"latency":5024,"batch_size":31},{"latency":5224,"batch_size":33},{"latency":8462,"batch_size":35},{"latency":6115,"batch_size":37},{"latency":6359,"batch_size":39},{"latency":6670,"batch_size":41},{"latency":6853,"batch_size":43},{"latency":7830,"batch_size":45},{"latency":7194,"batch_size":47},{"latency":7175,"batch_size":49},{"latency":7140,"batch_size":51},{"latency":11090,"batch_size":53},{"latency":7241,"batch_size":55},{"latency":7353,"batch_size":57},{"latency":7404,"batch_size":59},{"latency":10599,"batch_size":61},{"latency":8235,"batch_size":63},{"latency":8192,"batch_size":65},{"latency":8248,"batch_size":67},{"latency":8441,"batch_size":69},{"latency":8866,"batch_size":71},{"latency":8818,"batch_size":73},{"latency":8972,"batch_size":75},{"latency":8902,"batch_size":77},{"latency":9283,"batch_size":79},{"latency":9616,"batch_size":81},{"latency":9279,"batch_size":83},{"latency":10627,"batch_size":85},{"latency":10743,"batch_size":87},{"latency":10434,"batch_size":89},{"latency":9971,"batch_size":91},{"latency":9659,"batch_size":93},{"latency":9820,"batch_size":95},{"latency":9697,"batch_size":97},{"latency":9513,"batch_size":99},{"latency":9814,"batch_size":101},{"latency":10159,"batch_size":103},{"latency":11400,"batch_size":105},{"latency":11145,"batch_size":107},{"latency":11628,"batch_size":109},{"latency":11959,"batch_size":111},{"latency":14851,"batch_size":113},{"latency":13148,"batch_size":115},{"latency":12588,"batch_size":117},{"latency":12841,"batch_size":119},{"latency":12741,"batch_size":121},{"latency":13429,"batch_size":123},{"latency":13141,"batch_size":125},{"latency":13463,"batch_size":127},{"latency":14107,"batch_size":129},{"latency":13556,"batch_size":131},{"latency":14183,"batch_size":133},{"latency":14024,"batch_size":135},{"latency":15263,"batch_size":137},{"latency":14596,"batch_size":139},{"latency":16838,"batch_size":141},{"latency":14871,"batch_size":143},{"latency":15020,"batch_size":145},{"latency":15365,"batch_size":147},{"latency":16101,"batch_size":149},{"latency":16503,"batch_size":151},{"latency":16717,"batch_size":153},{"latency":16320,"batch_size":155},{"latency":17086,"batch_size":157},{"latency":17011,"batch_size":159},{"latency":18166,"batch_size":161},{"latency":18242,"batch_size":161},{"latency":18560,"batch_size":161},{"latency":25994,"batch_size":161},{"latency":16742,"batch_size":144},{"latency":16857,"batch_size":146},{"latency":16623,"batch_size":148},{"latency":17176,"batch_size":150},{"latency":17087,"batch_size":152},{"latency":17812,"batch_size":154},{"latency":17783,"batch_size":156},{"latency":17939,"batch_size":158},{"latency":18629,"batch_size":160},{"latency":18385,"batch_size":160},{"latency":18456,"batch_size":160},{"latency":17876,"batch_size":160},{"latency":17628,"batch_size":162},{"latency":17438,"batch_size":164},{"latency":18141,"batch_size":166},{"latency":17941,"batch_size":166},{"latency":18698,"batch_size":168},{"latency":19921,"batch_size":168},{"latency":19763,"batch_size":168},{"latency":20830,"batch_size":168},{"latency":16882,"batch_size":151},{"latency":16662,"batch_size":153},{"latency":16561,"batch_size":155},{"latency":17119,"batch_size":157},{"latency":17229,"batch_size":159},{"latency":17036,"batch_size":161},{"latency":17852,"batch_size":163},{"latency":17619,"batch_size":165},{"latency":18027,"batch_size":167},{"latency":17699,"batch_size":167},{"latency":19300,"batch_size":169},{"latency":19529,"batch_size":169},{"latency":19482,"batch_size":169},{"latency":19751,"batch_size":169},{"latency":19603,"batch_size":169},{"latency":19968,"batch_size":169},{"latency":21758,"batch_size":169},{"latency":17262,"batch_size":152},{"latency":17042,"batch_size":154},{"latency":16917,"batch_size":156},{"latency":17278,"batch_size":158},{"latency":17023,"batch_size":160},{"latency":16503,"batch_size":162},{"latency":17631,"batch_size":164},{"latency":18292,"batch_size":166},{"latency":18051,"batch_size":166},{"latency":18049,"batch_size":166},{"latency":18314,"batch_size":166},{"latency":17635,"batch_size":166},{"latency":19122,"batch_size":168},{"latency":19392,"batch_size":168},{"latency":19324,"batch_size":168},{"latency":20140,"batch_size":168},{"latency":16842,"batch_size":151},{"latency":16667,"batch_size":153},{"latency":16537,"batch_size":155},{"latency":17315,"batch_size":157},{"latency":17846,"batch_size":159},{"latency":17444,"batch_size":161},{"latency":17406,"batch_size":163},{"latency":17832,"batch_size":165},{"latency":18763,"batch_size":167},{"latency":18561,"batch_size":167},{"latency":18560,"batch_size":167},{"latency":18123,"batch_size":167},{"latency":18222,"batch_size":167},{"latency":17841,"batch_size":167},{"latency":19144,"batch_size":169},{"latency":19456,"batch_size":169},{"latency":19119,"batch_size":169},{"latency":19957,"batch_size":169},{"latency":19378,"batch_size":169},{"latency":19577,"batch_size":169},{"latency":19376,"batch_size":169},{"latency":19519,"batch_size":169},{"latency":19265,"batch_size":169},{"latency":19234,"batch_size":169},{"latency":18858,"batch_size":169},{"latency":19497,"batch_size":169},{"latency":18824,"batch_size":169},{"latency":19244,"batch_size":169},{"latency":19209,"batch_size":169},{"latency":19165,"batch_size":169},{"latency":18746,"batch_size":169},{"latency":18857,"batch_size":169},{"latency":18726,"batch_size":169},{"latency":18811,"batch_size":169},{"latency":18842,"batch_size":169},{"latency":18721,"batch_size":169},{"latency":19137,"batch_size":169},{"latency":19474,"batch_size":169},{"latency":18886,"batch_size":169},{"latency":19116,"batch_size":169},{"latency":18847,"batch_size":169},{"latency":19036,"batch_size":169},{"latency":20352,"batch_size":169},{"latency":16511,"batch_size":152},{"latency":15808,"batch_size":154},{"latency":16618,"batch_size":156},{"latency":16277,"batch_size":158},{"latency":16554,"batch_size":160},{"latency":17908,"batch_size":162},{"latency":17189,"batch_size":164},{"latency":17613,"batch_size":166},{"latency":18646,"batch_size":168},{"latency":18753,"batch_size":168},{"latency":18576,"batch_size":168},{"latency":20982,"batch_size":168},{"latency":16327,"batch_size":151},{"latency":16197,"batch_size":153},{"latency":16666,"batch_size":155},{"latency":17095,"batch_size":157},{"latency":17475,"batch_size":159},{"latency":17172,"batch_size":161},{"latency":17036,"batch_size":163},{"latency":17418,"batch_size":165},{"latency":17500,"batch_size":167},{"latency":18519,"batch_size":169},{"latency":19229,"batch_size":169},{"latency":19435,"batch_size":169},{"latency":19108,"batch_size":169},{"latency":19042,"batch_size":169},{"latency":18893,"batch_size":169},{"latency":18981,"batch_size":169},{"latency":18921,"batch_size":169},{"latency":18615,"batch_size":169},{"latency":19031,"batch_size":169},{"latency":18859,"batch_size":169},{"latency":18772,"batch_size":169},{"latency":18679,"batch_size":169},{"latency":19744,"batch_size":169},{"latency":19619,"batch_size":169},{"latency":19587,"batch_size":169},{"latency":19525,"batch_size":169},{"latency":20006,"batch_size":169},{"latency":16901,"batch_size":152},{"latency":16202,"batch_size":154},{"latency":16275,"batch_size":156},{"latency":16630,"batch_size":158},{"latency":16752,"batch_size":160},{"latency":17872,"batch_size":162},{"latency":17859,"batch_size":164},{"latency":17408,"batch_size":166},{"latency":18742,"batch_size":168},{"latency":19258,"batch_size":168},{"latency":18826,"batch_size":168},{"latency":18921,"batch_size":168},{"latency":18906,"batch_size":168},{"latency":19795,"batch_size":168},{"latency":19428,"batch_size":168},{"latency":18563,"batch_size":168},{"latency":18776,"batch_size":168},{"latency":18948,"batch_size":168},{"latency":19870,"batch_size":168},{"latency":19105,"batch_size":168},{"latency":18777,"batch_size":168},{"latency":18638,"batch_size":168},{"latency":18847,"batch_size":168},{"latency":18609,"batch_size":168},{"latency":20064,"batch_size":168},{"latency":16242,"batch_size":151},{"latency":15415,"batch_size":153},{"latency":15831,"batch_size":155},{"latency":15454,"batch_size":157},{"latency":16373,"batch_size":159},{"latency":16984,"batch_size":161},{"latency":17241,"batch_size":163},{"latency":17205,"batch_size":165},{"latency":17327,"batch_size":167},{"latency":18353,"batch_size":169},{"latency":18829,"batch_size":169},{"latency":18664,"batch_size":169},{"latency":19003,"batch_size":169},{"latency":18896,"batch_size":169},{"latency":18846,"batch_size":169},{"latency":18644,"batch_size":169},{"latency":19495,"batch_size":169},{"latency":18694,"batch_size":169},{"latency":19877,"batch_size":169},{"latency":19670,"batch_size":169},{"latency":19607,"batch_size":169},{"latency":19038,"batch_size":169},{"latency":19285,"batch_size":169},{"latency":19539,"batch_size":169},{"latency":17038,"batch_size":169},{"latency":17745,"batch_size":171},{"latency":17255,"batch_size":173},{"latency":18362,"batch_size":175},{"latency":17495,"batch_size":175},{"latency":17826,"batch_size":177},{"latency":18521,"batch_size":179},{"latency":17988,"batch_size":179},{"latency":18683,"batch_size":181},{"latency":17777,"batch_size":181},{"latency":19174,"batch_size":183},{"latency":18126,"batch_size":183},{"latency":18428,"batch_size":183},{"latency":18118,"batch_size":183},{"latency":20059,"batch_size":183},{"latency":16719,"batch_size":164},{"latency":15613,"batch_size":166},{"latency":16671,"batch_size":168},{"latency":17360,"batch_size":170},{"latency":17726,"batch_size":172},{"latency":17588,"batch_size":174},{"latency":17763,"batch_size":176},{"latency":17841,"batch_size":178},{"latency":17554,"batch_size":180},{"latency":18243,"batch_size":182},{"latency":17846,"batch_size":182},{"latency":20107,"batch_size":184},{"latency":15565,"batch_size":165},{"latency":15964,"batch_size":167},{"latency":16092,"batch_size":169},{"latency":17616,"batch_size":171},{"latency":17317,"batch_size":173},{"latency":17578,"batch_size":175},{"latency":17590,"batch_size":177},{"latency":17990,"batch_size":179},{"latency":18092,"batch_size":181},{"latency":20880,"batch_size":181},{"latency":16117,"batch_size":162},{"latency":14623,"batch_size":164},{"latency":18508,"batch_size":166},{"latency":14822,"batch_size":166},{"latency":17097,"batch_size":168},{"latency":17218,"batch_size":170},{"latency":17329,"batch_size":172},{"latency":17090,"batch_size":174},{"latency":18816,"batch_size":176},{"latency":18320,"batch_size":176},{"latency":17721,"batch_size":176},{"latency":17918,"batch_size":178},{"latency":17274,"batch_size":180},{"latency":18013,"batch_size":182},{"latency":17794,"batch_size":182},{"latency":18973,"batch_size":184},{"latency":18725,"batch_size":184},{"latency":19163,"batch_size":184},{"latency":20201,"batch_size":184},{"latency":16264,"batch_size":165},{"latency":16507,"batch_size":167},{"latency":18521,"batch_size":169},{"latency":18336,"batch_size":169},{"latency":16923,"batch_size":169},{"latency":17628,"batch_size":171},{"latency":16752,"batch_size":173},{"latency":17809,"batch_size":175},{"latency":17658,"batch_size":177},{"latency":18276,"batch_size":179},{"latency":18141,"batch_size":179},{"latency":19539,"batch_size":179},{"latency":18082,"batch_size":179},{"latency":17347,"batch_size":179},{"latency":18557,"batch_size":181},{"latency":18238,"batch_size":181},{"latency":19519,"batch_size":181},{"latency":22054,"batch_size":181},{"latency":16016,"batch_size":162},{"latency":15578,"batch_size":164},{"latency":15053,"batch_size":166},{"latency":16814,"batch_size":168},{"latency":17652,"batch_size":170},{"latency":17745,"batch_size":172},{"latency":17292,"batch_size":174},{"latency":17775,"batch_size":176},{"latency":18055,"batch_size":178},{"latency":17506,"batch_size":178},{"latency":18888,"batch_size":180},{"latency":17997,"batch_size":180},{"latency":18915,"batch_size":182},{"latency":18081,"batch_size":182},{"latency":19460,"batch_size":182},{"latency":20073,"batch_size":182},{"latency":15603,"batch_size":163},{"latency":15199,"batch_size":165},{"latency":15666,"batch_size":167},{"latency":17354,"batch_size":169},{"latency":17267,"batch_size":171},{"latency":18056,"batch_size":173},{"latency":17729,"batch_size":173},{"latency":18189,"batch_size":175},{"latency":17931,"batch_size":175},{"latency":17520,"batch_size":177},{"latency":19542,"batch_size":179},{"latency":17733,"batch_size":179},{"latency":18500,"batch_size":181},{"latency":16818,"batch_size":181},{"latency":18410,"batch_size":183},{"latency":17933,"batch_size":183},{"latency":18446,"batch_size":185},{"latency":18349,"batch_size":185},{"latency":18662,"batch_size":185},{"latency":18960,"batch_size":185},{"latency":17978,"batch_size":185},{"latency":18740,"batch_size":187},{"latency":18280,"batch_size":187},{"latency":18392,"batch_size":187},{"latency":19132,"batch_size":187},{"latency":18540,"batch_size":187},{"latency":19421,"batch_size":187},{"latency":18925,"batch_size":187},{"latency":18808,"batch_size":187},{"latency":19071,"batch_size":187},{"latency":18529,"batch_size":187},{"latency":19122,"batch_size":187},{"latency":18625,"batch_size":187},{"latency":19048,"batch_size":187},{"latency":18771,"batch_size":187},{"latency":19847,"batch_size":187},{"latency":19201,"batch_size":187},{"latency":18935,"batch_size":187},{"latency":19013,"batch_size":187},{"latency":18687,"batch_size":187},{"latency":18521,"batch_size":187},{"latency":19221,"batch_size":187},{"latency":18978,"batch_size":187},{"latency":18936,"batch_size":187},{"latency":18137,"batch_size":187},{"latency":19185,"batch_size":187},{"latency":18468,"batch_size":187},{"latency":18962,"batch_size":187},{"latency":19529,"batch_size":187},{"latency":18470,"batch_size":187},{"latency":18131,"batch_size":187},{"latency":18435,"batch_size":187},{"latency":18388,"batch_size":187},{"latency":18880,"batch_size":187},{"latency":18626,"batch_size":187},{"latency":19126,"batch_size":187},{"latency":18522,"batch_size":187},{"latency":18805,"batch_size":187},{"latency":18654,"batch_size":187},{"latency":18166,"batch_size":187},{"latency":19001,"batch_size":187},{"latency":18522,"batch_size":187},{"latency":18061,"batch_size":187},{"latency":18380,"batch_size":187},{"latency":18435,"batch_size":187},{"latency":21455,"batch_size":187},{"latency":18336,"batch_size":168},{"latency":16740,"batch_size":168},{"latency":17036,"batch_size":170},{"latency":17924,"batch_size":172},{"latency":17113,"batch_size":174},{"latency":17645,"batch_size":176},{"latency":17719,"batch_size":178},{"latency":18322,"batch_size":180},{"latency":18831,"batch_size":180},{"latency":18333,"batch_size":180},{"latency":18377,"batch_size":180},{"latency":17935,"batch_size":180},{"latency":18124,"batch_size":182},{"latency":17738,"batch_size":182},{"latency":18587,"batch_size":184},{"latency":20718,"batch_size":184},{"latency":15373,"batch_size":165},{"latency":15995,"batch_size":167},{"latency":16472,"batch_size":169},{"latency":17485,"batch_size":171},{"latency":16580,"batch_size":173},{"latency":18884,"batch_size":175},{"latency":18150,"batch_size":175},{"latency":17857,"batch_size":175},{"latency":17484,"batch_size":177},{"latency":17632,"batch_size":179},{"latency":19465,"batch_size":181},{"latency":18400,"batch_size":181},{"latency":18653,"batch_size":181},{"latency":18609,"batch_size":181},{"latency":18355,"batch_size":181},{"latency":18518,"batch_size":181},{"latency":18293,"batch_size":181},{"latency":19087,"batch_size":181},{"latency":18754,"batch_size":181},{"latency":18619,"batch_size":181},{"latency":17847,"batch_size":181},{"latency":17858,"batch_size":183},{"latency":18477,"batch_size":185},{"latency":18233,"batch_size":185},{"latency":18359,"batch_size":185},{"latency":18619,"batch_size":185},{"latency":18932,"batch_size":185},{"latency":18763,"batch_size":185},{"latency":18719,"batch_size":185},{"latency":21851,"batch_size":185},{"latency":16518,"batch_size":166},{"latency":16129,"batch_size":168},{"latency":17428,"batch_size":170},{"latency":17053,"batch_size":172},{"latency":16645,"batch_size":174},{"latency":16072,"batch_size":176},{"latency":16846,"batch_size":178},{"latency":17809,"batch_size":180},{"latency":17972,"batch_size":182},{"latency":17920,"batch_size":184},{"latency":18083,"batch_size":186},{"latency":18483,"batch_size":186}],"alpha":46.17177914622698,"beta":13225.141103082364,"batch_size":147,"name":"spark_svm"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.2:7777)
+INFO:clipper::batching: rf_d8 BATCHER: Updated batching model: max_batch_size: 135, alpha = 93.73780402156719, beta = 7335.262195497905
+INFO:clipper::batching: rf_d8 BATCHER: Predicted max thruput: 6753.422047282918, baseline: 134.60761879993038, increase: 50.17117238601959
+INFO:clipper::batching: GREPTHISrf_d8: XXXXXX {"measurements":[{"latency":7351,"batch_size":3},{"latency":7407,"batch_size":5},{"latency":7571,"batch_size":7},{"latency":7432,"batch_size":9},{"latency":7613,"batch_size":11},{"latency":7445,"batch_size":13},{"latency":7492,"batch_size":15},{"latency":7708,"batch_size":17},{"latency":7687,"batch_size":19},{"latency":7656,"batch_size":21},{"latency":8081,"batch_size":23},{"latency":7850,"batch_size":25},{"latency":7917,"batch_size":27},{"latency":7770,"batch_size":29},{"latency":7916,"batch_size":31},{"latency":7989,"batch_size":33},{"latency":8106,"batch_size":35},{"latency":8002,"batch_size":37},{"latency":7935,"batch_size":37},{"latency":7429,"batch_size":1},{"latency":7311,"batch_size":3},{"latency":7229,"batch_size":5},{"latency":7368,"batch_size":7},{"latency":7566,"batch_size":9},{"latency":7613,"batch_size":11},{"latency":7665,"batch_size":13},{"latency":7749,"batch_size":15},{"latency":7728,"batch_size":17},{"latency":8217,"batch_size":19},{"latency":7757,"batch_size":21},{"latency":7828,"batch_size":23},{"latency":7884,"batch_size":25},{"latency":7819,"batch_size":27},{"latency":7640,"batch_size":29},{"latency":7803,"batch_size":31},{"latency":7449,"batch_size":33},{"latency":7770,"batch_size":35},{"latency":8252,"batch_size":37},{"latency":8210,"batch_size":39},{"latency":10625,"batch_size":41},{"latency":9668,"batch_size":43},{"latency":8838,"batch_size":45},{"latency":8889,"batch_size":47},{"latency":8850,"batch_size":49},{"latency":10180,"batch_size":51},{"latency":8607,"batch_size":53},{"latency":8792,"batch_size":55},{"latency":8517,"batch_size":57},{"latency":8999,"batch_size":59},{"latency":8972,"batch_size":61},{"latency":9339,"batch_size":63},{"latency":9100,"batch_size":65},{"latency":9968,"batch_size":67},{"latency":9328,"batch_size":69},{"latency":9620,"batch_size":71},{"latency":9907,"batch_size":73},{"latency":10092,"batch_size":75},{"latency":9703,"batch_size":77},{"latency":11386,"batch_size":79},{"latency":10181,"batch_size":81},{"latency":10741,"batch_size":83},{"latency":11741,"batch_size":85},{"latency":12022,"batch_size":87},{"latency":11545,"batch_size":89},{"latency":12744,"batch_size":91},{"latency":11746,"batch_size":93},{"latency":12323,"batch_size":95},{"latency":12479,"batch_size":97},{"latency":12691,"batch_size":99},{"latency":12361,"batch_size":101},{"latency":13784,"batch_size":103},{"latency":12763,"batch_size":105},{"latency":13652,"batch_size":107},{"latency":13828,"batch_size":109},{"latency":13495,"batch_size":111},{"latency":13904,"batch_size":113},{"latency":14642,"batch_size":115},{"latency":14632,"batch_size":117},{"latency":13996,"batch_size":119},{"latency":15347,"batch_size":121},{"latency":14485,"batch_size":123},{"latency":15276,"batch_size":125},{"latency":15269,"batch_size":127},{"latency":16212,"batch_size":129},{"latency":15742,"batch_size":131},{"latency":16778,"batch_size":133},{"latency":16094,"batch_size":135},{"latency":19033,"batch_size":137},{"latency":15634,"batch_size":137},{"latency":17080,"batch_size":139},{"latency":17070,"batch_size":141},{"latency":16550,"batch_size":143},{"latency":20715,"batch_size":145},{"latency":15752,"batch_size":130},{"latency":23084,"batch_size":132},{"latency":14599,"batch_size":118},{"latency":15573,"batch_size":120},{"latency":14486,"batch_size":122},{"latency":15697,"batch_size":124},{"latency":15489,"batch_size":126},{"latency":15746,"batch_size":128},{"latency":16140,"batch_size":130},{"latency":15384,"batch_size":132},{"latency":16990,"batch_size":134},{"latency":15654,"batch_size":136},{"latency":17297,"batch_size":138},{"latency":16083,"batch_size":140},{"latency":19874,"batch_size":142},{"latency":17716,"batch_size":142},{"latency":17065,"batch_size":144},{"latency":17595,"batch_size":146},{"latency":17305,"batch_size":148},{"latency":18533,"batch_size":150},{"latency":16708,"batch_size":150},{"latency":17278,"batch_size":152},{"latency":17910,"batch_size":154},{"latency":17412,"batch_size":156},{"latency":18519,"batch_size":158},{"latency":16966,"batch_size":158},{"latency":17937,"batch_size":160},{"latency":18496,"batch_size":162},{"latency":18463,"batch_size":162},{"latency":18389,"batch_size":162},{"latency":17800,"batch_size":162},{"latency":19785,"batch_size":164},{"latency":17897,"batch_size":164},{"latency":19544,"batch_size":166},{"latency":19293,"batch_size":166},{"latency":18755,"batch_size":166},{"latency":19668,"batch_size":166},{"latency":19081,"batch_size":166},{"latency":19761,"batch_size":166},{"latency":18717,"batch_size":166},{"latency":19845,"batch_size":166},{"latency":19193,"batch_size":166},{"latency":21909,"batch_size":166},{"latency":16801,"batch_size":149},{"latency":17568,"batch_size":151},{"latency":17832,"batch_size":153},{"latency":17345,"batch_size":155},{"latency":18995,"batch_size":157},{"latency":17662,"batch_size":157},{"latency":18727,"batch_size":159},{"latency":18159,"batch_size":159},{"latency":18836,"batch_size":159},{"latency":17775,"batch_size":159},{"latency":18929,"batch_size":161},{"latency":17718,"batch_size":161},{"latency":20045,"batch_size":163},{"latency":16402,"batch_size":146},{"latency":17286,"batch_size":148},{"latency":17335,"batch_size":150},{"latency":17372,"batch_size":152},{"latency":18916,"batch_size":154},{"latency":18348,"batch_size":154},{"latency":17508,"batch_size":154},{"latency":17732,"batch_size":156},{"latency":17774,"batch_size":158},{"latency":22214,"batch_size":160},{"latency":17020,"batch_size":144},{"latency":17052,"batch_size":146},{"latency":17079,"batch_size":148},{"latency":17505,"batch_size":150},{"latency":18884,"batch_size":152},{"latency":17531,"batch_size":152},{"latency":18137,"batch_size":154},{"latency":18182,"batch_size":154},{"latency":18310,"batch_size":154},{"latency":19795,"batch_size":154},{"latency":17480,"batch_size":154},{"latency":17984,"batch_size":156},{"latency":17841,"batch_size":158},{"latency":19930,"batch_size":160},{"latency":18614,"batch_size":160},{"latency":19257,"batch_size":160},{"latency":18483,"batch_size":160},{"latency":17981,"batch_size":160},{"latency":18707,"batch_size":162},{"latency":17920,"batch_size":162},{"latency":19703,"batch_size":164},{"latency":19610,"batch_size":164},{"latency":18678,"batch_size":164},{"latency":18536,"batch_size":164},{"latency":18532,"batch_size":164},{"latency":18307,"batch_size":164},{"latency":18012,"batch_size":164},{"latency":18418,"batch_size":164},{"latency":18005,"batch_size":164},{"latency":18042,"batch_size":164},{"latency":17838,"batch_size":164},{"latency":18953,"batch_size":166},{"latency":18737,"batch_size":166},{"latency":23981,"batch_size":166},{"latency":16832,"batch_size":149},{"latency":17544,"batch_size":151},{"latency":18079,"batch_size":153},{"latency":17391,"batch_size":153},{"latency":18683,"batch_size":155},{"latency":17079,"batch_size":155},{"latency":17869,"batch_size":157},{"latency":18508,"batch_size":159},{"latency":18340,"batch_size":159},{"latency":18879,"batch_size":159},{"latency":18244,"batch_size":159},{"latency":19044,"batch_size":159},{"latency":18253,"batch_size":159},{"latency":19704,"batch_size":159},{"latency":17915,"batch_size":159},{"latency":19223,"batch_size":161},{"latency":17685,"batch_size":161},{"latency":20060,"batch_size":163},{"latency":16710,"batch_size":146},{"latency":17350,"batch_size":148},{"latency":17636,"batch_size":150},{"latency":17304,"batch_size":152},{"latency":18534,"batch_size":154},{"latency":19370,"batch_size":154},{"latency":17687,"batch_size":154},{"latency":17571,"batch_size":156},{"latency":17768,"batch_size":158},{"latency":19307,"batch_size":160},{"latency":17626,"batch_size":160},{"latency":18804,"batch_size":162},{"latency":18332,"batch_size":162},{"latency":19492,"batch_size":162},{"latency":18336,"batch_size":162},{"latency":19375,"batch_size":162},{"latency":18475,"batch_size":162},{"latency":19439,"batch_size":162},{"latency":18349,"batch_size":162},{"latency":21252,"batch_size":162},{"latency":15993,"batch_size":145},{"latency":17793,"batch_size":147},{"latency":16247,"batch_size":149},{"latency":18545,"batch_size":151},{"latency":16937,"batch_size":151},{"latency":17337,"batch_size":153},{"latency":18404,"batch_size":155},{"latency":17794,"batch_size":155},{"latency":19431,"batch_size":157},{"latency":18001,"batch_size":157},{"latency":18715,"batch_size":157},{"latency":18029,"batch_size":157},{"latency":17714,"batch_size":157},{"latency":18013,"batch_size":159},{"latency":21177,"batch_size":159},{"latency":16459,"batch_size":143},{"latency":18041,"batch_size":145},{"latency":16552,"batch_size":145},{"latency":16960,"batch_size":147},{"latency":17364,"batch_size":149},{"latency":17610,"batch_size":151},{"latency":18249,"batch_size":153},{"latency":17321,"batch_size":153},{"latency":19477,"batch_size":155},{"latency":17377,"batch_size":155},{"latency":18862,"batch_size":157},{"latency":17647,"batch_size":157},{"latency":19636,"batch_size":159},{"latency":18228,"batch_size":159},{"latency":18605,"batch_size":159},{"latency":19043,"batch_size":159},{"latency":17791,"batch_size":159},{"latency":17964,"batch_size":161},{"latency":17860,"batch_size":163},{"latency":19663,"batch_size":165},{"latency":18809,"batch_size":165},{"latency":22802,"batch_size":165},{"latency":16611,"batch_size":148},{"latency":16923,"batch_size":150},{"latency":17272,"batch_size":152},{"latency":17091,"batch_size":154},{"latency":18236,"batch_size":156},{"latency":17231,"batch_size":156},{"latency":18361,"batch_size":158},{"latency":17530,"batch_size":158},{"latency":19167,"batch_size":160},{"latency":18622,"batch_size":160},{"latency":19322,"batch_size":160},{"latency":18555,"batch_size":160},{"latency":18109,"batch_size":160},{"latency":18359,"batch_size":160},{"latency":18008,"batch_size":160},{"latency":21286,"batch_size":160},{"latency":16373,"batch_size":144},{"latency":17884,"batch_size":146},{"latency":17507,"batch_size":148},{"latency":18400,"batch_size":150},{"latency":16746,"batch_size":150},{"latency":17515,"batch_size":152},{"latency":18301,"batch_size":154},{"latency":17651,"batch_size":154},{"latency":23608,"batch_size":156},{"latency":15631,"batch_size":140},{"latency":16423,"batch_size":142},{"latency":16898,"batch_size":144},{"latency":16476,"batch_size":146},{"latency":17946,"batch_size":148},{"latency":16991,"batch_size":150},{"latency":18632,"batch_size":152},{"latency":17452,"batch_size":152},{"latency":18324,"batch_size":154},{"latency":18155,"batch_size":154},{"latency":18335,"batch_size":154},{"latency":17625,"batch_size":154},{"latency":17829,"batch_size":156},{"latency":17611,"batch_size":158},{"latency":19684,"batch_size":160},{"latency":18330,"batch_size":160},{"latency":19154,"batch_size":160},{"latency":18342,"batch_size":160},{"latency":17691,"batch_size":160},{"latency":18581,"batch_size":162},{"latency":17899,"batch_size":162},{"latency":19420,"batch_size":164},{"latency":18291,"batch_size":164},{"latency":19709,"batch_size":164},{"latency":18589,"batch_size":164},{"latency":18083,"batch_size":164},{"latency":18112,"batch_size":164},{"latency":17982,"batch_size":164},{"latency":19621,"batch_size":166},{"latency":18860,"batch_size":166},{"latency":19274,"batch_size":166},{"latency":19198,"batch_size":166},{"latency":18664,"batch_size":166},{"latency":18696,"batch_size":166},{"latency":18710,"batch_size":166},{"latency":18602,"batch_size":166},{"latency":18657,"batch_size":166},{"latency":18734,"batch_size":166},{"latency":18610,"batch_size":166},{"latency":18503,"batch_size":166},{"latency":18740,"batch_size":166},{"latency":18652,"batch_size":166},{"latency":18594,"batch_size":166},{"latency":17960,"batch_size":166},{"latency":21695,"batch_size":168},{"latency":16976,"batch_size":151},{"latency":16812,"batch_size":153},{"latency":17137,"batch_size":155},{"latency":17560,"batch_size":157},{"latency":18602,"batch_size":159},{"latency":17389,"batch_size":159},{"latency":18109,"batch_size":161},{"latency":17380,"batch_size":161},{"latency":23601,"batch_size":163},{"latency":16139,"batch_size":146},{"latency":16818,"batch_size":148},{"latency":17093,"batch_size":150},{"latency":16588,"batch_size":152},{"latency":18235,"batch_size":154},{"latency":17238,"batch_size":154},{"latency":17563,"batch_size":156},{"latency":17111,"batch_size":158},{"latency":18505,"batch_size":160},{"latency":21798,"batch_size":160},{"latency":15855,"batch_size":144},{"latency":19395,"batch_size":146},{"latency":16144,"batch_size":146},{"latency":18241,"batch_size":148},{"latency":16603,"batch_size":148},{"latency":17233,"batch_size":150},{"latency":17085,"batch_size":152},{"latency":18161,"batch_size":154},{"latency":17063,"batch_size":154},{"latency":17926,"batch_size":156},{"latency":17414,"batch_size":158},{"latency":18993,"batch_size":160},{"latency":17494,"batch_size":160},{"latency":19211,"batch_size":162},{"latency":18098,"batch_size":162},{"latency":19396,"batch_size":162},{"latency":20540,"batch_size":162},{"latency":16202,"batch_size":145},{"latency":15978,"batch_size":147},{"latency":16688,"batch_size":149},{"latency":16884,"batch_size":151},{"latency":17693,"batch_size":153},{"latency":17008,"batch_size":155},{"latency":17265,"batch_size":157},{"latency":18184,"batch_size":159},{"latency":17299,"batch_size":159},{"latency":18795,"batch_size":161},{"latency":17389,"batch_size":161},{"latency":19513,"batch_size":163},{"latency":18328,"batch_size":163},{"latency":18515,"batch_size":163},{"latency":18107,"batch_size":163},{"latency":17725,"batch_size":163},{"latency":18371,"batch_size":165},{"latency":17790,"batch_size":165},{"latency":19254,"batch_size":167},{"latency":18168,"batch_size":167},{"latency":18571,"batch_size":167},{"latency":18182,"batch_size":167},{"latency":17815,"batch_size":167},{"latency":19485,"batch_size":169},{"latency":19819,"batch_size":169},{"latency":19888,"batch_size":169},{"latency":19392,"batch_size":169},{"latency":19186,"batch_size":169},{"latency":19539,"batch_size":169},{"latency":18886,"batch_size":169},{"latency":19459,"batch_size":169},{"latency":19280,"batch_size":169},{"latency":19401,"batch_size":169},{"latency":18839,"batch_size":169},{"latency":19599,"batch_size":169},{"latency":18985,"batch_size":169},{"latency":19148,"batch_size":169},{"latency":19378,"batch_size":169},{"latency":19896,"batch_size":169},{"latency":19441,"batch_size":169},{"latency":19399,"batch_size":169},{"latency":19602,"batch_size":169},{"latency":19330,"batch_size":169},{"latency":19201,"batch_size":169},{"latency":19490,"batch_size":169},{"latency":19394,"batch_size":169},{"latency":19676,"batch_size":169},{"latency":19467,"batch_size":169},{"latency":19877,"batch_size":169},{"latency":20312,"batch_size":169},{"latency":16994,"batch_size":152},{"latency":17433,"batch_size":154},{"latency":17310,"batch_size":156},{"latency":17111,"batch_size":158},{"latency":17805,"batch_size":160},{"latency":18888,"batch_size":162},{"latency":17659,"batch_size":162},{"latency":19482,"batch_size":164},{"latency":19366,"batch_size":164},{"latency":18221,"batch_size":164},{"latency":17569,"batch_size":164},{"latency":18688,"batch_size":166},{"latency":18274,"batch_size":166},{"latency":18034,"batch_size":166},{"latency":17440,"batch_size":166},{"latency":18882,"batch_size":168},{"latency":18966,"batch_size":168},{"latency":19420,"batch_size":168},{"latency":18774,"batch_size":168},{"latency":19202,"batch_size":168},{"latency":19098,"batch_size":168},{"latency":18801,"batch_size":168},{"latency":20943,"batch_size":168},{"latency":17198,"batch_size":151},{"latency":17672,"batch_size":153},{"latency":16605,"batch_size":155},{"latency":18100,"batch_size":157},{"latency":17021,"batch_size":157},{"latency":17993,"batch_size":159},{"latency":17345,"batch_size":161},{"latency":19439,"batch_size":163},{"latency":18020,"batch_size":163},{"latency":18451,"batch_size":163},{"latency":17331,"batch_size":163},{"latency":19372,"batch_size":165},{"latency":17741,"batch_size":165},{"latency":19262,"batch_size":167},{"latency":20193,"batch_size":167},{"latency":16476,"batch_size":150},{"latency":17930,"batch_size":152},{"latency":17076,"batch_size":154},{"latency":17806,"batch_size":156},{"latency":16943,"batch_size":158},{"latency":17534,"batch_size":160},{"latency":18324,"batch_size":162},{"latency":17395,"batch_size":162},{"latency":18341,"batch_size":164},{"latency":17131,"batch_size":164},{"latency":18968,"batch_size":166},{"latency":17911,"batch_size":166},{"latency":19820,"batch_size":168},{"latency":19287,"batch_size":168},{"latency":19417,"batch_size":168},{"latency":18736,"batch_size":168},{"latency":18060,"batch_size":168},{"latency":18144,"batch_size":168},{"latency":17948,"batch_size":168},{"latency":18851,"batch_size":170},{"latency":18987,"batch_size":170},{"latency":19357,"batch_size":170},{"latency":19012,"batch_size":170},{"latency":18418,"batch_size":170},{"latency":20961,"batch_size":170},{"latency":16196,"batch_size":153},{"latency":17357,"batch_size":155},{"latency":16954,"batch_size":157},{"latency":16637,"batch_size":159},{"latency":18102,"batch_size":161},{"latency":16600,"batch_size":161},{"latency":18655,"batch_size":163},{"latency":17478,"batch_size":163},{"latency":18442,"batch_size":165},{"latency":17566,"batch_size":165},{"latency":19671,"batch_size":167},{"latency":17504,"batch_size":167}],"alpha":93.73780402156719,"beta":7335.262195497905,"batch_size":135,"name":"rf_d8"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.2:7777)
+INFO:clipper::batching: rf_d16 BATCHER: Updated batching model: max_batch_size: 130, alpha = 87.12295082476713, beta = 8645.540982267823
+INFO:clipper::batching: rf_d16 BATCHER: Predicted max thruput: 6509.26770349963, baseline: 114.51259405626291, increase: 56.843247305195646
+INFO:clipper::batching: GREPTHISrf_d16: XXXXXX {"measurements":[{"latency":8609,"batch_size":3},{"latency":8592,"batch_size":5},{"latency":8421,"batch_size":7},{"latency":8409,"batch_size":9},{"latency":8440,"batch_size":11},{"latency":8494,"batch_size":13},{"latency":8644,"batch_size":15},{"latency":8735,"batch_size":17},{"latency":9309,"batch_size":19},{"latency":9547,"batch_size":21},{"latency":9984,"batch_size":23},{"latency":10285,"batch_size":25},{"latency":10136,"batch_size":27},{"latency":9802,"batch_size":29},{"latency":9996,"batch_size":31},{"latency":9951,"batch_size":33},{"latency":9747,"batch_size":35},{"latency":9879,"batch_size":37},{"latency":9614,"batch_size":37},{"latency":8335,"batch_size":2},{"latency":7941,"batch_size":4},{"latency":7697,"batch_size":6},{"latency":7711,"batch_size":8},{"latency":7746,"batch_size":10},{"latency":7994,"batch_size":12},{"latency":7944,"batch_size":14},{"latency":7805,"batch_size":16},{"latency":7836,"batch_size":18},{"latency":10388,"batch_size":20},{"latency":9742,"batch_size":22},{"latency":8283,"batch_size":24},{"latency":8129,"batch_size":26},{"latency":8028,"batch_size":28},{"latency":7884,"batch_size":30},{"latency":7772,"batch_size":32},{"latency":7968,"batch_size":34},{"latency":7942,"batch_size":36},{"latency":8200,"batch_size":38},{"latency":8326,"batch_size":40},{"latency":8786,"batch_size":42},{"latency":8516,"batch_size":44},{"latency":9203,"batch_size":46},{"latency":8809,"batch_size":48},{"latency":9005,"batch_size":50},{"latency":9264,"batch_size":52},{"latency":9454,"batch_size":54},{"latency":9434,"batch_size":56},{"latency":9797,"batch_size":58},{"latency":9754,"batch_size":60},{"latency":9991,"batch_size":62},{"latency":10456,"batch_size":64},{"latency":10392,"batch_size":66},{"latency":10280,"batch_size":68},{"latency":10790,"batch_size":70},{"latency":10789,"batch_size":72},{"latency":11440,"batch_size":74},{"latency":13107,"batch_size":76},{"latency":11608,"batch_size":78},{"latency":11457,"batch_size":80},{"latency":12337,"batch_size":82},{"latency":12599,"batch_size":84},{"latency":13454,"batch_size":86},{"latency":12746,"batch_size":88},{"latency":13254,"batch_size":90},{"latency":13029,"batch_size":92},{"latency":14101,"batch_size":94},{"latency":13262,"batch_size":96},{"latency":14162,"batch_size":98},{"latency":13649,"batch_size":100},{"latency":14822,"batch_size":102},{"latency":14016,"batch_size":104},{"latency":15259,"batch_size":106},{"latency":14390,"batch_size":108},{"latency":15409,"batch_size":110},{"latency":15124,"batch_size":112},{"latency":15674,"batch_size":114},{"latency":15347,"batch_size":116},{"latency":16441,"batch_size":118},{"latency":15530,"batch_size":120},{"latency":16559,"batch_size":122},{"latency":16448,"batch_size":124},{"latency":17115,"batch_size":126},{"latency":16719,"batch_size":128},{"latency":19054,"batch_size":130},{"latency":17522,"batch_size":130},{"latency":17052,"batch_size":132},{"latency":17889,"batch_size":134},{"latency":17644,"batch_size":136},{"latency":18253,"batch_size":138},{"latency":17758,"batch_size":138},{"latency":18681,"batch_size":140},{"latency":17981,"batch_size":140},{"latency":19340,"batch_size":142},{"latency":18857,"batch_size":142},{"latency":18785,"batch_size":142},{"latency":18268,"batch_size":142},{"latency":18496,"batch_size":142},{"latency":19081,"batch_size":142},{"latency":18607,"batch_size":142},{"latency":20668,"batch_size":142},{"latency":16724,"batch_size":127},{"latency":17502,"batch_size":129},{"latency":17343,"batch_size":131},{"latency":18125,"batch_size":133},{"latency":17375,"batch_size":133},{"latency":18493,"batch_size":135},{"latency":17471,"batch_size":135},{"latency":18614,"batch_size":137},{"latency":17363,"batch_size":137},{"latency":18761,"batch_size":139},{"latency":18731,"batch_size":139},{"latency":18153,"batch_size":139},{"latency":17939,"batch_size":139},{"latency":19293,"batch_size":141},{"latency":18300,"batch_size":141},{"latency":18390,"batch_size":141},{"latency":19753,"batch_size":141},{"latency":18647,"batch_size":141},{"latency":18033,"batch_size":141},{"latency":18588,"batch_size":141},{"latency":18021,"batch_size":141},{"latency":18078,"batch_size":141},{"latency":17833,"batch_size":141},{"latency":18954,"batch_size":143},{"latency":18959,"batch_size":143},{"latency":18438,"batch_size":143},{"latency":18743,"batch_size":143},{"latency":18195,"batch_size":143},{"latency":18568,"batch_size":143},{"latency":18323,"batch_size":143},{"latency":18776,"batch_size":143},{"latency":18449,"batch_size":143},{"latency":18305,"batch_size":143},{"latency":18684,"batch_size":143},{"latency":18561,"batch_size":143},{"latency":18122,"batch_size":143},{"latency":18380,"batch_size":143},{"latency":18238,"batch_size":143},{"latency":20695,"batch_size":143},{"latency":16501,"batch_size":128},{"latency":18081,"batch_size":130},{"latency":17597,"batch_size":130},{"latency":18406,"batch_size":132},{"latency":17822,"batch_size":132},{"latency":18249,"batch_size":134},{"latency":17190,"batch_size":134},{"latency":18836,"batch_size":136},{"latency":18106,"batch_size":136},{"latency":18293,"batch_size":136},{"latency":21511,"batch_size":136},{"latency":17255,"batch_size":122},{"latency":16537,"batch_size":124},{"latency":17396,"batch_size":126},{"latency":17451,"batch_size":128},{"latency":18069,"batch_size":130},{"latency":17123,"batch_size":130},{"latency":18089,"batch_size":132},{"latency":17136,"batch_size":132},{"latency":18199,"batch_size":134},{"latency":17170,"batch_size":134},{"latency":18961,"batch_size":136},{"latency":17994,"batch_size":136},{"latency":18591,"batch_size":138},{"latency":17875,"batch_size":138},{"latency":19612,"batch_size":140},{"latency":18023,"batch_size":140},{"latency":18162,"batch_size":140},{"latency":17847,"batch_size":140},{"latency":19291,"batch_size":142},{"latency":18382,"batch_size":142},{"latency":18460,"batch_size":142},{"latency":18313,"batch_size":142},{"latency":18397,"batch_size":142},{"latency":18314,"batch_size":142},{"latency":18429,"batch_size":142},{"latency":18622,"batch_size":142},{"latency":19060,"batch_size":142},{"latency":19738,"batch_size":142},{"latency":19068,"batch_size":142},{"latency":18500,"batch_size":142},{"latency":18688,"batch_size":142},{"latency":18638,"batch_size":142},{"latency":19079,"batch_size":142},{"latency":18486,"batch_size":142},{"latency":18363,"batch_size":142},{"latency":18367,"batch_size":142},{"latency":18768,"batch_size":142},{"latency":18147,"batch_size":142},{"latency":18660,"batch_size":142},{"latency":17970,"batch_size":142},{"latency":22160,"batch_size":144},{"latency":16739,"batch_size":129},{"latency":17856,"batch_size":131},{"latency":17802,"batch_size":133},{"latency":18177,"batch_size":135},{"latency":17305,"batch_size":135},{"latency":18782,"batch_size":137},{"latency":17509,"batch_size":137},{"latency":18466,"batch_size":139},{"latency":18213,"batch_size":139},{"latency":18070,"batch_size":139},{"latency":17823,"batch_size":139},{"latency":18735,"batch_size":141},{"latency":17576,"batch_size":141},{"latency":18839,"batch_size":143},{"latency":17871,"batch_size":143},{"latency":19839,"batch_size":145},{"latency":20618,"batch_size":145},{"latency":17479,"batch_size":130},{"latency":18056,"batch_size":132},{"latency":17246,"batch_size":132},{"latency":18020,"batch_size":134},{"latency":16899,"batch_size":134},{"latency":18332,"batch_size":136},{"latency":17317,"batch_size":136},{"latency":18292,"batch_size":138},{"latency":20477,"batch_size":138},{"latency":17187,"batch_size":124},{"latency":16514,"batch_size":126},{"latency":17634,"batch_size":128},{"latency":17161,"batch_size":130},{"latency":17982,"batch_size":132},{"latency":17147,"batch_size":134},{"latency":18482,"batch_size":136},{"latency":17805,"batch_size":136},{"latency":18381,"batch_size":138},{"latency":20271,"batch_size":138},{"latency":16530,"batch_size":124},{"latency":16401,"batch_size":126},{"latency":17863,"batch_size":128},{"latency":17546,"batch_size":130},{"latency":17906,"batch_size":132},{"latency":17320,"batch_size":134},{"latency":18574,"batch_size":136},{"latency":17888,"batch_size":136},{"latency":18679,"batch_size":138},{"latency":18719,"batch_size":138},{"latency":18407,"batch_size":138},{"latency":18010,"batch_size":138},{"latency":18315,"batch_size":138},{"latency":17673,"batch_size":138},{"latency":18640,"batch_size":140},{"latency":17530,"batch_size":140},{"latency":18841,"batch_size":142},{"latency":17992,"batch_size":142},{"latency":18969,"batch_size":144},{"latency":18003,"batch_size":144},{"latency":18452,"batch_size":144},{"latency":18507,"batch_size":144},{"latency":18315,"batch_size":144},{"latency":18236,"batch_size":144},{"latency":18437,"batch_size":144},{"latency":19134,"batch_size":144},{"latency":17700,"batch_size":144},{"latency":19185,"batch_size":146},{"latency":18404,"batch_size":146},{"latency":18909,"batch_size":146},{"latency":18597,"batch_size":146},{"latency":18835,"batch_size":146},{"latency":18019,"batch_size":146},{"latency":18358,"batch_size":146},{"latency":18443,"batch_size":146},{"latency":18972,"batch_size":146},{"latency":18280,"batch_size":146},{"latency":18769,"batch_size":146},{"latency":18236,"batch_size":146},{"latency":18184,"batch_size":146},{"latency":18416,"batch_size":146},{"latency":18465,"batch_size":146},{"latency":18026,"batch_size":146},{"latency":18944,"batch_size":146},{"latency":18646,"batch_size":146},{"latency":18954,"batch_size":146},{"latency":18672,"batch_size":146},{"latency":18944,"batch_size":146},{"latency":18183,"batch_size":146},{"latency":18418,"batch_size":146},{"latency":18267,"batch_size":146},{"latency":18224,"batch_size":146},{"latency":18267,"batch_size":146},{"latency":18628,"batch_size":146},{"latency":18095,"batch_size":146},{"latency":18640,"batch_size":146},{"latency":18539,"batch_size":146},{"latency":18929,"batch_size":146},{"latency":19136,"batch_size":146},{"latency":19556,"batch_size":146},{"latency":18654,"batch_size":146},{"latency":18858,"batch_size":146},{"latency":18486,"batch_size":146},{"latency":18616,"batch_size":146},{"latency":18441,"batch_size":146},{"latency":21755,"batch_size":146},{"latency":16962,"batch_size":131},{"latency":18457,"batch_size":133},{"latency":17739,"batch_size":133},{"latency":17929,"batch_size":135},{"latency":17161,"batch_size":137},{"latency":19021,"batch_size":139},{"latency":17940,"batch_size":139},{"latency":18654,"batch_size":141},{"latency":18213,"batch_size":141},{"latency":18198,"batch_size":141},{"latency":17843,"batch_size":141},{"latency":19141,"batch_size":143},{"latency":18053,"batch_size":143},{"latency":18292,"batch_size":143},{"latency":18648,"batch_size":143},{"latency":19394,"batch_size":143},{"latency":17911,"batch_size":143},{"latency":19555,"batch_size":145},{"latency":18746,"batch_size":145},{"latency":18874,"batch_size":145},{"latency":18473,"batch_size":145},{"latency":18912,"batch_size":145},{"latency":18658,"batch_size":145},{"latency":21021,"batch_size":145},{"latency":17306,"batch_size":130},{"latency":18016,"batch_size":132},{"latency":17023,"batch_size":132},{"latency":18046,"batch_size":134},{"latency":17352,"batch_size":134},{"latency":18618,"batch_size":136},{"latency":17546,"batch_size":136},{"latency":18290,"batch_size":138},{"latency":18130,"batch_size":138},{"latency":18311,"batch_size":138},{"latency":17658,"batch_size":138},{"latency":18946,"batch_size":140},{"latency":18012,"batch_size":140},{"latency":18028,"batch_size":140},{"latency":20548,"batch_size":140},{"latency":16863,"batch_size":126},{"latency":17618,"batch_size":128},{"latency":17960,"batch_size":130},{"latency":17253,"batch_size":132},{"latency":18312,"batch_size":134},{"latency":17510,"batch_size":134},{"latency":19055,"batch_size":136},{"latency":18168,"batch_size":136},{"latency":17573,"batch_size":136},{"latency":18035,"batch_size":138},{"latency":17800,"batch_size":138},{"latency":18476,"batch_size":140},{"latency":17593,"batch_size":140},{"latency":19175,"batch_size":142},{"latency":18324,"batch_size":142},{"latency":18438,"batch_size":142},{"latency":18410,"batch_size":142},{"latency":20966,"batch_size":142},{"latency":18331,"batch_size":127},{"latency":17014,"batch_size":127},{"latency":16877,"batch_size":129},{"latency":16874,"batch_size":131},{"latency":17832,"batch_size":133},{"latency":17131,"batch_size":135},{"latency":18361,"batch_size":137},{"latency":17350,"batch_size":137},{"latency":18720,"batch_size":139},{"latency":18487,"batch_size":139},{"latency":18534,"batch_size":139},{"latency":17728,"batch_size":139},{"latency":19052,"batch_size":141},{"latency":18034,"batch_size":141},{"latency":18300,"batch_size":141},{"latency":17880,"batch_size":141},{"latency":19170,"batch_size":143},{"latency":18267,"batch_size":143},{"latency":18285,"batch_size":143},{"latency":18179,"batch_size":143},{"latency":18303,"batch_size":143},{"latency":18352,"batch_size":143},{"latency":18425,"batch_size":143},{"latency":18260,"batch_size":143},{"latency":19846,"batch_size":143},{"latency":17931,"batch_size":143},{"latency":19524,"batch_size":145},{"latency":18480,"batch_size":145},{"latency":18762,"batch_size":145},{"latency":18497,"batch_size":145},{"latency":18835,"batch_size":145},{"latency":18728,"batch_size":145},{"latency":18772,"batch_size":145},{"latency":18794,"batch_size":145},{"latency":18645,"batch_size":145},{"latency":18882,"batch_size":145},{"latency":20480,"batch_size":145},{"latency":17116,"batch_size":130},{"latency":17836,"batch_size":132},{"latency":17266,"batch_size":134},{"latency":18819,"batch_size":136},{"latency":17882,"batch_size":136},{"latency":18519,"batch_size":138},{"latency":17513,"batch_size":138},{"latency":18756,"batch_size":140},{"latency":17583,"batch_size":140},{"latency":19073,"batch_size":142},{"latency":18467,"batch_size":142},{"latency":18827,"batch_size":142},{"latency":18804,"batch_size":142},{"latency":19046,"batch_size":142},{"latency":18312,"batch_size":142},{"latency":19092,"batch_size":142},{"latency":18783,"batch_size":142},{"latency":18634,"batch_size":142},{"latency":18438,"batch_size":142},{"latency":18675,"batch_size":142},{"latency":21017,"batch_size":142},{"latency":17353,"batch_size":127},{"latency":16812,"batch_size":129},{"latency":18144,"batch_size":131},{"latency":16864,"batch_size":131},{"latency":18038,"batch_size":133},{"latency":17280,"batch_size":133},{"latency":18316,"batch_size":135},{"latency":17519,"batch_size":135},{"latency":24484,"batch_size":137},{"latency":16555,"batch_size":123},{"latency":17203,"batch_size":125},{"latency":17060,"batch_size":127},{"latency":17814,"batch_size":129},{"latency":16921,"batch_size":131},{"latency":18140,"batch_size":133},{"latency":17365,"batch_size":133},{"latency":19087,"batch_size":135},{"latency":17668,"batch_size":135},{"latency":18406,"batch_size":137},{"latency":17506,"batch_size":137},{"latency":19018,"batch_size":139},{"latency":18228,"batch_size":139},{"latency":18139,"batch_size":139},{"latency":17887,"batch_size":139},{"latency":18741,"batch_size":141},{"latency":17593,"batch_size":141},{"latency":17930,"batch_size":143},{"latency":17218,"batch_size":145},{"latency":19407,"batch_size":147},{"latency":18254,"batch_size":147},{"latency":18361,"batch_size":147},{"latency":18190,"batch_size":147},{"latency":18741,"batch_size":147},{"latency":18423,"batch_size":147},{"latency":18886,"batch_size":147},{"latency":19793,"batch_size":147},{"latency":18331,"batch_size":147},{"latency":18367,"batch_size":147},{"latency":18851,"batch_size":147},{"latency":18714,"batch_size":147},{"latency":18796,"batch_size":147},{"latency":18651,"batch_size":147},{"latency":18820,"batch_size":147},{"latency":18559,"batch_size":147},{"latency":18788,"batch_size":147},{"latency":17936,"batch_size":147},{"latency":20157,"batch_size":149},{"latency":17330,"batch_size":134},{"latency":18707,"batch_size":136},{"latency":17468,"batch_size":136},{"latency":17952,"batch_size":138},{"latency":15810,"batch_size":140},{"latency":17012,"batch_size":142},{"latency":15700,"batch_size":144},{"latency":16431,"batch_size":146},{"latency":15567,"batch_size":148},{"latency":16673,"batch_size":150},{"latency":16081,"batch_size":152},{"latency":16873,"batch_size":154},{"latency":16123,"batch_size":156},{"latency":17114,"batch_size":158},{"latency":16713,"batch_size":160},{"latency":17802,"batch_size":162},{"latency":16569,"batch_size":164},{"latency":16613,"batch_size":166},{"latency":18680,"batch_size":168},{"latency":17731,"batch_size":168},{"latency":19115,"batch_size":170},{"latency":18044,"batch_size":170},{"latency":21499,"batch_size":170},{"latency":15957,"batch_size":153},{"latency":17080,"batch_size":155},{"latency":16599,"batch_size":157},{"latency":17248,"batch_size":159},{"latency":17146,"batch_size":161},{"latency":17860,"batch_size":163},{"latency":17674,"batch_size":165},{"latency":17970,"batch_size":167},{"latency":18120,"batch_size":169},{"latency":17731,"batch_size":169},{"latency":17693,"batch_size":171},{"latency":17532,"batch_size":173},{"latency":19255,"batch_size":175},{"latency":17819,"batch_size":175},{"latency":18602,"batch_size":177},{"latency":17704,"batch_size":177},{"latency":19775,"batch_size":179},{"latency":18442,"batch_size":179},{"latency":17890,"batch_size":179},{"latency":17630,"batch_size":181},{"latency":17530,"batch_size":183}],"alpha":87.12295082476713,"beta":8645.540982267823,"batch_size":130,"name":"rf_d16"}
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 141683
+    },
+    {
+      "name": "queued_predictions",
+      "count": 317
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 85542
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 100435
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 70881
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 92556
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 77772
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 141636
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5001376331335888
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 32109,
+      "mean": 23837.206225680933,
+      "std": 2221.7674826699437,
+      "p95": 27460.199999999997,
+      "p99": 29052.309999999998,
+      "p50": 23772.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 1675,
+      "max": 25994,
+      "mean": 17286.79584143969,
+      "std": 2481.5141261515734,
+      "p95": 19864.25,
+      "p99": 21455.0,
+      "p50": 17972.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 156.0985401459854,
+      "std": 36.59089203543716,
+      "p95": 187.0,
+      "p99": 187.0,
+      "p50": 168.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 2062,
+      "max": 22812,
+      "mean": 16419.177285992217,
+      "std": 2836.925581744446,
+      "p95": 19727.0,
+      "p99": 21702.0,
+      "p50": 17082.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 177.13403880070548,
+      "std": 44.81425767435059,
+      "p95": 219.60000000000003,
+      "p99": 229.0,
+      "p50": 191.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7697,
+      "max": 24484,
+      "mean": 17502.02310311284,
+      "std": 2056.1737061975925,
+      "p95": 19524.0,
+      "p99": 21499.0,
+      "p50": 18120.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 131.25878003696858,
+      "std": 28.951548631093386,
+      "p95": 158.89999999999999,
+      "p99": 178.16000000000009,
+      "p50": 138.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 14686.971546692606,
+      "std": 3225.244977923437,
+      "p95": 20059.0,
+      "p99": 21925.0,
+      "p50": 13909.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 145.29984301412874,
+      "std": 30.374955806171788,
+      "p95": 164.0,
+      "p99": 167.0,
+      "p50": 152.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7229,
+      "max": 23981,
+      "mean": 17573.242217898834,
+      "std": 2179.4914335910345,
+      "p95": 19888.0,
+      "p99": 22802.0,
+      "p50": 17926.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 144.0222222222222,
+      "std": 33.79101255327197,
+      "p95": 169.0,
+      "p99": 170.0,
+      "p50": 156.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14185.409273331808,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 8563.34923702456,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 10036.994020475928,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7096.500048668453,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 9249.604406423756,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 7772.161307824137,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 284500
+    },
+    {
+      "name": "queued_predictions",
+      "count": 500
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 181680
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 216500
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 153821
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 199425
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 163632
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 284455
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5000878734622144
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 32082,
+      "mean": 23895.647130350193,
+      "std": 2221.3524408021969,
+      "p95": 27527.7,
+      "p99": 28728.48,
+      "p50": 23832.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 2206,
+      "max": 25994,
+      "mean": 15412.447227626459,
+      "std": 2502.4316959577706,
+      "p95": 19392.0,
+      "p99": 20352.0,
+      "p50": 13905.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 151.14808652246257,
+      "std": 25.1068928870239,
+      "p95": 184.8499999999999,
+      "p99": 187.0,
+      "p50": 147.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 2062,
+      "max": 22812,
+      "mean": 14394.26313229572,
+      "std": 2801.1898605114859,
+      "p95": 19008.0,
+      "p99": 20391.0,
+      "p50": 13754.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 171.55309033280509,
+      "std": 30.444446917212085,
+      "p95": 215.0,
+      "p99": 224.3699999999999,
+      "p50": 167.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7697,
+      "max": 24484,
+      "mean": 15796.991488326848,
+      "std": 2192.4764828247896,
+      "p95": 19021.0,
+      "p99": 20668.0,
+      "p50": 14699.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 130.5780984719864,
+      "std": 19.6201679338917,
+      "p95": 146.0,
+      "p99": 170.21000000000005,
+      "p50": 130.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 13316.28137159533,
+      "std": 2562.6539573711359,
+      "p95": 19614.0,
+      "p99": 20778.0,
+      "p50": 12254.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 146.2065934065934,
+      "std": 20.75869850287445,
+      "p95": 163.0,
+      "p99": 166.0,
+      "p50": 147.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7229,
+      "max": 23981,
+      "mean": 15865.7203307393,
+      "std": 2404.591565162877,
+      "p95": 19492.0,
+      "p99": 21798.0,
+      "p50": 15272.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 139.1393372982158,
+      "std": 23.31456634771968,
+      "p95": 166.0999999999999,
+      "p99": 169.0,
+      "p50": 135.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14217.623896722382,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 9079.289664522046,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 10819.386361386396,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7687.061568105389,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 9973.42528828917,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 8184.103677806771,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 427500
+    },
+    {
+      "name": "queued_predictions",
+      "count": 500
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 277524
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 332398
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 235981
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 306735
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 257052
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 427455
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5000584795321638
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 32082,
+      "mean": 23842.328550583657,
+      "std": 2186.1020272932985,
+      "p95": 27411.4,
+      "p99": 28666.639999999992,
+      "p50": 23751.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 2206,
+      "max": 25994,
+      "mean": 14817.242825875486,
+      "std": 2209.729763101512,
+      "p95": 19087.0,
+      "p99": 20107.0,
+      "p50": 13741.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 149.6893203883495,
+      "std": 20.30967815444181,
+      "p95": 181.0,
+      "p99": 187.0,
+      "p50": 147.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 2062,
+      "max": 22812,
+      "mean": 13746.720209143969,
+      "std": 2462.9249075502095,
+      "p95": 18661.0,
+      "p99": 20013.0,
+      "p50": 13093.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 169.93762781186096,
+      "std": 24.547655938359858,
+      "p95": 212.0,
+      "p99": 222.0,
+      "p50": 167.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7772,
+      "max": 24484,
+      "mean": 15276.52468385214,
+      "std": 1926.460161566556,
+      "p95": 18782.0,
+      "p99": 20477.0,
+      "p50": 14461.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 130.37624309392266,
+      "std": 15.828419041026536,
+      "p95": 146.0,
+      "p99": 167.88999999999988,
+      "p50": 130.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 12911.611259727626,
+      "std": 2195.6567749766397,
+      "p95": 19066.0,
+      "p99": 20493.0,
+      "p50": 12113.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 146.48305489260145,
+      "std": 16.758284219889825,
+      "p95": 163.0,
+      "p99": 165.0,
+      "p50": 147.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7566,
+      "max": 23981,
+      "mean": 14809.75839007782,
+      "std": 2380.9419063759798,
+      "p95": 19287.0,
+      "p99": 20943.0,
+      "p50": 14180.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 137.6081370449679,
+      "std": 18.611368865656379,
+      "p95": 165.54999999999996,
+      "p99": 169.0,
+      "p50": 135.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14243.299002595912,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 9246.449545488847,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 11080.286725095842,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7862.334105136866,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 10224.589330719897,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 8564.37046369683,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 570500
+    },
+    {
+      "name": "queued_predictions",
+      "count": 500
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 373368
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 447628
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 318141
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 414339
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 349662
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 570455
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5000438212094653
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 32082,
+      "mean": 23845.664640077823,
+      "std": 2201.6274852225458,
+      "p95": 27452.8,
+      "p99": 28625.749999999996,
+      "p50": 23732.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 4859,
+      "max": 25994,
+      "mean": 14554.349221789884,
+      "std": 2020.616071801769,
+      "p95": 18906.0,
+      "p99": 20064.0,
+      "p50": 13695.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 148.98962490023943,
+      "std": 17.50756586091352,
+      "p95": 179.0,
+      "p99": 187.0,
+      "p50": 147.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 2062,
+      "max": 22812,
+      "mean": 13447.86673151751,
+      "std": 2226.1694416241268,
+      "p95": 18335.0,
+      "p99": 19611.0,
+      "p50": 12419.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 169.17157974300833,
+      "std": 21.143671849525373,
+      "p95": 209.0,
+      "p99": 220.0,
+      "p50": 167.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7942,
+      "max": 24484,
+      "mean": 15057.549854085602,
+      "std": 1757.289049653634,
+      "p95": 18658.0,
+      "p99": 19839.0,
+      "p50": 14414.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 130.2788697788698,
+      "std": 13.62713948836037,
+      "p95": 144.0,
+      "p99": 161.57000000000017,
+      "p50": 130.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 12675.525899805447,
+      "std": 1949.261888278332,
+      "p95": 17778.0,
+      "p99": 20187.75,
+      "p50": 12075.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 146.6167728237792,
+      "std": 14.429860448219129,
+      "p95": 161.0,
+      "p99": 165.0,
+      "p50": 147.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7566,
+      "max": 23981,
+      "mean": 14340.631201361868,
+      "std": 2174.721511647107,
+      "p95": 18884.0,
+      "p99": 19930.0,
+      "p50": 13443.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 136.90759592795616,
+      "std": 15.95761857346585,
+      "p95": 164.0,
+      "p99": 169.0,
+      "p50": 135.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14256.039163051304,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 9329.971423701494,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 11185.630392665284,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7949.921697990387,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 10353.782148241311,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 8737.589687474152,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 713500
+    },
+    {
+      "name": "queued_predictions",
+      "count": 500
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 470094
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 564027
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 400431
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 533997
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 442407
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 713455
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5000350385423966
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 46767,
+      "mean": 23864.532344357976,
+      "std": 2263.374432753166,
+      "p95": 27426.35,
+      "p99": 28651.619999999995,
+      "p50": 23785.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 4859,
+      "max": 25994,
+      "mean": 14351.392144941634,
+      "std": 1844.4554280702949,
+      "p95": 18746.0,
+      "p99": 19892.0,
+      "p50": 13662.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 148.57585335018966,
+      "std": 15.601369087964982,
+      "p95": 174.0,
+      "p99": 187.0,
+      "p50": 147.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 3476,
+      "max": 22812,
+      "mean": 13266.136065175097,
+      "std": 2067.469376933633,
+      "p95": 18089.0,
+      "p99": 19555.0,
+      "p50": 12307.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 168.71881543523782,
+      "std": 18.830734316801779,
+      "p95": 205.0,
+      "p99": 218.0,
+      "p50": 167.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7942,
+      "max": 24484,
+      "mean": 14921.761186770427,
+      "std": 1630.0374696226857,
+      "p95": 18554.0,
+      "p99": 19598.0,
+      "p50": 14390.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 130.22146341463415,
+      "std": 12.1438218200746,
+      "p95": 143.0,
+      "p99": 155.23999999999979,
+      "p50": 130.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 12239.225680933852,
+      "std": 1926.7328481064236,
+      "p95": 15733.0,
+      "p99": 20003.0,
+      "p50": 11954.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 146.70247252747255,
+      "std": 12.714948021940064,
+      "p95": 160.0,
+      "p99": 164.0,
+      "p50": 147.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7566,
+      "max": 23981,
+      "mean": 14070.310432879378,
+      "std": 2008.839920792635,
+      "p95": 18652.0,
+      "p99": 19819.0,
+      "p50": 13339.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 136.50323974082074,
+      "std": 14.186589650814293,
+      "p95": 162.0,
+      "p99": 169.0,
+      "p50": 135.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14263.902517574965,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 9397.717750808168,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 11275.546060649738,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 8005.074552480706,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 10675.211948627953,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 8844.22289368039,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 857000
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 565938
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 680092
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 482201
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 653361
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 534612
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 856955
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5000291715285881
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 46767,
+      "mean": 23925.58414396887,
+      "std": 2272.1366757820185,
+      "p95": 27466.05,
+      "p99": 28752.789999999997,
+      "p50": 23852.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 5024,
+      "max": 26798,
+      "mean": 14246.148711089494,
+      "std": 1736.0577982087539,
+      "p95": 18609.0,
+      "p99": 19763.0,
+      "p50": 13652.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 148.3066037735849,
+      "std": 14.218158636605477,
+      "p95": 169.0,
+      "p99": 187.0,
+      "p50": 147.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 3476,
+      "max": 22812,
+      "mean": 13154.114664396888,
+      "std": 1952.5977978439135,
+      "p95": 17853.0,
+      "p99": 19459.5,
+      "p50": 12261.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 168.4229816740961,
+      "std": 17.14558700231296,
+      "p95": 202.0,
+      "p99": 218.0,
+      "p50": 167.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7942,
+      "max": 24484,
+      "mean": 14830.908195525291,
+      "std": 1516.729898748603,
+      "p95": 18438.0,
+      "p99": 19394.0,
+      "p50": 14370.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 130.1838056680162,
+      "std": 11.06328531446585,
+      "p95": 142.0,
+      "p99": 147.94000000000006,
+      "p50": 130.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 11965.866974708171,
+      "std": 1850.5215430600186,
+      "p95": 15241.5,
+      "p99": 19893.0,
+      "p50": 11803.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 146.75679317314173,
+      "std": 11.496079325088438,
+      "p95": 158.0,
+      "p99": 164.0,
+      "p50": 147.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7566,
+      "max": 23981,
+      "mean": 13909.859314202335,
+      "std": 1869.0804567073793,
+      "p95": 18403.0,
+      "p99": 19656.25,
+      "p50": 13297.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 136.2415902140673,
+      "std": 12.905221003745,
+      "p95": 160.0,
+      "p99": 168.0,
+      "p50": 135.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14276.343159844168,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 9430.132535603942,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 11329.31926548832,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 8034.915703525769,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 10886.469440238589,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 8905.839255808394,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1000000
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 661929
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 795990
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 565271
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 773607
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 628572
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 999955
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.500025
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 46767,
+      "mean": 23917.2701848249,
+      "std": 2273.837422591955,
+      "p95": 27465.0,
+      "p99": 28789.799999999996,
+      "p50": 23824.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 5224,
+      "max": 26798,
+      "mean": 14170.481639105059,
+      "std": 1629.5507160211556,
+      "p95": 18500.0,
+      "p99": 19616.0,
+      "p50": 13646.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 148.11568583575744,
+      "std": 13.146250460452665,
+      "p95": 169.0,
+      "p99": 187.0,
+      "p50": 147.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 3476,
+      "max": 22812,
+      "mean": 13071.067607003892,
+      "std": 1870.6349119760778,
+      "p95": 17602.0,
+      "p99": 19272.0,
+      "p50": 12238.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 168.21428571428573,
+      "std": 15.846179289454867,
+      "p95": 198.34999999999946,
+      "p99": 216.67000000000008,
+      "p50": 167.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7942,
+      "max": 24484,
+      "mean": 14742.057149805447,
+      "std": 1440.3827156850933,
+      "p95": 18362.5,
+      "p99": 19237.5,
+      "p50": 14329.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 130.15680405249828,
+      "std": 10.218414123732007,
+      "p95": 141.0,
+      "p99": 147.0,
+      "p50": 130.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 11792.52468385214,
+      "std": 1797.4055797370668,
+      "p95": 14873.0,
+      "p99": 19840.0,
+      "p50": 11660.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 146.79449715370019,
+      "std": 10.567647053483043,
+      "p95": 155.0,
+      "p99": 164.0,
+      "p50": 147.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7566,
+      "max": 23981,
+      "mean": 13775.219601167315,
+      "std": 1774.6878463242672,
+      "p95": 18182.0,
+      "p99": 19504.0,
+      "p50": 13218.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 136.05454545454547,
+      "std": 11.901543256159027,
+      "p95": 159.0,
+      "p99": 168.0,
+      "p50": 135.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14278.838209182952,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 9451.576962008725,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 11365.812263836942,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 8071.413038092655,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 11046.209032764364,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 8975.277762666006,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/with_isolation_160830-151625_results.json
+INFO:clipper::server: ending input loop: prediction worker 7
+INFO:clipper::server: ending input loop: prediction worker 4
+INFO:clipper::server: ending input loop: prediction worker 2
+INFO:clipper::server: ending input loop: prediction worker 1
+INFO:clipper::server: ending input loop: prediction worker 6
+INFO:clipper::server: ending input loop: prediction worker 5
+INFO:clipper::server: ending input loop: prediction worker 3
+INFO:clipper::server: ending input loop: prediction worker 0
+INFO:clipper::server: ending output loop: prediction worker 1
+INFO:clipper::server: ending output loop: prediction worker 2
+INFO:clipper::server: ending output loop: prediction worker 6
+INFO:clipper::server: ending output loop: prediction worker 5
+INFO:clipper::server: ending output loop: prediction worker 7
+INFO:clipper::server: ending output loop: prediction worker 3
+INFO:clipper::server: ending output loop: prediction worker 0
+INFO:clipper::server: Ending loop: update worker 0
+INFO:clipper::server: Dropping ClipperServer
+INFO:clipper::server: ending output loop: prediction worker 4
+INFO:clipper_benchmarks: {
+  "name": "with_isolation_160830-151625",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1000000
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 760860
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 916397
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 645741
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 897234
+    },
+    {
+      "name": "rf_d8:prediction_counter",
+      "count": 719967
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 999955
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 45
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 87123
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 64457
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 8645541
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 9219358
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 130
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 167
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 8356835
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 107714
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 6509268
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 114513
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 108580
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:beta_gauge",
+      "count": 4087420
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 7332140
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 238322
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:alpha_gauge",
+      "count": 93738
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:beta_gauge",
+      "count": 7335262
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 135
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:max_thru_gauge",
+      "count": 6753422
+    },
+    {
+      "name": "rf_d8:172.21.0.8:6001:base_thru_gauge",
+      "count": 134608
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:alpha_gauge",
+      "count": 46172
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:beta_gauge",
+      "count": 13225141
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:max_thru_gauge",
+      "count": 7345449
+    },
+    {
+      "name": "spark_svm:172.21.0.4:6001:base_thru_gauge",
+      "count": 75350
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.500025
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18872,
+      "max": 46767,
+      "mean": 23917.2701848249,
+      "std": 2273.837422591955,
+      "p95": 27465.0,
+      "p99": 28789.799999999996,
+      "p50": 23824.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 5224,
+      "max": 26798,
+      "mean": 14013.800705252917,
+      "std": 1573.5657529737244,
+      "p95": 18321.5,
+      "p99": 19529.0,
+      "p50": 13583.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 5,
+      "max": 187,
+      "mean": 147.9696616102684,
+      "std": 12.261379418734633,
+      "p95": 169.0,
+      "p99": 185.0,
+      "p50": 147.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 3747,
+      "max": 22812,
+      "mean": 12932.940418287937,
+      "std": 1826.6277971785558,
+      "p95": 17394.0,
+      "p99": 19270.0,
+      "p50": 12188.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 8,
+      "max": 234,
+      "mean": 168.05373189070236,
+      "std": 14.766979834264833,
+      "p95": 193.0,
+      "p99": 216.0,
+      "p50": 167.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7942,
+      "max": 22160,
+      "mean": 14686.84204766537,
+      "std": 1360.1491797943086,
+      "p95": 18291.5,
+      "p99": 19092.0,
+      "p50": 14325.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 2,
+      "max": 183,
+      "mean": 130.1372430471584,
+      "std": 9.559830136801857,
+      "p95": 140.0,
+      "p99": 147.0,
+      "p50": 130.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1254,
+      "max": 23360,
+      "mean": 11520.742582684825,
+      "std": 1810.7594008292602,
+      "p95": 14536.25,
+      "p99": 19822.75,
+      "p50": 11096.5
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 167,
+      "mean": 146.82277859597449,
+      "std": 9.813707214879173,
+      "p95": 153.0,
+      "p99": 164.0,
+      "p50": 147.0
+    },
+    {
+      "name": "rf_d8:model_latency",
+      "min": 7566,
+      "max": 23981,
+      "mean": 13673.748905642024,
+      "std": 1688.4934474720845,
+      "p95": 17982.0,
+      "p99": 19460.5,
+      "p50": 13182.0
+    },
+    {
+      "name": "rf_d8:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 135.91959229898075,
+      "std": 11.119375133705449,
+      "p95": 156.0,
+      "p99": 167.0,
+      "p50": 135.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 12493.637927226508,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 9505.909234546172,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 11451.218610063059,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 8067.654147970822,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 11209.716591947008,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d8:model_thruput",
+      "rate": 8996.693546270231,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Shutting down metrics thread

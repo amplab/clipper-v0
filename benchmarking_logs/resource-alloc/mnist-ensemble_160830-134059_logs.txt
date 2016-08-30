@@ -1,0 +1,1394 @@
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 20000
+num_message_encodes = 1
+name = "mnist-ensemble_160830-134059"
+bench_batch_size = 12
+input_type = "float"
+redis_port = 6379
+target_qps = 1000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "kernel_svm"
+addresses = [ "kernel_svm_r0:6001", "kernel_svm_r1:6001", "kernel_svm_r2:6001", "kernel_svm_r3:6001", "kernel_svm_r4:6001", "kernel_svm_r5:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+INFO:clipper::configuration: spark_svm_r0:6001
+/tmp/digits_bench.toml contains:
+num_benchmark_requests = 20000
+num_message_encodes = 1
+name = "mnist-ensemble_160830-134059"
+bench_batch_size = 12
+input_type = "float"
+redis_port = 6379
+target_qps = 1000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "kernel_svm"
+addresses = [ "kernel_svm_r0:6001", "kernel_svm_r1:6001", "kernel_svm_r2:6001", "kernel_svm_r3:6001", "kernel_svm_r4:6001", "kernel_svm_r5:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper::configuration: logistic_reg_r0:6001
+INFO:clipper::configuration: rf_d16_r0:6001
+INFO:clipper::configuration: kernel_svm_r0:6001
+INFO:clipper::configuration: kernel_svm_r1:6001
+INFO:clipper::configuration: kernel_svm_r2:6001
+INFO:clipper::configuration: kernel_svm_r3:6001
+INFO:clipper::configuration: kernel_svm_r4:6001
+INFO:clipper::configuration: kernel_svm_r5:6001
+INFO:clipper::configuration: quantilereg:7777
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to rf_d16 model wrapper at V4(172.21.0.5:6001)
+INFO:clipper::batching: Connected to kernel_svm model wrapper at V4(172.21.0.7:6001)
+INFO:clipper::batching: Connected to kernel_svm model wrapper at V4(172.21.0.6:6001)
+INFO:clipper::batching: Couldn't connect to kernel_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to kernel_svm model wrapper at V4(172.21.0.9:6001)
+INFO:clipper::batching: Couldn't connect to kernel_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.4:6001)
+INFO:clipper::batching: Couldn't connect to kernel_svm model wrapper. Sleeping 1 second
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting update worker 0
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to kernel_svm model wrapper at V4(172.21.0.10:6001)
+INFO:clipper::batching: Connected to kernel_svm model wrapper at V4(172.21.0.11:6001)
+INFO:clipper::batching: Connected to kernel_svm model wrapper at V4(172.21.0.12:6001)
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to spark_svm model wrapper at V4(172.21.0.8:6001)
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper::correction_policy: OLD correction state: [0.25, 0.25, 0.25, 0.25], offline_model_order: ["kernel_svm", "logistic_reg", "spark_svm", "rf_d16"]
+INFO:clipper::correction_policy: New correction state: [2.4016385334705395, 1.0740119592684576, 1.10480580817929, 0.27144036343789374], offline_model_order: ["kernel_svm", "logistic_reg", "spark_svm", "rf_d16"], labels: Some([1, -1])
+INFO:clipper_benchmarks: {
+  "name": "mnist-ensemble_160830-134059",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 390
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 393
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 398
+    },
+    {
+      "name": "kernel_svm:prediction_counter",
+      "count": 398
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:base_thru_gauge",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 499663,
+      "max": 499663,
+      "mean": 499663.0,
+      "std": null,
+      "p95": 499663.0,
+      "p99": 499663.0,
+      "p50": 499663.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 901,
+      "max": 6747,
+      "mean": 4872.820512820513,
+      "std": 1500.471709408394,
+      "p95": 6747.0,
+      "p99": 6747.0,
+      "p50": 5123.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.5,
+      "std": 11.180339887498949,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 1335,
+      "max": 5151,
+      "mean": 3812.3918575063614,
+      "std": 886.4680716045812,
+      "p95": 5151.0,
+      "p99": 5151.0,
+      "p50": 3901.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.65,
+      "std": 11.333578428722327,
+      "p95": 36.9,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7157,
+      "max": 9735,
+      "mean": 9099.319095477387,
+      "std": 697.2623589194602,
+      "p95": 9735.0,
+      "p99": 9735.0,
+      "p50": 9394.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 37,
+      "mean": 19.9,
+      "std": 11.670475568716127,
+      "p95": 37.0,
+      "p99": 37.0,
+      "p50": 20.0
+    },
+    {
+      "name": "kernel_svm:model_latency",
+      "min": 5798,
+      "max": 31222,
+      "mean": 22396.120603015075,
+      "std": 5231.9998719878899,
+      "p95": 30604.999999999993,
+      "p99": 31012.12,
+      "p50": 21816.0
+    },
+    {
+      "name": "kernel_svm:model_batch_size",
+      "min": 1,
+      "max": 5,
+      "mean": 3.2892561983471078,
+      "std": 1.0987721672312672,
+      "p95": 5.0,
+      "p99": 5.0,
+      "p50": 3.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.049947497687805469,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 19.47952993596679,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 19.629826427380583,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 19.87958863237171,
+      "unit": "events per second"
+    },
+    {
+      "name": "kernel_svm:model_thruput",
+      "rate": 19.879606505666165,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 52, alpha = 377.54545037638786, beta = 410.454549457404
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 2594.445555527725, baseline: 1269.035533262594, increase: 2.0444230973246293
+INFO:clipper::batching: GREPTHISlogistic_reg: XXXXXX {"measurements":[{"latency":4848,"batch_size":3},{"latency":1335,"batch_size":5},{"latency":1734,"batch_size":7},{"latency":4423,"batch_size":9},{"latency":2104,"batch_size":11},{"latency":2328,"batch_size":13},{"latency":2695,"batch_size":15},{"latency":2712,"batch_size":17},{"latency":3174,"batch_size":19},{"latency":3258,"batch_size":21},{"latency":3274,"batch_size":23},{"latency":3901,"batch_size":25},{"latency":3637,"batch_size":27},{"latency":3867,"batch_size":29},{"latency":4366,"batch_size":31},{"latency":4719,"batch_size":33},{"latency":4296,"batch_size":35},{"latency":5151,"batch_size":37},{"latency":4268,"batch_size":32},{"latency":4941,"batch_size":12},{"latency":952,"batch_size":2},{"latency":1134,"batch_size":4},{"latency":1357,"batch_size":6},{"latency":1901,"batch_size":8},{"latency":1040,"batch_size":4},{"latency":1601,"batch_size":6},{"latency":1293,"batch_size":6},{"latency":1482,"batch_size":4},{"latency":1308,"batch_size":6},{"latency":712,"batch_size":2},{"latency":1298,"batch_size":4},{"latency":1273,"batch_size":6},{"latency":688,"batch_size":2},{"latency":1174,"batch_size":4},{"latency":1241,"batch_size":6},{"latency":679,"batch_size":2},{"latency":1175,"batch_size":4},{"latency":1225,"batch_size":6},{"latency":674,"batch_size":2},{"latency":1186,"batch_size":4},{"latency":1154,"batch_size":6},{"latency":633,"batch_size":2},{"latency":1155,"batch_size":4},{"latency":1164,"batch_size":6},{"latency":616,"batch_size":2},{"latency":1028,"batch_size":4},{"latency":1059,"batch_size":6},{"latency":555,"batch_size":2},{"latency":1140,"batch_size":4},{"latency":1048,"batch_size":6},{"latency":570,"batch_size":2},{"latency":1072,"batch_size":4},{"latency":1056,"batch_size":6},{"latency":589,"batch_size":2},{"latency":1067,"batch_size":4},{"latency":1071,"batch_size":6},{"latency":584,"batch_size":2},{"latency":1071,"batch_size":4},{"latency":1074,"batch_size":6},{"latency":573,"batch_size":2},{"latency":1056,"batch_size":4},{"latency":1032,"batch_size":6},{"latency":541,"batch_size":2},{"latency":992,"batch_size":4},{"latency":1004,"batch_size":6},{"latency":545,"batch_size":2},{"latency":967,"batch_size":4},{"latency":1062,"batch_size":6},{"latency":552,"batch_size":2},{"latency":1124,"batch_size":4},{"latency":1084,"batch_size":6},{"latency":601,"batch_size":2},{"latency":1234,"batch_size":4},{"latency":1308,"batch_size":6},{"latency":635,"batch_size":2},{"latency":1109,"batch_size":4},{"latency":1244,"batch_size":6},{"latency":661,"batch_size":2},{"latency":1184,"batch_size":4},{"latency":1185,"batch_size":6},{"latency":647,"batch_size":2},{"latency":1182,"batch_size":4},{"latency":1219,"batch_size":6},{"latency":645,"batch_size":2},{"latency":1121,"batch_size":4},{"latency":1199,"batch_size":6},{"latency":633,"batch_size":2},{"latency":1111,"batch_size":4},{"latency":1145,"batch_size":6},{"latency":574,"batch_size":2},{"latency":1167,"batch_size":4},{"latency":1155,"batch_size":6},{"latency":620,"batch_size":2},{"latency":1042,"batch_size":4},{"latency":1103,"batch_size":6},{"latency":551,"batch_size":2},{"latency":1066,"batch_size":4},{"latency":1053,"batch_size":6},{"latency":577,"batch_size":2},{"latency":1057,"batch_size":4},{"latency":1069,"batch_size":6},{"latency":579,"batch_size":2},{"latency":846,"batch_size":2},{"latency":830,"batch_size":4},{"latency":1048,"batch_size":6},{"latency":1034,"batch_size":4},{"latency":1035,"batch_size":6},{"latency":551,"batch_size":2},{"latency":1008,"batch_size":4},{"latency":997,"batch_size":6},{"latency":549,"batch_size":2},{"latency":1045,"batch_size":4},{"latency":954,"batch_size":6},{"latency":523,"batch_size":2},{"latency":726,"batch_size":1},{"latency":701,"batch_size":3},{"latency":874,"batch_size":5},{"latency":658,"batch_size":3},{"latency":1087,"batch_size":5},{"latency":1108,"batch_size":7},{"latency":1237,"batch_size":6},{"latency":950,"batch_size":6},{"latency":1231,"batch_size":6},{"latency":966,"batch_size":6},{"latency":1403,"batch_size":8},{"latency":776,"batch_size":4},{"latency":1183,"batch_size":6},{"latency":934,"batch_size":6},{"latency":1414,"batch_size":8},{"latency":756,"batch_size":4},{"latency":937,"batch_size":4},{"latency":932,"batch_size":6},{"latency":524,"batch_size":2},{"latency":1035,"batch_size":4},{"latency":975,"batch_size":6},{"latency":579,"batch_size":2},{"latency":1209,"batch_size":4},{"latency":1298,"batch_size":6},{"latency":673,"batch_size":2},{"latency":1236,"batch_size":4},{"latency":1233,"batch_size":6},{"latency":684,"batch_size":2},{"latency":1205,"batch_size":4},{"latency":1304,"batch_size":6},{"latency":682,"batch_size":2},{"latency":1207,"batch_size":4},{"latency":1301,"batch_size":6},{"latency":736,"batch_size":2},{"latency":1283,"batch_size":4},{"latency":1289,"batch_size":6},{"latency":685,"batch_size":2},{"latency":1172,"batch_size":4},{"latency":1257,"batch_size":6},{"latency":647,"batch_size":2},{"latency":745,"batch_size":1},{"latency":832,"batch_size":3},{"latency":1064,"batch_size":5},{"latency":796,"batch_size":3},{"latency":1325,"batch_size":5},{"latency":1289,"batch_size":7},{"latency":1419,"batch_size":6},{"latency":1135,"batch_size":6},{"latency":1071,"batch_size":4},{"latency":1016,"batch_size":6},{"latency":560,"batch_size":2},{"latency":1083,"batch_size":4},{"latency":1107,"batch_size":6},{"latency":631,"batch_size":2},{"latency":1184,"batch_size":4},{"latency":1152,"batch_size":6},{"latency":590,"batch_size":2},{"latency":985,"batch_size":2},{"latency":869,"batch_size":4},{"latency":1110,"batch_size":6},{"latency":1401,"batch_size":6},{"latency":1071,"batch_size":6},{"latency":1560,"batch_size":8},{"latency":913,"batch_size":4},{"latency":1354,"batch_size":6},{"latency":1090,"batch_size":6},{"latency":1141,"batch_size":4},{"latency":1052,"batch_size":6},{"latency":606,"batch_size":2},{"latency":1083,"batch_size":4},{"latency":1124,"batch_size":6},{"latency":610,"batch_size":2},{"latency":1072,"batch_size":4},{"latency":1123,"batch_size":6},{"latency":612,"batch_size":2},{"latency":1127,"batch_size":4},{"latency":1119,"batch_size":6},{"latency":620,"batch_size":2},{"latency":1077,"batch_size":4},{"latency":1117,"batch_size":6},{"latency":627,"batch_size":2},{"latency":1296,"batch_size":4},{"latency":1303,"batch_size":6},{"latency":736,"batch_size":2},{"latency":998,"batch_size":3},{"latency":1103,"batch_size":5},{"latency":948,"batch_size":4},{"latency":1067,"batch_size":4},{"latency":1208,"batch_size":6},{"latency":629,"batch_size":2},{"latency":1116,"batch_size":4},{"latency":1245,"batch_size":6},{"latency":664,"batch_size":2},{"latency":1148,"batch_size":4},{"latency":1214,"batch_size":6},{"latency":607,"batch_size":2},{"latency":997,"batch_size":4},{"latency":1152,"batch_size":6},{"latency":630,"batch_size":2},{"latency":1065,"batch_size":4},{"latency":1118,"batch_size":6},{"latency":537,"batch_size":2},{"latency":985,"batch_size":4},{"latency":1091,"batch_size":6},{"latency":588,"batch_size":2},{"latency":1079,"batch_size":4},{"latency":1117,"batch_size":6},{"latency":587,"batch_size":2},{"latency":1009,"batch_size":4},{"latency":1079,"batch_size":6},{"latency":587,"batch_size":2},{"latency":953,"batch_size":4},{"latency":984,"batch_size":6},{"latency":561,"batch_size":2},{"latency":794,"batch_size":2},{"latency":791,"batch_size":4},{"latency":950,"batch_size":6},{"latency":779,"batch_size":2},{"latency":777,"batch_size":4},{"latency":919,"batch_size":6},{"latency":1430,"batch_size":8},{"latency":740,"batch_size":4},{"latency":1142,"batch_size":6},{"latency":932,"batch_size":6},{"latency":1312,"batch_size":8},{"latency":735,"batch_size":4},{"latency":1057,"batch_size":6},{"latency":854,"batch_size":6},{"latency":1376,"batch_size":8},{"latency":641,"batch_size":4},{"latency":1159,"batch_size":6},{"latency":821,"batch_size":6},{"latency":1434,"batch_size":8},{"latency":703,"batch_size":4},{"latency":1118,"batch_size":4},{"latency":911,"batch_size":6},{"latency":514,"batch_size":2},{"latency":1020,"batch_size":4},{"latency":890,"batch_size":6},{"latency":491,"batch_size":2},{"latency":616,"batch_size":1},{"latency":609,"batch_size":3},{"latency":761,"batch_size":5},{"latency":542,"batch_size":3},{"latency":1088,"batch_size":5},{"latency":997,"batch_size":7},{"latency":888,"batch_size":4},{"latency":906,"batch_size":6},{"latency":517,"batch_size":2},{"latency":923,"batch_size":4},{"latency":927,"batch_size":6},{"latency":652,"batch_size":2},{"latency":781,"batch_size":1},{"latency":880,"batch_size":3},{"latency":1099,"batch_size":5},{"latency":764,"batch_size":3},{"latency":1323,"batch_size":5},{"latency":1337,"batch_size":7},{"latency":1472,"batch_size":7},{"latency":1037,"batch_size":5},{"latency":960,"batch_size":3},{"latency":1042,"batch_size":5},{"latency":846,"batch_size":4},{"latency":1356,"batch_size":6},{"latency":1095,"batch_size":6},{"latency":1076,"batch_size":4},{"latency":1154,"batch_size":6},{"latency":612,"batch_size":2},{"latency":1095,"batch_size":4},{"latency":1166,"batch_size":6},{"latency":620,"batch_size":2},{"latency":1022,"batch_size":4},{"latency":1124,"batch_size":6},{"latency":597,"batch_size":2},{"latency":1161,"batch_size":4},{"latency":1148,"batch_size":6},{"latency":630,"batch_size":2},{"latency":1069,"batch_size":4},{"latency":1156,"batch_size":6},{"latency":619,"batch_size":2},{"latency":1046,"batch_size":4},{"latency":1164,"batch_size":6},{"latency":627,"batch_size":2},{"latency":1140,"batch_size":4},{"latency":1154,"batch_size":6},{"latency":620,"batch_size":2},{"latency":916,"batch_size":3},{"latency":975,"batch_size":5},{"latency":840,"batch_size":4},{"latency":1249,"batch_size":6},{"latency":1076,"batch_size":6},{"latency":1566,"batch_size":8},{"latency":871,"batch_size":4},{"latency":1353,"batch_size":6},{"latency":1110,"batch_size":6},{"latency":1316,"batch_size":6},{"latency":1136,"batch_size":6},{"latency":1723,"batch_size":8},{"latency":975,"batch_size":4},{"latency":1042,"batch_size":3},{"latency":1084,"batch_size":5},{"latency":921,"batch_size":4},{"latency":1405,"batch_size":6},{"latency":1188,"batch_size":6},{"latency":1013,"batch_size":3},{"latency":959,"batch_size":5},{"latency":795,"batch_size":4},{"latency":1113,"batch_size":4},{"latency":1115,"batch_size":6},{"latency":607,"batch_size":2},{"latency":1102,"batch_size":4},{"latency":1206,"batch_size":6},{"latency":703,"batch_size":2},{"latency":799,"batch_size":1},{"latency":883,"batch_size":3},{"latency":1112,"batch_size":5},{"latency":774,"batch_size":3},{"latency":1287,"batch_size":5},{"latency":1341,"batch_size":7},{"latency":1427,"batch_size":7},{"latency":986,"batch_size":5},{"latency":1447,"batch_size":7},{"latency":980,"batch_size":5},{"latency":937,"batch_size":3},{"latency":980,"batch_size":5},{"latency":834,"batch_size":4},{"latency":1225,"batch_size":5},{"latency":1174,"batch_size":7},{"latency":1443,"batch_size":7},{"latency":945,"batch_size":5},{"latency":1139,"batch_size":5},{"latency":1131,"batch_size":7},{"latency":1660,"batch_size":9},{"latency":711,"batch_size":3},{"latency":1171,"batch_size":5},{"latency":1145,"batch_size":7},{"latency":1499,"batch_size":9},{"latency":644,"batch_size":3},{"latency":646,"batch_size":1},{"latency":654,"batch_size":3},{"latency":823,"batch_size":5},{"latency":591,"batch_size":3},{"latency":1171,"batch_size":5},{"latency":1076,"batch_size":7},{"latency":1126,"batch_size":4},{"latency":1035,"batch_size":6},{"latency":528,"batch_size":2},{"latency":1070,"batch_size":4},{"latency":1012,"batch_size":6},{"latency":557,"batch_size":2},{"latency":1031,"batch_size":4},{"latency":1020,"batch_size":6},{"latency":5477,"batch_size":2},{"latency":1174,"batch_size":4},{"latency":1268,"batch_size":6},{"latency":682,"batch_size":2},{"latency":1051,"batch_size":4},{"latency":1198,"batch_size":6},{"latency":676,"batch_size":2},{"latency":1055,"batch_size":4},{"latency":1240,"batch_size":6},{"latency":669,"batch_size":2},{"latency":847,"batch_size":2},{"latency":930,"batch_size":4},{"latency":1192,"batch_size":6},{"latency":1268,"batch_size":5},{"latency":1293,"batch_size":7},{"latency":773,"batch_size":1},{"latency":790,"batch_size":3},{"latency":980,"batch_size":5},{"latency":727,"batch_size":3},{"latency":1217,"batch_size":5},{"latency":1253,"batch_size":7},{"latency":992,"batch_size":4},{"latency":1100,"batch_size":6},{"latency":590,"batch_size":2},{"latency":1029,"batch_size":4},{"latency":1116,"batch_size":6},{"latency":577,"batch_size":2},{"latency":591,"batch_size":1},{"latency":732,"batch_size":3},{"latency":923,"batch_size":5},{"latency":678,"batch_size":3},{"latency":1034,"batch_size":4},{"latency":1113,"batch_size":6},{"latency":596,"batch_size":2},{"latency":1025,"batch_size":4},{"latency":993,"batch_size":6},{"latency":502,"batch_size":2},{"latency":1016,"batch_size":4},{"latency":1009,"batch_size":6},{"latency":546,"batch_size":2},{"latency":712,"batch_size":1},{"latency":723,"batch_size":3},{"latency":874,"batch_size":5},{"latency":665,"batch_size":3},{"latency":668,"batch_size":1},{"latency":716,"batch_size":3},{"latency":866,"batch_size":5},{"latency":660,"batch_size":3},{"latency":789,"batch_size":2},{"latency":764,"batch_size":4},{"latency":949,"batch_size":6},{"latency":1376,"batch_size":8},{"latency":741,"batch_size":4},{"latency":1206,"batch_size":6},{"latency":963,"batch_size":6},{"latency":1341,"batch_size":8},{"latency":720,"batch_size":4},{"latency":1112,"batch_size":6},{"latency":903,"batch_size":6},{"latency":1221,"batch_size":7},{"latency":820,"batch_size":5},{"latency":643,"batch_size":1},{"latency":691,"batch_size":3},{"latency":840,"batch_size":5},{"latency":620,"batch_size":3},{"latency":987,"batch_size":4},{"latency":953,"batch_size":6},{"latency":539,"batch_size":2},{"latency":958,"batch_size":3},{"latency":867,"batch_size":5},{"latency":722,"batch_size":4},{"latency":1131,"batch_size":6},{"latency":966,"batch_size":6},{"latency":1443,"batch_size":8},{"latency":740,"batch_size":4},{"latency":1254,"batch_size":6},{"latency":902,"batch_size":6},{"latency":1256,"batch_size":6},{"latency":963,"batch_size":6},{"latency":1191,"batch_size":4},{"latency":1300,"batch_size":6},{"latency":662,"batch_size":2},{"latency":1118,"batch_size":4},{"latency":1203,"batch_size":6},{"latency":607,"batch_size":2},{"latency":734,"batch_size":1},{"latency":791,"batch_size":3},{"latency":1029,"batch_size":5},{"latency":693,"batch_size":3},{"latency":576,"batch_size":1},{"latency":736,"batch_size":3},{"latency":965,"batch_size":5},{"latency":729,"batch_size":3},{"latency":1185,"batch_size":5},{"latency":1302,"batch_size":7},{"latency":1469,"batch_size":7},{"latency":917,"batch_size":5},{"latency":1407,"batch_size":7},{"latency":992,"batch_size":5},{"latency":1469,"batch_size":7},{"latency":953,"batch_size":5},{"latency":1371,"batch_size":7},{"latency":898,"batch_size":5},{"latency":2829,"batch_size":7},{"latency":1012,"batch_size":5},{"latency":785,"batch_size":2},{"latency":772,"batch_size":4},{"latency":974,"batch_size":6},{"latency":1038,"batch_size":4},{"latency":1036,"batch_size":6},{"latency":564,"batch_size":2},{"latency":991,"batch_size":3},{"latency":869,"batch_size":5},{"latency":737,"batch_size":4},{"latency":750,"batch_size":1},{"latency":678,"batch_size":3},{"latency":850,"batch_size":5},{"latency":654,"batch_size":3},{"latency":958,"batch_size":3},{"latency":890,"batch_size":5},{"latency":756,"batch_size":4},{"latency":1153,"batch_size":5},{"latency":1137,"batch_size":7},{"latency":864,"batch_size":3},{"latency":835,"batch_size":5},{"latency":747,"batch_size":4},{"latency":1240,"batch_size":6},{"latency":1001,"batch_size":6},{"latency":788,"batch_size":1},{"latency":711,"batch_size":3},{"latency":879,"batch_size":5},{"latency":696,"batch_size":3},{"latency":1135,"batch_size":4}],"alpha":377.54545037638789,"beta":410.454549457404,"batch_size":52,"name":"logistic_reg"}
+INFO:clipper::batching: spark_svm BATCHER: Updated batching model: max_batch_size: 101, alpha = 192.59996664540168, beta = 508.40003334601306
+INFO:clipper::batching: spark_svm BATCHER: Predicted max thruput: 5059.86758564343, baseline: 1426.5335235552743, increase: 3.546967177492604
+INFO:clipper::batching: GREPTHISspark_svm: XXXXXX {"measurements":[{"latency":929,"batch_size":3},{"latency":1311,"batch_size":5},{"latency":1573,"batch_size":7},{"latency":1806,"batch_size":9},{"latency":2154,"batch_size":11},{"latency":2878,"batch_size":13},{"latency":2987,"batch_size":15},{"latency":3337,"batch_size":17},{"latency":3547,"batch_size":19},{"latency":4553,"batch_size":21},{"latency":4584,"batch_size":23},{"latency":5123,"batch_size":25},{"latency":5223,"batch_size":27},{"latency":5756,"batch_size":29},{"latency":5786,"batch_size":31},{"latency":5889,"batch_size":33},{"latency":6627,"batch_size":35},{"latency":6747,"batch_size":37},{"latency":4845,"batch_size":29},{"latency":1908,"batch_size":1},{"latency":858,"batch_size":3},{"latency":1135,"batch_size":5},{"latency":717,"batch_size":3},{"latency":1199,"batch_size":5},{"latency":1505,"batch_size":7},{"latency":1204,"batch_size":4},{"latency":1264,"batch_size":6},{"latency":665,"batch_size":2},{"latency":1171,"batch_size":4},{"latency":1294,"batch_size":6},{"latency":605,"batch_size":2},{"latency":1178,"batch_size":4},{"latency":1421,"batch_size":6},{"latency":627,"batch_size":2},{"latency":1168,"batch_size":4},{"latency":1250,"batch_size":6},{"latency":572,"batch_size":2},{"latency":822,"batch_size":2},{"latency":906,"batch_size":4},{"latency":1096,"batch_size":6},{"latency":740,"batch_size":2},{"latency":931,"batch_size":4},{"latency":1067,"batch_size":6},{"latency":1783,"batch_size":8},{"latency":787,"batch_size":4},{"latency":1477,"batch_size":6},{"latency":1003,"batch_size":6},{"latency":1602,"batch_size":8},{"latency":726,"batch_size":4},{"latency":1310,"batch_size":6},{"latency":1036,"batch_size":6},{"latency":1628,"batch_size":8},{"latency":752,"batch_size":4},{"latency":1346,"batch_size":5},{"latency":1425,"batch_size":7},{"latency":1996,"batch_size":8},{"latency":904,"batch_size":4},{"latency":897,"batch_size":3},{"latency":946,"batch_size":5},{"latency":765,"batch_size":4},{"latency":1504,"batch_size":6},{"latency":1166,"batch_size":6},{"latency":993,"batch_size":3},{"latency":1026,"batch_size":5},{"latency":786,"batch_size":4},{"latency":1468,"batch_size":6},{"latency":1270,"batch_size":6},{"latency":879,"batch_size":2},{"latency":922,"batch_size":4},{"latency":1260,"batch_size":6},{"latency":771,"batch_size":2},{"latency":873,"batch_size":4},{"latency":1204,"batch_size":6},{"latency":1776,"batch_size":8},{"latency":843,"batch_size":4},{"latency":835,"batch_size":2},{"latency":811,"batch_size":4},{"latency":1231,"batch_size":6},{"latency":1149,"batch_size":4},{"latency":1149,"batch_size":6},{"latency":500,"batch_size":2},{"latency":666,"batch_size":1},{"latency":637,"batch_size":3},{"latency":883,"batch_size":5},{"latency":592,"batch_size":3},{"latency":1132,"batch_size":5},{"latency":1215,"batch_size":7},{"latency":611,"batch_size":1},{"latency":684,"batch_size":3},{"latency":893,"batch_size":5},{"latency":618,"batch_size":3},{"latency":1193,"batch_size":5},{"latency":1263,"batch_size":7},{"latency":1566,"batch_size":7},{"latency":819,"batch_size":5},{"latency":720,"batch_size":1},{"latency":655,"batch_size":3},{"latency":840,"batch_size":5},{"latency":556,"batch_size":3},{"latency":1155,"batch_size":5},{"latency":1151,"batch_size":7},{"latency":1628,"batch_size":8},{"latency":704,"batch_size":4},{"latency":667,"batch_size":1},{"latency":645,"batch_size":3},{"latency":844,"batch_size":5},{"latency":581,"batch_size":3},{"latency":1124,"batch_size":5},{"latency":1136,"batch_size":7},{"latency":1607,"batch_size":9},{"latency":603,"batch_size":3},{"latency":1090,"batch_size":5},{"latency":1156,"batch_size":7},{"latency":554,"batch_size":1},{"latency":602,"batch_size":3},{"latency":805,"batch_size":5},{"latency":587,"batch_size":3},{"latency":1083,"batch_size":5},{"latency":1138,"batch_size":7},{"latency":856,"batch_size":3},{"latency":825,"batch_size":5},{"latency":659,"batch_size":4},{"latency":973,"batch_size":4},{"latency":970,"batch_size":6},{"latency":425,"batch_size":2},{"latency":852,"batch_size":2},{"latency":931,"batch_size":4},{"latency":1236,"batch_size":6},{"latency":1776,"batch_size":8},{"latency":1011,"batch_size":4},{"latency":1280,"batch_size":5},{"latency":1345,"batch_size":7},{"latency":1841,"batch_size":9},{"latency":694,"batch_size":3},{"latency":1195,"batch_size":5},{"latency":1278,"batch_size":7},{"latency":1720,"batch_size":8},{"latency":1125,"batch_size":4},{"latency":1144,"batch_size":4},{"latency":1097,"batch_size":6},{"latency":504,"batch_size":2},{"latency":1136,"batch_size":4},{"latency":1166,"batch_size":6},{"latency":521,"batch_size":2},{"latency":836,"batch_size":3},{"latency":934,"batch_size":5},{"latency":711,"batch_size":4},{"latency":673,"batch_size":1},{"latency":663,"batch_size":3},{"latency":931,"batch_size":5},{"latency":642,"batch_size":3},{"latency":761,"batch_size":2},{"latency":815,"batch_size":4},{"latency":1004,"batch_size":6},{"latency":1575,"batch_size":8},{"latency":818,"batch_size":4},{"latency":1254,"batch_size":6},{"latency":890,"batch_size":6},{"latency":1467,"batch_size":8},{"latency":677,"batch_size":4},{"latency":1251,"batch_size":6},{"latency":937,"batch_size":6},{"latency":589,"batch_size":1},{"latency":613,"batch_size":3},{"latency":845,"batch_size":5},{"latency":543,"batch_size":3},{"latency":1022,"batch_size":5},{"latency":1067,"batch_size":7},{"latency":1595,"batch_size":9},{"latency":548,"batch_size":3},{"latency":1042,"batch_size":5},{"latency":1060,"batch_size":7},{"latency":1563,"batch_size":9},{"latency":746,"batch_size":3},{"latency":648,"batch_size":1},{"latency":635,"batch_size":3},{"latency":788,"batch_size":5},{"latency":510,"batch_size":3},{"latency":974,"batch_size":5},{"latency":1027,"batch_size":7},{"latency":1886,"batch_size":9},{"latency":757,"batch_size":3},{"latency":631,"batch_size":1},{"latency":722,"batch_size":3},{"latency":980,"batch_size":5},{"latency":703,"batch_size":3},{"latency":1304,"batch_size":5},{"latency":1329,"batch_size":7},{"latency":781,"batch_size":2},{"latency":888,"batch_size":4},{"latency":1201,"batch_size":6},{"latency":754,"batch_size":2},{"latency":807,"batch_size":4},{"latency":1157,"batch_size":6},{"latency":641,"batch_size":1},{"latency":685,"batch_size":3},{"latency":945,"batch_size":5},{"latency":608,"batch_size":3},{"latency":1107,"batch_size":5},{"latency":1239,"batch_size":7},{"latency":1822,"batch_size":9},{"latency":634,"batch_size":3},{"latency":608,"batch_size":1},{"latency":659,"batch_size":3},{"latency":892,"batch_size":5},{"latency":600,"batch_size":3},{"latency":1165,"batch_size":5},{"latency":1182,"batch_size":7},{"latency":559,"batch_size":1},{"latency":635,"batch_size":3},{"latency":884,"batch_size":5},{"latency":587,"batch_size":3},{"latency":775,"batch_size":2},{"latency":790,"batch_size":4},{"latency":980,"batch_size":6},{"latency":1085,"batch_size":5},{"latency":1090,"batch_size":7},{"latency":1541,"batch_size":9},{"latency":584,"batch_size":3},{"latency":1010,"batch_size":5},{"latency":1053,"batch_size":7},{"latency":1575,"batch_size":9},{"latency":559,"batch_size":3},{"latency":1093,"batch_size":5},{"latency":1071,"batch_size":7},{"latency":1342,"batch_size":7},{"latency":794,"batch_size":5},{"latency":946,"batch_size":4},{"latency":896,"batch_size":6},{"latency":414,"batch_size":2},{"latency":925,"batch_size":4},{"latency":995,"batch_size":6},{"latency":475,"batch_size":2},{"latency":945,"batch_size":4},{"latency":987,"batch_size":6},{"latency":503,"batch_size":2},{"latency":638,"batch_size":1},{"latency":617,"batch_size":3},{"latency":833,"batch_size":5},{"latency":548,"batch_size":3},{"latency":1256,"batch_size":5},{"latency":1348,"batch_size":7},{"latency":1416,"batch_size":6},{"latency":1200,"batch_size":6},{"latency":1744,"batch_size":8},{"latency":894,"batch_size":4},{"latency":811,"batch_size":2},{"latency":971,"batch_size":4},{"latency":1259,"batch_size":6},{"latency":1591,"batch_size":8},{"latency":943,"batch_size":4},{"latency":1008,"batch_size":4},{"latency":1053,"batch_size":6},{"latency":520,"batch_size":2},{"latency":1079,"batch_size":4},{"latency":1118,"batch_size":6},{"latency":486,"batch_size":2},{"latency":985,"batch_size":4},{"latency":1109,"batch_size":6},{"latency":513,"batch_size":2},{"latency":567,"batch_size":1},{"latency":706,"batch_size":3},{"latency":922,"batch_size":5},{"latency":629,"batch_size":3},{"latency":1178,"batch_size":5},{"latency":1251,"batch_size":7},{"latency":1770,"batch_size":9},{"latency":664,"batch_size":3},{"latency":1137,"batch_size":5},{"latency":1184,"batch_size":7},{"latency":1710,"batch_size":9},{"latency":664,"batch_size":3},{"latency":1215,"batch_size":5},{"latency":1295,"batch_size":7},{"latency":1792,"batch_size":9},{"latency":674,"batch_size":3},{"latency":610,"batch_size":1},{"latency":699,"batch_size":3},{"latency":918,"batch_size":5},{"latency":633,"batch_size":3},{"latency":1148,"batch_size":5},{"latency":1227,"batch_size":7},{"latency":572,"batch_size":1},{"latency":700,"batch_size":3},{"latency":849,"batch_size":5},{"latency":592,"batch_size":3},{"latency":671,"batch_size":2},{"latency":814,"batch_size":4},{"latency":1023,"batch_size":6},{"latency":1486,"batch_size":7},{"latency":904,"batch_size":5},{"latency":1425,"batch_size":7},{"latency":896,"batch_size":5},{"latency":966,"batch_size":3},{"latency":934,"batch_size":5},{"latency":850,"batch_size":4},{"latency":1424,"batch_size":6},{"latency":1076,"batch_size":6},{"latency":1835,"batch_size":8},{"latency":882,"batch_size":4},{"latency":1613,"batch_size":6},{"latency":1280,"batch_size":6},{"latency":1705,"batch_size":8},{"latency":865,"batch_size":4},{"latency":1487,"batch_size":6},{"latency":1201,"batch_size":6},{"latency":1698,"batch_size":8},{"latency":858,"batch_size":4},{"latency":1419,"batch_size":6},{"latency":1211,"batch_size":6},{"latency":902,"batch_size":2},{"latency":889,"batch_size":4},{"latency":1160,"batch_size":6},{"latency":1415,"batch_size":6},{"latency":1227,"batch_size":6},{"latency":701,"batch_size":1},{"latency":730,"batch_size":3},{"latency":1012,"batch_size":5},{"latency":662,"batch_size":3},{"latency":575,"batch_size":1},{"latency":631,"batch_size":3},{"latency":867,"batch_size":5},{"latency":636,"batch_size":3},{"latency":641,"batch_size":1},{"latency":671,"batch_size":3},{"latency":871,"batch_size":5},{"latency":632,"batch_size":3},{"latency":748,"batch_size":2},{"latency":815,"batch_size":4},{"latency":968,"batch_size":6},{"latency":957,"batch_size":4},{"latency":961,"batch_size":6},{"latency":474,"batch_size":2},{"latency":767,"batch_size":2},{"latency":761,"batch_size":4},{"latency":928,"batch_size":6},{"latency":713,"batch_size":1},{"latency":634,"batch_size":3},{"latency":833,"batch_size":5},{"latency":573,"batch_size":3},{"latency":1090,"batch_size":5},{"latency":1084,"batch_size":7},{"latency":565,"batch_size":1},{"latency":599,"batch_size":3},{"latency":786,"batch_size":5},{"latency":517,"batch_size":3},{"latency":1043,"batch_size":4},{"latency":927,"batch_size":6},{"latency":428,"batch_size":2},{"latency":835,"batch_size":2},{"latency":714,"batch_size":4},{"latency":886,"batch_size":6},{"latency":1297,"batch_size":7},{"latency":830,"batch_size":5},{"latency":922,"batch_size":4},{"latency":989,"batch_size":6},{"latency":460,"batch_size":2},{"latency":547,"batch_size":1},{"latency":590,"batch_size":3},{"latency":908,"batch_size":5},{"latency":546,"batch_size":3},{"latency":857,"batch_size":4},{"latency":927,"batch_size":6},{"latency":466,"batch_size":2},{"latency":995,"batch_size":4},{"latency":971,"batch_size":6},{"latency":444,"batch_size":2},{"latency":664,"batch_size":1},{"latency":760,"batch_size":3},{"latency":1020,"batch_size":5},{"latency":656,"batch_size":3},{"latency":1110,"batch_size":4},{"latency":1174,"batch_size":6},{"latency":549,"batch_size":2},{"latency":1104,"batch_size":4},{"latency":1229,"batch_size":6},{"latency":518,"batch_size":2},{"latency":971,"batch_size":4},{"latency":1085,"batch_size":6},{"latency":480,"batch_size":2},{"latency":1037,"batch_size":4},{"latency":1087,"batch_size":6},{"latency":492,"batch_size":2},{"latency":968,"batch_size":4},{"latency":1039,"batch_size":6},{"latency":470,"batch_size":2},{"latency":1003,"batch_size":4},{"latency":1160,"batch_size":6},{"latency":502,"batch_size":2},{"latency":923,"batch_size":4},{"latency":1001,"batch_size":6},{"latency":517,"batch_size":2},{"latency":875,"batch_size":4},{"latency":913,"batch_size":6},{"latency":408,"batch_size":2},{"latency":669,"batch_size":2},{"latency":733,"batch_size":4},{"latency":936,"batch_size":6},{"latency":740,"batch_size":3},{"latency":780,"batch_size":5},{"latency":641,"batch_size":4},{"latency":821,"batch_size":3},{"latency":773,"batch_size":5},{"latency":722,"batch_size":4},{"latency":1048,"batch_size":6},{"latency":821,"batch_size":6},{"latency":1376,"batch_size":8},{"latency":635,"batch_size":4},{"latency":1035,"batch_size":6},{"latency":845,"batch_size":6},{"latency":1327,"batch_size":8},{"latency":670,"batch_size":4},{"latency":1050,"batch_size":5},{"latency":1027,"batch_size":7},{"latency":1225,"batch_size":7},{"latency":728,"batch_size":5},{"latency":1034,"batch_size":5},{"latency":1052,"batch_size":7},{"latency":793,"batch_size":4},{"latency":857,"batch_size":6},{"latency":425,"batch_size":2},{"latency":845,"batch_size":4},{"latency":963,"batch_size":6},{"latency":425,"batch_size":2},{"latency":848,"batch_size":4},{"latency":869,"batch_size":6},{"latency":423,"batch_size":2},{"latency":867,"batch_size":4},{"latency":883,"batch_size":6},{"latency":390,"batch_size":2},{"latency":841,"batch_size":4},{"latency":884,"batch_size":6},{"latency":464,"batch_size":2},{"latency":1069,"batch_size":4},{"latency":1240,"batch_size":6},{"latency":545,"batch_size":2},{"latency":1009,"batch_size":4},{"latency":1265,"batch_size":6},{"latency":543,"batch_size":2},{"latency":636,"batch_size":1},{"latency":702,"batch_size":3},{"latency":1015,"batch_size":5},{"latency":650,"batch_size":3},{"latency":1158,"batch_size":5},{"latency":1315,"batch_size":7},{"latency":1006,"batch_size":4},{"latency":1045,"batch_size":6},{"latency":477,"batch_size":2},{"latency":1010,"batch_size":4},{"latency":1144,"batch_size":6},{"latency":490,"batch_size":2},{"latency":1059,"batch_size":4},{"latency":1074,"batch_size":6},{"latency":502,"batch_size":2},{"latency":518,"batch_size":1},{"latency":646,"batch_size":3},{"latency":931,"batch_size":5},{"latency":633,"batch_size":3},{"latency":1105,"batch_size":5},{"latency":1195,"batch_size":7},{"latency":1710,"batch_size":9},{"latency":618,"batch_size":3},{"latency":1272,"batch_size":5},{"latency":1170,"batch_size":7},{"latency":558,"batch_size":1},{"latency":589,"batch_size":3},{"latency":765,"batch_size":5},{"latency":568,"batch_size":3},{"latency":1036,"batch_size":5},{"latency":1016,"batch_size":7},{"latency":1495,"batch_size":9},{"latency":533,"batch_size":3},{"latency":1024,"batch_size":5},{"latency":1031,"batch_size":7},{"latency":1187,"batch_size":6},{"latency":895,"batch_size":6},{"latency":951,"batch_size":4},{"latency":1040,"batch_size":6},{"latency":427,"batch_size":2},{"latency":487,"batch_size":1},{"latency":515,"batch_size":3},{"latency":733,"batch_size":5},{"latency":496,"batch_size":3},{"latency":1034,"batch_size":5},{"latency":1011,"batch_size":7},{"latency":1330,"batch_size":7},{"latency":839,"batch_size":5},{"latency":1314,"batch_size":7},{"latency":1087,"batch_size":5},{"latency":1394,"batch_size":7},{"latency":773,"batch_size":5},{"latency":788,"batch_size":3},{"latency":739,"batch_size":5},{"latency":630,"batch_size":4},{"latency":526,"batch_size":1},{"latency":579,"batch_size":3},{"latency":780,"batch_size":5},{"latency":534,"batch_size":3},{"latency":1286,"batch_size":5}],"alpha":192.59996664540169,"beta":508.40003334601308,"batch_size":101,"name":"spark_svm"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: rf_d16 BATCHER: Updated batching model: max_batch_size: 39, alpha = 381.6250000443355, beta = 5163.499999115732
+INFO:clipper::batching: rf_d16 BATCHER: Predicted max thruput: 1945.4403740411642, baseline: 180.338585721958, increase: 10.787710052470972
+INFO:clipper::batching: GREPTHISrf_d16: XXXXXX {"measurements":[{"latency":7157,"batch_size":3},{"latency":7241,"batch_size":5},{"latency":7474,"batch_size":7},{"latency":7404,"batch_size":9},{"latency":7582,"batch_size":11},{"latency":8033,"batch_size":13},{"latency":8403,"batch_size":15},{"latency":8488,"batch_size":17},{"latency":8558,"batch_size":19},{"latency":8829,"batch_size":21},{"latency":9465,"batch_size":23},{"latency":9638,"batch_size":25},{"latency":9062,"batch_size":27},{"latency":9220,"batch_size":29},{"latency":9489,"batch_size":31},{"latency":9394,"batch_size":33},{"latency":9629,"batch_size":35},{"latency":9735,"batch_size":37},{"latency":9706,"batch_size":37},{"latency":9743,"batch_size":12},{"latency":7959,"batch_size":5},{"latency":7901,"batch_size":7},{"latency":7987,"batch_size":9},{"latency":8300,"batch_size":11},{"latency":6593,"batch_size":4},{"latency":6769,"batch_size":6},{"latency":6575,"batch_size":6},{"latency":6781,"batch_size":8},{"latency":5876,"batch_size":4},{"latency":5809,"batch_size":6},{"latency":5745,"batch_size":6},{"latency":5905,"batch_size":8},{"latency":5404,"batch_size":4},{"latency":5381,"batch_size":6},{"latency":5256,"batch_size":6},{"latency":5446,"batch_size":8},{"latency":4978,"batch_size":4},{"latency":5146,"batch_size":6},{"latency":4955,"batch_size":6},{"latency":5171,"batch_size":7},{"latency":4612,"batch_size":5},{"latency":5098,"batch_size":7},{"latency":4747,"batch_size":5},{"latency":4982,"batch_size":7},{"latency":4436,"batch_size":5},{"latency":4584,"batch_size":3},{"latency":4511,"batch_size":5},{"latency":4272,"batch_size":4},{"latency":4482,"batch_size":6},{"latency":4387,"batch_size":6},{"latency":4994,"batch_size":8},{"latency":4294,"batch_size":4},{"latency":4700,"batch_size":6},{"latency":4490,"batch_size":6},{"latency":4974,"batch_size":8},{"latency":4352,"batch_size":4},{"latency":4663,"batch_size":6},{"latency":4348,"batch_size":6},{"latency":4791,"batch_size":8},{"latency":4233,"batch_size":4},{"latency":4837,"batch_size":6},{"latency":4459,"batch_size":6},{"latency":4777,"batch_size":6},{"latency":4441,"batch_size":6},{"latency":4290,"batch_size":3},{"latency":4392,"batch_size":5},{"latency":4200,"batch_size":4},{"latency":4424,"batch_size":6},{"latency":4559,"batch_size":6},{"latency":4968,"batch_size":8},{"latency":4347,"batch_size":4},{"latency":4534,"batch_size":5},{"latency":4579,"batch_size":7},{"latency":4769,"batch_size":6},{"latency":4489,"batch_size":6},{"latency":3972,"batch_size":1},{"latency":4089,"batch_size":3},{"latency":4290,"batch_size":5},{"latency":4564,"batch_size":7},{"latency":4638,"batch_size":8},{"latency":4080,"batch_size":2},{"latency":4223,"batch_size":4},{"latency":4482,"batch_size":6},{"latency":4622,"batch_size":8},{"latency":4204,"batch_size":4},{"latency":4553,"batch_size":6},{"latency":4457,"batch_size":6},{"latency":4893,"batch_size":8},{"latency":4077,"batch_size":4},{"latency":4612,"batch_size":6},{"latency":4528,"batch_size":6},{"latency":4427,"batch_size":3},{"latency":4356,"batch_size":5},{"latency":4182,"batch_size":4},{"latency":4460,"batch_size":6},{"latency":4474,"batch_size":6},{"latency":3933,"batch_size":1},{"latency":4066,"batch_size":3},{"latency":4382,"batch_size":5},{"latency":4579,"batch_size":7},{"latency":4758,"batch_size":8},{"latency":4363,"batch_size":4},{"latency":4453,"batch_size":6},{"latency":3954,"batch_size":2},{"latency":4188,"batch_size":4},{"latency":4404,"batch_size":6},{"latency":3954,"batch_size":2},{"latency":4181,"batch_size":4},{"latency":4401,"batch_size":6},{"latency":3824,"batch_size":2},{"latency":4182,"batch_size":4},{"latency":4412,"batch_size":6},{"latency":3872,"batch_size":2},{"latency":4118,"batch_size":4},{"latency":4323,"batch_size":6},{"latency":3860,"batch_size":2},{"latency":4087,"batch_size":4},{"latency":4312,"batch_size":6},{"latency":3942,"batch_size":2},{"latency":4271,"batch_size":4},{"latency":4498,"batch_size":6},{"latency":3955,"batch_size":2},{"latency":4139,"batch_size":4},{"latency":4327,"batch_size":6},{"latency":4598,"batch_size":8},{"latency":4351,"batch_size":6},{"latency":4630,"batch_size":8},{"latency":4208,"batch_size":4},{"latency":4710,"batch_size":6},{"latency":4346,"batch_size":6},{"latency":3884,"batch_size":1},{"latency":4093,"batch_size":3},{"latency":4305,"batch_size":5},{"latency":4586,"batch_size":7},{"latency":4776,"batch_size":8},{"latency":5182,"batch_size":10},{"latency":4029,"batch_size":2},{"latency":4477,"batch_size":4},{"latency":4380,"batch_size":6},{"latency":3941,"batch_size":2},{"latency":4217,"batch_size":4},{"latency":4408,"batch_size":6},{"latency":3912,"batch_size":2},{"latency":4166,"batch_size":4},{"latency":4410,"batch_size":6},{"latency":3952,"batch_size":2},{"latency":4154,"batch_size":4},{"latency":4395,"batch_size":6},{"latency":3915,"batch_size":2},{"latency":4201,"batch_size":4},{"latency":4371,"batch_size":6},{"latency":3873,"batch_size":2},{"latency":4174,"batch_size":4},{"latency":4420,"batch_size":6},{"latency":3888,"batch_size":2},{"latency":4514,"batch_size":4},{"latency":4461,"batch_size":6},{"latency":4626,"batch_size":8},{"latency":4446,"batch_size":6},{"latency":4670,"batch_size":8},{"latency":4112,"batch_size":4},{"latency":4591,"batch_size":6},{"latency":4373,"batch_size":6},{"latency":4410,"batch_size":6},{"latency":4193,"batch_size":6},{"latency":3701,"batch_size":1},{"latency":3919,"batch_size":3},{"latency":4132,"batch_size":5},{"latency":3893,"batch_size":3},{"latency":4018,"batch_size":5},{"latency":4477,"batch_size":7},{"latency":4419,"batch_size":9},{"latency":3835,"batch_size":3},{"latency":4362,"batch_size":5},{"latency":4148,"batch_size":7},{"latency":3833,"batch_size":2},{"latency":3959,"batch_size":4},{"latency":4190,"batch_size":6},{"latency":4215,"batch_size":6},{"latency":4267,"batch_size":6},{"latency":4540,"batch_size":8},{"latency":3929,"batch_size":4},{"latency":4643,"batch_size":6},{"latency":4204,"batch_size":6},{"latency":6690,"batch_size":4},{"latency":4808,"batch_size":6},{"latency":3788,"batch_size":2},{"latency":4032,"batch_size":4},{"latency":4362,"batch_size":6},{"latency":3666,"batch_size":2},{"latency":4097,"batch_size":4},{"latency":4243,"batch_size":6},{"latency":3669,"batch_size":2},{"latency":4061,"batch_size":4},{"latency":4143,"batch_size":6},{"latency":3696,"batch_size":2},{"latency":4020,"batch_size":4},{"latency":4111,"batch_size":6},{"latency":3619,"batch_size":2},{"latency":3924,"batch_size":4},{"latency":3992,"batch_size":6},{"latency":3585,"batch_size":2},{"latency":3840,"batch_size":4},{"latency":4069,"batch_size":6},{"latency":3618,"batch_size":2},{"latency":3943,"batch_size":4},{"latency":4203,"batch_size":6},{"latency":3701,"batch_size":2},{"latency":3935,"batch_size":4},{"latency":4132,"batch_size":6},{"latency":3599,"batch_size":2},{"latency":3838,"batch_size":4},{"latency":4137,"batch_size":6},{"latency":3693,"batch_size":2},{"latency":3930,"batch_size":4},{"latency":4146,"batch_size":6},{"latency":3602,"batch_size":2},{"latency":3918,"batch_size":4},{"latency":4239,"batch_size":6},{"latency":3625,"batch_size":2},{"latency":3816,"batch_size":4},{"latency":4124,"batch_size":6},{"latency":3670,"batch_size":2},{"latency":3875,"batch_size":4},{"latency":4130,"batch_size":6},{"latency":3714,"batch_size":2},{"latency":3886,"batch_size":4},{"latency":4153,"batch_size":6},{"latency":3755,"batch_size":2},{"latency":3866,"batch_size":4},{"latency":4074,"batch_size":6},{"latency":3654,"batch_size":2},{"latency":3866,"batch_size":4},{"latency":4102,"batch_size":6},{"latency":3551,"batch_size":2},{"latency":3871,"batch_size":4},{"latency":4061,"batch_size":6},{"latency":3615,"batch_size":2},{"latency":3859,"batch_size":4},{"latency":3949,"batch_size":6},{"latency":3573,"batch_size":2},{"latency":3634,"batch_size":2},{"latency":3800,"batch_size":4},{"latency":4061,"batch_size":6},{"latency":4464,"batch_size":7},{"latency":4009,"batch_size":5},{"latency":4606,"batch_size":7},{"latency":3995,"batch_size":5},{"latency":4020,"batch_size":3},{"latency":4037,"batch_size":5},{"latency":3857,"batch_size":4},{"latency":3774,"batch_size":3},{"latency":4003,"batch_size":5},{"latency":3893,"batch_size":4},{"latency":4081,"batch_size":6},{"latency":4121,"batch_size":6},{"latency":4668,"batch_size":8},{"latency":3935,"batch_size":4},{"latency":3830,"batch_size":2},{"latency":3947,"batch_size":4},{"latency":4039,"batch_size":6},{"latency":4342,"batch_size":8},{"latency":3907,"batch_size":4},{"latency":4398,"batch_size":6},{"latency":4134,"batch_size":6},{"latency":3812,"batch_size":3},{"latency":3999,"batch_size":5},{"latency":3768,"batch_size":4},{"latency":4071,"batch_size":6},{"latency":4145,"batch_size":6},{"latency":4544,"batch_size":8},{"latency":3981,"batch_size":4},{"latency":4276,"batch_size":6},{"latency":4208,"batch_size":6},{"latency":3573,"batch_size":1},{"latency":3802,"batch_size":3},{"latency":4094,"batch_size":5},{"latency":3812,"batch_size":3},{"latency":4044,"batch_size":5},{"latency":4321,"batch_size":7},{"latency":4776,"batch_size":9},{"latency":3849,"batch_size":3},{"latency":4195,"batch_size":5},{"latency":4273,"batch_size":7},{"latency":4325,"batch_size":6},{"latency":4259,"batch_size":6},{"latency":4543,"batch_size":7},{"latency":4011,"batch_size":5},{"latency":4110,"batch_size":2},{"latency":3906,"batch_size":4},{"latency":4124,"batch_size":6},{"latency":4445,"batch_size":8},{"latency":3861,"batch_size":4},{"latency":4422,"batch_size":6},{"latency":4160,"batch_size":6},{"latency":4832,"batch_size":8},{"latency":3939,"batch_size":4},{"latency":4581,"batch_size":6},{"latency":4189,"batch_size":6},{"latency":3865,"batch_size":2},{"latency":4138,"batch_size":4},{"latency":4317,"batch_size":6},{"latency":4376,"batch_size":8},{"latency":3930,"batch_size":4},{"latency":4740,"batch_size":6},{"latency":4224,"batch_size":6},{"latency":3854,"batch_size":2},{"latency":4107,"batch_size":4},{"latency":4238,"batch_size":6},{"latency":4397,"batch_size":8},{"latency":3925,"batch_size":4},{"latency":4090,"batch_size":4},{"latency":4197,"batch_size":6},{"latency":3598,"batch_size":2},{"latency":3752,"batch_size":3},{"latency":4020,"batch_size":5},{"latency":3879,"batch_size":4},{"latency":3498,"batch_size":1},{"latency":3871,"batch_size":3},{"latency":4102,"batch_size":5},{"latency":3817,"batch_size":3},{"latency":3991,"batch_size":5},{"latency":4275,"batch_size":7},{"latency":4463,"batch_size":8},{"latency":3888,"batch_size":4},{"latency":4281,"batch_size":6},{"latency":4137,"batch_size":6},{"latency":4109,"batch_size":2},{"latency":3949,"batch_size":4},{"latency":4228,"batch_size":6},{"latency":4172,"batch_size":8},{"latency":3730,"batch_size":4},{"latency":3750,"batch_size":2},{"latency":3920,"batch_size":4},{"latency":4113,"batch_size":6},{"latency":3939,"batch_size":4},{"latency":4170,"batch_size":6},{"latency":3522,"batch_size":2},{"latency":3915,"batch_size":4},{"latency":4249,"batch_size":6},{"latency":3762,"batch_size":2},{"latency":3869,"batch_size":4},{"latency":4109,"batch_size":6},{"latency":3717,"batch_size":2},{"latency":3853,"batch_size":4},{"latency":4034,"batch_size":6},{"latency":3571,"batch_size":2},{"latency":4057,"batch_size":4},{"latency":4146,"batch_size":6},{"latency":3715,"batch_size":2},{"latency":3889,"batch_size":4},{"latency":4131,"batch_size":6},{"latency":3604,"batch_size":2},{"latency":3887,"batch_size":4},{"latency":4125,"batch_size":6},{"latency":3650,"batch_size":2},{"latency":3883,"batch_size":4},{"latency":4187,"batch_size":6},{"latency":3587,"batch_size":2},{"latency":3936,"batch_size":4},{"latency":4133,"batch_size":6},{"latency":3909,"batch_size":2},{"latency":3895,"batch_size":4},{"latency":4120,"batch_size":6},{"latency":3673,"batch_size":2},{"latency":3843,"batch_size":4},{"latency":4095,"batch_size":6},{"latency":3966,"batch_size":2},{"latency":3888,"batch_size":4},{"latency":3975,"batch_size":6},{"latency":3685,"batch_size":2},{"latency":3781,"batch_size":3},{"latency":4101,"batch_size":5},{"latency":3788,"batch_size":4},{"latency":4057,"batch_size":6},{"latency":4114,"batch_size":6},{"latency":4421,"batch_size":8},{"latency":3824,"batch_size":4},{"latency":4358,"batch_size":6},{"latency":4201,"batch_size":6},{"latency":4501,"batch_size":8},{"latency":3988,"batch_size":4},{"latency":4311,"batch_size":6},{"latency":4117,"batch_size":6},{"latency":3530,"batch_size":1},{"latency":3791,"batch_size":3},{"latency":4071,"batch_size":5},{"latency":3807,"batch_size":3},{"latency":4031,"batch_size":5},{"latency":4262,"batch_size":7},{"latency":3494,"batch_size":1},{"latency":3798,"batch_size":3},{"latency":3909,"batch_size":5},{"latency":3702,"batch_size":3},{"latency":3963,"batch_size":5},{"latency":4227,"batch_size":7},{"latency":3835,"batch_size":2},{"latency":3910,"batch_size":4},{"latency":4080,"batch_size":6},{"latency":4399,"batch_size":8},{"latency":3879,"batch_size":4},{"latency":4335,"batch_size":6},{"latency":4155,"batch_size":6},{"latency":4073,"batch_size":4},{"latency":4113,"batch_size":6},{"latency":3631,"batch_size":2},{"latency":3442,"batch_size":1},{"latency":3741,"batch_size":3},{"latency":3986,"batch_size":5},{"latency":3754,"batch_size":3},{"latency":3950,"batch_size":5},{"latency":4213,"batch_size":7},{"latency":4574,"batch_size":9},{"latency":3815,"batch_size":3},{"latency":4105,"batch_size":4},{"latency":4187,"batch_size":6},{"latency":3728,"batch_size":2},{"latency":3972,"batch_size":4},{"latency":4161,"batch_size":6},{"latency":3543,"batch_size":2},{"latency":3883,"batch_size":4},{"latency":4164,"batch_size":6},{"latency":3627,"batch_size":2},{"latency":3868,"batch_size":4},{"latency":4097,"batch_size":6},{"latency":3618,"batch_size":2},{"latency":3713,"batch_size":4},{"latency":3759,"batch_size":6},{"latency":3257,"batch_size":2},{"latency":3703,"batch_size":4},{"latency":3733,"batch_size":6},{"latency":3453,"batch_size":2},{"latency":3381,"batch_size":2},{"latency":3474,"batch_size":4},{"latency":3632,"batch_size":6},{"latency":3623,"batch_size":2},{"latency":3588,"batch_size":4},{"latency":3771,"batch_size":6},{"latency":3111,"batch_size":1},{"latency":3511,"batch_size":3},{"latency":3632,"batch_size":5},{"latency":3407,"batch_size":3},{"latency":3561,"batch_size":5},{"latency":3867,"batch_size":7},{"latency":4104,"batch_size":8},{"latency":3575,"batch_size":4},{"latency":3835,"batch_size":4},{"latency":3854,"batch_size":6},{"latency":3406,"batch_size":2},{"latency":3155,"batch_size":1},{"latency":3511,"batch_size":3},{"latency":3636,"batch_size":5},{"latency":3428,"batch_size":3},{"latency":3596,"batch_size":5},{"latency":3894,"batch_size":7},{"latency":4122,"batch_size":9},{"latency":3542,"batch_size":3},{"latency":3984,"batch_size":5},{"latency":3951,"batch_size":7},{"latency":3645,"batch_size":3},{"latency":3517,"batch_size":5},{"latency":3381,"batch_size":4},{"latency":3154,"batch_size":1},{"latency":3428,"batch_size":3},{"latency":3613,"batch_size":5},{"latency":3368,"batch_size":3},{"latency":3581,"batch_size":5},{"latency":3858,"batch_size":7},{"latency":3943,"batch_size":8},{"latency":3530,"batch_size":4},{"latency":3392,"batch_size":1},{"latency":3504,"batch_size":3},{"latency":3671,"batch_size":5},{"latency":3410,"batch_size":3},{"latency":3696,"batch_size":5},{"latency":3897,"batch_size":7},{"latency":4120,"batch_size":7},{"latency":3822,"batch_size":5},{"latency":3788,"batch_size":3},{"latency":3668,"batch_size":5},{"latency":3545,"batch_size":4},{"latency":4023,"batch_size":6},{"latency":3780,"batch_size":6},{"latency":3665,"batch_size":3},{"latency":3747,"batch_size":5},{"latency":3570,"batch_size":4},{"latency":4026,"batch_size":6},{"latency":3702,"batch_size":6},{"latency":4037,"batch_size":5},{"latency":3882,"batch_size":7},{"latency":4345,"batch_size":9},{"latency":3446,"batch_size":3},{"latency":3583,"batch_size":2},{"latency":3584,"batch_size":4},{"latency":3744,"batch_size":6},{"latency":4017,"batch_size":8},{"latency":3587,"batch_size":4},{"latency":3559,"batch_size":2},{"latency":3557,"batch_size":4}],"alpha":381.6250000443355,"beta":5163.499999115732,"batch_size":39,"name":"rf_d16"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: kernel_svm BATCHER: Updated batching model: max_batch_size: 2, alpha = 9512.99999581275, beta = -598.9999959642395
+INFO:clipper::batching: kernel_svm BATCHER: Predicted max thruput: 108.53638684923814, baseline: 112.1830827930216, increase: 0.9674933523576668
+INFO:clipper::batching: GREPTHISkernel_svm: XXXXXX {"measurements":[{"latency":29844,"batch_size":3},{"latency":18082,"batch_size":2},{"latency":16965,"batch_size":2},{"latency":30535,"batch_size":4},{"latency":18950,"batch_size":3},{"latency":17703,"batch_size":3},{"latency":27319,"batch_size":5},{"latency":21781,"batch_size":4},{"latency":16427,"batch_size":3},{"latency":27091,"batch_size":5},{"latency":21826,"batch_size":4},{"latency":16541,"batch_size":3},{"latency":27165,"batch_size":5},{"latency":21826,"batch_size":4},{"latency":16502,"batch_size":3},{"latency":27103,"batch_size":5},{"latency":21804,"batch_size":4},{"latency":5798,"batch_size":1},{"latency":12051,"batch_size":1},{"latency":30612,"batch_size":3},{"latency":18427,"batch_size":2},{"latency":16905,"batch_size":2},{"latency":30191,"batch_size":4},{"latency":20605,"batch_size":3},{"latency":13168,"batch_size":2},{"latency":19131,"batch_size":3},{"latency":18098,"batch_size":3},{"latency":16583,"batch_size":3},{"latency":27188,"batch_size":5},{"latency":21778,"batch_size":4},{"latency":16478,"batch_size":3},{"latency":27215,"batch_size":5},{"latency":21839,"batch_size":4},{"latency":16471,"batch_size":3},{"latency":27165,"batch_size":5},{"latency":21815,"batch_size":4},{"latency":16431,"batch_size":3},{"latency":11141,"batch_size":2},{"latency":6871,"batch_size":1},{"latency":18983,"batch_size":3},{"latency":19031,"batch_size":3},{"latency":19097,"batch_size":3},{"latency":19037,"batch_size":3},{"latency":19028,"batch_size":3},{"latency":6622,"batch_size":1},{"latency":6687,"batch_size":1},{"latency":6769,"batch_size":1},{"latency":13037,"batch_size":2},{"latency":6685,"batch_size":1},{"latency":6743,"batch_size":1},{"latency":6738,"batch_size":1},{"latency":6767,"batch_size":1},{"latency":12882,"batch_size":2},{"latency":19088,"batch_size":3},{"latency":15125,"batch_size":2},{"latency":6857,"batch_size":1},{"latency":12939,"batch_size":2},{"latency":12876,"batch_size":2},{"latency":12880,"batch_size":2},{"latency":25277,"batch_size":4},{"latency":19205,"batch_size":3},{"latency":6614,"batch_size":1},{"latency":12752,"batch_size":2},{"latency":6705,"batch_size":1},{"latency":6533,"batch_size":1},{"latency":6572,"batch_size":1},{"latency":6429,"batch_size":1},{"latency":6663,"batch_size":1},{"latency":6527,"batch_size":1},{"latency":18736,"batch_size":3},{"latency":6607,"batch_size":1},{"latency":12345,"batch_size":2},{"latency":6468,"batch_size":1},{"latency":12305,"batch_size":2},{"latency":18108,"batch_size":3},{"latency":12283,"batch_size":2},{"latency":6730,"batch_size":1},{"latency":6340,"batch_size":1},{"latency":6354,"batch_size":1},{"latency":6274,"batch_size":1},{"latency":12338,"batch_size":2},{"latency":12235,"batch_size":2},{"latency":18215,"batch_size":3},{"latency":12256,"batch_size":2},{"latency":12324,"batch_size":2},{"latency":18125,"batch_size":3},{"latency":18261,"batch_size":3},{"latency":6276,"batch_size":1},{"latency":6364,"batch_size":1},{"latency":6258,"batch_size":1},{"latency":17778,"batch_size":3},{"latency":6032,"batch_size":1},{"latency":10511,"batch_size":2},{"latency":5171,"batch_size":1},{"latency":9933,"batch_size":2},{"latency":9811,"batch_size":2},{"latency":5862,"batch_size":1},{"latency":5573,"batch_size":1},{"latency":5953,"batch_size":1},{"latency":5614,"batch_size":1},{"latency":5883,"batch_size":1},{"latency":5995,"batch_size":1},{"latency":5990,"batch_size":1},{"latency":5972,"batch_size":1},{"latency":11104,"batch_size":2},{"latency":5890,"batch_size":1},{"latency":11251,"batch_size":2},{"latency":5825,"batch_size":1},{"latency":16591,"batch_size":3},{"latency":16683,"batch_size":3},{"latency":27277,"batch_size":5},{"latency":22133,"batch_size":4},{"latency":16668,"batch_size":3},{"latency":27464,"batch_size":5},{"latency":21921,"batch_size":4},{"latency":16679,"batch_size":3},{"latency":16490,"batch_size":3},{"latency":5864,"batch_size":1},{"latency":5804,"batch_size":1},{"latency":5761,"batch_size":1},{"latency":5773,"batch_size":1},{"latency":5769,"batch_size":1},{"latency":11028,"batch_size":2},{"latency":5713,"batch_size":1},{"latency":5878,"batch_size":1},{"latency":5643,"batch_size":1},{"latency":5852,"batch_size":1},{"latency":11067,"batch_size":2},{"latency":5820,"batch_size":1},{"latency":7879,"batch_size":1},{"latency":8914,"batch_size":1},{"latency":23162,"batch_size":3},{"latency":14567,"batch_size":2},{"latency":26783,"batch_size":4},{"latency":18771,"batch_size":3},{"latency":17211,"batch_size":3},{"latency":22074,"batch_size":4},{"latency":11255,"batch_size":2},{"latency":5914,"batch_size":1},{"latency":5862,"batch_size":1},{"latency":5943,"batch_size":1},{"latency":5808,"batch_size":1},{"latency":5841,"batch_size":1},{"latency":5855,"batch_size":1},{"latency":5873,"batch_size":1},{"latency":5752,"batch_size":1},{"latency":16739,"batch_size":3},{"latency":5837,"batch_size":1},{"latency":5813,"batch_size":1},{"latency":5713,"batch_size":1},{"latency":6068,"batch_size":1},{"latency":5800,"batch_size":1},{"latency":5750,"batch_size":1},{"latency":11234,"batch_size":2},{"latency":11187,"batch_size":2},{"latency":5816,"batch_size":1},{"latency":11095,"batch_size":2},{"latency":11141,"batch_size":2},{"latency":11230,"batch_size":2},{"latency":5708,"batch_size":1},{"latency":5364,"batch_size":1},{"latency":5857,"batch_size":1},{"latency":5711,"batch_size":1},{"latency":16679,"batch_size":3},{"latency":11299,"batch_size":2},{"latency":6008,"batch_size":1},{"latency":6107,"batch_size":1},{"latency":11158,"batch_size":2},{"latency":16476,"batch_size":3},{"latency":5821,"batch_size":1},{"latency":11290,"batch_size":2},{"latency":11191,"batch_size":2},{"latency":11164,"batch_size":2},{"latency":16635,"batch_size":3},{"latency":5801,"batch_size":1},{"latency":5269,"batch_size":1},{"latency":5802,"batch_size":1},{"latency":5766,"batch_size":1},{"latency":15150,"batch_size":3},{"latency":14588,"batch_size":3},{"latency":5125,"batch_size":1},{"latency":5065,"batch_size":1},{"latency":11123,"batch_size":2},{"latency":6011,"batch_size":1},{"latency":16485,"batch_size":3},{"latency":16565,"batch_size":3},{"latency":11156,"batch_size":2},{"latency":5883,"batch_size":1},{"latency":16673,"batch_size":3},{"latency":5816,"batch_size":1},{"latency":5873,"batch_size":1},{"latency":11215,"batch_size":2},{"latency":22072,"batch_size":4},{"latency":16578,"batch_size":3},{"latency":5871,"batch_size":1},{"latency":5845,"batch_size":1},{"latency":5865,"batch_size":1},{"latency":5844,"batch_size":1},{"latency":16694,"batch_size":3},{"latency":11159,"batch_size":2},{"latency":5747,"batch_size":1},{"latency":11133,"batch_size":2},{"latency":16499,"batch_size":3},{"latency":16693,"batch_size":3},{"latency":27593,"batch_size":5},{"latency":22000,"batch_size":4},{"latency":16705,"batch_size":3},{"latency":27447,"batch_size":5},{"latency":21558,"batch_size":4},{"latency":16766,"batch_size":3},{"latency":23692,"batch_size":4},{"latency":16913,"batch_size":3},{"latency":16765,"batch_size":3},{"latency":16630,"batch_size":3},{"latency":16581,"batch_size":3},{"latency":11253,"batch_size":2},{"latency":5790,"batch_size":1},{"latency":10125,"batch_size":2},{"latency":6085,"batch_size":1},{"latency":11358,"batch_size":2},{"latency":11301,"batch_size":2},{"latency":5876,"batch_size":1},{"latency":5921,"batch_size":1},{"latency":16570,"batch_size":3},{"latency":11489,"batch_size":2},{"latency":11235,"batch_size":2},{"latency":11371,"batch_size":2},{"latency":11317,"batch_size":2},{"latency":22458,"batch_size":4},{"latency":16689,"batch_size":3},{"latency":11487,"batch_size":2},{"latency":5981,"batch_size":1},{"latency":16845,"batch_size":3},{"latency":11363,"batch_size":2},{"latency":11425,"batch_size":2},{"latency":11491,"batch_size":2},{"latency":11169,"batch_size":2},{"latency":6264,"batch_size":1},{"latency":6093,"batch_size":1},{"latency":11405,"batch_size":2},{"latency":17060,"batch_size":3},{"latency":27198,"batch_size":5},{"latency":16959,"batch_size":3},{"latency":11356,"batch_size":2},{"latency":5143,"batch_size":1},{"latency":14510,"batch_size":3},{"latency":5457,"batch_size":1},{"latency":11388,"batch_size":2},{"latency":11347,"batch_size":2},{"latency":17087,"batch_size":3},{"latency":22103,"batch_size":4},{"latency":16603,"batch_size":3},{"latency":21579,"batch_size":4},{"latency":16567,"batch_size":3},{"latency":22171,"batch_size":4},{"latency":16812,"batch_size":3},{"latency":11363,"batch_size":2},{"latency":5929,"batch_size":1},{"latency":6018,"batch_size":1},{"latency":6160,"batch_size":1},{"latency":11234,"batch_size":2},{"latency":5745,"batch_size":1},{"latency":11229,"batch_size":2},{"latency":11220,"batch_size":2},{"latency":16863,"batch_size":3},{"latency":21989,"batch_size":4},{"latency":16581,"batch_size":3},{"latency":11256,"batch_size":2},{"latency":16600,"batch_size":3},{"latency":22151,"batch_size":4},{"latency":6028,"batch_size":1},{"latency":6063,"batch_size":1},{"latency":11250,"batch_size":2},{"latency":16782,"batch_size":3},{"latency":21838,"batch_size":4},{"latency":16699,"batch_size":3},{"latency":21713,"batch_size":4},{"latency":16578,"batch_size":3},{"latency":11016,"batch_size":2},{"latency":5721,"batch_size":1},{"latency":11105,"batch_size":2},{"latency":11046,"batch_size":2},{"latency":5873,"batch_size":1},{"latency":11144,"batch_size":2},{"latency":5561,"batch_size":1},{"latency":5255,"batch_size":1},{"latency":5103,"batch_size":1},{"latency":5813,"batch_size":1},{"latency":5982,"batch_size":1},{"latency":11026,"batch_size":2},{"latency":11293,"batch_size":2},{"latency":21576,"batch_size":4},{"latency":11290,"batch_size":2},{"latency":21862,"batch_size":4},{"latency":5807,"batch_size":1},{"latency":5782,"batch_size":1},{"latency":16756,"batch_size":3},{"latency":16585,"batch_size":3},{"latency":11107,"batch_size":2},{"latency":6026,"batch_size":1},{"latency":11339,"batch_size":2},{"latency":27833,"batch_size":3},{"latency":19248,"batch_size":2},{"latency":17566,"batch_size":2},{"latency":15931,"batch_size":2},{"latency":8183,"batch_size":1},{"latency":7880,"batch_size":1},{"latency":14751,"batch_size":2},{"latency":20634,"batch_size":3},{"latency":13229,"batch_size":2},{"latency":24467,"batch_size":4},{"latency":16769,"batch_size":3},{"latency":27440,"batch_size":5},{"latency":22104,"batch_size":4},{"latency":16654,"batch_size":3},{"latency":24440,"batch_size":5},{"latency":19487,"batch_size":4},{"latency":14747,"batch_size":3},{"latency":24248,"batch_size":5},{"latency":14602,"batch_size":3},{"latency":9854,"batch_size":2},{"latency":5096,"batch_size":1},{"latency":5182,"batch_size":1},{"latency":5098,"batch_size":1},{"latency":11396,"batch_size":2},{"latency":5936,"batch_size":1},{"latency":16523,"batch_size":3},{"latency":11233,"batch_size":2},{"latency":5850,"batch_size":1},{"latency":16314,"batch_size":3},{"latency":21896,"batch_size":4},{"latency":16121,"batch_size":3},{"latency":27217,"batch_size":5},{"latency":22066,"batch_size":4},{"latency":16429,"batch_size":3},{"latency":27369,"batch_size":5},{"latency":21896,"batch_size":4},{"latency":16391,"batch_size":3},{"latency":5816,"batch_size":1},{"latency":11241,"batch_size":2},{"latency":5383,"batch_size":1},{"latency":10098,"batch_size":2},{"latency":5138,"batch_size":1},{"latency":5214,"batch_size":1},{"latency":16749,"batch_size":3},{"latency":5820,"batch_size":1},{"latency":12432,"batch_size":2},{"latency":16875,"batch_size":3},{"latency":10977,"batch_size":2},{"latency":5954,"batch_size":1},{"latency":5893,"batch_size":1},{"latency":5802,"batch_size":1},{"latency":5996,"batch_size":1},{"latency":5934,"batch_size":1},{"latency":5924,"batch_size":1},{"latency":5773,"batch_size":1},{"latency":11091,"batch_size":2},{"latency":16838,"batch_size":3},{"latency":16892,"batch_size":3},{"latency":5924,"batch_size":1},{"latency":5907,"batch_size":1},{"latency":5828,"batch_size":1},{"latency":6136,"batch_size":1},{"latency":11314,"batch_size":2},{"latency":16600,"batch_size":3},{"latency":5971,"batch_size":1},{"latency":16700,"batch_size":3},{"latency":27757,"batch_size":5},{"latency":22213,"batch_size":4},{"latency":16782,"batch_size":3},{"latency":11189,"batch_size":2},{"latency":21194,"batch_size":4},{"latency":11349,"batch_size":2},{"latency":5651,"batch_size":1},{"latency":16412,"batch_size":3},{"latency":16228,"batch_size":3},{"latency":5846,"batch_size":1},{"latency":16751,"batch_size":3},{"latency":16720,"batch_size":3},{"latency":27595,"batch_size":5},{"latency":21769,"batch_size":4},{"latency":14374,"batch_size":3},{"latency":23958,"batch_size":5},{"latency":19436,"batch_size":4},{"latency":19391,"batch_size":4},{"latency":19288,"batch_size":4},{"latency":14791,"batch_size":3},{"latency":14643,"batch_size":3},{"latency":5317,"batch_size":1},{"latency":11237,"batch_size":2},{"latency":5845,"batch_size":1},{"latency":5806,"batch_size":1},{"latency":5938,"batch_size":1},{"latency":5713,"batch_size":1},{"latency":5769,"batch_size":1},{"latency":5967,"batch_size":1},{"latency":5740,"batch_size":1},{"latency":5837,"batch_size":1},{"latency":5739,"batch_size":1},{"latency":6197,"batch_size":1},{"latency":5741,"batch_size":1},{"latency":5926,"batch_size":1},{"latency":6127,"batch_size":1},{"latency":16738,"batch_size":3},{"latency":5994,"batch_size":1},{"latency":11005,"batch_size":2},{"latency":5862,"batch_size":1},{"latency":5992,"batch_size":1},{"latency":16399,"batch_size":3},{"latency":11152,"batch_size":2},{"latency":11235,"batch_size":2},{"latency":5683,"batch_size":1},{"latency":5743,"batch_size":1},{"latency":5919,"batch_size":1},{"latency":5751,"batch_size":1},{"latency":5762,"batch_size":1},{"latency":5781,"batch_size":1},{"latency":11207,"batch_size":2},{"latency":16555,"batch_size":3},{"latency":21876,"batch_size":4},{"latency":11067,"batch_size":2},{"latency":5984,"batch_size":1},{"latency":16680,"batch_size":3},{"latency":16573,"batch_size":3},{"latency":16279,"batch_size":3},{"latency":21862,"batch_size":4},{"latency":11147,"batch_size":2},{"latency":6128,"batch_size":1},{"latency":5700,"batch_size":1},{"latency":5829,"batch_size":1},{"latency":5822,"batch_size":1},{"latency":6061,"batch_size":1},{"latency":11200,"batch_size":2},{"latency":5879,"batch_size":1},{"latency":11118,"batch_size":2},{"latency":11234,"batch_size":2},{"latency":5815,"batch_size":1},{"latency":11154,"batch_size":2},{"latency":16538,"batch_size":3},{"latency":11164,"batch_size":2},{"latency":5871,"batch_size":1},{"latency":5774,"batch_size":1},{"latency":5898,"batch_size":1},{"latency":16457,"batch_size":3},{"latency":5787,"batch_size":1},{"latency":5922,"batch_size":1},{"latency":16543,"batch_size":3},{"latency":16477,"batch_size":3},{"latency":11074,"batch_size":2},{"latency":16597,"batch_size":3},{"latency":11207,"batch_size":2},{"latency":21664,"batch_size":4},{"latency":16238,"batch_size":3},{"latency":27355,"batch_size":5},{"latency":21986,"batch_size":4},{"latency":16551,"batch_size":3},{"latency":5761,"batch_size":1},{"latency":11220,"batch_size":2},{"latency":5729,"batch_size":1},{"latency":5764,"batch_size":1},{"latency":5813,"batch_size":1},{"latency":6177,"batch_size":1},{"latency":5335,"batch_size":1},{"latency":11379,"batch_size":2},{"latency":5857,"batch_size":1},{"latency":10991,"batch_size":2},{"latency":5866,"batch_size":1},{"latency":5936,"batch_size":1},{"latency":11009,"batch_size":2},{"latency":9963,"batch_size":2},{"latency":14547,"batch_size":3},{"latency":10008,"batch_size":2},{"latency":9735,"batch_size":2},{"latency":14521,"batch_size":3},{"latency":5108,"batch_size":1},{"latency":5973,"batch_size":1},{"latency":5887,"batch_size":1},{"latency":11062,"batch_size":2},{"latency":6094,"batch_size":1},{"latency":11415,"batch_size":2},{"latency":5948,"batch_size":1},{"latency":16725,"batch_size":3},{"latency":11169,"batch_size":2},{"latency":22042,"batch_size":4},{"latency":16635,"batch_size":3},{"latency":16694,"batch_size":3},{"latency":11392,"batch_size":2},{"latency":5764,"batch_size":1},{"latency":16401,"batch_size":3},{"latency":21861,"batch_size":4},{"latency":16639,"batch_size":3},{"latency":21874,"batch_size":4},{"latency":5789,"batch_size":1},{"latency":11192,"batch_size":2},{"latency":5851,"batch_size":1},{"latency":5917,"batch_size":1},{"latency":5885,"batch_size":1},{"latency":16700,"batch_size":3},{"latency":27112,"batch_size":5}],"alpha":9512.99999581275,"beta":-598.9999959642395,"batch_size":2,"name":"kernel_svm"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: kernel_svm BATCHER: Updated batching model: max_batch_size: 2, alpha = 8572.499999101497, beta = 1755.5000005045993
+INFO:clipper::batching: kernel_svm BATCHER: Predicted max thruput: 105.81730642770081, baseline: 96.82416731585393, increase: 1.092881140743612
+INFO:clipper::batching: GREPTHISkernel_svm: XXXXXX {"measurements":[{"latency":30963,"batch_size":3},{"latency":19049,"batch_size":2},{"latency":17542,"batch_size":2},{"latency":30757,"batch_size":4},{"latency":18533,"batch_size":3},{"latency":17468,"batch_size":3},{"latency":27351,"batch_size":5},{"latency":21814,"batch_size":4},{"latency":16468,"batch_size":3},{"latency":27103,"batch_size":5},{"latency":21877,"batch_size":4},{"latency":16603,"batch_size":3},{"latency":27167,"batch_size":5},{"latency":21898,"batch_size":4},{"latency":18420,"batch_size":3},{"latency":16838,"batch_size":3},{"latency":27317,"batch_size":5},{"latency":19234,"batch_size":3},{"latency":24599,"batch_size":2},{"latency":10328,"batch_size":1},{"latency":27650,"batch_size":3},{"latency":17012,"batch_size":2},{"latency":30453,"batch_size":4},{"latency":20859,"batch_size":3},{"latency":13286,"batch_size":2},{"latency":25505,"batch_size":4},{"latency":17058,"batch_size":3},{"latency":27374,"batch_size":5},{"latency":21936,"batch_size":4},{"latency":16639,"batch_size":3},{"latency":16667,"batch_size":3},{"latency":16565,"batch_size":3},{"latency":5912,"batch_size":1},{"latency":11239,"batch_size":2},{"latency":16625,"batch_size":3},{"latency":21860,"batch_size":4},{"latency":16577,"batch_size":3},{"latency":27263,"batch_size":5},{"latency":21866,"batch_size":4},{"latency":16537,"batch_size":3},{"latency":27189,"batch_size":5},{"latency":21939,"batch_size":4},{"latency":16575,"batch_size":3},{"latency":27211,"batch_size":5},{"latency":21954,"batch_size":4},{"latency":16652,"batch_size":3},{"latency":27304,"batch_size":5},{"latency":21873,"batch_size":4},{"latency":16608,"batch_size":3},{"latency":27272,"batch_size":5},{"latency":21985,"batch_size":4},{"latency":16619,"batch_size":3},{"latency":27237,"batch_size":5},{"latency":21471,"batch_size":4},{"latency":15336,"batch_size":3},{"latency":28112,"batch_size":5},{"latency":21775,"batch_size":4},{"latency":16806,"batch_size":3},{"latency":27240,"batch_size":5},{"latency":21942,"batch_size":4},{"latency":16736,"batch_size":3},{"latency":26883,"batch_size":5},{"latency":21669,"batch_size":4},{"latency":16641,"batch_size":3},{"latency":27035,"batch_size":5},{"latency":11213,"batch_size":2},{"latency":5694,"batch_size":1},{"latency":11574,"batch_size":2},{"latency":5995,"batch_size":1},{"latency":5977,"batch_size":1},{"latency":5917,"batch_size":1},{"latency":11278,"batch_size":2},{"latency":5952,"batch_size":1},{"latency":16468,"batch_size":3},{"latency":23369,"batch_size":5},{"latency":18738,"batch_size":4},{"latency":14476,"batch_size":3},{"latency":14742,"batch_size":3},{"latency":9999,"batch_size":2},{"latency":5079,"batch_size":1},{"latency":5867,"batch_size":1},{"latency":11384,"batch_size":2},{"latency":11022,"batch_size":2},{"latency":5765,"batch_size":1},{"latency":11517,"batch_size":2},{"latency":6011,"batch_size":1},{"latency":5213,"batch_size":1},{"latency":6228,"batch_size":1},{"latency":5851,"batch_size":1},{"latency":16368,"batch_size":3},{"latency":16697,"batch_size":3},{"latency":16086,"batch_size":3},{"latency":10747,"batch_size":2},{"latency":5718,"batch_size":1},{"latency":5991,"batch_size":1},{"latency":5996,"batch_size":1},{"latency":5847,"batch_size":1},{"latency":5664,"batch_size":1},{"latency":6004,"batch_size":1},{"latency":6029,"batch_size":1},{"latency":16109,"batch_size":3},{"latency":16331,"batch_size":3},{"latency":26401,"batch_size":5},{"latency":21657,"batch_size":4},{"latency":16204,"batch_size":3},{"latency":26698,"batch_size":5},{"latency":21482,"batch_size":4},{"latency":16384,"batch_size":3},{"latency":25935,"batch_size":5},{"latency":19328,"batch_size":4},{"latency":9823,"batch_size":2},{"latency":14492,"batch_size":3},{"latency":18984,"batch_size":4},{"latency":19068,"batch_size":4},{"latency":18904,"batch_size":4},{"latency":19293,"batch_size":4},{"latency":19276,"batch_size":4},{"latency":19277,"batch_size":4},{"latency":10108,"batch_size":2},{"latency":14575,"batch_size":3},{"latency":23894,"batch_size":5},{"latency":9707,"batch_size":2},{"latency":14448,"batch_size":3},{"latency":5158,"batch_size":1},{"latency":5220,"batch_size":1},{"latency":5235,"batch_size":1},{"latency":5095,"batch_size":1},{"latency":11528,"batch_size":2},{"latency":6126,"batch_size":1},{"latency":5911,"batch_size":1},{"latency":6164,"batch_size":1},{"latency":11306,"batch_size":2},{"latency":5832,"batch_size":1},{"latency":16433,"batch_size":3},{"latency":21840,"batch_size":4},{"latency":5782,"batch_size":1},{"latency":11248,"batch_size":2},{"latency":5827,"batch_size":1},{"latency":11138,"batch_size":2},{"latency":12575,"batch_size":2},{"latency":21998,"batch_size":4},{"latency":5957,"batch_size":1},{"latency":5817,"batch_size":1},{"latency":5877,"batch_size":1},{"latency":5766,"batch_size":1},{"latency":6263,"batch_size":1},{"latency":5920,"batch_size":1},{"latency":15908,"batch_size":3},{"latency":16339,"batch_size":3},{"latency":11211,"batch_size":2},{"latency":11096,"batch_size":2},{"latency":5756,"batch_size":1},{"latency":5749,"batch_size":1},{"latency":5828,"batch_size":1},{"latency":5854,"batch_size":1},{"latency":5922,"batch_size":1},{"latency":5913,"batch_size":1},{"latency":27473,"batch_size":3},{"latency":16933,"batch_size":2},{"latency":30016,"batch_size":4},{"latency":20701,"batch_size":3},{"latency":13188,"batch_size":2},{"latency":24583,"batch_size":4},{"latency":16687,"batch_size":3},{"latency":27347,"batch_size":5},{"latency":21806,"batch_size":4},{"latency":16591,"batch_size":3},{"latency":5858,"batch_size":1},{"latency":16120,"batch_size":3},{"latency":6036,"batch_size":1},{"latency":5983,"batch_size":1},{"latency":10995,"batch_size":2},{"latency":5708,"batch_size":1},{"latency":5392,"batch_size":1},{"latency":11060,"batch_size":2},{"latency":5958,"batch_size":1},{"latency":5823,"batch_size":1},{"latency":5835,"batch_size":1},{"latency":5544,"batch_size":1},{"latency":5875,"batch_size":1},{"latency":5491,"batch_size":1},{"latency":5996,"batch_size":1},{"latency":10794,"batch_size":2},{"latency":16428,"batch_size":3},{"latency":5829,"batch_size":1},{"latency":5785,"batch_size":1},{"latency":5874,"batch_size":1},{"latency":11211,"batch_size":2},{"latency":16010,"batch_size":3},{"latency":21461,"batch_size":4},{"latency":16562,"batch_size":3},{"latency":11006,"batch_size":2},{"latency":11105,"batch_size":2},{"latency":5639,"batch_size":1},{"latency":5989,"batch_size":1},{"latency":5695,"batch_size":1},{"latency":11379,"batch_size":2},{"latency":5842,"batch_size":1},{"latency":16645,"batch_size":3},{"latency":11075,"batch_size":2},{"latency":9690,"batch_size":2},{"latency":13994,"batch_size":3},{"latency":9417,"batch_size":2},{"latency":14021,"batch_size":3},{"latency":9543,"batch_size":2},{"latency":9553,"batch_size":2},{"latency":18422,"batch_size":4},{"latency":14247,"batch_size":3},{"latency":14318,"batch_size":3},{"latency":23379,"batch_size":5},{"latency":19082,"batch_size":4},{"latency":9597,"batch_size":2},{"latency":5099,"batch_size":1},{"latency":5744,"batch_size":1},{"latency":5655,"batch_size":1},{"latency":16200,"batch_size":3},{"latency":11162,"batch_size":2},{"latency":5811,"batch_size":1},{"latency":11047,"batch_size":2},{"latency":6021,"batch_size":1},{"latency":5714,"batch_size":1},{"latency":11245,"batch_size":2},{"latency":11178,"batch_size":2},{"latency":5896,"batch_size":1},{"latency":5866,"batch_size":1},{"latency":5826,"batch_size":1},{"latency":11113,"batch_size":2},{"latency":11168,"batch_size":2},{"latency":11188,"batch_size":2},{"latency":11521,"batch_size":2},{"latency":5870,"batch_size":1},{"latency":11309,"batch_size":2},{"latency":5958,"batch_size":1},{"latency":5724,"batch_size":1},{"latency":11269,"batch_size":2},{"latency":5830,"batch_size":1},{"latency":16386,"batch_size":3},{"latency":16076,"batch_size":3},{"latency":26625,"batch_size":5},{"latency":21627,"batch_size":4},{"latency":16371,"batch_size":3},{"latency":26804,"batch_size":5},{"latency":21654,"batch_size":4},{"latency":16042,"batch_size":3},{"latency":26573,"batch_size":5},{"latency":21373,"batch_size":4},{"latency":16383,"batch_size":3},{"latency":26671,"batch_size":5},{"latency":21423,"batch_size":4},{"latency":16261,"batch_size":3},{"latency":26978,"batch_size":5},{"latency":21607,"batch_size":4},{"latency":16557,"batch_size":3},{"latency":26758,"batch_size":5},{"latency":21612,"batch_size":4},{"latency":16570,"batch_size":3},{"latency":26867,"batch_size":5},{"latency":21607,"batch_size":4},{"latency":16365,"batch_size":3},{"latency":26819,"batch_size":5},{"latency":21707,"batch_size":4},{"latency":16145,"batch_size":3},{"latency":26866,"batch_size":5},{"latency":21706,"batch_size":4},{"latency":16100,"batch_size":3},{"latency":26734,"batch_size":5},{"latency":21852,"batch_size":4},{"latency":16534,"batch_size":3},{"latency":21862,"batch_size":4},{"latency":16128,"batch_size":3},{"latency":21382,"batch_size":4},{"latency":16574,"batch_size":3},{"latency":11240,"batch_size":2},{"latency":5939,"batch_size":1},{"latency":16463,"batch_size":3},{"latency":16596,"batch_size":3},{"latency":21770,"batch_size":4},{"latency":5736,"batch_size":1},{"latency":8061,"batch_size":1},{"latency":8145,"batch_size":1},{"latency":7985,"batch_size":1},{"latency":7652,"batch_size":1},{"latency":7813,"batch_size":1},{"latency":7666,"batch_size":1},{"latency":14168,"batch_size":2},{"latency":25978,"batch_size":4},{"latency":12513,"batch_size":2},{"latency":6251,"batch_size":1},{"latency":10037,"batch_size":2},{"latency":5819,"batch_size":1},{"latency":16241,"batch_size":3},{"latency":5847,"batch_size":1},{"latency":6147,"batch_size":1},{"latency":11013,"batch_size":2},{"latency":11158,"batch_size":2},{"latency":10613,"batch_size":2},{"latency":5629,"batch_size":1},{"latency":15820,"batch_size":3},{"latency":15967,"batch_size":3},{"latency":11001,"batch_size":2},{"latency":5518,"batch_size":1},{"latency":16391,"batch_size":3},{"latency":16394,"batch_size":3},{"latency":16120,"batch_size":3},{"latency":21417,"batch_size":4},{"latency":5824,"batch_size":1},{"latency":11165,"batch_size":2},{"latency":15696,"batch_size":3},{"latency":5731,"batch_size":1},{"latency":5582,"batch_size":1},{"latency":5929,"batch_size":1},{"latency":5896,"batch_size":1},{"latency":10746,"batch_size":2},{"latency":6000,"batch_size":1},{"latency":6174,"batch_size":1},{"latency":5974,"batch_size":1},{"latency":5549,"batch_size":1},{"latency":5927,"batch_size":1},{"latency":10938,"batch_size":2},{"latency":5870,"batch_size":1},{"latency":7401,"batch_size":1},{"latency":6132,"batch_size":1},{"latency":11224,"batch_size":2},{"latency":10787,"batch_size":2},{"latency":5814,"batch_size":1},{"latency":6089,"batch_size":1},{"latency":16434,"batch_size":3},{"latency":16092,"batch_size":3},{"latency":11169,"batch_size":2},{"latency":16281,"batch_size":3},{"latency":5938,"batch_size":1},{"latency":5806,"batch_size":1},{"latency":11100,"batch_size":2},{"latency":5602,"batch_size":1},{"latency":16597,"batch_size":3},{"latency":16071,"batch_size":3},{"latency":15998,"batch_size":3},{"latency":16327,"batch_size":3},{"latency":11028,"batch_size":2},{"latency":16410,"batch_size":3},{"latency":5788,"batch_size":1},{"latency":11159,"batch_size":2},{"latency":11241,"batch_size":2},{"latency":5823,"batch_size":1},{"latency":5725,"batch_size":1},{"latency":5987,"batch_size":1},{"latency":11206,"batch_size":2},{"latency":5824,"batch_size":1},{"latency":5793,"batch_size":1},{"latency":6078,"batch_size":1},{"latency":5794,"batch_size":1},{"latency":5912,"batch_size":1},{"latency":5904,"batch_size":1},{"latency":11167,"batch_size":2},{"latency":11104,"batch_size":2},{"latency":5785,"batch_size":1},{"latency":16212,"batch_size":3},{"latency":16376,"batch_size":3},{"latency":11247,"batch_size":2},{"latency":5800,"batch_size":1},{"latency":5807,"batch_size":1},{"latency":5854,"batch_size":1},{"latency":5765,"batch_size":1},{"latency":5799,"batch_size":1},{"latency":5885,"batch_size":1},{"latency":5866,"batch_size":1},{"latency":11028,"batch_size":2},{"latency":5707,"batch_size":1},{"latency":10933,"batch_size":2},{"latency":15752,"batch_size":3},{"latency":9779,"batch_size":2},{"latency":18896,"batch_size":4},{"latency":9891,"batch_size":2},{"latency":5097,"batch_size":1},{"latency":9524,"batch_size":2},{"latency":5883,"batch_size":1},{"latency":5990,"batch_size":1},{"latency":11183,"batch_size":2},{"latency":5931,"batch_size":1},{"latency":16434,"batch_size":3},{"latency":5799,"batch_size":1},{"latency":10961,"batch_size":2},{"latency":16520,"batch_size":3},{"latency":5834,"batch_size":1},{"latency":11307,"batch_size":2},{"latency":16488,"batch_size":3},{"latency":16239,"batch_size":3},{"latency":16601,"batch_size":3},{"latency":21482,"batch_size":4},{"latency":16566,"batch_size":3},{"latency":21277,"batch_size":4},{"latency":11196,"batch_size":2},{"latency":11175,"batch_size":2},{"latency":6074,"batch_size":1},{"latency":11319,"batch_size":2},{"latency":5735,"batch_size":1},{"latency":11489,"batch_size":2},{"latency":5822,"batch_size":1},{"latency":5938,"batch_size":1},{"latency":5575,"batch_size":1},{"latency":11053,"batch_size":2},{"latency":5680,"batch_size":1},{"latency":5833,"batch_size":1},{"latency":11071,"batch_size":2},{"latency":5668,"batch_size":1},{"latency":6157,"batch_size":1},{"latency":5863,"batch_size":1},{"latency":5827,"batch_size":1},{"latency":5755,"batch_size":1},{"latency":5721,"batch_size":1},{"latency":16549,"batch_size":3},{"latency":27348,"batch_size":5},{"latency":11158,"batch_size":2},{"latency":5832,"batch_size":1},{"latency":16324,"batch_size":3},{"latency":10976,"batch_size":2},{"latency":5718,"batch_size":1},{"latency":5810,"batch_size":1},{"latency":5817,"batch_size":1},{"latency":5895,"batch_size":1},{"latency":5816,"batch_size":1},{"latency":16104,"batch_size":3},{"latency":16195,"batch_size":3},{"latency":5846,"batch_size":1},{"latency":10825,"batch_size":2},{"latency":20739,"batch_size":4},{"latency":16071,"batch_size":3},{"latency":27089,"batch_size":5},{"latency":16607,"batch_size":3},{"latency":5745,"batch_size":1},{"latency":16321,"batch_size":3},{"latency":26722,"batch_size":5},{"latency":21278,"batch_size":4},{"latency":15608,"batch_size":3},{"latency":16070,"batch_size":3},{"latency":26992,"batch_size":5},{"latency":21399,"batch_size":4},{"latency":16264,"batch_size":3},{"latency":26910,"batch_size":5},{"latency":21678,"batch_size":4},{"latency":16621,"batch_size":3},{"latency":26622,"batch_size":5},{"latency":21505,"batch_size":4},{"latency":16061,"batch_size":3},{"latency":23238,"batch_size":5},{"latency":18925,"batch_size":4},{"latency":19213,"batch_size":4},{"latency":19298,"batch_size":4},{"latency":19076,"batch_size":4},{"latency":19279,"batch_size":4},{"latency":19234,"batch_size":4},{"latency":18809,"batch_size":4},{"latency":18631,"batch_size":4},{"latency":18676,"batch_size":4},{"latency":18513,"batch_size":4},{"latency":19296,"batch_size":4},{"latency":9819,"batch_size":2},{"latency":9515,"batch_size":2},{"latency":4989,"batch_size":1},{"latency":9803,"batch_size":2},{"latency":14593,"batch_size":3},{"latency":9849,"batch_size":2},{"latency":5886,"batch_size":1},{"latency":6064,"batch_size":1},{"latency":5950,"batch_size":1},{"latency":5664,"batch_size":1},{"latency":5989,"batch_size":1},{"latency":10823,"batch_size":2},{"latency":5871,"batch_size":1},{"latency":16699,"batch_size":3},{"latency":5823,"batch_size":1},{"latency":5801,"batch_size":1},{"latency":5929,"batch_size":1},{"latency":11179,"batch_size":2},{"latency":11258,"batch_size":2},{"latency":5581,"batch_size":1},{"latency":16628,"batch_size":3},{"latency":21539,"batch_size":4},{"latency":11415,"batch_size":2},{"latency":5851,"batch_size":1},{"latency":16153,"batch_size":3},{"latency":11265,"batch_size":2},{"latency":11183,"batch_size":2},{"latency":5765,"batch_size":1},{"latency":11173,"batch_size":2},{"latency":16555,"batch_size":3},{"latency":16234,"batch_size":3},{"latency":16675,"batch_size":3},{"latency":16591,"batch_size":3},{"latency":16572,"batch_size":3},{"latency":11170,"batch_size":2},{"latency":11078,"batch_size":2},{"latency":21355,"batch_size":4},{"latency":16312,"batch_size":3},{"latency":21278,"batch_size":4},{"latency":15981,"batch_size":3},{"latency":16333,"batch_size":3},{"latency":26868,"batch_size":5},{"latency":21525,"batch_size":4}],"alpha":8572.499999101497,"beta":1755.5000005045993,"batch_size":2,"name":"kernel_svm"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: kernel_svm BATCHER: Updated batching model: max_batch_size: 2, alpha = 8073.999999123127, beta = 2555.9999999001907
+INFO:clipper::batching: kernel_svm BATCHER: Predicted max thruput: 106.9289991551646, baseline: 94.07337724288615, increase: 1.136655260914964
+INFO:clipper::batching: GREPTHISkernel_svm: XXXXXX {"measurements":[{"latency":29692,"batch_size":3},{"latency":18271,"batch_size":2},{"latency":17017,"batch_size":2},{"latency":29987,"batch_size":4},{"latency":18430,"batch_size":3},{"latency":17101,"batch_size":3},{"latency":27534,"batch_size":5},{"latency":21918,"batch_size":4},{"latency":16580,"batch_size":3},{"latency":27670,"batch_size":5},{"latency":25102,"batch_size":4},{"latency":19052,"batch_size":3},{"latency":21500,"batch_size":3},{"latency":13297,"batch_size":2},{"latency":25519,"batch_size":4},{"latency":19192,"batch_size":3},{"latency":19176,"batch_size":3},{"latency":19127,"batch_size":3},{"latency":18949,"batch_size":3},{"latency":18289,"batch_size":3},{"latency":11456,"batch_size":2},{"latency":24816,"batch_size":2},{"latency":10296,"batch_size":1},{"latency":27700,"batch_size":3},{"latency":15540,"batch_size":2},{"latency":26553,"batch_size":4},{"latency":18353,"batch_size":3},{"latency":17145,"batch_size":3},{"latency":27407,"batch_size":5},{"latency":22719,"batch_size":4},{"latency":16576,"batch_size":3},{"latency":27329,"batch_size":5},{"latency":21968,"batch_size":4},{"latency":16561,"batch_size":3},{"latency":27375,"batch_size":5},{"latency":21946,"batch_size":4},{"latency":16595,"batch_size":3},{"latency":27211,"batch_size":5},{"latency":21822,"batch_size":4},{"latency":16574,"batch_size":3},{"latency":27226,"batch_size":5},{"latency":16585,"batch_size":3},{"latency":16662,"batch_size":3},{"latency":16536,"batch_size":3},{"latency":5958,"batch_size":1},{"latency":13148,"batch_size":2},{"latency":13080,"batch_size":2},{"latency":6848,"batch_size":1},{"latency":6927,"batch_size":1},{"latency":6773,"batch_size":1},{"latency":19202,"batch_size":3},{"latency":19209,"batch_size":3},{"latency":19321,"batch_size":3},{"latency":6852,"batch_size":1},{"latency":16665,"batch_size":3},{"latency":16689,"batch_size":3},{"latency":11304,"batch_size":2},{"latency":11341,"batch_size":2},{"latency":21885,"batch_size":4},{"latency":11261,"batch_size":2},{"latency":5981,"batch_size":1},{"latency":11228,"batch_size":2},{"latency":22069,"batch_size":4},{"latency":15006,"batch_size":3},{"latency":24065,"batch_size":5},{"latency":19027,"batch_size":4},{"latency":19486,"batch_size":4},{"latency":19085,"batch_size":4},{"latency":19265,"batch_size":4},{"latency":19127,"batch_size":4},{"latency":19214,"batch_size":4},{"latency":14292,"batch_size":3},{"latency":5087,"batch_size":1},{"latency":14350,"batch_size":3},{"latency":9749,"batch_size":2},{"latency":19130,"batch_size":4},{"latency":19085,"batch_size":4},{"latency":19141,"batch_size":4},{"latency":19369,"batch_size":4},{"latency":19115,"batch_size":4},{"latency":19328,"batch_size":4},{"latency":16470,"batch_size":3},{"latency":16176,"batch_size":3},{"latency":16283,"batch_size":3},{"latency":15633,"batch_size":3},{"latency":5284,"batch_size":1},{"latency":14681,"batch_size":3},{"latency":19088,"batch_size":4},{"latency":14596,"batch_size":3},{"latency":18866,"batch_size":4},{"latency":14491,"batch_size":3},{"latency":14224,"batch_size":3},{"latency":14581,"batch_size":3},{"latency":5000,"batch_size":1},{"latency":9782,"batch_size":2},{"latency":5019,"batch_size":1},{"latency":9939,"batch_size":2},{"latency":9898,"batch_size":2},{"latency":5843,"batch_size":1},{"latency":10844,"batch_size":2},{"latency":5853,"batch_size":1},{"latency":10916,"batch_size":2},{"latency":5461,"batch_size":1},{"latency":5822,"batch_size":1},{"latency":5354,"batch_size":1},{"latency":5816,"batch_size":1},{"latency":10853,"batch_size":2},{"latency":16090,"batch_size":3},{"latency":21400,"batch_size":4},{"latency":16431,"batch_size":3},{"latency":26652,"batch_size":5},{"latency":16074,"batch_size":3},{"latency":10908,"batch_size":2},{"latency":5817,"batch_size":1},{"latency":5784,"batch_size":1},{"latency":5846,"batch_size":1},{"latency":5758,"batch_size":1},{"latency":5858,"batch_size":1},{"latency":16297,"batch_size":3},{"latency":16452,"batch_size":3},{"latency":5366,"batch_size":1},{"latency":6012,"batch_size":1},{"latency":6079,"batch_size":1},{"latency":16697,"batch_size":3},{"latency":16533,"batch_size":3},{"latency":9957,"batch_size":2},{"latency":5589,"batch_size":1},{"latency":10630,"batch_size":1},{"latency":18490,"batch_size":2},{"latency":16910,"batch_size":2},{"latency":30334,"batch_size":4},{"latency":21177,"batch_size":3},{"latency":13586,"batch_size":2},{"latency":25363,"batch_size":4},{"latency":17220,"batch_size":3},{"latency":27224,"batch_size":5},{"latency":21736,"batch_size":4},{"latency":16392,"batch_size":3},{"latency":21698,"batch_size":4},{"latency":11079,"batch_size":2},{"latency":21878,"batch_size":4},{"latency":16133,"batch_size":3},{"latency":26988,"batch_size":5},{"latency":23060,"batch_size":4},{"latency":16875,"batch_size":3},{"latency":26793,"batch_size":5},{"latency":21336,"batch_size":4},{"latency":16325,"batch_size":3},{"latency":26309,"batch_size":5},{"latency":16606,"batch_size":3},{"latency":26668,"batch_size":5},{"latency":19540,"batch_size":4},{"latency":18720,"batch_size":4},{"latency":14126,"batch_size":3},{"latency":5876,"batch_size":1},{"latency":5589,"batch_size":1},{"latency":5984,"batch_size":1},{"latency":5907,"batch_size":1},{"latency":5782,"batch_size":1},{"latency":16761,"batch_size":3},{"latency":16522,"batch_size":3},{"latency":11148,"batch_size":2},{"latency":16313,"batch_size":3},{"latency":21768,"batch_size":4},{"latency":5874,"batch_size":1},{"latency":16301,"batch_size":3},{"latency":16485,"batch_size":3},{"latency":11188,"batch_size":2},{"latency":5951,"batch_size":1},{"latency":5897,"batch_size":1},{"latency":11406,"batch_size":2},{"latency":5965,"batch_size":1},{"latency":6002,"batch_size":1},{"latency":11293,"batch_size":2},{"latency":5807,"batch_size":1},{"latency":16272,"batch_size":3},{"latency":5963,"batch_size":1},{"latency":11124,"batch_size":2},{"latency":5995,"batch_size":1},{"latency":11284,"batch_size":2},{"latency":10932,"batch_size":2},{"latency":5902,"batch_size":1},{"latency":26778,"batch_size":3},{"latency":16354,"batch_size":2},{"latency":15271,"batch_size":2},{"latency":7585,"batch_size":1},{"latency":7011,"batch_size":1},{"latency":6954,"batch_size":1},{"latency":10217,"batch_size":1},{"latency":19878,"batch_size":2},{"latency":17915,"batch_size":2},{"latency":31420,"batch_size":4},{"latency":21471,"batch_size":3},{"latency":13726,"batch_size":2},{"latency":24992,"batch_size":4},{"latency":18318,"batch_size":3},{"latency":18221,"batch_size":3},{"latency":18246,"batch_size":3},{"latency":18368,"batch_size":3},{"latency":18332,"batch_size":3},{"latency":18409,"batch_size":3},{"latency":18450,"batch_size":3},{"latency":18320,"batch_size":3},{"latency":18354,"batch_size":3},{"latency":18285,"batch_size":3},{"latency":18284,"batch_size":3},{"latency":18424,"batch_size":3},{"latency":18379,"batch_size":3},{"latency":18293,"batch_size":3},{"latency":18255,"batch_size":3},{"latency":18207,"batch_size":3},{"latency":18297,"batch_size":3},{"latency":18167,"batch_size":3},{"latency":18486,"batch_size":3},{"latency":18219,"batch_size":3},{"latency":18447,"batch_size":3},{"latency":18361,"batch_size":3},{"latency":18238,"batch_size":3},{"latency":18307,"batch_size":3},{"latency":18443,"batch_size":3},{"latency":18361,"batch_size":3},{"latency":18400,"batch_size":3},{"latency":18457,"batch_size":3},{"latency":18284,"batch_size":3},{"latency":18292,"batch_size":3},{"latency":18278,"batch_size":3},{"latency":18273,"batch_size":3},{"latency":18307,"batch_size":3},{"latency":18215,"batch_size":3},{"latency":18254,"batch_size":3},{"latency":18316,"batch_size":3},{"latency":18179,"batch_size":3},{"latency":17859,"batch_size":3},{"latency":26998,"batch_size":5},{"latency":18975,"batch_size":4},{"latency":18825,"batch_size":4},{"latency":18794,"batch_size":4},{"latency":9937,"batch_size":2},{"latency":19137,"batch_size":4},{"latency":14230,"batch_size":3},{"latency":9735,"batch_size":2},{"latency":5085,"batch_size":1},{"latency":5431,"batch_size":1},{"latency":6155,"batch_size":1},{"latency":5900,"batch_size":1},{"latency":5896,"batch_size":1},{"latency":5824,"batch_size":1},{"latency":11250,"batch_size":2},{"latency":16146,"batch_size":3},{"latency":21643,"batch_size":4},{"latency":16219,"batch_size":3},{"latency":5969,"batch_size":1},{"latency":5906,"batch_size":1},{"latency":5915,"batch_size":1},{"latency":5717,"batch_size":1},{"latency":6167,"batch_size":1},{"latency":6205,"batch_size":1},{"latency":11003,"batch_size":2},{"latency":16185,"batch_size":3},{"latency":5894,"batch_size":1},{"latency":16504,"batch_size":3},{"latency":16467,"batch_size":3},{"latency":6053,"batch_size":1},{"latency":16486,"batch_size":3},{"latency":26373,"batch_size":5},{"latency":16530,"batch_size":3},{"latency":16696,"batch_size":3},{"latency":11323,"batch_size":2},{"latency":11444,"batch_size":2},{"latency":6035,"batch_size":1},{"latency":5844,"batch_size":1},{"latency":6043,"batch_size":1},{"latency":6255,"batch_size":1},{"latency":5875,"batch_size":1},{"latency":11000,"batch_size":2},{"latency":5634,"batch_size":1},{"latency":6033,"batch_size":1},{"latency":11105,"batch_size":2},{"latency":5671,"batch_size":1},{"latency":5669,"batch_size":1},{"latency":6001,"batch_size":1},{"latency":5715,"batch_size":1},{"latency":5731,"batch_size":1},{"latency":5850,"batch_size":1},{"latency":11087,"batch_size":2},{"latency":5758,"batch_size":1},{"latency":5182,"batch_size":1},{"latency":16176,"batch_size":3},{"latency":21391,"batch_size":4},{"latency":16138,"batch_size":3},{"latency":5847,"batch_size":1},{"latency":11080,"batch_size":2},{"latency":6009,"batch_size":1},{"latency":5731,"batch_size":1},{"latency":5939,"batch_size":1},{"latency":5795,"batch_size":1},{"latency":5833,"batch_size":1},{"latency":6011,"batch_size":1},{"latency":5878,"batch_size":1},{"latency":11180,"batch_size":2},{"latency":6079,"batch_size":1},{"latency":10846,"batch_size":2},{"latency":16114,"batch_size":3},{"latency":10973,"batch_size":2},{"latency":10949,"batch_size":2},{"latency":5686,"batch_size":1},{"latency":5825,"batch_size":1},{"latency":5817,"batch_size":1},{"latency":5819,"batch_size":1},{"latency":16201,"batch_size":3},{"latency":26303,"batch_size":5},{"latency":21354,"batch_size":4},{"latency":16166,"batch_size":3},{"latency":26281,"batch_size":5},{"latency":21113,"batch_size":4},{"latency":17176,"batch_size":3},{"latency":27076,"batch_size":5},{"latency":21605,"batch_size":4},{"latency":16597,"batch_size":3},{"latency":26637,"batch_size":5},{"latency":21586,"batch_size":4},{"latency":16692,"batch_size":3},{"latency":26716,"batch_size":5},{"latency":21528,"batch_size":4},{"latency":16058,"batch_size":3},{"latency":26847,"batch_size":5},{"latency":21783,"batch_size":4},{"latency":16495,"batch_size":3},{"latency":26693,"batch_size":5},{"latency":21487,"batch_size":4},{"latency":16442,"batch_size":3},{"latency":21666,"batch_size":4},{"latency":16354,"batch_size":3},{"latency":21656,"batch_size":4},{"latency":16063,"batch_size":3},{"latency":16309,"batch_size":3},{"latency":16420,"batch_size":3},{"latency":5727,"batch_size":1},{"latency":9725,"batch_size":2},{"latency":5147,"batch_size":1},{"latency":11402,"batch_size":2},{"latency":11152,"batch_size":2},{"latency":16194,"batch_size":3},{"latency":18806,"batch_size":4},{"latency":14172,"batch_size":3},{"latency":5235,"batch_size":1},{"latency":14613,"batch_size":3},{"latency":9725,"batch_size":2},{"latency":6024,"batch_size":1},{"latency":5827,"batch_size":1},{"latency":6029,"batch_size":1},{"latency":11223,"batch_size":2},{"latency":11279,"batch_size":2},{"latency":5872,"batch_size":1},{"latency":11018,"batch_size":2},{"latency":21547,"batch_size":4},{"latency":16636,"batch_size":3},{"latency":11048,"batch_size":2},{"latency":5652,"batch_size":1},{"latency":11028,"batch_size":2},{"latency":6110,"batch_size":1},{"latency":11260,"batch_size":2},{"latency":16629,"batch_size":3},{"latency":11100,"batch_size":2},{"latency":5981,"batch_size":1},{"latency":5801,"batch_size":1},{"latency":10996,"batch_size":2},{"latency":5891,"batch_size":1},{"latency":5935,"batch_size":1},{"latency":11270,"batch_size":2},{"latency":10872,"batch_size":2},{"latency":20933,"batch_size":4},{"latency":11050,"batch_size":2},{"latency":6148,"batch_size":1},{"latency":5818,"batch_size":1},{"latency":5685,"batch_size":1},{"latency":10851,"batch_size":2},{"latency":5736,"batch_size":1},{"latency":5838,"batch_size":1},{"latency":5901,"batch_size":1},{"latency":16237,"batch_size":3},{"latency":5917,"batch_size":1},{"latency":16303,"batch_size":3},{"latency":21493,"batch_size":4},{"latency":11092,"batch_size":2},{"latency":15918,"batch_size":3},{"latency":5813,"batch_size":1},{"latency":11247,"batch_size":2},{"latency":16548,"batch_size":3},{"latency":16473,"batch_size":3},{"latency":5884,"batch_size":1},{"latency":5938,"batch_size":1},{"latency":6006,"batch_size":1},{"latency":11140,"batch_size":2},{"latency":5850,"batch_size":1},{"latency":11141,"batch_size":2},{"latency":21447,"batch_size":4},{"latency":16293,"batch_size":3},{"latency":21411,"batch_size":4},{"latency":15548,"batch_size":3},{"latency":21270,"batch_size":4},{"latency":16287,"batch_size":3},{"latency":16587,"batch_size":3},{"latency":5891,"batch_size":1},{"latency":11050,"batch_size":2},{"latency":5779,"batch_size":1},{"latency":11279,"batch_size":2},{"latency":5833,"batch_size":1},{"latency":5873,"batch_size":1},{"latency":5948,"batch_size":1},{"latency":5742,"batch_size":1},{"latency":15789,"batch_size":3},{"latency":26557,"batch_size":5},{"latency":21673,"batch_size":4},{"latency":16255,"batch_size":3},{"latency":26811,"batch_size":5},{"latency":11292,"batch_size":2},{"latency":16094,"batch_size":3},{"latency":27069,"batch_size":5},{"latency":21604,"batch_size":4},{"latency":16302,"batch_size":3},{"latency":26654,"batch_size":5},{"latency":18975,"batch_size":4},{"latency":19062,"batch_size":4},{"latency":19075,"batch_size":4},{"latency":19355,"batch_size":4},{"latency":9809,"batch_size":2},{"latency":5240,"batch_size":1},{"latency":5187,"batch_size":1},{"latency":11233,"batch_size":2},{"latency":11429,"batch_size":2},{"latency":5963,"batch_size":1},{"latency":5830,"batch_size":1},{"latency":5892,"batch_size":1},{"latency":6093,"batch_size":1},{"latency":10999,"batch_size":2},{"latency":5706,"batch_size":1},{"latency":5942,"batch_size":1},{"latency":6068,"batch_size":1},{"latency":6132,"batch_size":1},{"latency":11198,"batch_size":2},{"latency":6027,"batch_size":1},{"latency":5883,"batch_size":1},{"latency":5917,"batch_size":1},{"latency":5831,"batch_size":1},{"latency":5844,"batch_size":1},{"latency":5929,"batch_size":1},{"latency":6066,"batch_size":1},{"latency":5874,"batch_size":1},{"latency":16471,"batch_size":3},{"latency":16379,"batch_size":3},{"latency":5762,"batch_size":1},{"latency":10840,"batch_size":2},{"latency":5708,"batch_size":1},{"latency":5906,"batch_size":1},{"latency":6116,"batch_size":1},{"latency":16437,"batch_size":3},{"latency":5876,"batch_size":1},{"latency":16310,"batch_size":3},{"latency":10477,"batch_size":2},{"latency":5139,"batch_size":1},{"latency":5742,"batch_size":1},{"latency":5716,"batch_size":1},{"latency":5971,"batch_size":1},{"latency":5860,"batch_size":1},{"latency":6073,"batch_size":1},{"latency":5842,"batch_size":1},{"latency":5940,"batch_size":1},{"latency":6194,"batch_size":1},{"latency":6099,"batch_size":1},{"latency":6008,"batch_size":1},{"latency":6078,"batch_size":1},{"latency":6180,"batch_size":1},{"latency":16596,"batch_size":3},{"latency":10981,"batch_size":2},{"latency":11011,"batch_size":2},{"latency":5925,"batch_size":1},{"latency":5978,"batch_size":1},{"latency":10900,"batch_size":2},{"latency":11442,"batch_size":2},{"latency":21854,"batch_size":4},{"latency":11224,"batch_size":2},{"latency":5884,"batch_size":1},{"latency":16697,"batch_size":3},{"latency":11099,"batch_size":2},{"latency":10936,"batch_size":2},{"latency":10967,"batch_size":2},{"latency":5832,"batch_size":1},{"latency":5917,"batch_size":1},{"latency":5623,"batch_size":1},{"latency":5753,"batch_size":1},{"latency":5982,"batch_size":1},{"latency":5802,"batch_size":1},{"latency":6010,"batch_size":1},{"latency":10876,"batch_size":2},{"latency":16112,"batch_size":3},{"latency":16327,"batch_size":3},{"latency":10987,"batch_size":2},{"latency":5720,"batch_size":1}],"alpha":8073.999999123127,"beta":2555.9999999001909,"batch_size":2,"name":"kernel_svm"}
+INFO:clipper::batching: kernel_svm BATCHER: Updated batching model: max_batch_size: 2, alpha = 6804.167453292526, beta = 4180.660406344447
+INFO:clipper::batching: kernel_svm BATCHER: Predicted max thruput: 112.4290587982981, baseline: 91.03465368578365, increase: 1.2350138573203084
+INFO:clipper::batching: GREPTHISkernel_svm: XXXXXX {"measurements":[{"latency":31222,"batch_size":3},{"latency":19157,"batch_size":2},{"latency":17646,"batch_size":2},{"latency":30843,"batch_size":4},{"latency":18662,"batch_size":3},{"latency":17562,"batch_size":3},{"latency":27316,"batch_size":5},{"latency":21833,"batch_size":4},{"latency":16462,"batch_size":3},{"latency":27101,"batch_size":5},{"latency":21801,"batch_size":4},{"latency":16514,"batch_size":3},{"latency":27166,"batch_size":5},{"latency":21833,"batch_size":4},{"latency":16581,"batch_size":3},{"latency":29124,"batch_size":5},{"latency":22191,"batch_size":4},{"latency":11256,"batch_size":2},{"latency":34398,"batch_size":3},{"latency":18957,"batch_size":2},{"latency":17722,"batch_size":2},{"latency":31220,"batch_size":4},{"latency":21263,"batch_size":3},{"latency":13491,"batch_size":2},{"latency":25533,"batch_size":4},{"latency":17926,"batch_size":3},{"latency":27303,"batch_size":5},{"latency":21840,"batch_size":4},{"latency":16502,"batch_size":3},{"latency":27159,"batch_size":5},{"latency":21878,"batch_size":4},{"latency":16600,"batch_size":3},{"latency":27189,"batch_size":5},{"latency":21842,"batch_size":4},{"latency":16547,"batch_size":3},{"latency":27142,"batch_size":5},{"latency":21880,"batch_size":4},{"latency":16517,"batch_size":3},{"latency":16544,"batch_size":3},{"latency":21878,"batch_size":4},{"latency":16433,"batch_size":3},{"latency":27186,"batch_size":5},{"latency":21922,"batch_size":4},{"latency":16584,"batch_size":3},{"latency":16560,"batch_size":3},{"latency":16562,"batch_size":3},{"latency":27263,"batch_size":5},{"latency":25240,"batch_size":4},{"latency":19120,"batch_size":3},{"latency":19115,"batch_size":3},{"latency":19075,"batch_size":3},{"latency":19211,"batch_size":3},{"latency":18181,"batch_size":3},{"latency":17627,"batch_size":3},{"latency":27613,"batch_size":5},{"latency":21915,"batch_size":4},{"latency":16699,"batch_size":3},{"latency":27146,"batch_size":5},{"latency":21838,"batch_size":4},{"latency":16474,"batch_size":3},{"latency":21543,"batch_size":4},{"latency":16322,"batch_size":3},{"latency":5813,"batch_size":1},{"latency":5926,"batch_size":1},{"latency":11235,"batch_size":2},{"latency":11264,"batch_size":2},{"latency":5821,"batch_size":1},{"latency":5872,"batch_size":1},{"latency":11142,"batch_size":2},{"latency":5944,"batch_size":1},{"latency":16672,"batch_size":3},{"latency":27208,"batch_size":5},{"latency":16476,"batch_size":3},{"latency":16303,"batch_size":3},{"latency":26742,"batch_size":5},{"latency":21172,"batch_size":4},{"latency":14565,"batch_size":3},{"latency":18958,"batch_size":4},{"latency":14378,"batch_size":3},{"latency":14336,"batch_size":3},{"latency":19290,"batch_size":4},{"latency":21724,"batch_size":4},{"latency":11028,"batch_size":2},{"latency":21316,"batch_size":4},{"latency":11206,"batch_size":2},{"latency":5877,"batch_size":1},{"latency":11048,"batch_size":2},{"latency":16056,"batch_size":3},{"latency":10698,"batch_size":2},{"latency":16217,"batch_size":3},{"latency":5847,"batch_size":1},{"latency":5722,"batch_size":1},{"latency":5929,"batch_size":1},{"latency":5466,"batch_size":1},{"latency":5863,"batch_size":1},{"latency":6071,"batch_size":1},{"latency":5609,"batch_size":1},{"latency":5918,"batch_size":1},{"latency":6017,"batch_size":1},{"latency":6108,"batch_size":1},{"latency":5928,"batch_size":1},{"latency":5950,"batch_size":1},{"latency":5926,"batch_size":1},{"latency":11316,"batch_size":2},{"latency":10942,"batch_size":2},{"latency":5640,"batch_size":1},{"latency":11154,"batch_size":2},{"latency":5596,"batch_size":1},{"latency":11157,"batch_size":2},{"latency":16375,"batch_size":3},{"latency":16549,"batch_size":3},{"latency":22251,"batch_size":4},{"latency":16449,"batch_size":3},{"latency":11105,"batch_size":2},{"latency":21787,"batch_size":4},{"latency":16208,"batch_size":3},{"latency":5805,"batch_size":1},{"latency":11064,"batch_size":2},{"latency":21872,"batch_size":4},{"latency":16455,"batch_size":3},{"latency":27285,"batch_size":5},{"latency":22064,"batch_size":4},{"latency":16504,"batch_size":3},{"latency":11220,"batch_size":2},{"latency":16342,"batch_size":3},{"latency":27214,"batch_size":5},{"latency":11294,"batch_size":2},{"latency":11191,"batch_size":2},{"latency":16229,"batch_size":3},{"latency":5725,"batch_size":1},{"latency":16374,"batch_size":3},{"latency":16448,"batch_size":3},{"latency":16398,"batch_size":3},{"latency":5756,"batch_size":1},{"latency":5845,"batch_size":1},{"latency":5876,"batch_size":1},{"latency":5928,"batch_size":1},{"latency":6066,"batch_size":1},{"latency":16616,"batch_size":3},{"latency":17733,"batch_size":3},{"latency":5779,"batch_size":1},{"latency":16470,"batch_size":3},{"latency":5651,"batch_size":1},{"latency":11053,"batch_size":2},{"latency":10837,"batch_size":2},{"latency":11293,"batch_size":2},{"latency":16131,"batch_size":3},{"latency":16062,"batch_size":3},{"latency":21544,"batch_size":4},{"latency":16531,"batch_size":3},{"latency":26576,"batch_size":5},{"latency":19015,"batch_size":4},{"latency":18565,"batch_size":4},{"latency":18475,"batch_size":4},{"latency":18443,"batch_size":4},{"latency":18927,"batch_size":4},{"latency":19211,"batch_size":4},{"latency":14470,"batch_size":3},{"latency":5111,"batch_size":1},{"latency":10097,"batch_size":2},{"latency":6009,"batch_size":1},{"latency":11115,"batch_size":2},{"latency":16476,"batch_size":3},{"latency":5873,"batch_size":1},{"latency":11364,"batch_size":2},{"latency":5855,"batch_size":1},{"latency":11144,"batch_size":2},{"latency":16433,"batch_size":3},{"latency":16286,"batch_size":3},{"latency":27038,"batch_size":5},{"latency":20975,"batch_size":4},{"latency":16537,"batch_size":3},{"latency":25982,"batch_size":5},{"latency":16399,"batch_size":3},{"latency":16189,"batch_size":3},{"latency":26090,"batch_size":5},{"latency":18446,"batch_size":4},{"latency":19235,"batch_size":4},{"latency":9633,"batch_size":2},{"latency":4916,"batch_size":1},{"latency":5902,"batch_size":1},{"latency":5603,"batch_size":1},{"latency":5873,"batch_size":1},{"latency":10943,"batch_size":2},{"latency":11030,"batch_size":2},{"latency":11103,"batch_size":2},{"latency":16349,"batch_size":3},{"latency":11055,"batch_size":2},{"latency":5601,"batch_size":1},{"latency":9856,"batch_size":2},{"latency":10034,"batch_size":2},{"latency":5912,"batch_size":1},{"latency":5801,"batch_size":1},{"latency":11221,"batch_size":2},{"latency":11079,"batch_size":2},{"latency":5805,"batch_size":1},{"latency":5815,"batch_size":1},{"latency":5790,"batch_size":1},{"latency":5725,"batch_size":1},{"latency":5564,"batch_size":1},{"latency":5885,"batch_size":1},{"latency":5860,"batch_size":1},{"latency":5659,"batch_size":1},{"latency":10727,"batch_size":2},{"latency":5814,"batch_size":1},{"latency":5947,"batch_size":1},{"latency":5947,"batch_size":1},{"latency":5960,"batch_size":1},{"latency":5907,"batch_size":1},{"latency":16584,"batch_size":3},{"latency":5840,"batch_size":1},{"latency":10889,"batch_size":2},{"latency":11019,"batch_size":2},{"latency":5924,"batch_size":1},{"latency":5598,"batch_size":1},{"latency":5968,"batch_size":1},{"latency":11138,"batch_size":2},{"latency":10983,"batch_size":2},{"latency":10952,"batch_size":2},{"latency":5786,"batch_size":1},{"latency":5992,"batch_size":1},{"latency":11130,"batch_size":2},{"latency":5707,"batch_size":1},{"latency":16793,"batch_size":3},{"latency":16249,"batch_size":3},{"latency":5848,"batch_size":1},{"latency":5818,"batch_size":1},{"latency":5838,"batch_size":1},{"latency":11313,"batch_size":2},{"latency":11162,"batch_size":2},{"latency":16237,"batch_size":3},{"latency":5932,"batch_size":1},{"latency":5684,"batch_size":1},{"latency":5703,"batch_size":1},{"latency":10728,"batch_size":2},{"latency":5683,"batch_size":1},{"latency":11485,"batch_size":2},{"latency":5844,"batch_size":1},{"latency":16411,"batch_size":3},{"latency":5675,"batch_size":1},{"latency":11053,"batch_size":2},{"latency":11021,"batch_size":2},{"latency":5817,"batch_size":1},{"latency":5679,"batch_size":1},{"latency":5974,"batch_size":1},{"latency":11037,"batch_size":2},{"latency":16516,"batch_size":3},{"latency":26588,"batch_size":5},{"latency":21436,"batch_size":4},{"latency":16067,"batch_size":3},{"latency":26534,"batch_size":5},{"latency":21436,"batch_size":4},{"latency":16364,"batch_size":3},{"latency":26589,"batch_size":5},{"latency":21509,"batch_size":4},{"latency":11170,"batch_size":2},{"latency":16643,"batch_size":3},{"latency":10924,"batch_size":2},{"latency":16614,"batch_size":3},{"latency":5809,"batch_size":1},{"latency":5699,"batch_size":1},{"latency":5987,"batch_size":1},{"latency":11008,"batch_size":2},{"latency":11009,"batch_size":2},{"latency":21715,"batch_size":4},{"latency":16291,"batch_size":3},{"latency":16256,"batch_size":3},{"latency":11002,"batch_size":2},{"latency":11079,"batch_size":2},{"latency":10891,"batch_size":2},{"latency":16363,"batch_size":3},{"latency":10952,"batch_size":2},{"latency":11131,"batch_size":2},{"latency":6038,"batch_size":1},{"latency":6030,"batch_size":1},{"latency":16503,"batch_size":3},{"latency":27024,"batch_size":5},{"latency":21555,"batch_size":4},{"latency":16269,"batch_size":3},{"latency":21665,"batch_size":4},{"latency":16445,"batch_size":3},{"latency":21834,"batch_size":4},{"latency":16293,"batch_size":3},{"latency":11143,"batch_size":2},{"latency":5725,"batch_size":1},{"latency":16504,"batch_size":3},{"latency":27399,"batch_size":5},{"latency":19229,"batch_size":4},{"latency":19201,"batch_size":4},{"latency":19042,"batch_size":4},{"latency":18691,"batch_size":4},{"latency":18358,"batch_size":4},{"latency":18692,"batch_size":4},{"latency":18502,"batch_size":4},{"latency":18280,"batch_size":4},{"latency":18903,"batch_size":4},{"latency":18571,"batch_size":4},{"latency":18847,"batch_size":4},{"latency":18483,"batch_size":4},{"latency":18486,"batch_size":4},{"latency":19045,"batch_size":4},{"latency":18849,"batch_size":4},{"latency":18101,"batch_size":4},{"latency":18004,"batch_size":4},{"latency":18755,"batch_size":4},{"latency":18668,"batch_size":4},{"latency":9783,"batch_size":2},{"latency":5045,"batch_size":1},{"latency":5249,"batch_size":1},{"latency":5938,"batch_size":1},{"latency":5804,"batch_size":1},{"latency":5665,"batch_size":1},{"latency":5839,"batch_size":1},{"latency":5480,"batch_size":1},{"latency":16114,"batch_size":3},{"latency":10842,"batch_size":2},{"latency":5680,"batch_size":1},{"latency":5901,"batch_size":1},{"latency":16563,"batch_size":3},{"latency":10855,"batch_size":2},{"latency":10988,"batch_size":2},{"latency":5471,"batch_size":1},{"latency":9809,"batch_size":2},{"latency":5819,"batch_size":1},{"latency":5902,"batch_size":1},{"latency":6650,"batch_size":1},{"latency":6205,"batch_size":1},{"latency":16560,"batch_size":3},{"latency":10923,"batch_size":2},{"latency":11198,"batch_size":2},{"latency":16374,"batch_size":3},{"latency":5763,"batch_size":1},{"latency":5617,"batch_size":1},{"latency":11307,"batch_size":2},{"latency":11173,"batch_size":2},{"latency":11368,"batch_size":2},{"latency":5861,"batch_size":1},{"latency":16308,"batch_size":3},{"latency":5629,"batch_size":1},{"latency":5790,"batch_size":1},{"latency":5985,"batch_size":1},{"latency":8732,"batch_size":1},{"latency":17789,"batch_size":2},{"latency":23795,"batch_size":3},{"latency":14846,"batch_size":2},{"latency":14377,"batch_size":2},{"latency":7376,"batch_size":1},{"latency":13796,"batch_size":2},{"latency":13075,"batch_size":2},{"latency":12704,"batch_size":2},{"latency":17021,"batch_size":3},{"latency":5899,"batch_size":1},{"latency":16331,"batch_size":3},{"latency":6087,"batch_size":1},{"latency":6137,"batch_size":1},{"latency":5946,"batch_size":1},{"latency":11130,"batch_size":2},{"latency":5803,"batch_size":1},{"latency":16267,"batch_size":3},{"latency":10889,"batch_size":2},{"latency":10730,"batch_size":2},{"latency":16135,"batch_size":3},{"latency":5899,"batch_size":1},{"latency":5764,"batch_size":1},{"latency":5628,"batch_size":1},{"latency":5847,"batch_size":1},{"latency":5296,"batch_size":1},{"latency":11350,"batch_size":2},{"latency":11196,"batch_size":2},{"latency":5926,"batch_size":1},{"latency":6079,"batch_size":1},{"latency":16286,"batch_size":3},{"latency":21779,"batch_size":4},{"latency":16302,"batch_size":3},{"latency":16185,"batch_size":3},{"latency":16458,"batch_size":3},{"latency":5818,"batch_size":1},{"latency":11205,"batch_size":2},{"latency":21128,"batch_size":4},{"latency":16330,"batch_size":3},{"latency":27127,"batch_size":5},{"latency":5917,"batch_size":1},{"latency":11098,"batch_size":2},{"latency":11249,"batch_size":2},{"latency":11131,"batch_size":2},{"latency":10973,"batch_size":2},{"latency":5950,"batch_size":1},{"latency":16444,"batch_size":3},{"latency":10681,"batch_size":2},{"latency":10672,"batch_size":2},{"latency":16307,"batch_size":3},{"latency":5844,"batch_size":1},{"latency":15682,"batch_size":3},{"latency":26548,"batch_size":5},{"latency":21158,"batch_size":4},{"latency":15952,"batch_size":3},{"latency":21557,"batch_size":4},{"latency":16234,"batch_size":3},{"latency":16313,"batch_size":3},{"latency":26582,"batch_size":5},{"latency":16590,"batch_size":3},{"latency":11076,"batch_size":2},{"latency":21800,"batch_size":4},{"latency":16407,"batch_size":3},{"latency":26491,"batch_size":5},{"latency":21728,"batch_size":4},{"latency":5249,"batch_size":1},{"latency":5036,"batch_size":1},{"latency":5351,"batch_size":1},{"latency":5113,"batch_size":1},{"latency":5959,"batch_size":1},{"latency":6039,"batch_size":1},{"latency":5754,"batch_size":1},{"latency":16263,"batch_size":3},{"latency":10955,"batch_size":2},{"latency":16538,"batch_size":3},{"latency":5900,"batch_size":1},{"latency":11043,"batch_size":2},{"latency":5768,"batch_size":1},{"latency":10977,"batch_size":2},{"latency":5901,"batch_size":1},{"latency":5840,"batch_size":1},{"latency":5622,"batch_size":1},{"latency":5738,"batch_size":1},{"latency":10813,"batch_size":2},{"latency":5670,"batch_size":1},{"latency":5664,"batch_size":1},{"latency":5502,"batch_size":1},{"latency":5860,"batch_size":1},{"latency":5616,"batch_size":1},{"latency":5887,"batch_size":1},{"latency":5838,"batch_size":1},{"latency":6103,"batch_size":1},{"latency":5692,"batch_size":1},{"latency":5731,"batch_size":1},{"latency":5844,"batch_size":1},{"latency":6193,"batch_size":1},{"latency":6041,"batch_size":1},{"latency":16391,"batch_size":3},{"latency":10778,"batch_size":2},{"latency":11154,"batch_size":2},{"latency":11021,"batch_size":2},{"latency":16489,"batch_size":3},{"latency":16151,"batch_size":3},{"latency":5704,"batch_size":1},{"latency":5939,"batch_size":1},{"latency":5962,"batch_size":1},{"latency":5739,"batch_size":1},{"latency":11173,"batch_size":2},{"latency":5931,"batch_size":1},{"latency":5914,"batch_size":1},{"latency":5753,"batch_size":1},{"latency":11216,"batch_size":2},{"latency":11091,"batch_size":2},{"latency":5875,"batch_size":1},{"latency":5911,"batch_size":1},{"latency":5957,"batch_size":1},{"latency":5712,"batch_size":1},{"latency":11112,"batch_size":2},{"latency":11252,"batch_size":2},{"latency":5760,"batch_size":1},{"latency":11229,"batch_size":2},{"latency":11198,"batch_size":2},{"latency":16437,"batch_size":3},{"latency":10951,"batch_size":2},{"latency":11002,"batch_size":2},{"latency":21170,"batch_size":4},{"latency":16308,"batch_size":3},{"latency":21409,"batch_size":4},{"latency":16506,"batch_size":3},{"latency":26730,"batch_size":5},{"latency":21864,"batch_size":4},{"latency":16087,"batch_size":3},{"latency":21471,"batch_size":4},{"latency":16057,"batch_size":3},{"latency":25886,"batch_size":5},{"latency":21653,"batch_size":4},{"latency":16350,"batch_size":3},{"latency":21734,"batch_size":4},{"latency":10937,"batch_size":2},{"latency":5502,"batch_size":1},{"latency":15817,"batch_size":3},{"latency":5848,"batch_size":1},{"latency":16440,"batch_size":3},{"latency":26828,"batch_size":5},{"latency":21143,"batch_size":4},{"latency":16636,"batch_size":3},{"latency":16228,"batch_size":3},{"latency":16508,"batch_size":3},{"latency":10913,"batch_size":2},{"latency":5830,"batch_size":1},{"latency":5959,"batch_size":1},{"latency":6165,"batch_size":1},{"latency":5903,"batch_size":1},{"latency":11214,"batch_size":2},{"latency":11193,"batch_size":2},{"latency":11096,"batch_size":2},{"latency":5784,"batch_size":1},{"latency":6086,"batch_size":1}],"alpha":6804.167453292526,"beta":4180.660406344447,"batch_size":2,"name":"kernel_svm"}
+INFO:clipper::batching: kernel_svm BATCHER: Updated batching model: max_batch_size: 2, alpha = 6422.99999176993, beta = 4220.0000164247385
+INFO:clipper::batching: kernel_svm BATCHER: Predicted max thruput: 117.19207781578277, baseline: 93.95847028375849, increase: 1.247275285153726
+INFO:clipper::batching: GREPTHISkernel_svm: XXXXXX {"measurements":[{"latency":29951,"batch_size":3},{"latency":18271,"batch_size":2},{"latency":16953,"batch_size":2},{"latency":29912,"batch_size":4},{"latency":18055,"batch_size":3},{"latency":16918,"batch_size":3},{"latency":27323,"batch_size":5},{"latency":21816,"batch_size":4},{"latency":16524,"batch_size":3},{"latency":31010,"batch_size":5},{"latency":25048,"batch_size":4},{"latency":19098,"batch_size":3},{"latency":19129,"batch_size":3},{"latency":19129,"batch_size":3},{"latency":19145,"batch_size":3},{"latency":20928,"batch_size":3},{"latency":13634,"batch_size":2},{"latency":25398,"batch_size":4},{"latency":18845,"batch_size":3},{"latency":6573,"batch_size":1},{"latency":15102,"batch_size":1},{"latency":30088,"batch_size":3},{"latency":9578,"batch_size":1},{"latency":17066,"batch_size":2},{"latency":27299,"batch_size":4},{"latency":18747,"batch_size":3},{"latency":17565,"batch_size":3},{"latency":27409,"batch_size":5},{"latency":16689,"batch_size":3},{"latency":27388,"batch_size":5},{"latency":22000,"batch_size":4},{"latency":16670,"batch_size":3},{"latency":27282,"batch_size":5},{"latency":11291,"batch_size":2},{"latency":16490,"batch_size":3},{"latency":5889,"batch_size":1},{"latency":5830,"batch_size":1},{"latency":6903,"batch_size":1},{"latency":6965,"batch_size":1},{"latency":6653,"batch_size":1},{"latency":12832,"batch_size":2},{"latency":6639,"batch_size":1},{"latency":7008,"batch_size":1},{"latency":7134,"batch_size":1},{"latency":19106,"batch_size":3},{"latency":19088,"batch_size":3},{"latency":19075,"batch_size":3},{"latency":19073,"batch_size":3},{"latency":19076,"batch_size":3},{"latency":19007,"batch_size":3},{"latency":19228,"batch_size":3},{"latency":19153,"batch_size":3},{"latency":19229,"batch_size":3},{"latency":6799,"batch_size":1},{"latency":17390,"batch_size":3},{"latency":16677,"batch_size":3},{"latency":22001,"batch_size":4},{"latency":5872,"batch_size":1},{"latency":5804,"batch_size":1},{"latency":6844,"batch_size":1},{"latency":12929,"batch_size":2},{"latency":25467,"batch_size":4},{"latency":19241,"batch_size":3},{"latency":19178,"batch_size":3},{"latency":12950,"batch_size":2},{"latency":13055,"batch_size":2},{"latency":18990,"batch_size":3},{"latency":6780,"batch_size":1},{"latency":6663,"batch_size":1},{"latency":6528,"batch_size":1},{"latency":6661,"batch_size":1},{"latency":12604,"batch_size":2},{"latency":18353,"batch_size":3},{"latency":18469,"batch_size":3},{"latency":18424,"batch_size":3},{"latency":18201,"batch_size":3},{"latency":18285,"batch_size":3},{"latency":17692,"batch_size":3},{"latency":27149,"batch_size":5},{"latency":21702,"batch_size":4},{"latency":16441,"batch_size":3},{"latency":27349,"batch_size":5},{"latency":21938,"batch_size":4},{"latency":16577,"batch_size":3},{"latency":26617,"batch_size":5},{"latency":21386,"batch_size":4},{"latency":16027,"batch_size":3},{"latency":14641,"batch_size":3},{"latency":16526,"batch_size":3},{"latency":5904,"batch_size":1},{"latency":16446,"batch_size":3},{"latency":16205,"batch_size":3},{"latency":5878,"batch_size":1},{"latency":5743,"batch_size":1},{"latency":5931,"batch_size":1},{"latency":11095,"batch_size":2},{"latency":21339,"batch_size":4},{"latency":16239,"batch_size":3},{"latency":11125,"batch_size":2},{"latency":5800,"batch_size":1},{"latency":10926,"batch_size":2},{"latency":5679,"batch_size":1},{"latency":5594,"batch_size":1},{"latency":16072,"batch_size":3},{"latency":10972,"batch_size":2},{"latency":10379,"batch_size":2},{"latency":20679,"batch_size":4},{"latency":15924,"batch_size":3},{"latency":5795,"batch_size":1},{"latency":5392,"batch_size":1},{"latency":5012,"batch_size":1},{"latency":16387,"batch_size":3},{"latency":11201,"batch_size":2},{"latency":5894,"batch_size":1},{"latency":5946,"batch_size":1},{"latency":11031,"batch_size":2},{"latency":16329,"batch_size":3},{"latency":16191,"batch_size":3},{"latency":16265,"batch_size":3},{"latency":16746,"batch_size":3},{"latency":5778,"batch_size":1},{"latency":6048,"batch_size":1},{"latency":5948,"batch_size":1},{"latency":5922,"batch_size":1},{"latency":5825,"batch_size":1},{"latency":5906,"batch_size":1},{"latency":5975,"batch_size":1},{"latency":5939,"batch_size":1},{"latency":11190,"batch_size":2},{"latency":16297,"batch_size":3},{"latency":5863,"batch_size":1},{"latency":5775,"batch_size":1},{"latency":11163,"batch_size":2},{"latency":5870,"batch_size":1},{"latency":16645,"batch_size":3},{"latency":5890,"batch_size":1},{"latency":16542,"batch_size":3},{"latency":16718,"batch_size":3},{"latency":11385,"batch_size":2},{"latency":5903,"batch_size":1},{"latency":11201,"batch_size":2},{"latency":16602,"batch_size":3},{"latency":5793,"batch_size":1},{"latency":6094,"batch_size":1},{"latency":5854,"batch_size":1},{"latency":5151,"batch_size":1},{"latency":14424,"batch_size":3},{"latency":9994,"batch_size":2},{"latency":9865,"batch_size":2},{"latency":18768,"batch_size":4},{"latency":19177,"batch_size":4},{"latency":5163,"batch_size":1},{"latency":5082,"batch_size":1},{"latency":5176,"batch_size":1},{"latency":5911,"batch_size":1},{"latency":5755,"batch_size":1},{"latency":5887,"batch_size":1},{"latency":5980,"batch_size":1},{"latency":11334,"batch_size":2},{"latency":16497,"batch_size":3},{"latency":11067,"batch_size":2},{"latency":7102,"batch_size":1},{"latency":6676,"batch_size":1},{"latency":5928,"batch_size":1},{"latency":16444,"batch_size":3},{"latency":11024,"batch_size":2},{"latency":16244,"batch_size":3},{"latency":16041,"batch_size":3},{"latency":10932,"batch_size":2},{"latency":5715,"batch_size":1},{"latency":5987,"batch_size":1},{"latency":16490,"batch_size":3},{"latency":5775,"batch_size":1},{"latency":5812,"batch_size":1},{"latency":16244,"batch_size":3},{"latency":15006,"batch_size":3},{"latency":9878,"batch_size":2},{"latency":9571,"batch_size":2},{"latency":13982,"batch_size":3},{"latency":22928,"batch_size":5},{"latency":14118,"batch_size":3},{"latency":9654,"batch_size":2},{"latency":9832,"batch_size":2},{"latency":14575,"batch_size":3},{"latency":14484,"batch_size":3},{"latency":5116,"batch_size":1},{"latency":5881,"batch_size":1},{"latency":6121,"batch_size":1},{"latency":5711,"batch_size":1},{"latency":5848,"batch_size":1},{"latency":5733,"batch_size":1},{"latency":16487,"batch_size":3},{"latency":16432,"batch_size":3},{"latency":21833,"batch_size":4},{"latency":16433,"batch_size":3},{"latency":21626,"batch_size":4},{"latency":16465,"batch_size":3},{"latency":26425,"batch_size":5},{"latency":16502,"batch_size":3},{"latency":5682,"batch_size":1},{"latency":5601,"batch_size":1},{"latency":9739,"batch_size":2},{"latency":9813,"batch_size":2},{"latency":14152,"batch_size":3},{"latency":13494,"batch_size":3},{"latency":13842,"batch_size":3},{"latency":22925,"batch_size":5},{"latency":9849,"batch_size":2},{"latency":9734,"batch_size":2},{"latency":18477,"batch_size":4},{"latency":18614,"batch_size":4},{"latency":18585,"batch_size":4},{"latency":18960,"batch_size":4},{"latency":19170,"batch_size":4},{"latency":18708,"batch_size":4},{"latency":19015,"batch_size":4},{"latency":14379,"batch_size":3},{"latency":5039,"batch_size":1},{"latency":5200,"batch_size":1},{"latency":9654,"batch_size":2},{"latency":5072,"batch_size":1},{"latency":5336,"batch_size":1},{"latency":5217,"batch_size":1},{"latency":5764,"batch_size":1},{"latency":5616,"batch_size":1},{"latency":6065,"batch_size":1},{"latency":11143,"batch_size":2},{"latency":6000,"batch_size":1},{"latency":11045,"batch_size":2},{"latency":11112,"batch_size":2},{"latency":11068,"batch_size":2},{"latency":11314,"batch_size":2},{"latency":5968,"batch_size":1},{"latency":11120,"batch_size":2},{"latency":5996,"batch_size":1},{"latency":5708,"batch_size":1},{"latency":10835,"batch_size":2},{"latency":5867,"batch_size":1},{"latency":16232,"batch_size":3},{"latency":5875,"batch_size":1},{"latency":16164,"batch_size":3},{"latency":16291,"batch_size":3},{"latency":11032,"batch_size":2},{"latency":16424,"batch_size":3},{"latency":16359,"batch_size":3},{"latency":16159,"batch_size":3},{"latency":5821,"batch_size":1},{"latency":16600,"batch_size":3},{"latency":11194,"batch_size":2},{"latency":11175,"batch_size":2},{"latency":16264,"batch_size":3},{"latency":16447,"batch_size":3},{"latency":26542,"batch_size":5},{"latency":11177,"batch_size":2},{"latency":10839,"batch_size":2},{"latency":10936,"batch_size":2},{"latency":5758,"batch_size":1},{"latency":10912,"batch_size":2},{"latency":5796,"batch_size":1},{"latency":5633,"batch_size":1},{"latency":11107,"batch_size":2},{"latency":5954,"batch_size":1},{"latency":16430,"batch_size":3},{"latency":5866,"batch_size":1},{"latency":5840,"batch_size":1},{"latency":5906,"batch_size":1},{"latency":5943,"batch_size":1},{"latency":5727,"batch_size":1},{"latency":5794,"batch_size":1},{"latency":16577,"batch_size":3},{"latency":10932,"batch_size":2},{"latency":5999,"batch_size":1},{"latency":11064,"batch_size":2},{"latency":5853,"batch_size":1},{"latency":5810,"batch_size":1},{"latency":11364,"batch_size":2},{"latency":10843,"batch_size":2},{"latency":5796,"batch_size":1},{"latency":10934,"batch_size":2},{"latency":5736,"batch_size":1},{"latency":16250,"batch_size":3},{"latency":16316,"batch_size":3},{"latency":11017,"batch_size":2},{"latency":11176,"batch_size":2},{"latency":16330,"batch_size":3},{"latency":5835,"batch_size":1},{"latency":16238,"batch_size":3},{"latency":16201,"batch_size":3},{"latency":26930,"batch_size":5},{"latency":5878,"batch_size":1},{"latency":5271,"batch_size":1},{"latency":14430,"batch_size":3},{"latency":23311,"batch_size":5},{"latency":9852,"batch_size":2},{"latency":9475,"batch_size":2},{"latency":19118,"batch_size":4},{"latency":9464,"batch_size":2},{"latency":5160,"batch_size":1},{"latency":9930,"batch_size":2},{"latency":5230,"batch_size":1},{"latency":5995,"batch_size":1},{"latency":5827,"batch_size":1},{"latency":6069,"batch_size":1},{"latency":5879,"batch_size":1},{"latency":11178,"batch_size":2},{"latency":5800,"batch_size":1},{"latency":5919,"batch_size":1},{"latency":11062,"batch_size":2},{"latency":5818,"batch_size":1},{"latency":5842,"batch_size":1},{"latency":5895,"batch_size":1},{"latency":11172,"batch_size":2},{"latency":16740,"batch_size":3},{"latency":16478,"batch_size":3},{"latency":11302,"batch_size":2},{"latency":5739,"batch_size":1},{"latency":16191,"batch_size":3},{"latency":21450,"batch_size":4},{"latency":16608,"batch_size":3},{"latency":27236,"batch_size":5},{"latency":21896,"batch_size":4},{"latency":16511,"batch_size":3},{"latency":16347,"batch_size":3},{"latency":5787,"batch_size":1},{"latency":11162,"batch_size":2},{"latency":5839,"batch_size":1},{"latency":5927,"batch_size":1},{"latency":5706,"batch_size":1},{"latency":10791,"batch_size":2},{"latency":5621,"batch_size":1},{"latency":11041,"batch_size":2},{"latency":10936,"batch_size":2},{"latency":16277,"batch_size":3},{"latency":20520,"batch_size":4},{"latency":5948,"batch_size":1},{"latency":5553,"batch_size":1},{"latency":9651,"batch_size":2},{"latency":21601,"batch_size":4},{"latency":5688,"batch_size":1},{"latency":11160,"batch_size":2},{"latency":10893,"batch_size":2},{"latency":10987,"batch_size":2},{"latency":15769,"batch_size":3},{"latency":25846,"batch_size":5},{"latency":21389,"batch_size":4},{"latency":16298,"batch_size":3},{"latency":21498,"batch_size":4},{"latency":16146,"batch_size":3},{"latency":26749,"batch_size":5},{"latency":21034,"batch_size":4},{"latency":15960,"batch_size":3},{"latency":21270,"batch_size":4},{"latency":15640,"batch_size":3},{"latency":21452,"batch_size":4},{"latency":16117,"batch_size":3},{"latency":26089,"batch_size":5},{"latency":21194,"batch_size":4},{"latency":16184,"batch_size":3},{"latency":28005,"batch_size":5},{"latency":21683,"batch_size":4},{"latency":16440,"batch_size":3},{"latency":26611,"batch_size":5},{"latency":21583,"batch_size":4},{"latency":16521,"batch_size":3},{"latency":26726,"batch_size":5},{"latency":21924,"batch_size":4},{"latency":14224,"batch_size":3},{"latency":23119,"batch_size":5},{"latency":19053,"batch_size":4},{"latency":19054,"batch_size":4},{"latency":19150,"batch_size":4},{"latency":18666,"batch_size":4},{"latency":18813,"batch_size":4},{"latency":19046,"batch_size":4},{"latency":18907,"batch_size":4},{"latency":18994,"batch_size":4},{"latency":18849,"batch_size":4},{"latency":18719,"batch_size":4},{"latency":18921,"batch_size":4},{"latency":18844,"batch_size":4},{"latency":18280,"batch_size":4},{"latency":18582,"batch_size":4},{"latency":19097,"batch_size":4},{"latency":18792,"batch_size":4},{"latency":18555,"batch_size":4},{"latency":18788,"batch_size":4},{"latency":19205,"batch_size":4},{"latency":18898,"batch_size":4},{"latency":18980,"batch_size":4},{"latency":19043,"batch_size":4},{"latency":18976,"batch_size":4},{"latency":18746,"batch_size":4},{"latency":19125,"batch_size":4},{"latency":18900,"batch_size":4},{"latency":18562,"batch_size":4},{"latency":18808,"batch_size":4},{"latency":9998,"batch_size":2},{"latency":9796,"batch_size":2},{"latency":18720,"batch_size":4},{"latency":9897,"batch_size":2},{"latency":5274,"batch_size":1},{"latency":9760,"batch_size":2},{"latency":14894,"batch_size":3},{"latency":26280,"batch_size":5},{"latency":21552,"batch_size":4},{"latency":15755,"batch_size":3},{"latency":26505,"batch_size":5},{"latency":21096,"batch_size":4},{"latency":15900,"batch_size":3},{"latency":26737,"batch_size":5},{"latency":21511,"batch_size":4},{"latency":16463,"batch_size":3},{"latency":26403,"batch_size":5},{"latency":21904,"batch_size":4},{"latency":16531,"batch_size":3},{"latency":26917,"batch_size":5},{"latency":21248,"batch_size":4},{"latency":16366,"batch_size":3},{"latency":21463,"batch_size":4},{"latency":16206,"batch_size":3},{"latency":11108,"batch_size":2},{"latency":10661,"batch_size":2},{"latency":14171,"batch_size":3},{"latency":16481,"batch_size":3},{"latency":16577,"batch_size":3},{"latency":21661,"batch_size":4},{"latency":10914,"batch_size":2},{"latency":16348,"batch_size":3},{"latency":5657,"batch_size":1},{"latency":5577,"batch_size":1},{"latency":16303,"batch_size":3},{"latency":5986,"batch_size":1},{"latency":11538,"batch_size":2},{"latency":5948,"batch_size":1},{"latency":16272,"batch_size":3},{"latency":10768,"batch_size":2},{"latency":11090,"batch_size":2},{"latency":16107,"batch_size":3},{"latency":26650,"batch_size":5},{"latency":21651,"batch_size":4},{"latency":11205,"batch_size":2},{"latency":10926,"batch_size":2},{"latency":5717,"batch_size":1},{"latency":5747,"batch_size":1},{"latency":5908,"batch_size":1},{"latency":11099,"batch_size":2},{"latency":5917,"batch_size":1},{"latency":14890,"batch_size":3},{"latency":14073,"batch_size":3},{"latency":5908,"batch_size":1},{"latency":11409,"batch_size":2},{"latency":5894,"batch_size":1},{"latency":16459,"batch_size":3},{"latency":21841,"batch_size":4},{"latency":16503,"batch_size":3},{"latency":16557,"batch_size":3},{"latency":16313,"batch_size":3},{"latency":6032,"batch_size":1},{"latency":16392,"batch_size":3},{"latency":26534,"batch_size":5},{"latency":16633,"batch_size":3},{"latency":11192,"batch_size":2},{"latency":21444,"batch_size":4},{"latency":16493,"batch_size":3},{"latency":11020,"batch_size":2},{"latency":10927,"batch_size":2},{"latency":16300,"batch_size":3},{"latency":26450,"batch_size":5},{"latency":20574,"batch_size":4},{"latency":16402,"batch_size":3},{"latency":26912,"batch_size":5},{"latency":21703,"batch_size":4},{"latency":15829,"batch_size":3},{"latency":26659,"batch_size":5},{"latency":21361,"batch_size":4},{"latency":16444,"batch_size":3},{"latency":26621,"batch_size":5},{"latency":21709,"batch_size":4},{"latency":16420,"batch_size":3},{"latency":26740,"batch_size":5},{"latency":21945,"batch_size":4},{"latency":16526,"batch_size":3},{"latency":27043,"batch_size":5},{"latency":21666,"batch_size":4},{"latency":16337,"batch_size":3},{"latency":23287,"batch_size":5},{"latency":18572,"batch_size":4},{"latency":19024,"batch_size":4},{"latency":18848,"batch_size":4},{"latency":18987,"batch_size":4},{"latency":18115,"batch_size":4},{"latency":13360,"batch_size":3},{"latency":4519,"batch_size":1},{"latency":4269,"batch_size":1},{"latency":4307,"batch_size":1},{"latency":4305,"batch_size":1},{"latency":13152,"batch_size":3},{"latency":13211,"batch_size":3},{"latency":9298,"batch_size":2}],"alpha":6422.99999176993,"beta":4220.0000164247389,"batch_size":2,"name":"kernel_svm"}
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: kernel_svm BATCHER: Updated batching model: max_batch_size: 3, alpha = 3583.000000005263, beta = 10955.999999494303
+INFO:clipper::batching: kernel_svm BATCHER: Predicted max thruput: 138.21700069420473, baseline: 68.78052135871931, increase: 2.009536973023874
+INFO:clipper::batching: GREPTHISkernel_svm: XXXXXX {"measurements":[{"latency":29811,"batch_size":3},{"latency":18122,"batch_size":2},{"latency":16949,"batch_size":2},{"latency":30597,"batch_size":4},{"latency":19007,"batch_size":3},{"latency":17644,"batch_size":3},{"latency":27311,"batch_size":5},{"latency":21812,"batch_size":4},{"latency":16483,"batch_size":3},{"latency":27109,"batch_size":5},{"latency":21827,"batch_size":4},{"latency":16547,"batch_size":3},{"latency":27178,"batch_size":5},{"latency":21787,"batch_size":4},{"latency":16516,"batch_size":3},{"latency":27116,"batch_size":5},{"latency":25288,"batch_size":4},{"latency":18193,"batch_size":3},{"latency":17374,"batch_size":3},{"latency":17174,"batch_size":3},{"latency":23593,"batch_size":1},{"latency":10518,"batch_size":1},{"latency":19014,"batch_size":2},{"latency":17506,"batch_size":2},{"latency":8485,"batch_size":1},{"latency":13535,"batch_size":2},{"latency":24543,"batch_size":4},{"latency":17081,"batch_size":3},{"latency":27186,"batch_size":5},{"latency":21850,"batch_size":4},{"latency":16506,"batch_size":3},{"latency":16512,"batch_size":3},{"latency":11109,"batch_size":2},{"latency":6764,"batch_size":1},{"latency":6636,"batch_size":1},{"latency":18948,"batch_size":3},{"latency":19003,"batch_size":3},{"latency":18974,"batch_size":3},{"latency":19002,"batch_size":3},{"latency":18957,"batch_size":3},{"latency":12835,"batch_size":2},{"latency":12845,"batch_size":2},{"latency":25142,"batch_size":4},{"latency":12648,"batch_size":2},{"latency":12731,"batch_size":2},{"latency":25101,"batch_size":4},{"latency":18988,"batch_size":3},{"latency":18957,"batch_size":3},{"latency":18939,"batch_size":3},{"latency":19014,"batch_size":3},{"latency":21146,"batch_size":3},{"latency":13179,"batch_size":2},{"latency":25137,"batch_size":4},{"latency":18898,"batch_size":3},{"latency":19082,"batch_size":3},{"latency":18990,"batch_size":3},{"latency":18950,"batch_size":3},{"latency":19006,"batch_size":3},{"latency":18964,"batch_size":3},{"latency":18957,"batch_size":3},{"latency":18439,"batch_size":3},{"latency":17422,"batch_size":3},{"latency":27960,"batch_size":5},{"latency":21839,"batch_size":4},{"latency":16796,"batch_size":3},{"latency":27315,"batch_size":5},{"latency":22082,"batch_size":4},{"latency":16680,"batch_size":3},{"latency":27319,"batch_size":5},{"latency":21930,"batch_size":4},{"latency":16217,"batch_size":3},{"latency":27261,"batch_size":5},{"latency":21965,"batch_size":4},{"latency":16533,"batch_size":3},{"latency":21950,"batch_size":4},{"latency":16619,"batch_size":3},{"latency":16456,"batch_size":3},{"latency":11089,"batch_size":2},{"latency":5716,"batch_size":1},{"latency":6015,"batch_size":1},{"latency":9927,"batch_size":2},{"latency":14844,"batch_size":3},{"latency":14586,"batch_size":3},{"latency":5076,"batch_size":1},{"latency":16706,"batch_size":3},{"latency":10840,"batch_size":2},{"latency":5853,"batch_size":1},{"latency":11041,"batch_size":2},{"latency":11156,"batch_size":2},{"latency":10689,"batch_size":2},{"latency":16212,"batch_size":3},{"latency":27079,"batch_size":5},{"latency":22040,"batch_size":4},{"latency":16553,"batch_size":3},{"latency":21855,"batch_size":4},{"latency":16610,"batch_size":3},{"latency":27444,"batch_size":5},{"latency":21998,"batch_size":4},{"latency":16574,"batch_size":3},{"latency":22078,"batch_size":4},{"latency":11222,"batch_size":2},{"latency":21364,"batch_size":4},{"latency":16514,"batch_size":3},{"latency":27139,"batch_size":5},{"latency":21693,"batch_size":4},{"latency":16719,"batch_size":3},{"latency":26262,"batch_size":5},{"latency":21840,"batch_size":4},{"latency":16413,"batch_size":3},{"latency":27198,"batch_size":5},{"latency":21799,"batch_size":4},{"latency":16619,"batch_size":3},{"latency":27336,"batch_size":5},{"latency":16653,"batch_size":3},{"latency":22110,"batch_size":4},{"latency":16373,"batch_size":3},{"latency":27375,"batch_size":5},{"latency":21942,"batch_size":4},{"latency":16560,"batch_size":3},{"latency":26991,"batch_size":5},{"latency":21896,"batch_size":4},{"latency":16426,"batch_size":3},{"latency":27270,"batch_size":5},{"latency":21694,"batch_size":4},{"latency":15805,"batch_size":3},{"latency":27023,"batch_size":5},{"latency":21843,"batch_size":4},{"latency":16510,"batch_size":3},{"latency":27151,"batch_size":5},{"latency":22072,"batch_size":4},{"latency":16559,"batch_size":3},{"latency":27374,"batch_size":5},{"latency":21589,"batch_size":4},{"latency":16368,"batch_size":3},{"latency":24968,"batch_size":5},{"latency":19262,"batch_size":4},{"latency":19326,"batch_size":4},{"latency":19314,"batch_size":4},{"latency":19426,"batch_size":4},{"latency":19266,"batch_size":4},{"latency":19276,"batch_size":4},{"latency":19574,"batch_size":4},{"latency":19535,"batch_size":4},{"latency":19539,"batch_size":4},{"latency":19320,"batch_size":4},{"latency":19096,"batch_size":4},{"latency":19634,"batch_size":4},{"latency":19365,"batch_size":4},{"latency":9887,"batch_size":2},{"latency":5360,"batch_size":1},{"latency":14594,"batch_size":3},{"latency":5150,"batch_size":1},{"latency":14813,"batch_size":3},{"latency":14834,"batch_size":3},{"latency":14644,"batch_size":3},{"latency":10909,"batch_size":2},{"latency":10450,"batch_size":2},{"latency":5203,"batch_size":1},{"latency":9828,"batch_size":2},{"latency":9984,"batch_size":2},{"latency":5964,"batch_size":1},{"latency":16871,"batch_size":3},{"latency":27765,"batch_size":5},{"latency":22014,"batch_size":4},{"latency":16701,"batch_size":3},{"latency":16708,"batch_size":3},{"latency":22031,"batch_size":4},{"latency":16605,"batch_size":3},{"latency":27306,"batch_size":5},{"latency":22277,"batch_size":4},{"latency":16609,"batch_size":3},{"latency":22002,"batch_size":4},{"latency":16890,"batch_size":3},{"latency":22178,"batch_size":4},{"latency":11426,"batch_size":2},{"latency":5959,"batch_size":1},{"latency":5785,"batch_size":1},{"latency":6106,"batch_size":1},{"latency":5990,"batch_size":1},{"latency":11183,"batch_size":2},{"latency":11424,"batch_size":2},{"latency":5959,"batch_size":1},{"latency":16884,"batch_size":3},{"latency":16896,"batch_size":3},{"latency":27657,"batch_size":5},{"latency":22045,"batch_size":4},{"latency":16916,"batch_size":3},{"latency":11513,"batch_size":2},{"latency":5255,"batch_size":1},{"latency":5162,"batch_size":1},{"latency":11566,"batch_size":2},{"latency":11462,"batch_size":2},{"latency":5800,"batch_size":1},{"latency":5958,"batch_size":1},{"latency":10908,"batch_size":2},{"latency":16177,"batch_size":3},{"latency":5867,"batch_size":1},{"latency":5841,"batch_size":1},{"latency":6009,"batch_size":1},{"latency":11462,"batch_size":2},{"latency":11124,"batch_size":2},{"latency":5866,"batch_size":1},{"latency":5950,"batch_size":1},{"latency":5579,"batch_size":1},{"latency":5976,"batch_size":1},{"latency":5930,"batch_size":1},{"latency":6048,"batch_size":1},{"latency":16730,"batch_size":3},{"latency":11243,"batch_size":2},{"latency":5931,"batch_size":1},{"latency":6085,"batch_size":1},{"latency":11418,"batch_size":2},{"latency":5861,"batch_size":1},{"latency":10900,"batch_size":2},{"latency":21944,"batch_size":4},{"latency":16568,"batch_size":3},{"latency":27388,"batch_size":5},{"latency":16744,"batch_size":3},{"latency":16617,"batch_size":3},{"latency":27400,"batch_size":5},{"latency":21998,"batch_size":4},{"latency":16597,"batch_size":3},{"latency":21600,"batch_size":4},{"latency":16442,"batch_size":3},{"latency":16763,"batch_size":3},{"latency":11111,"batch_size":2},{"latency":16468,"batch_size":3},{"latency":11242,"batch_size":2},{"latency":5857,"batch_size":1},{"latency":11110,"batch_size":2},{"latency":5791,"batch_size":1},{"latency":5974,"batch_size":1},{"latency":5832,"batch_size":1},{"latency":5838,"batch_size":1},{"latency":11188,"batch_size":2},{"latency":21915,"batch_size":4},{"latency":5754,"batch_size":1},{"latency":5913,"batch_size":1},{"latency":5723,"batch_size":1},{"latency":5831,"batch_size":1},{"latency":5703,"batch_size":1},{"latency":5896,"batch_size":1},{"latency":5588,"batch_size":1},{"latency":5968,"batch_size":1},{"latency":5776,"batch_size":1},{"latency":5937,"batch_size":1},{"latency":6052,"batch_size":1},{"latency":5790,"batch_size":1},{"latency":11300,"batch_size":2},{"latency":5645,"batch_size":1},{"latency":5984,"batch_size":1},{"latency":5830,"batch_size":1},{"latency":16673,"batch_size":3},{"latency":21795,"batch_size":4},{"latency":16636,"batch_size":3},{"latency":16446,"batch_size":3},{"latency":11100,"batch_size":2},{"latency":10972,"batch_size":2},{"latency":15483,"batch_size":3},{"latency":19622,"batch_size":4},{"latency":14495,"batch_size":3},{"latency":5837,"batch_size":1},{"latency":11243,"batch_size":2},{"latency":5796,"batch_size":1},{"latency":5687,"batch_size":1},{"latency":5748,"batch_size":1},{"latency":5611,"batch_size":1},{"latency":5798,"batch_size":1},{"latency":11371,"batch_size":2},{"latency":5730,"batch_size":1},{"latency":16575,"batch_size":3},{"latency":27426,"batch_size":5},{"latency":22250,"batch_size":4},{"latency":16729,"batch_size":3},{"latency":27334,"batch_size":5},{"latency":16665,"batch_size":3},{"latency":5812,"batch_size":1},{"latency":16006,"batch_size":3},{"latency":24162,"batch_size":5},{"latency":19460,"batch_size":4},{"latency":19549,"batch_size":4},{"latency":19373,"batch_size":4},{"latency":19325,"batch_size":4},{"latency":19173,"batch_size":4},{"latency":14624,"batch_size":3},{"latency":10047,"batch_size":2},{"latency":14605,"batch_size":3},{"latency":5129,"batch_size":1},{"latency":14693,"batch_size":3},{"latency":5249,"batch_size":1},{"latency":11330,"batch_size":2},{"latency":11515,"batch_size":2},{"latency":5833,"batch_size":1},{"latency":11182,"batch_size":2},{"latency":16418,"batch_size":3},{"latency":27149,"batch_size":5},{"latency":16633,"batch_size":3},{"latency":5831,"batch_size":1},{"latency":16659,"batch_size":3},{"latency":28454,"batch_size":5},{"latency":22408,"batch_size":4},{"latency":16662,"batch_size":3},{"latency":22216,"batch_size":4},{"latency":16627,"batch_size":3},{"latency":21682,"batch_size":4},{"latency":16506,"batch_size":3},{"latency":16394,"batch_size":3},{"latency":16249,"batch_size":3},{"latency":16397,"batch_size":3},{"latency":26653,"batch_size":5},{"latency":21827,"batch_size":4},{"latency":16612,"batch_size":3},{"latency":27168,"batch_size":5},{"latency":22080,"batch_size":4},{"latency":16621,"batch_size":3},{"latency":16751,"batch_size":3},{"latency":11296,"batch_size":2},{"latency":11228,"batch_size":2},{"latency":22313,"batch_size":4},{"latency":5839,"batch_size":1},{"latency":11358,"batch_size":2},{"latency":11328,"batch_size":2},{"latency":5928,"batch_size":1},{"latency":5587,"batch_size":1},{"latency":5912,"batch_size":1},{"latency":5850,"batch_size":1},{"latency":16597,"batch_size":3},{"latency":5808,"batch_size":1},{"latency":5798,"batch_size":1},{"latency":5693,"batch_size":1},{"latency":5821,"batch_size":1},{"latency":11218,"batch_size":2},{"latency":16775,"batch_size":3},{"latency":5844,"batch_size":1},{"latency":16719,"batch_size":3},{"latency":5907,"batch_size":1},{"latency":11035,"batch_size":2},{"latency":5800,"batch_size":1},{"latency":5834,"batch_size":1},{"latency":11353,"batch_size":2},{"latency":5919,"batch_size":1},{"latency":16420,"batch_size":3},{"latency":16567,"batch_size":3},{"latency":16519,"batch_size":3},{"latency":16641,"batch_size":3},{"latency":5778,"batch_size":1},{"latency":11303,"batch_size":2},{"latency":11113,"batch_size":2},{"latency":5630,"batch_size":1},{"latency":11089,"batch_size":2},{"latency":21934,"batch_size":4},{"latency":16198,"batch_size":3},{"latency":21172,"batch_size":4},{"latency":16590,"batch_size":3},{"latency":16385,"batch_size":3},{"latency":5659,"batch_size":1},{"latency":11376,"batch_size":2},{"latency":21873,"batch_size":4},{"latency":16234,"batch_size":3},{"latency":10965,"batch_size":2},{"latency":5823,"batch_size":1},{"latency":5248,"batch_size":1},{"latency":5035,"batch_size":1},{"latency":5815,"batch_size":1},{"latency":5764,"batch_size":1},{"latency":5878,"batch_size":1},{"latency":5641,"batch_size":1},{"latency":5811,"batch_size":1},{"latency":10800,"batch_size":2},{"latency":11074,"batch_size":2},{"latency":11169,"batch_size":2},{"latency":11096,"batch_size":2},{"latency":16503,"batch_size":3},{"latency":5739,"batch_size":1},{"latency":5785,"batch_size":1},{"latency":5834,"batch_size":1},{"latency":5736,"batch_size":1},{"latency":5873,"batch_size":1},{"latency":5843,"batch_size":1},{"latency":11289,"batch_size":2},{"latency":16503,"batch_size":3},{"latency":11227,"batch_size":2},{"latency":5755,"batch_size":1},{"latency":5773,"batch_size":1},{"latency":16529,"batch_size":3},{"latency":5888,"batch_size":1},{"latency":5805,"batch_size":1},{"latency":16266,"batch_size":3},{"latency":27236,"batch_size":5},{"latency":21755,"batch_size":4},{"latency":16510,"batch_size":3},{"latency":16629,"batch_size":3},{"latency":27021,"batch_size":5},{"latency":21842,"batch_size":4},{"latency":16347,"batch_size":3},{"latency":11038,"batch_size":2},{"latency":11230,"batch_size":2},{"latency":16417,"batch_size":3},{"latency":11103,"batch_size":2},{"latency":5867,"batch_size":1},{"latency":16527,"batch_size":3},{"latency":11067,"batch_size":2},{"latency":5670,"batch_size":1},{"latency":5192,"batch_size":1},{"latency":5354,"batch_size":1},{"latency":5950,"batch_size":1},{"latency":11107,"batch_size":2},{"latency":5803,"batch_size":1},{"latency":5980,"batch_size":1},{"latency":11069,"batch_size":2},{"latency":5762,"batch_size":1},{"latency":11162,"batch_size":2},{"latency":11279,"batch_size":2},{"latency":5786,"batch_size":1},{"latency":11248,"batch_size":2},{"latency":5801,"batch_size":1},{"latency":5793,"batch_size":1},{"latency":5308,"batch_size":1},{"latency":5155,"batch_size":1},{"latency":11050,"batch_size":2},{"latency":11251,"batch_size":2},{"latency":5843,"batch_size":1},{"latency":11311,"batch_size":2},{"latency":16387,"batch_size":3},{"latency":10478,"batch_size":2},{"latency":14626,"batch_size":3},{"latency":5144,"batch_size":1},{"latency":5863,"batch_size":1},{"latency":5831,"batch_size":1},{"latency":5988,"batch_size":1},{"latency":5845,"batch_size":1},{"latency":16486,"batch_size":3},{"latency":5840,"batch_size":1},{"latency":16327,"batch_size":3},{"latency":21898,"batch_size":4},{"latency":16258,"batch_size":3},{"latency":27327,"batch_size":5},{"latency":21925,"batch_size":4},{"latency":16691,"batch_size":3},{"latency":11261,"batch_size":2},{"latency":6174,"batch_size":1},{"latency":5841,"batch_size":1},{"latency":5885,"batch_size":1},{"latency":11150,"batch_size":2},{"latency":16649,"batch_size":3},{"latency":5759,"batch_size":1},{"latency":5841,"batch_size":1},{"latency":5765,"batch_size":1},{"latency":11040,"batch_size":2},{"latency":11190,"batch_size":2},{"latency":5844,"batch_size":1},{"latency":16502,"batch_size":3},{"latency":21970,"batch_size":4},{"latency":11228,"batch_size":2},{"latency":11216,"batch_size":2},{"latency":5813,"batch_size":1},{"latency":16336,"batch_size":3},{"latency":26174,"batch_size":5},{"latency":20990,"batch_size":4},{"latency":5682,"batch_size":1},{"latency":16299,"batch_size":3},{"latency":21863,"batch_size":4},{"latency":16695,"batch_size":3},{"latency":21914,"batch_size":4},{"latency":16470,"batch_size":3},{"latency":16612,"batch_size":3},{"latency":5881,"batch_size":1},{"latency":5706,"batch_size":1},{"latency":16606,"batch_size":3},{"latency":27068,"batch_size":5},{"latency":11131,"batch_size":2},{"latency":11085,"batch_size":2},{"latency":16453,"batch_size":3},{"latency":16500,"batch_size":3},{"latency":27098,"batch_size":5},{"latency":21748,"batch_size":4},{"latency":15981,"batch_size":3},{"latency":27101,"batch_size":5},{"latency":21863,"batch_size":4},{"latency":16455,"batch_size":3},{"latency":27165,"batch_size":5},{"latency":21838,"batch_size":4},{"latency":16493,"batch_size":3},{"latency":27208,"batch_size":5},{"latency":23015,"batch_size":4},{"latency":16713,"batch_size":3},{"latency":5800,"batch_size":1},{"latency":5761,"batch_size":1},{"latency":5243,"batch_size":1},{"latency":5160,"batch_size":1},{"latency":5987,"batch_size":1},{"latency":5664,"batch_size":1},{"latency":5872,"batch_size":1},{"latency":11144,"batch_size":2},{"latency":5779,"batch_size":1},{"latency":5861,"batch_size":1},{"latency":16596,"batch_size":3},{"latency":16652,"batch_size":3},{"latency":22214,"batch_size":4}],"alpha":3583.000000005263,"beta":10955.999999494303,"batch_size":3,"name":"kernel_svm"}
+INFO:clipper_benchmarks: {
+  "name": "mnist-ensemble_160830-134059",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 9840
+    },
+    {
+      "name": "queued_predictions",
+      "count": 12
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 9852
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 9852
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 9852
+    },
+    {
+      "name": "kernel_svm:prediction_counter",
+      "count": 9831
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 381625
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 5163500
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 39
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 1945440
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 180339
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:alpha_gauge",
+      "count": 3583000
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:beta_gauge",
+      "count": 10956000
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 3
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:max_thru_gauge",
+      "count": 138217
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:base_thru_gauge",
+      "count": 68781
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 9513000
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:beta_gauge",
+      "count": -599000
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 108536
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 112183
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:alpha_gauge",
+      "count": 8074000
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:beta_gauge",
+      "count": 2556000
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:max_thru_gauge",
+      "count": 106929
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:base_thru_gauge",
+      "count": 94073
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:alpha_gauge",
+      "count": 377545
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:beta_gauge",
+      "count": 410455
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 52
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:max_thru_gauge",
+      "count": 2594446
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:base_thru_gauge",
+      "count": 1269036
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 4496
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 5344
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:alpha_gauge",
+      "count": 6423000
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:beta_gauge",
+      "count": 4220000
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:max_thru_gauge",
+      "count": 117192
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:base_thru_gauge",
+      "count": 93958
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:alpha_gauge",
+      "count": 6804167
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:beta_gauge",
+      "count": 4180660
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:max_thru_gauge",
+      "count": 112429
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:base_thru_gauge",
+      "count": 91035
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:alpha_gauge",
+      "count": 8572500
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:beta_gauge",
+      "count": 1755500
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:max_thru_gauge",
+      "count": 105817
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:base_thru_gauge",
+      "count": 96824
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:alpha_gauge",
+      "count": 192600
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:beta_gauge",
+      "count": 508400
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 101
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:max_thru_gauge",
+      "count": 5059868
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:base_thru_gauge",
+      "count": 1426534
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9495934959349593
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 20029,
+      "max": 23856,
+      "mean": 20337.945768482492,
+      "std": 202.9712057509441,
+      "p95": 20636.35,
+      "p99": 20776.61,
+      "p50": 20310.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 4,
+      "mean": 3.3013132295719846,
+      "std": 0.5062664740805811,
+      "p95": 4.0,
+      "p99": 4.0,
+      "p50": 3.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 279,
+      "max": 19771,
+      "mean": 1675.3435068093386,
+      "std": 2001.2148117279804,
+      "p95": 2287.0,
+      "p99": 10757.0,
+      "p50": 1468.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 101,
+      "mean": 5.86777843954735,
+      "std": 4.22241075342833,
+      "p95": 11.0,
+      "p99": 12.0,
+      "p50": 5.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 375,
+      "max": 10732,
+      "mean": 1400.0077821011674,
+      "std": 818.5279032706735,
+      "p95": 2042.0,
+      "p99": 2714.0,
+      "p50": 1319.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 52,
+      "mean": 5.744606413994169,
+      "std": 3.080610648194569,
+      "p95": 11.0,
+      "p99": 12.0,
+      "p50": 6.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 3056,
+      "max": 9743,
+      "mean": 4236.54450389105,
+      "std": 533.2973601944018,
+      "p95": 4790.25,
+      "p99": 6593.0,
+      "p50": 4239.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 30,
+      "mean": 5.85731272294887,
+      "std": 3.2706357685414448,
+      "p95": 11.0,
+      "p99": 12.0,
+      "p50": 6.0
+    },
+    {
+      "name": "kernel_svm:model_latency",
+      "min": 4269,
+      "max": 34398,
+      "mean": 14885.540612840467,
+      "std": 6152.894203302378,
+      "p95": 27037.25,
+      "p99": 27473.0,
+      "p50": 14799.0
+    },
+    {
+      "name": "kernel_svm:model_batch_size",
+      "min": 1,
+      "max": 5,
+      "mean": 2.2093441150044925,
+      "std": 1.0763789372006896,
+      "p95": 4.0,
+      "p99": 5.0,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 983.2805336335404,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 985.6784833501876,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 985.6784833501876,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 984.479262731754,
+      "unit": "events per second"
+    },
+    {
+      "name": "kernel_svm:model_thruput",
+      "rate": 982.8804332348288,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: {
+  "name": "mnist-ensemble_160830-134059",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 19692
+    },
+    {
+      "name": "queued_predictions",
+      "count": 12
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 19704
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 19704
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 19704
+    },
+    {
+      "name": "kernel_svm:prediction_counter",
+      "count": 19681
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:alpha_gauge",
+      "count": 381625
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:beta_gauge",
+      "count": 5163500
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 39
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:max_thru_gauge",
+      "count": 1945440
+    },
+    {
+      "name": "rf_d16:172.21.0.5:6001:base_thru_gauge",
+      "count": 180339
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:alpha_gauge",
+      "count": 3583000
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:beta_gauge",
+      "count": 10956000
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 3
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:max_thru_gauge",
+      "count": 138217
+    },
+    {
+      "name": "kernel_svm:172.21.0.7:6001:base_thru_gauge",
+      "count": 68781
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:alpha_gauge",
+      "count": 9513000
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:beta_gauge",
+      "count": -599000
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:max_thru_gauge",
+      "count": 108536
+    },
+    {
+      "name": "kernel_svm:172.21.0.6:6001:base_thru_gauge",
+      "count": 112183
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:alpha_gauge",
+      "count": 8074000
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:beta_gauge",
+      "count": 2556000
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:max_thru_gauge",
+      "count": 106929
+    },
+    {
+      "name": "kernel_svm:172.21.0.9:6001:base_thru_gauge",
+      "count": 94073
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:alpha_gauge",
+      "count": 377545
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:beta_gauge",
+      "count": 410455
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:max_batch_size_gauge",
+      "count": 52
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:max_thru_gauge",
+      "count": 2594446
+    },
+    {
+      "name": "logistic_reg:172.21.0.4:6001:base_thru_gauge",
+      "count": 1269036
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 9011
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 10681
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:alpha_gauge",
+      "count": 6423000
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:beta_gauge",
+      "count": 4220000
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:max_thru_gauge",
+      "count": 117192
+    },
+    {
+      "name": "kernel_svm:172.21.0.10:6001:base_thru_gauge",
+      "count": 93958
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:alpha_gauge",
+      "count": 6804167
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:beta_gauge",
+      "count": 4180660
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:max_thru_gauge",
+      "count": 112429
+    },
+    {
+      "name": "kernel_svm:172.21.0.11:6001:base_thru_gauge",
+      "count": 91035
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:alpha_gauge",
+      "count": 8572500
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:beta_gauge",
+      "count": 1755500
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:max_batch_size_gauge",
+      "count": 2
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:max_thru_gauge",
+      "count": 105817
+    },
+    {
+      "name": "kernel_svm:172.21.0.12:6001:base_thru_gauge",
+      "count": 96824
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:alpha_gauge",
+      "count": 192600
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:beta_gauge",
+      "count": 508400
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 101
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:max_thru_gauge",
+      "count": 5059868
+    },
+    {
+      "name": "spark_svm:172.21.0.8:6001:base_thru_gauge",
+      "count": 1426534
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9509953280520008
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 20029,
+      "max": 23555,
+      "mean": 20335.960359922177,
+      "std": 176.64060770559699,
+      "p95": 20641.05,
+      "p99": 20766.0,
+      "p50": 20312.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 4,
+      "mean": 3.362354085603113,
+      "std": 0.5058866349171726,
+      "p95": 4.0,
+      "p99": 4.0,
+      "p50": 3.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 302,
+      "max": 19771,
+      "mean": 1650.3487354085604,
+      "std": 1379.388020440954,
+      "p95": 2320.0,
+      "p99": 2657.0,
+      "p50": 1607.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 101,
+      "mean": 6.075855689176688,
+      "std": 3.9073689655997088,
+      "p95": 11.0,
+      "p99": 12.0,
+      "p50": 6.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 404,
+      "max": 10732,
+      "mean": 1394.0646887159533,
+      "std": 646.8512973990303,
+      "p95": 2046.0,
+      "p99": 2301.5,
+      "p50": 1362.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 52,
+      "mean": 5.973030303030303,
+      "std": 3.0484915791991229,
+      "p95": 11.0,
+      "p99": 12.0,
+      "p50": 6.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 3056,
+      "max": 9743,
+      "mean": 4218.361624513619,
+      "std": 468.0268008200683,
+      "p95": 4747.0,
+      "p99": 5404.0,
+      "p50": 4231.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 30,
+      "mean": 6.1003095975232199,
+      "std": 3.395180838133718,
+      "p95": 11.0,
+      "p99": 12.0,
+      "p50": 6.0
+    },
+    {
+      "name": "kernel_svm:model_latency",
+      "min": 4269,
+      "max": 34398,
+      "mean": 12828.426921206226,
+      "std": 5158.362142172112,
+      "p95": 22925.0,
+      "p99": 27348.75,
+      "p50": 11110.0
+    },
+    {
+      "name": "kernel_svm:model_batch_size",
+      "min": 1,
+      "max": 5,
+      "mean": 1.9858949416342414,
+      "std": 0.8510899517384997,
+      "p95": 4.0,
+      "p99": 5.0,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 983.8338885509853,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 985.0328564114269,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 985.0328564114269,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 984.8330120502153,
+      "unit": "events per second"
+    },
+    {
+      "name": "kernel_svm:model_thruput",
+      "rate": 983.783829153855,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 20000 requests
+WARN:clipper_benchmarks: error in on_pred: sending on a closed channel
+WARN:clipper_benchmarks: error in on_pred: sending on a closed channel
+WARN:clipper_benchmarks: error in on_pred: sending on a closed channel
+WARN:clipper_benchmarks: error in on_pred: sending on a closed channel
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/mnist-ensemble_160830-134059_results.json
+INFO:clipper::server: ending input loop: prediction worker 6
+INFO:clipper::server: ending input loop: prediction worker 7
+INFO:clipper::server: ending input loop: prediction worker 1
+INFO:clipper::server: ending input loop: prediction worker 5
+INFO:clipper::server: ending input loop: prediction worker 3
+INFO:clipper::server: ending input loop: prediction worker 0
+INFO:clipper::server: ending output loop: prediction worker 1
+INFO:clipper::server: ending output loop: prediction worker 3
+INFO:clipper::server: ending output loop: prediction worker 7
+INFO:clipper::server: ending output loop: prediction worker 5
+INFO:clipper::server: ending output loop: prediction worker 6
+INFO:clipper::server: ending input loop: prediction worker 2
+INFO:clipper::server: ending output loop: prediction worker 2
+INFO:clipper::server: ending input loop: prediction worker 4
+INFO:clipper::server: ending output loop: prediction worker 4
+INFO:clipper::server: ending output loop: prediction worker 0
+INFO:clipper::server: Ending loop: update worker 0
+INFO:clipper::server: Dropping ClipperServer

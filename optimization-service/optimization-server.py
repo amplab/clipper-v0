@@ -10,7 +10,10 @@ import os
 import json
 import pandas as pd
 import statsmodels.formula.api as smf
+import threading
 
+class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+    pass
 
 class QuantileRegressionHandler(SocketServer.BaseRequestHandler):
 
@@ -54,10 +57,16 @@ def fit_quantile_regression(batches, latencies):
 
 def start(port):
     ip = "0.0.0.0"
-    server = SocketServer.TCPServer((ip, port), QuantileRegressionHandler)
+    server = ThreadedTCPServer((ip, port), QuantileRegressionHandler)
     # server.handle_request()
     print("Starting to listen for optimizations", file=sys.stderr)
     server.serve_forever()
+    # server_thread = threading.Thread(target=server.serve_forever)
+    # server_thread.daemon = True
+    # server.serve_forever()
+    # server_thread.start()
+    # print("Server loop running in thread:", server_thread.name)
+
 
 
 if __name__=='__main__':
