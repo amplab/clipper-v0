@@ -29,6 +29,8 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
         # Restore variables from training checkpoint
         saver = tf.train.Saver()
         saver.restore(self.sess, self.checkpoint_path)
+        # Do a sample inference to preload everything
+        self.predict_floats(np.zeros(input_shape))
 
     def predict_ints(self, inputs):
         return np.ones(len(inputs))
@@ -82,7 +84,7 @@ if __name__=='__main__':
     os.environ["CLIPPER_MODEL_PATH"] = "/Users/giuliozhou/Research/RISE/clipper/model_wrappers/python/inception_nn/inception-v3-model/model.ckpt-157585"
     model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path, file=sys.stderr)
-    model = InceptionModelWrapper(299, 1000, model_path)
+    model = InceptionModelWrapper(4, 299, 1000, model_path)
     print(model.predict_floats(imgs))
     print(model.predict_floats(imgs2))
     # rpc.start(model, 6001)
