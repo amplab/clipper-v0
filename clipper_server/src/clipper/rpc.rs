@@ -307,6 +307,9 @@ fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
             _ => unreachable!(),
         }
     }
+    // Write a newline to prevent decompression from truncating the last character of 
+    // the string
+    compressor.write_all("\n".as_bytes()).unwrap();
     let (compressed_str, result) = compressor.finish();
     if let Err(_) = result {
         panic!("Failed to compress string!");

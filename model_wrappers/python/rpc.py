@@ -7,7 +7,8 @@ import time
 import datetime
 import sys
 import os
-import lz4
+import lz4tools
+import StringIO
 
 SHUTDOWN_CODE = 0
 FIXEDINT_CODE = 1
@@ -150,7 +151,15 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                 input_lengths_bytes = 4 * num_inputs
                 input_lengths = np.array(array.array('i', bytes(data[:input_lengths_bytes])))
                 data = data[input_lengths_bytes:]
-                decompressed_strs = lz4.loads(data)
+                # Lz4tools only operates on files, so we define a memory buffer with
+                # a file interface via StringIO and use it as input for decompression
+                mock_file = StringIO.StringIO()
+                mock_file.write(data)
+                mock_file.seek(0)
+                comp_file = lz4tools.Lz4File(None, mock_file)
+                decompressed_strs = comp_file.read()
+                # Close the underlying memory file "mock_file"
+                comp_file.close()
                 for length in input_lengths:
                     inputs.append(decompressed_strs[:length])
                     decompressed_strs = decompressed_strs[length:]
