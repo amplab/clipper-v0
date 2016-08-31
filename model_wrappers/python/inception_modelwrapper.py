@@ -37,6 +37,7 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
         return np.ones(len(inputs))
 
     def predict_floats(self, inputs):
+        inputs = np.array(inputs)
         inputs = inputs.reshape(
             (len(inputs), self.image_size, self.image_size, 3))
         # Pad the inputs ndarray with the first image if necessary
@@ -49,7 +50,10 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
                                   feed_dict={self.jpegs: inputs})
         # Mark reuse_scope as True for future reuse of inception variables
         self.reuse_scope = True
-        return top_1[0].indices.flatten()
+        preds = top_1[0].indices.flatten()
+        preds = preds.astype(np.float64)
+        print(len(preds), preds)
+        return preds
 
     def preprocess_image(self, image_buffer):
         """Preprocess JPEG encoded bytes to 3D float Tensor."""
@@ -79,18 +83,8 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
 
 
 if __name__=='__main__':
-    imgs = map(lambda x: skio.imread(os.path.join(DAISY_PATH, x)),
-                                     os.listdir(DAISY_PATH)[-4:])
-    imgs = map(lambda x: resize(x, (299, 299)).flatten(), imgs)
-    imgs = np.array(imgs)
-    imgs2 = map(lambda x: skio.imread(os.path.join(ROSES_PATH, x)),
-                                      os.listdir(ROSES_PATH)[-4:])
-    imgs2 = map(lambda x: resize(x, (299, 299)).flatten(), imgs2)
-    imgs2 = np.array(imgs2)
-    os.environ["CLIPPER_MODEL_PATH"] = "/Users/giuliozhou/Research/RISE/clipper/model_wrappers/python/inception_nn/inception-v3-model/model.ckpt-157585"
+    os.environ["CLIPPER_MODEL_PATH"] = "inception_nn/inception-v3-model/model.ckpt-157585"
     model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path, file=sys.stderr)
-    model = InceptionModelWrapper(4, 299, 1000, model_path)
-    print(model.predict_floats(imgs))
-    print(model.predict_floats(imgs2))
-    # rpc.start(model, 6001)
+    model = InceptionModelWrapper(1, 299, 1000, model_path)
+    rpc.start(model, 6001)
