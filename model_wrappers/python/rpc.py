@@ -119,24 +119,23 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                 content_len = struct.unpack("<I", data[:additional_header_bytes])[0]
                 data = data[additional_header_bytes:]
                 inputs = []
-                while content_len > 0:
-                    while len(data) < 4:
-                        data += self.request.recv(4096)
+                while len(data) < content_len:
+                    data += self.request.recv(4096)
+                for i in range(0, num_inputs):
                     input_len = struct.unpack("<I", data[:4])[0]
-                    data = data[4:]
-                    while len(data) < input_len:
-                        data += self.request.recv(4096)
+                    data = data[4:] 
                     if input_type == VARBYTE_CODE:
-                        inputs.append(data)
-                    elif input_type == VARFLOAT_CODE:
-                        inputs.append(struct.unpack("<f", data)[0])
+                        inputs.append(data[:input_len])
                     else:
-                        assert input_type == VARINT_CODE
-                        inputs.append(struct.unpack("<I", data)[0])
+                        # Our inputs are either four byte floats or integers, so we must read
+                        # 4 * input_len bytes from the packed data
+                        input_len = input_len * 4
+                        if input_type == VARFLOAT_CODE:
+                            inputs.append(np.array(array.array('f', bytes(data[:input_len]))))
+                        else:
+                            assert input_type == VARINT_CODE
+                            inputs.append(np.array(array.array('i', bytes(data[:input_len]))))
                     data = data[input_len:]
-                    # Decrement remaining content length in accordance with the fact that we just
-                    # read an encoded value and its associated integer length from the stream
-                    content_len = content_len - 4 - input_len
                 assert len(inputs) == num_inputs
 
             elif input_type == STRING_CODE:
