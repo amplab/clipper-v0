@@ -509,7 +509,8 @@ mod tests {
         let mut strs = Vec::new();
         strs.push("cats");
         strs.push("afsdiofjsdoifssd");
-        //let strs = ["cats", "afsdiofjsdoifssd", "oceanic\n", "92842jcwf*0azxm$$__ "];
+        strs.push("92842jcwf*0azxm$$__ ");
+        strs.push("oceanic\n");
         for x in strs.iter() {
             let r = RpcPredictRequest {
                 input: Input::Str { s: x.to_string() },
