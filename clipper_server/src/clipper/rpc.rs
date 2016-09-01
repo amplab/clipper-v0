@@ -5,7 +5,7 @@ use std::io::{Read, Write, Cursor};
 use std::mem;
 use server::{Input, Output, InputType};
 use batching::RpcPredictRequest;
-use lz4::EncoderBuilder;
+use lz4::{EncoderBuilder, Decoder};
 
 
 
@@ -199,6 +199,46 @@ pub fn decode_fixed_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
     responses
 }
 
+pub fn decode_fixed_bytes(bytes: &mut Vec<u8>) -> Vec<Vec<u8>> {
+    let mut cursor = Cursor::new(bytes);
+    assert_eq!(FIXEDBYTE_CODE, cursor.read_u8().unwrap());
+    let num_inputs = cursor.read_u32::<LittleEndian>().unwrap();
+    let inp_len = cursor.read_u32::<LittleEndian>().unwrap();
+    let mut responses = Vec::with_capacity(num_inputs as usize);
+    for _ in 0..num_inputs {
+        let mut cur_response = Vec::with_capacity(inp_len as usize);
+        for _ in 0..inp_len {
+            cur_response.push(cursor.read_u8().unwrap());
+        }
+        responses.push(cur_response);
+    }
+    responses
+}
+
+pub fn decode_strs(bytes: &mut Vec<u8>) -> Vec<String> {
+    let mut cursor = Cursor::new(bytes);
+    assert_eq!(STRING_CODE, cursor.read_u8().unwrap());
+    let num_inputs = cursor.read_u32::<LittleEndian>().unwrap();
+    let content_len = cursor.read_u32::<LittleEndian>().unwrap();
+    let mut str_lens = Vec::new();
+    for _ in 0..num_inputs {
+        str_lens.push(cursor.read_u32::<LittleEndian>().unwrap());
+    }
+    let mut decoder = Decoder::new(cursor).unwrap();
+    let mut decompressed = Vec::new();
+    decoder.read_to_end(&mut decompressed).unwrap();
+
+    let mut outputs = Vec::new();
+    for str_len in str_lens.iter() {
+        let new_decomp = decompressed.split_off(*str_len as usize);
+        let output = decompressed.clone();
+        decompressed = new_decomp;
+        let output_str = String::from_utf8(output).expect("Failed to parse string from bytes");
+        outputs.push(output_str);
+    }
+    outputs
+}
+
 fn encode_fixed_floats(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(FIXEDFLOAT_CODE);
@@ -248,7 +288,7 @@ fn encode_var_floats(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     message
 }
 
-fn encode_fixed_bytes(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
+pub fn encode_fixed_bytes(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(FIXEDBYTE_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
@@ -258,7 +298,7 @@ fn encode_fixed_bytes(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
         match x.input {
             Input::Bytes {ref b, length: _} => {
                 for xi in b.iter() {
-                    message.write_u8::<>(*xi).unwrap();
+                    message.write_u8(*xi).unwrap();
                 }
             }
             _ => unreachable!(),
@@ -286,7 +326,7 @@ fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
             Input::Bytes {ref b, length: _} => {
                 message.write_u32::<LittleEndian>(b.len() as u32).unwrap();
                 for xi in b.iter() {
-                    message.write_u8::<>(*xi).unwrap();
+                    message.write_u8(*xi).unwrap();
                 }
             }
             _ => unreachable!(),
@@ -295,7 +335,7 @@ fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     message
 }
 
-fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
+pub fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(STRING_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
@@ -343,7 +383,10 @@ mod tests {
         rng.gen_iter::<i32>().take(d).collect::<Vec<i32>>()
     }
 
-
+    fn random_bytes(d: usize) -> Vec<u8> {
+        let mut rng = thread_rng();
+        rng.gen_iter::<u8>().take(d).collect::<Vec<u8>>()
+    }
 
     #[test]
     fn fixed_ints() {
@@ -393,6 +436,58 @@ mod tests {
         assert_eq!(decoded_vecs.len(), 7);
         for i in 0..decoded_vecs.len() {
             assert_eq!(&decoded_vecs[i][..], &orig_inputs[i][..]);
+        }
+    }
+
+    #[test]
+    fn fixed_bytes() {
+        let mut rng = thread_rng();
+        let inp_length = rng.gen_range::<usize>(0, 3000);
+        let mut reqs: Vec<RpcPredictRequest> = Vec::new();
+        let mut orig_inputs = Vec::new();
+        for _ in 0..7 {
+            let v = random_bytes(inp_length);
+            orig_inputs.push(v.clone());
+            let r = RpcPredictRequest {
+                input: Input::Bytes {
+                    b: v,
+                    length: inp_length as i32,
+                },
+                recv_time: time::PreciseTime::now(),
+            };
+            reqs.push(r);
+        }
+        let mut encoded_bytes = encode_fixed_bytes(&reqs, inp_length as i32);
+        let decoded_vecs = decode_fixed_bytes(&mut encoded_bytes);
+        for i in 0..decoded_vecs.len() {
+            assert_eq!(&decoded_vecs[i][..], &orig_inputs[i][..]);
+        }
+    }
+
+    #[test]
+    fn var_bytes() {
+        
+    }
+
+    #[test]
+    fn strings() {
+        let mut reqs: Vec<RpcPredictRequest> = Vec::new();
+        let mut strs = Vec::new();
+        strs.push("cats");
+        strs.push("afsdiofjsdoifssd");
+        //let strs = ["cats", "afsdiofjsdoifssd", "oceanic\n", "92842jcwf*0azxm$$__ "];
+        for x in strs.iter() {
+            let r = RpcPredictRequest {
+                input: Input::Str { s: x.to_string() },
+                recv_time: time::PreciseTime::now(),
+            };
+            reqs.push(r);
+        }
+        let mut encoded_strs = encode_strs(&reqs);
+        let decoded_strs = decode_strs(&mut encoded_strs);
+        assert_eq!(decoded_strs.len(), strs.len());
+        for i in 0..decoded_strs.len() {
+            assert_eq!(&decoded_strs[i][..], &strs[i][..]);
         }
     }
 
