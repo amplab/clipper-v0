@@ -511,6 +511,7 @@ mod tests {
         strs.push("afsdiofjsdoifssd");
         strs.push("92842jcwf*0azxm$$__ ");
         strs.push("oceanic\n");
+        strs.push("");
         for x in strs.iter() {
             let r = RpcPredictRequest {
                 input: Input::Str { s: x.to_string() },
