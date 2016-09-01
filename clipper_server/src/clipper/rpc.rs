@@ -215,6 +215,23 @@ pub fn decode_fixed_bytes(bytes: &mut Vec<u8>) -> Vec<Vec<u8>> {
     responses
 }
 
+pub fn decode_var_bytes(bytes: &mut Vec<u8>) -> Vec<Vec<u8>> {
+    let mut cursor = Cursor::new(bytes);
+    assert_eq!(VARBYTE_CODE, cursor.read_u8().unwrap());
+    let num_inputs = cursor.read_u32::<LittleEndian>().unwrap();
+    let content_len = cursor.read_u32::<LittleEndian>().unwrap();
+    let mut responses = Vec::with_capacity(num_inputs as usize);
+    for _ in 0..num_inputs {
+        let inp_len = cursor.read_u32::<LittleEndian>().unwrap();
+        let mut cur_response = Vec::with_capacity(inp_len as usize);
+        for _ in 0..inp_len {
+            cur_response.push(cursor.read_u8().unwrap());
+        }
+        responses.push(cur_response);
+    }
+    responses
+}
+
 pub fn decode_strs(bytes: &mut Vec<u8>) -> Vec<String> {
     let mut cursor = Cursor::new(bytes);
     assert_eq!(STRING_CODE, cursor.read_u8().unwrap());
@@ -307,7 +324,7 @@ pub fn encode_fixed_bytes(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u
     message
 }
 
-fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
+pub fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(VARBYTE_CODE);
     message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
@@ -417,7 +434,6 @@ mod tests {
 
     #[test]
     fn var_ints() {
-        // let inp_length = 4;
         let mut reqs: Vec<RpcPredictRequest> = Vec::new();
         let mut orig_inputs = Vec::new();
         let mut rng = thread_rng();
@@ -458,15 +474,33 @@ mod tests {
             reqs.push(r);
         }
         let mut encoded_bytes = encode_fixed_bytes(&reqs, inp_length as i32);
-        let decoded_vecs = decode_fixed_bytes(&mut encoded_bytes);
-        for i in 0..decoded_vecs.len() {
-            assert_eq!(&decoded_vecs[i][..], &orig_inputs[i][..]);
+        let decoded_bytes = decode_fixed_bytes(&mut encoded_bytes);
+        for i in 0..decoded_bytes.len() {
+            assert_eq!(&decoded_bytes[i][..], &orig_inputs[i][..]);
         }
     }
 
     #[test]
     fn var_bytes() {
-        
+        let mut reqs: Vec<RpcPredictRequest> = Vec::new();
+        let mut orig_inputs = Vec::new();
+        let mut rng = thread_rng();
+        for _ in 0..7 {
+            let inp_length = rng.gen_range::<usize>(0, 3000);
+            let v = random_bytes(inp_length);
+            orig_inputs.push(v.clone());
+            let r = RpcPredictRequest {
+                input: Input::Bytes { b: v, length: -1 },
+                recv_time: time::PreciseTime::now(),
+            };
+            reqs.push(r);
+        }
+        let mut encoded_bytes = encode_var_bytes(&reqs);
+        let decoded_bytes = decode_var_bytes(&mut encoded_bytes);
+        assert_eq!(decoded_bytes.len(), 7);
+        for i in 0..decoded_bytes.len() {
+            assert_eq!(&decoded_bytes[i][..], &orig_inputs[i][..]);
+        }
     }
 
     #[test]
