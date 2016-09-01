@@ -157,7 +157,14 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                 mock_file.write(data)
                 mock_file.seek(0)
                 comp_file = lz4tools.Lz4File(None, mock_file)
-                decompressed_strs = comp_file.read()
+                try:
+                    decompressed_strs = comp_file.read()
+                except EOFError:
+                    # An EOF error indicates that the input string was empty.
+                    # Artificially modify our decompressed strings and input
+                    # lengths accordingly to avoid a crash
+                    decompressed_strs = "Error: Input string was empty"
+                    input_lengths = [len(decompressed_strs)]
                 # Close the underlying memory file "mock_file"
                 comp_file.close()
                 for length in input_lengths:
