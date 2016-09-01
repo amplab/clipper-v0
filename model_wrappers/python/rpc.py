@@ -139,7 +139,6 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                         input_len = input_len * 4
                         inputs.append(np.array(array.array('i', bytes(data[:input_len]))))
                     data = data[input_len:]
-                    print(inputs)
                 assert len(inputs) == num_inputs
 
             elif input_type == STRING_CODE:
