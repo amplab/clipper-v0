@@ -11,6 +11,7 @@ from skimage.transform import resize
 
 DAISY_PATH = '../../clipper_server/models/inception/raw-data/train/daisy/'
 ROSES_PATH = '../../clipper_server/models/inception/raw-data/train/roses/'
+CLIPPER_MODEL_PATH = 'inception_nn/inception-v3-model/model.ckpt-157585'
 
 class InceptionModelWrapper(rpc.ModelWrapperBase):
 
@@ -83,8 +84,7 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
 
 
 if __name__=='__main__':
-    os.environ["CLIPPER_MODEL_PATH"] = "inception_nn/inception-v3-model/model.ckpt-157585"
-    model_path = os.environ["CLIPPER_MODEL_PATH"]
+    model_path = CLIPPER_MODEL_PATH
     print(model_path, file=sys.stderr)
     model = InceptionModelWrapper(1, 299, 1000, model_path)
     rpc.start(model, 6001)

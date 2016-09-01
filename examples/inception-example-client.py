@@ -15,22 +15,6 @@ import sklearn.linear_model
 
 DAISY_PATH = '../clipper_server/models/inception/raw-data/train/daisy/'
 
-# def load_digits(digits_location, digits_filename = "train-mnist-dense-with-labels.data"):
-#     digits_path = digits_location + "/" + digits_filename
-#     print("Source file:", digits_path)
-#     df = pd.read_csv(digits_path, sep=",", header=None)
-#     data = df.values
-#     print("Number of image files:", len(data))
-#     y = data[:,0]
-#     X = data[:,1:]
-#     return (X, y)
-# 
-# def normalize_digits(X):
-#     mu = np.mean(X,0)
-#     sigma = np.var(X,0)
-#     Z = (X - mu) / np.array([np.sqrt(z) if z > 0 else 1. for z in sigma])
-#     return Z 
-
 def load_inception_imgs(img_location):
     imgs = []
     img_files = os.listdir(img_location)
@@ -40,7 +24,6 @@ def load_inception_imgs(img_location):
     for i in range(len(img_files)):
         img = skio.imread(os.path.join(img_location, img_files[i]))
         img = resize(img, (299, 299)).flatten().tolist()
-        print(type(img[0]))
         imgs.append(img)
     return imgs
 
@@ -68,13 +51,9 @@ def inception_prediction(host, uid, x):
 if __name__=='__main__':
     args = sys.argv
     x = load_inception_imgs(DAISY_PATH)
-    # x, y = load_digits(os.path.expanduser("~/model-serving/data/mnist_data"), digits_filename = "test.data")
     uid = 4
-    # num_inputs = int(args[2])
     while True:
-        # mnist_update(uid, x[int(i)], float(y[int(i)]))
         example_num = np.random.randint(0,len(x))
-        # mnist_update(uid, x[example_num], float(y[example_num]))
         inception_prediction("localhost", uid, x[example_num])
         time.sleep(1.5)
 
