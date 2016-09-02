@@ -7,6 +7,8 @@ import time
 import datetime
 import sys
 import os
+import lz4tools
+import StringIO
 
 SHUTDOWN_CODE = 0
 FIXEDINT_CODE = 1
@@ -112,9 +114,64 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                         assert len(i) == input_len
 
             elif is_var_format(input_type):
-                raise NotImplementedError
+                additional_header_bytes = 4
+                while len(data) < additional_header_bytes:
+                    data += self.request.recv(4096)
+                content_len = struct.unpack("<I", data[:additional_header_bytes])[0]
+                data = data[additional_header_bytes:]
+                inputs = []
+                while len(data) < content_len:
+                    data += self.request.recv(4096)
+                for i in range(0, num_inputs):
+                    input_len = struct.unpack("<I", data[:4])[0]
+                    data = data[4:] 
+                    if input_type == VARBYTE_CODE:
+                        inputs.append(data[:input_len])
+                    else:
+                        # Our inputs are either four byte floats or integers, so we must read
+                        # 4 * input_len bytes from the packed data
+                        input_len = input_len * 4
+                        if input_type == VARFLOAT_CODE:
+                            inputs.append(np.array(array.array('f', bytes(data[:input_len]))))
+                        else:
+                            assert input_type == VARINT_CODE
+                            inputs.append(np.array(array.array('i', bytes(data[:input_len]))))
+                    data = data[input_len:]
+                assert len(inputs) == num_inputs
+
             elif input_type == STRING_CODE:
-                raise NotImplementedError
+                additional_header_bytes = 4
+                while len(data) < additional_header_bytes:
+                    data += self.request.recv(4096)
+                content_len = struct.unpack("<I", data[:additional_header_bytes])[0]
+                data = data[additional_header_bytes:]
+                while len(data) < content_len:
+                    data += self.request.recv(4096)
+                inputs = []
+                input_lengths_bytes = 4 * num_inputs
+                input_lengths = np.array(array.array('i', bytes(data[:input_lengths_bytes])))
+                data = data[input_lengths_bytes:]
+                # Lz4tools only operates on files, so we define a memory buffer with
+                # a file interface via StringIO and use it as input for decompression
+                mock_file = StringIO.StringIO()
+                mock_file.write(data)
+                mock_file.seek(0)
+                comp_file = lz4tools.Lz4File(None, mock_file)
+                try:
+                    decompressed_strs = comp_file.read()
+                except EOFError:
+                    # An EOF error indicates that the input string was empty.
+                    # Artificially modify our decompressed strings and input
+                    # lengths accordingly to avoid a crash
+                    decompressed_strs = "Error: Input string was empty"
+                    input_lengths = [len(decompressed_strs)]
+                # Close the underlying memory file "mock_file"
+                comp_file.close()
+                for length in input_lengths:
+                    inputs.append(decompressed_strs[:length])
+                    decompressed_strs = decompressed_strs[length:]
+                for i in range(0, len(inputs)):
+                    assert len(inputs[i]) == input_lengths[i]
             else:
                 raise RuntimeError("Invalid input type: " + input)
 

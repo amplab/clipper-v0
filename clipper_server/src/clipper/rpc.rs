@@ -5,6 +5,7 @@ use std::io::{Read, Write, Cursor};
 use std::mem;
 use server::{Input, Output, InputType};
 use batching::RpcPredictRequest;
+use lz4::EncoderBuilder;
 
 
 
@@ -248,19 +249,83 @@ fn encode_var_floats(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
 }
 
 fn encode_fixed_bytes(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
-    unimplemented!()
+    let mut message = Vec::new();
+    message.push(FIXEDBYTE_CODE);
+    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
+    message.write_u32::<LittleEndian>(length as u32).unwrap();
+    assert!(message.len() == 9);
+    for x in inputs.iter() {
+        match x.input {
+            Input::Bytes {ref b, length: _} => {
+                for xi in b.iter() {
+                    message.write_u8::<>(*xi).unwrap();
+                }
+            }
+            _ => unreachable!(),
+        }
+    }
+    message
 }
 
 fn encode_var_bytes(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
-    unimplemented!()
+    let mut message = Vec::new();
+    message.push(VARBYTE_CODE);
+    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
+    let mut content_len = 0;
+    for x in inputs.iter() {
+        match x.input {
+            Input::Bytes {ref b, length: _} => content_len += b.len(),
+            _ => unreachable!(),
+        }
+    }
+    content_len += mem::size_of::<u32>() * inputs.len();
+    message.write_u32::<LittleEndian>(content_len as u32).unwrap();
+    assert!(message.len() == 9);
+    for x in inputs.iter() {
+        match x.input {
+            Input::Bytes {ref b, length: _} => {
+                message.write_u32::<LittleEndian>(b.len() as u32).unwrap();
+                for xi in b.iter() {
+                    message.write_u8::<>(*xi).unwrap();
+                }
+            }
+            _ => unreachable!(),
+        }
+    }
+    message
 }
 
 fn encode_strs(inputs: &Vec<RpcPredictRequest>) -> Vec<u8> {
-    unimplemented!()
+    let mut message = Vec::new();
+    message.push(STRING_CODE);
+    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
+    // Compress the string content and write the compressed length to the output vector
+    let mut compressor = EncoderBuilder::new().build(Vec::new()).unwrap();
+    for x in inputs.iter() {
+        match x.input {
+            Input::Str {ref s} => compressor.write_all(s.as_bytes()).unwrap(),
+            _ => unreachable!(),
+        }
+    }
+    // Write a newline to prevent decompression from truncating the last character of 
+    // the string
+    compressor.write_all("\n".as_bytes()).unwrap();
+    let (compressed_str, result) = compressor.finish();
+    if let Err(_) = result {
+        panic!("Failed to compress string!");
+    }
+    let content_len = compressed_str.len() + (mem::size_of::<u32>() * inputs.len());
+    message.write_u32::<LittleEndian>(content_len as u32).unwrap();
+    // Write the length of each uncompressed string to the output vector
+    for x in inputs.iter() {
+        match x.input {
+            Input::Str {ref s} => message.write_u32::<LittleEndian>(s.len() as u32).unwrap(),
+            _ => unreachable!(),
+        }
+    }
+    message.append(&mut compressed_str.to_owned());
+    message
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
