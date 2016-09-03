@@ -370,6 +370,8 @@ struct PredictionMetrics {
     pub accuracy_counter: Arc<metrics::RatioCounter>,
     pub cache_hit_counter: Arc<metrics::RatioCounter>,
     pub in_time_predictions_hist: Arc<metrics::Histogram>,
+    pub cache_included_thruput_meter: Arc<RwLock<HashMap<String, Arc<metrics::Meter>>>>,
+    pub registry: Arc<RwLock<metrics::Registry>>,
 }
 
 impl PredictionMetrics {
@@ -418,6 +420,8 @@ impl PredictionMetrics {
             accuracy_counter: accuracy_counter,
             cache_hit_counter: cache_hit_counter,
             in_time_predictions_hist: in_time_predictions_hist,
+            cache_included_thruput_meter: Arc::new(RwLock::new(HashMap::new())),
+            registry: metrics_register,
         }
     }
 }
@@ -880,6 +884,32 @@ impl<P, S> PredictionWorker<P, S>
                         match cache.fetch(model_name, &req.query, req.salt.clone()) {
                             Some(v) => {
                                 ys.insert(model_name.clone(), v);
+                                let mut need_write_lock: bool = false;
+                                {
+                                    let read_map = prediction_metrics.cache_included_thruput_meter
+                                        .read()
+                                        .unwrap();
+                                    match read_map.get(model_name) {
+                                        Some(m) => m.mark(1),
+                                        None => need_write_lock = true,
+                                    }
+                                }
+                                if need_write_lock {
+                                    let mut write_map =
+                                        prediction_metrics.cache_included_thruput_meter
+                                            .write()
+                                            .unwrap();
+                                    let meter = write_map.entry(model_name.clone())
+                                        .or_insert({
+                                            let metric_name = format!("{}:cache_included_thruput",
+                                                                      model_name);
+                                            prediction_metrics.registry
+                                                .write()
+                                                .unwrap()
+                                                .create_meter(metric_name)
+                                        });
+                                    meter.mark(1);
+                                }
                             }
                             None => missing_ys.push(model_name.clone()),
                         }
