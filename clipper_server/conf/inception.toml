@@ -1,0 +1,39 @@
+
+name = "clipper-test"
+slo_micros = 10000
+# correction_policy = "hello world"
+correction_policy = "logistic_regression"
+use_lsh = true
+input_type = "float"
+input_length = 268203  # 299 * 299 * 3
+window_size = -1
+# redis_ip = "redis-clipper"
+redis_ip = "localhost"
+redis_port = 6379
+batch_size = -1
+
+num_predict_workers = 1
+num_update_workers = 1
+# largest prime less than 50000
+cache_size = 49999
+
+
+[batching]
+strategy = "aimd"
+sample_size = 1000
+
+# [[models]]
+# name = "m1"
+# addresses = ["c70.millennium.berkeley.edu:6001"]
+# num_outputs = 1
+# version = 1
+
+# [[models]]
+# name = "m2"
+# addresses = ["127.0.0.1:6004"]
+
+[[models]]
+name = "m1"
+addresses = ["127.0.0.1:6001"]
+num_outputs = 1
+version = 1
