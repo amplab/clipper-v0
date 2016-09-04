@@ -13,7 +13,7 @@ import numpy as np
 import skimage.io as skio
 import sklearn.linear_model
 
-DAISY_PATH = '../clipper_server/models/inception/raw-data/train/daisy/'
+DAISY_PATH = 'data/daisy'
 
 def load_inception_imgs(img_location):
     imgs = []
@@ -23,11 +23,12 @@ def load_inception_imgs(img_location):
     # Read in the images and reshape
     for i in range(len(img_files)):
         img = skio.imread(os.path.join(img_location, img_files[i]))
-        img = resize(img, (299, 299)).flatten().tolist()
+        img = resize(img, (299, 299))
+        img = img.flatten().tolist()
         imgs.append(img)
     return imgs
 
-def mnist_update(uid, x, y):
+def inception_update(uid, x, y):
     url = "http://localhost:1337/update"
     req_json = json.dumps({'uid': uid, 'input': list(x), 'label': y})
     headers = {'Content-type': 'application/json'}

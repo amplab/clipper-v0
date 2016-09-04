@@ -1,5 +1,6 @@
 from __future__ import print_function
 import numpy as np
+import skimage
 import skimage.io as skio
 import sys
 import os
@@ -8,10 +9,6 @@ import tensorflow as tf
 
 from inception import inception_model as inception
 from skimage.transform import resize
-
-DAISY_PATH = '../../clipper_server/models/inception/raw-data/train/daisy/'
-ROSES_PATH = '../../clipper_server/models/inception/raw-data/train/roses/'
-CLIPPER_MODEL_PATH = 'inception_nn/inception-v3-model/model.ckpt-157585'
 
 class InceptionModelWrapper(rpc.ModelWrapperBase):
 
@@ -35,7 +32,8 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
         self.predict_floats(np.zeros(input_shape))
 
     def predict_ints(self, inputs):
-        return np.ones(len(inputs))
+        inputs = map(lambda x: skimage.img_as_float(x.astype(np.ubyte)), inputs)
+        return self.predict_floats(inputs)
 
     def predict_floats(self, inputs):
         inputs = np.array(inputs)
@@ -53,7 +51,6 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
         self.reuse_scope = True
         preds = top_1[0].indices.flatten()
         preds = preds.astype(np.float64)
-        print(len(preds), preds)
         return preds
 
     def preprocess_image(self, image_buffer):
@@ -84,7 +81,7 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
 
 
 if __name__=='__main__':
-    model_path = CLIPPER_MODEL_PATH
+    model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path, file=sys.stderr)
     model = InceptionModelWrapper(1, 299, 1000, model_path)
     rpc.start(model, 6001)
