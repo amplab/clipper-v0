@@ -6,6 +6,7 @@ use std::mem;
 use server::{Input, Output, InputType};
 use batching::RpcPredictRequest;
 use lz4::EncoderBuilder;
+use std::error::Error;
 
 
 
