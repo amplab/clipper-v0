@@ -25,6 +25,12 @@ pub struct RpcPredictRequest {
     pub salt: Option<i32>,
 }
 
+#[derive(Debug, Serialize, PartialEq, Eq, Clone)]
+struct VariableLoadBatchResponseMetrics {
+    pub measurement_time_nanos: u64,
+    pub total_latency_nanos: u64,
+}
+
 pub struct PredictionBatcher<C>
     where C: PredictionCache<Output>
 {
@@ -168,6 +174,8 @@ impl<C> PredictionBatcher<C>
         stream.set_read_timeout(None).unwrap();
         // let max_batch_size = batch_size;
         let mut cur_batch_size = 1;
+        let mut var_load_batch_latency_logger: Vec<VariableLoadBatchResponseMetrics> =
+            Vec::with_capacity(11000);
         let mut batcher: Box<Batcher> = match batch_strategy {
             BatchStrategy::Static { size: s } => {
                 Box::new(StaticBatcher { batch_size: s }) as Box<Batcher>
@@ -232,11 +240,28 @@ impl<C> PredictionBatcher<C>
             for _ in 0..batch.len() {
                 latency_hist.insert(latency);
             }
+
+            let measurement_time = time::precise_time_ns();
+            for b in batch.iter() {
+                let var_load_batch_metric = VariableLoadBatchResponseMetrics {
+                    measurement_time_nanos: measurement_time,
+                    total_latency_nanos: b.recv_time.to(end_time).num_nanoseconds().unwrap() as u64,
+                };
+                var_load_batch_latency_logger.push(var_load_batch_metric);
+            }
+            if var_load_batch_latency_logger.len() >= 10000 {
+                let lat_string = serde_json::ser::to_string(&var_load_batch_latency_logger)
+                    .unwrap();
+                debug!("GREPTHISVARLOAD{}: XXXXXX {}", name, lat_string);
+                var_load_batch_latency_logger.clear();
+            }
+
+
             thruput_meter.mark(batch.len());
             predictions_counter.incr(batch.len() as isize);
             batch_size_hist.insert(batch.len() as i64);
             if latency > slo_micros as i64 {
-                debug!("latency: {}, batch size: {}",
+                trace!("latency: {}, batch size: {}",
                        (latency as f64 / 1000.0),
                        batch.len());
             }
@@ -255,6 +280,13 @@ impl<C> PredictionBatcher<C>
         }
         if !rpc::shutdown(&mut stream) {
             warn!("Connection to model: {} did not shut down cleanly", name);
+        }
+
+        // Log the remaining latencies measurements
+        if var_load_batch_latency_logger.len() > 0 {
+            let lat_string = serde_json::ser::to_string(&var_load_batch_latency_logger).unwrap();
+            debug!("GREPTHISVARLOAD{}: XXXXXX {}", name, lat_string);
+            var_load_batch_latency_logger.clear();
         }
         // stream.shutdown(Shutdown::Both).unwrap();
     }

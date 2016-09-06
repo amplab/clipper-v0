@@ -1,0 +1,76 @@
+{
+    "clipper_conf": {
+        "num_message_encodes": 1, 
+        "use_lsh": false, 
+        "window_size": -1, 
+        "load_generator": "uniform", 
+        "input_type": "float", 
+        "request_generator": "cache_hits", 
+        "results_path": "/tmp/benchmarking_logs", 
+        "num_update_workers": 1, 
+        "batching": {
+            "sample_size": 500, 
+            "opt_addr": "quantilereg:7777", 
+            "strategy": "learned"
+        }, 
+        "input_length": 784, 
+        "num_benchmark_requests": 10000000, 
+        "models": [
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "spark_svm", 
+                "addresses": [
+                    "spark_svm_r0:6001"
+                ]
+            }
+        ], 
+        "redis_ip": "redis", 
+        "mnist_path": "/mnist_data/test.data", 
+        "bench_batch_size": 10000, 
+        "target_qps": 800000, 
+        "name": "cache_hit_rate_100_hitrate_160905-212421", 
+        "cache_hit_rate": 1.0, 
+        "salt_cache": false, 
+        "num_predict_workers": 8, 
+        "redis_port": 6379, 
+        "cache_size": 49999, 
+        "slo_micros": 20000, 
+        "correction_policy": "logistic_regression", 
+        "send_updates": false
+    }, 
+    "docker_compose_conf": {
+        "services": {
+            "quantilereg": {
+                "cpuset": "1-1", 
+                "image": "clipper/quantile-reg"
+            }, 
+            "clipper": {
+                "cpuset": "2-11", 
+                "depends_on": [
+                    "redis", 
+                    "quantilereg", 
+                    "spark_svm_r0"
+                ], 
+                "image": "cl-dev-digits", 
+                "volumes": [
+                    "${MNIST_PATH}:/mnist_data:ro", 
+                    "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro", 
+                    "${CLIPPER_ROOT}/benchmarking_logs/caching:/tmp/benchmarking_logs"
+                ]
+            }, 
+            "spark_svm_r0": {
+                "cpuset": "12-12", 
+                "image": "clipper/spark-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+                ]
+            }, 
+            "redis": {
+                "cpuset": "0-0", 
+                "image": "redis:alpine"
+            }
+        }, 
+        "version": "2"
+    }
+}

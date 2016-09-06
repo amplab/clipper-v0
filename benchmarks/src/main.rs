@@ -12,7 +12,7 @@ extern crate time;
 extern crate log;
 extern crate env_logger;
 
-use rand::{thread_rng, Rng};
+use rand::{thread_rng, Rng, ThreadRng};
 #[allow(unused_imports)]
 use clipper::server::{ClipperServer, Input, PredictionRequest, UpdateRequest, Update};
 use clipper::configuration;
@@ -30,6 +30,7 @@ use std::io::prelude::*;
 use std::path::Path;
 use std::io::{BufReader, BufWriter};
 use std::error::Error;
+use std::collections::VecDeque;
 
 mod digits;
 
@@ -89,6 +90,194 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
     })
 }
 
+
+trait LoadGenerator {
+    fn next_request(&mut self) -> bool;
+}
+
+struct UniformLoadGenerator {
+    bench_batch_size: usize,
+    total_requests: usize,
+    // requested_load_qps: usize,
+    inter_batch_sleep_time_ms: u64,
+
+    // mutable
+    current_batch_count: usize,
+    total_count: usize,
+}
+
+impl UniformLoadGenerator {
+    pub fn new(batch_size: usize,
+               total_reqs: usize,
+               requested_load_qps: usize)
+               -> UniformLoadGenerator {
+
+        let sleep_time = 1000 / (requested_load_qps / batch_size) as u64;
+        info!("SLEEP TIME: {}", sleep_time);
+        UniformLoadGenerator {
+            bench_batch_size: batch_size,
+            total_requests: total_reqs,
+            current_batch_count: 0,
+            total_count: 0,
+            // requested_load_qps: requested_load_qps,
+            inter_batch_sleep_time_ms: sleep_time,
+        }
+    }
+}
+
+impl LoadGenerator for UniformLoadGenerator {
+    fn next_request(&mut self) -> bool {
+        if self.total_count < self.total_requests {
+            self.total_count += 1;
+            self.current_batch_count += 1;
+            if self.current_batch_count >= self.bench_batch_size {
+                self.current_batch_count = 0;
+                // info!("INTER BATCH SLEEPING!! total count: {}", self.total_count);
+                thread::sleep(Duration::from_millis(self.inter_batch_sleep_time_ms));
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+
+
+trait RequestGenerator {
+    fn get_next_request(&mut self, request_num: usize) -> (Vec<f64>, f64);
+    fn get_next_update(&mut self) -> Option<(Vec<f64>, f64)> {
+        unimplemented!();
+    }
+}
+
+
+/// A request generator that randomly selects positive and
+/// negative examples with equal frequency. Good for accuracy
+/// experiments.
+struct BalancedRequestGenerator {
+    min_pos_index: usize,
+    max_pos_index: usize,
+    min_neg_index: usize,
+    max_neg_index: usize,
+    rng: ThreadRng,
+    data: digits::TrainingData,
+}
+
+struct CacheHitRequestGenerator {
+    rng: ThreadRng,
+    cached_inputs: Vec<(Vec<f64>, f64)>,
+    cache_hit_rate: f64,
+}
+
+impl CacheHitRequestGenerator {
+    pub fn new(cache_hit_rate: f64) -> CacheHitRequestGenerator {
+        CacheHitRequestGenerator {
+            rng: thread_rng(),
+            cached_inputs: Vec::new(),
+            cache_hit_rate: cache_hit_rate,
+        }
+    }
+
+    fn random_features(&mut self, d: usize) -> Vec<f64> {
+        self.rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
+    }
+}
+
+impl RequestGenerator for CacheHitRequestGenerator {
+    fn get_next_request(&mut self, _: usize) -> (Vec<f64>, f64) {
+
+        if self.cached_inputs.len() < 100 {
+            let input = self.random_features(784);
+            let label = self.rng.gen::<bool>();
+            let y = if label { 1.0 } else { -1.0 };
+            self.cached_inputs.push((input.clone(), y));
+            (input, y)
+        } else {
+            let cache_hit = self.rng.gen_range::<f64>(0.0, 1.0) <= self.cache_hit_rate;
+            if cache_hit {
+                let idx = self.rng.gen_range::<usize>(0, self.cached_inputs.len());
+                self.cached_inputs[idx].clone()
+
+            } else {
+                let input = self.random_features(784);
+                let label = self.rng.gen::<bool>();
+                let y = if label { 1.0 } else { -1.0 };
+                (input, y)
+            }
+        }
+    }
+}
+
+struct CachedUpdatesRequestGenerator {
+    rng: ThreadRng,
+    sent_predictions: VecDeque<(Vec<f64>, f64)>,
+}
+
+impl CachedUpdatesRequestGenerator {
+    pub fn new() -> CachedUpdatesRequestGenerator {
+        CachedUpdatesRequestGenerator {
+            rng: thread_rng(),
+            sent_predictions: VecDeque::with_capacity(5000),
+        }
+    }
+
+    fn random_features(&mut self, d: usize) -> Vec<f64> {
+        self.rng.gen_iter::<f64>().take(d).collect::<Vec<f64>>()
+    }
+}
+
+impl RequestGenerator for CachedUpdatesRequestGenerator {
+    fn get_next_request(&mut self, _: usize) -> (Vec<f64>, f64) {
+        let input = self.random_features(784);
+        let label = self.rng.gen::<bool>();
+        let y = if label { 1.0 } else { -1.0 };
+        self.sent_predictions.push_back((input.clone(), y));
+        (input, y)
+    }
+
+    fn get_next_update(&mut self) -> Option<(Vec<f64>, f64)> {
+        self.sent_predictions.pop_front()
+    }
+}
+
+
+impl BalancedRequestGenerator {
+    pub fn new(min_pos_index: usize,
+               max_pos_index: usize,
+               min_neg_index: usize,
+               max_neg_index: usize,
+               data: digits::TrainingData)
+               -> BalancedRequestGenerator {
+
+        BalancedRequestGenerator {
+            min_pos_index: min_pos_index,
+            max_pos_index: max_pos_index,
+            min_neg_index: min_neg_index,
+            max_neg_index: max_neg_index,
+            rng: thread_rng(),
+            data: data,
+        }
+    }
+}
+
+impl RequestGenerator for BalancedRequestGenerator {
+    fn get_next_request(&mut self, request_num: usize) -> (Vec<f64>, f64) {
+        let idx = if request_num % 2 == 0 {
+            self.rng.gen_range::<usize>(self.min_neg_index, self.max_neg_index)
+        } else {
+            self.rng.gen_range::<usize>(self.min_pos_index, self.max_pos_index)
+        };
+
+        let input_data = self.data.xs[idx].clone();
+        let label = self.data.ys[idx];
+        let y = if label == LABEL { 1.0 } else { -1.0 };
+        (input_data, y)
+    }
+}
+
+
+
 #[allow(unused_variables)] // needed for metrics shutdown signal
 fn start_digits_benchmark(conf_path: &String) {
     let path = Path::new(conf_path);
@@ -118,7 +307,7 @@ fn start_digits_benchmark(conf_path: &String) {
         .as_integer()
         .unwrap() as usize;
     let target_qps = pc.get("target_qps")
-        .unwrap_or(&Value::Integer(10000))
+        .unwrap_or(&Value::Integer(1000))
         .as_integer()
         .unwrap() as usize;
     let batch_size = pc.get("bench_batch_size")
@@ -129,6 +318,20 @@ fn start_digits_benchmark(conf_path: &String) {
         .unwrap_or(&Value::Boolean(true))
         .as_bool()
         .unwrap();
+    let send_updates = pc.get("send_updates")
+        .unwrap_or(&Value::Boolean(false))
+        .as_bool()
+        .unwrap();
+    let load_generator_name = pc.get("load_generator")
+        .unwrap_or(&Value::String("uniform".to_string()))
+        .as_str()
+        .unwrap()
+        .to_string();
+    let req_generator_name = pc.get("request_generator")
+        .unwrap_or(&Value::String("balanced".to_string()))
+        .as_str()
+        .unwrap()
+        .to_string();
     let all_test_data = digits::load_mnist_dense(&mnist_path).unwrap();
     // let norm_test_data = all_test_data;
     let norm_test_data = digits::normalize(&all_test_data);
@@ -214,7 +417,7 @@ fn start_digits_benchmark(conf_path: &String) {
     let mut rng = thread_rng();
     let num_users = 1;
     // let batch_size = 200;
-    let inter_batch_sleep_time_ms = 1000 / (target_qps / batch_size) as u64;
+    // let inter_batch_sleep_time_ms = 1000 / (target_qps / batch_size) as u64;
 
     thread::sleep(Duration::from_secs(10));
 
@@ -261,21 +464,61 @@ fn start_digits_benchmark(conf_path: &String) {
     let _ = launch_monitor_thread(clipper.get_metrics(),
                                   report_interval_secs,
                                   metrics_signal_rx);
-    while events_fired < num_requests {
-        for _ in 0..batch_size {
-            if events_fired % 20000 == 0 {
-                info!("Submitted {} requests", events_fired);
+
+    let mut load_gen = match load_generator_name.as_str() {
+        "uniform" => UniformLoadGenerator::new(batch_size, num_requests, target_qps),
+        _ => panic!("{} is unsupported load generator type", load_generator_name),
+    };
+
+    let mut request_generator: Box<RequestGenerator> = match req_generator_name.as_str() {
+        "balanced" => {
+            Box::new(BalancedRequestGenerator::new(first_three_pos as usize,
+                                                   last_three_pos as usize,
+                                                   last_three_pos as usize + 1,
+                                                   norm_test_data.ys.len(),
+                                                   norm_test_data))
+        }
+        "cached_updates" => Box::new(CachedUpdatesRequestGenerator::new()),
+        "cache_hits" => {
+            Box::new(CacheHitRequestGenerator::new(pc.get("cache_hit_rate")
+                .unwrap()
+                .as_float()
+                .unwrap()))
+        }
+        _ => {
+            panic!("{} is unsupported request generator type",
+                   req_generator_name)
+        }
+
+    };
+
+    while load_gen.next_request() {
+        if events_fired % 20000 == 0 {
+            info!("Submitted {} requests", events_fired);
+        }
+        let mut send_update_req: bool = false;
+        if send_updates {
+            if rng.gen_range::<f64>(0.0, 1.0) >= 0.55 {
+                send_update_req = true;
             }
-            let idx = if events_fired % 2 == 0 {
-                rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
-            } else {
-                rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
-            };
-            let input_data = norm_test_data.xs[idx].clone();
-            // make each input unique so there are no cache hits
-            // input_data[783] = events_fired as f64;
-            let label = norm_test_data.ys[idx];
-            let y = if label == LABEL { 1.0 } else { -1.0 };
+        }
+
+        if send_update_req {
+            if let Some((input_data, y)) = request_generator.get_next_update() {
+                let input = Input::Floats {
+                    f: input_data,
+                    length: 784,
+                };
+                let updates = vec![Update {
+                                       query: Arc::new(input),
+                                       label: y,
+                                   }];
+                let update_req = UpdateRequest::new(user, updates);
+                clipper.schedule_update(update_req);
+            }
+        } else {
+
+            let (input_data, y) = request_generator.get_next_request(events_fired);
             let input = Input::Floats {
                 f: input_data,
                 length: 784,
@@ -298,8 +541,46 @@ fn start_digits_benchmark(conf_path: &String) {
             }
             events_fired += 1;
         }
-        thread::sleep(Duration::from_millis(inter_batch_sleep_time_ms));
     }
+    // while events_fired < num_requests {
+    //     for _ in 0..batch_size {
+    //         if events_fired % 20000 == 0 {
+    //             info!("Submitted {} requests", events_fired);
+    //         }
+    //         let idx = if events_fired % 2 == 0 {
+    //             rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
+    //         } else {
+    //             rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
+    //         };
+    //         let input_data = norm_test_data.xs[idx].clone();
+    //         // make each input unique so there are no cache hits
+    //         // input_data[783] = events_fired as f64;
+    //         let label = norm_test_data.ys[idx];
+    //         let y = if label == LABEL { 1.0 } else { -1.0 };
+    //         let input = Input::Floats {
+    //             f: input_data,
+    //             length: 784,
+    //         };
+    //         // let user = rng.gen_range::<u32>(0, num_users);
+    //         {
+    //             let sender = sender.clone();
+    //             // let req_num = events_fired;
+    //             let on_pred = Box::new(move |pred_y| {
+    //                 match sender.send((pred_y, pred_y == y)) {
+    //                     Ok(_) => {}
+    //                     Err(e) => warn!("error in on_pred: {}", e.description()),
+    //                 };
+    //                 // if req_num % 100 == 0 {
+    //                 //     info!("completed prediction {}", req_num);
+    //                 // }
+    //             });
+    //             let r = PredictionRequest::new(user, input, on_pred, salt_cache);
+    //             clipper.schedule_prediction(r);
+    //         }
+    //         events_fired += 1;
+    //     }
+    //     thread::sleep(Duration::from_millis(inter_batch_sleep_time_ms));
+    // }
 
     receiver_jh.join().unwrap();
     {
