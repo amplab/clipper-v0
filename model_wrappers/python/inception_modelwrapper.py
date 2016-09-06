@@ -36,9 +36,10 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
         return self.predict_floats(inputs)
 
     def predict_floats(self, inputs):
+        number_of_inputs = len(inputs)
         inputs = np.array(inputs)
         inputs = inputs.reshape(
-            (len(inputs), self.image_size, self.image_size, 3))
+            (number_of_inputs, self.image_size, self.image_size, 3))
         # Pad the inputs ndarray with the first image if necessary
         if len(inputs) < self.batch_size:
             top_img = inputs[0].reshape((1,) + inputs[0].shape)
@@ -51,7 +52,7 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
         self.reuse_scope = True
         preds = top_1[0].indices.flatten()
         preds = preds.astype(np.float64)
-        return preds
+        return preds[:number_of_inputs]
 
     def preprocess_image(self, image_buffer):
         """Preprocess JPEG encoded bytes to 3D float Tensor."""
