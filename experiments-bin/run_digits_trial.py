@@ -11,8 +11,8 @@ import subprocess32 as subprocess
 cur_model_core_num = 0
 MAX_CORES = 47
 isolated_cores = True
-experiment_name = "cache_hit_rate_100_hitrate_%s" % str(time.strftime("%y%m%d-%H%M%S"))
-benchmarking_logs = "benchmarking_logs/caching"
+experiment_name = "DEBUG_cache_hit_rate_0_hitrate_%s" % str(time.strftime("%y%m%d-%H%M%S"))
+benchmarking_logs = "benchmarking_logs/caching_kernel_svm"
 CLIPPER_ROOT = os.path.abspath("..")
 
 def reserve_cores(num_cores):
