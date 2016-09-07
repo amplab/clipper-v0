@@ -7,12 +7,22 @@ import os
 import json
 # import shutil
 import subprocess32 as subprocess
+from fabric.api import *
+from fabric.colors import green as _green, yellow as _yellow
+from fabric.contrib.console import confirm
+from fabric.contrib.files import append
 
 
 class DigitsBenchmarker:
 
     def __init__(self, experiment_name, log_dest, target_qps, batch_size, num_requests):
+        self.remote_node = "c69.millennium.berkeley.edu"
+        env.key_filename = "~/.ssh/c70.millenium"
+        env.user = "crankshaw"
+        env.host_string = self.remote_node
         self.cur_model_core_num = 0
+        self.remote_cur_model_core_num = 0
+        self.remote_port_start = 7001
         self.MAX_CORES = 47
         # self.NUM_REPS = NUM_REPS
         self.isolated_cores = True
@@ -55,6 +65,11 @@ class DigitsBenchmarker:
                 "models": []
                 }
 
+        self.remote_dc_dict = {
+                "version": "2",
+                "services": { }
+                }
+
         self.dc_dict = {
                 "version": "2",
                 "services": {
@@ -85,12 +100,59 @@ class DigitsBenchmarker:
         s = "%d-%d" % (self.cur_model_core_num, self.MAX_CORES)
         return s
 
-    def add_model(self, name_base, image, mp, container_mp, num_replicas=1):
+    def remote_reserve_cores(self, num_cores):
+        s = "%d-%d" % (self.remote_cur_model_core_num, self.remote_cur_model_core_num + num_cores - 1)
+        self.remote_cur_model_core_num += num_cores
+        if self.remote_cur_model_core_num >= self.MAX_CORES:
+            print("WARNING: Trying to reserve more than %d cores: %d" % (self.MAX_CORES, self.remote_cur_model_core_num))
+            sys.exit(1)
+        return s
+
+    def remote_overlap_reserve_cores(self):
+        s = "%d-%d" % (self.remote_cur_model_core_num, self.MAX_CORES)
+        return s
+
+
+    def add_remote_reps(self, name_base, image, mp, container_mp, rep_start, num_replicas=1):
+        model_names = [name_base + "_r%d" % i for i in range(rep_start, rep_start + num_replicas)]
+        model_addrs = ["%s:%d" % (self.remote_node, self.remote_port_start + i) for i in range(num_replicas)]
+
+        pnum = self.remote_port_start
+        self.remote_port_start += num_replicas
+
+        dc_entries = {}
+        for n in model_names:
+            if self.isolated_cores:
+                core_res = self.remote_reserve_cores(1)
+            else:
+                core_res = self.remote_overlap_reserve_cores()
+
+            dc_entries[n] = {
+                    "image": image,
+                    "volumes": ["%s:/model:ro" % mp],
+                    # "environment": ["CLIPPER_MODEL_PATH=%s" % container_mp],
+                    "cpuset": core_res,
+                    "ports": ["%d:6001" % pnum],
+                    }
+            pnum += 1
+
+        # self.clipper_conf_dict["models"].append(clipper_model_def)
+        self.remote_dc_dict["services"].update(dc_entries)
+        # self.dc_dict["services"]["clipper"]["depends_on"].extend(model_names)
+        # self.dc_dict["services"].update(dc_entries)
+        return model_addrs
+
+
+
+    def add_model(self, name_base, image, mp, container_mp, num_replicas, remote_replicas=0):
         model_names = [name_base + "_r%d" % i for i in range(num_replicas)]
         model_addrs = ["%s:6001" % n for n in model_names]
+        remote_model_addrs = []
+        if remote_replicas > 0:
+            remote_model_addrs = self.add_remote_reps(name_base, image, mp, container_mp, num_replicas, remote_replicas)
         clipper_model_def = {
                 "name": name_base,
-                "addresses": model_addrs,
+                "addresses": model_addrs + remote_model_addrs,
                 "num_outputs": 1,
                 "version": 1
         }
@@ -124,12 +186,13 @@ class DigitsBenchmarker:
         container_mp =  "/model"
         self.add_model(name_base, image, mp, container_mp, num_replicas)
 
-    def add_sklearn_log_regression(self, num_replicas=1):
+    def add_sklearn_log_regression(self, local_replicas=1, remote_replicas=0):
         name_base = "logistic_reg"
         image = "clipper/sklearn-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/",
         container_mp =  "/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas)
+        self.add_model(name_base, image, mp, container_mp, local_replicas, remote_replicas=remote_replicas)
+
 
     def add_sklearn_linear_svm(self, num_replicas=1):
         name_base = "linear_svm"
@@ -173,6 +236,13 @@ class DigitsBenchmarker:
 
         with open(os.path.join(self.CLIPPER_ROOT, self.benchmarking_logs, "%s_config.json" % self.experiment_name), "w") as f:
             json.dump({"clipper_conf": self.clipper_conf_dict, "docker_compose_conf": self.dc_dict}, f, indent=4)
+        
+        if len(self.remote_dc_dict["services"]) > 0:
+            remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
+            with cd(remote_dc_dir):
+                with open("/tmp/docker-compose.yml", "w") as f:
+                    yaml.dump(self.remote_dc_dict, f)
+                    put("/tmp/docker-compose.yml", "docker-compose.yml")
 
         self.run_with_docker()
 
@@ -188,6 +258,14 @@ class DigitsBenchmarker:
         alias dcup="sudo docker-compose up clipper"
         """
 
+        # start remote model wrappers
+        if len(self.remote_dc_dict["services"]) > 0:
+            remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
+            with cd(remote_dc_dir):
+                sudo("docker-compose up -d")
+                # for sname in self.remote_dc_dict["services"]:
+                    # sudo("docker-compose up %s" % sname)
+
         docker_compose_up = ["sudo", "docker-compose", "up", "clipper"]
         docker_compose_stop = ["sudo", "docker-compose", "stop"]
         print("Starting experiment: %s" % self.experiment_name)
@@ -198,6 +276,13 @@ class DigitsBenchmarker:
         dcstop_err_code = subprocess.call(docker_compose_stop)
         if dcstop_err_code > 0:
             print("WARNING: Docker container shutdown terminated with non-zero error code: %d" % dcstop_err_code)
+
+
+        # Shutdown remote containers if they exist
+        if len(self.remote_dc_dict["services"]) > 0:
+            remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
+            with cd(remote_dc_dir):
+                sudo("docker-compose stop")
 
 
 # def gen_configs():
@@ -230,18 +315,24 @@ if __name__=='__main__':
 
     # num_reps = 1
     # for num_reps in [1,2] + range(4,37,4):
-    for num_reps in range(16,33,4):
-        print("STARTING RUN WITH %d REPLICAS" % num_reps)
-        time.sleep(10)
-        exp_name = "sklearn_logreg_%d_replicas" % num_reps
-        log_dest = "benchmarking_logs/replica-scaling"
-        # every 4 replicas add another million to the number of requests
-        # to let things stabilize
-        num_requests = 1000000 * (num_reps / 4 + 1)
-        benchmarker = DigitsBenchmarker(exp_name, log_dest, 10000*num_reps, 150*num_reps, num_requests)
-        benchmarker.add_sklearn_log_regression(num_replicas=num_reps)
-        benchmarker.run_clipper()
-        time.sleep(5)
+    local_num_reps = 1
+    remote_num_reps = 10
+    # for remote_reps in [1,2] + range(4,25,4):
+    print("STARTING RUN WITH %d LOCAL REPLICAS AND %d REMOTE REPLICAS" % (local_num_reps, remote_num_reps))
+    time.sleep(10)
+    total_num_reps = local_num_reps + remote_num_reps
+    exp_name = "DEBUG_sklearn_logreg_%d_local_replicas_%d_remote_replicas" % (local_num_reps, remote_num_reps)
+    log_dest = "benchmarking_logs/replica-scaling"
+    # every 4 replicas add another million to the number of requests
+    # to let things stabilize
+    num_requests = 1000000 * (total_num_reps / 4 + 1)
+    benchmarker = DigitsBenchmarker(exp_name, log_dest, 10000*total_num_reps, 150*total_num_reps, num_requests)
+    benchmarker.add_sklearn_log_regression(local_replicas=local_num_reps, remote_replicas = remote_num_reps)
+    # print(toml.dumps(benchmarker.clipper_conf_dict))
+    # print(yaml.dump(benchmarker.remote_dc_dict))
+    # print(yaml.dump(benchmarker.dc_dict))
+    benchmarker.run_clipper()
+    time.sleep(5)
 
 
 
