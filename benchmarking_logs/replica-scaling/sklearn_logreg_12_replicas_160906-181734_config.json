@@ -1,0 +1,174 @@
+{
+    "clipper_conf": {
+        "num_message_encodes": 1, 
+        "use_lsh": false, 
+        "window_size": -1, 
+        "load_generator": "uniform", 
+        "input_type": "float", 
+        "request_generator": "balanced", 
+        "results_path": "/tmp/benchmarking_logs", 
+        "num_update_workers": 1, 
+        "batching": {
+            "sample_size": 500, 
+            "opt_addr": "quantilereg:7777", 
+            "strategy": "learned"
+        }, 
+        "input_length": 784, 
+        "num_benchmark_requests": 4000000, 
+        "models": [
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "logistic_reg", 
+                "addresses": [
+                    "logistic_reg_r0:6001", 
+                    "logistic_reg_r1:6001", 
+                    "logistic_reg_r2:6001", 
+                    "logistic_reg_r3:6001", 
+                    "logistic_reg_r4:6001", 
+                    "logistic_reg_r5:6001", 
+                    "logistic_reg_r6:6001", 
+                    "logistic_reg_r7:6001", 
+                    "logistic_reg_r8:6001", 
+                    "logistic_reg_r9:6001", 
+                    "logistic_reg_r10:6001", 
+                    "logistic_reg_r11:6001"
+                ]
+            }
+        ], 
+        "redis_ip": "redis", 
+        "mnist_path": "/mnist_data/test.data", 
+        "bench_batch_size": 1800, 
+        "target_qps": 120000, 
+        "name": "sklearn_logreg_12_replicas_160906-181734", 
+        "salt_cache": true, 
+        "num_predict_workers": 12, 
+        "redis_port": 6379, 
+        "cache_size": 49999, 
+        "slo_micros": 20000, 
+        "correction_policy": "logistic_regression", 
+        "send_updates": false
+    }, 
+    "docker_compose_conf": {
+        "services": {
+            "clipper": {
+                "cpuset": "2-11", 
+                "depends_on": [
+                    "redis", 
+                    "quantilereg", 
+                    "logistic_reg_r0", 
+                    "logistic_reg_r1", 
+                    "logistic_reg_r2", 
+                    "logistic_reg_r3", 
+                    "logistic_reg_r4", 
+                    "logistic_reg_r5", 
+                    "logistic_reg_r6", 
+                    "logistic_reg_r7", 
+                    "logistic_reg_r8", 
+                    "logistic_reg_r9", 
+                    "logistic_reg_r10", 
+                    "logistic_reg_r11"
+                ], 
+                "image": "cl-dev-digits", 
+                "volumes": [
+                    "${MNIST_PATH}:/mnist_data:ro", 
+                    "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro", 
+                    "${CLIPPER_ROOT}/benchmarking_logs/replica-scaling:/tmp/benchmarking_logs"
+                ]
+            }, 
+            "redis": {
+                "cpuset": "0-0", 
+                "image": "redis:alpine"
+            }, 
+            "quantilereg": {
+                "cpuset": "1-1", 
+                "image": "clipper/quantile-reg"
+            }, 
+            "logistic_reg_r5": {
+                "cpuset": "17-17", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r9": {
+                "cpuset": "21-21", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r8": {
+                "cpuset": "20-20", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r4": {
+                "cpuset": "16-16", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r11": {
+                "cpuset": "23-23", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r10": {
+                "cpuset": "22-22", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r7": {
+                "cpuset": "19-19", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r6": {
+                "cpuset": "18-18", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r1": {
+                "cpuset": "13-13", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r0": {
+                "cpuset": "12-12", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r3": {
+                "cpuset": "15-15", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r2": {
+                "cpuset": "14-14", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }
+        }, 
+        "version": "2"
+    }
+}

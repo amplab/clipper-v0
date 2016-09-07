@@ -1,14 +1,94 @@
 services:
   clipper:
-    cpuset: 2-11
-    depends_on: [redis, quantilereg, spark_svm_r0]
+    cpuset: 2-25
+    depends_on: [redis, quantilereg, logistic_reg_r0, logistic_reg_r1, logistic_reg_r2,
+      logistic_reg_r3, logistic_reg_r4, logistic_reg_r5, logistic_reg_r6, logistic_reg_r7,
+      logistic_reg_r8, logistic_reg_r9, logistic_reg_r10, logistic_reg_r11, logistic_reg_r12,
+      logistic_reg_r13, logistic_reg_r14, logistic_reg_r15, logistic_reg_r16, logistic_reg_r17,
+      logistic_reg_r18, logistic_reg_r19]
     image: cl-dev-digits
     volumes: ['${MNIST_PATH}:/mnist_data:ro', '${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro',
-      '${CLIPPER_ROOT}/benchmarking_logs/caching:/tmp/benchmarking_logs']
+      '${CLIPPER_ROOT}/benchmarking_logs/replica-scaling:/tmp/benchmarking_logs']
+  logistic_reg_r0:
+    cpuset: 26-26
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r1:
+    cpuset: 27-27
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r10:
+    cpuset: 36-36
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r11:
+    cpuset: 37-37
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r12:
+    cpuset: 38-38
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r13:
+    cpuset: 39-39
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r14:
+    cpuset: 40-40
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r15:
+    cpuset: 41-41
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r16:
+    cpuset: 42-42
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r17:
+    cpuset: 43-43
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r18:
+    cpuset: 44-44
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r19:
+    cpuset: 45-45
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r2:
+    cpuset: 28-28
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r3:
+    cpuset: 29-29
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r4:
+    cpuset: 30-30
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r5:
+    cpuset: 31-31
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r6:
+    cpuset: 32-32
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r7:
+    cpuset: 33-33
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r8:
+    cpuset: 34-34
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  logistic_reg_r9:
+    cpuset: 35-35
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
   quantilereg: {cpuset: 1-1, image: clipper/quantile-reg}
   redis: {cpuset: 0-0, image: 'redis:alpine'}
-  spark_svm_r0:
-    cpuset: 12-12
-    image: clipper/spark-mw-dev
-    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
 version: '2'

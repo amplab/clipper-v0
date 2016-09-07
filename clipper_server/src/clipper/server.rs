@@ -810,6 +810,7 @@ impl<P, S> PredictionWorker<P, S>
                                                               input: req.query.clone(),
                                                               recv_time: req.recv_time.clone(),
                                                               salt: req.salt.clone(),
+                                                              ttl: true,
                                                           });
                                 num_requests += 1;
                                 prediction_metrics.cache_hit_counter.incr(0, 1);
@@ -1182,6 +1183,7 @@ impl<P, S> UpdateWorker<P, S>
                                                   input: update.query.clone(),
                                                   recv_time: req.recv_time.clone(),
                                                   salt: None,
+                                                  ttl: false,
                                               });
                 }
             }

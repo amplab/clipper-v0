@@ -1,0 +1,2098 @@
+/tmp/digits_bench.toml contains:
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 10000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 150
+target_qps = 10000
+name = "DEBUG_sklearn_logreg_1_replicas_160906-180322"
+salt_cache = true
+num_predict_workers = 12
+redis_port = 6379
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = false
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+/tmp/digits_bench.toml contains:
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 10000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 150
+target_qps = 10000
+name = "DEBUG_sklearn_logreg_1_replicas_160906-180322"
+salt_cache = true
+num_predict_workers = 12
+redis_port = 6379
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = false
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+INFO:clipper::configuration: logistic_reg_r0:6001
+addresses = [ "logistic_reg_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper::configuration: quantilereg:7777
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.2:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 8 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 8 
+INFO:clipper::server: starting input prediction worker 9 
+INFO:clipper::server: starting prediction worker 9 output thread with 20 ms SLO
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting input prediction worker 10 
+INFO:clipper::server: starting prediction worker 11 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 11 
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: starting prediction worker 10 output thread with 20 ms SLO
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper::correction_policy: OLD correction state: [1], offline_model_order: ["logistic_reg"]
+INFO:clipper::correction_policy: New correction state: [2.5292877044937394], offline_model_order: ["logistic_reg"], labels: Some([1, -1])
+INFO:clipper_benchmarks: {
+  "name": "DEBUG_sklearn_logreg_1_replicas_160906-180322",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 130975,
+      "max": 130975,
+      "mean": 130975.0,
+      "std": null,
+      "p95": 130975.0,
+      "p99": 130975.0,
+      "p50": 130975.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 1424,
+      "max": 6479,
+      "mean": 4448.73,
+      "std": 1217.5997947809559,
+      "p95": 6479.0,
+      "p99": 6479.0,
+      "p50": 4383.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04993973771849509,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 19.975902070537207,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: SLEEP TIME: 15
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/DEBUG_sklearn_logreg_1_replicas_160906-180322_results.json
+INFO:clipper::server: ending input loop: prediction worker 5
+INFO:clipper::server: ending input loop: prediction worker 1
+INFO:clipper::server: ending input loop: prediction worker 10
+INFO:clipper::server: ending input loop: prediction worker 2
+INFO:clipper::server: ending input loop: prediction worker 3
+INFO:clipper::server: ending input loop: prediction worker 8
+INFO:clipper::server: ending input loop: prediction worker 6
+INFO:clipper::server: ending input loop: prediction worker 7
+INFO:clipper::server: ending output loop: prediction worker 5
+INFO:clipper::server: ending input loop: prediction worker 11
+INFO:clipper::server: ending output loop: prediction worker 7
+INFO:clipper::server: ending output loop: prediction worker 1
+INFO:clipper::server: ending input loop: prediction worker 0
+INFO:clipper::server: ending output loop: prediction worker 10
+INFO:clipper::server: ending output loop: prediction worker 8
+INFO:clipper::server: ending output loop: prediction worker 11
+INFO:clipper::server: ending input loop: prediction worker 9
+INFO:clipper::server: ending output loop: prediction worker 0
+INFO:clipper::server: ending output loop: prediction worker 6
+INFO:clipper::server: ending output loop: prediction worker 2
+INFO:clipper::server: ending input loop: prediction worker 4
+INFO:clipper::server: ending output loop: prediction worker 3
+INFO:clipper::server: ending output loop: prediction worker 9
+INFO:clipper::server: ending output loop: prediction worker 4
+INFO:clipper::server: Ending loop: update worker 0
+INFO:clipper::server: Dropping ClipperServer
+/tmp/digits_bench.toml contains:
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 1000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 150
+target_qps = 10000
+name = "sklearn_logreg_1_replicas_160906-181023"
+salt_cache = true
+num_predict_workers = 12
+redis_port = 6379
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = false
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+INFO:clipper::configuration: logistic_reg_r0:6001
+/tmp/digits_bench.toml contains:
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 1000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 150
+target_qps = 10000
+name = "sklearn_logreg_1_replicas_160906-181023"
+salt_cache = true
+num_predict_workers = 12
+redis_port = 6379
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = false
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper::configuration: quantilereg:7777
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.3:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 8 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 9 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 10 
+INFO:clipper::server: starting input prediction worker 8 
+INFO:clipper::server: starting prediction worker 10 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 9 
+INFO:clipper::server: starting prediction worker 11 output thread with 20 ms SLO
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting input prediction worker 11 
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper::correction_policy: OLD correction state: [1], offline_model_order: ["logistic_reg"]
+INFO:clipper::correction_policy: New correction state: [2.275298759293496], offline_model_order: ["logistic_reg"], labels: Some([1, -1])
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 132948,
+      "max": 132948,
+      "mean": 132948.0,
+      "std": null,
+      "p95": 132948.0,
+      "p99": 132948.0,
+      "p50": 132948.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 1385,
+      "max": 7428,
+      "mean": 4609.2725,
+      "std": 1618.228786128336,
+      "p95": 7428.0,
+      "p99": 7428.0,
+      "p50": 4381.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04994768728971711,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 19.979081901249395,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: SLEEP TIME: 15
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 157, alpha = 105.91502934870879, beta = 3420.2549118844886
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 7830.847891853029, baseline: 283.59381897807026, increase: 27.612900450621503
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 93149
+    },
+    {
+      "name": "queued_predictions",
+      "count": 300
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 84898
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 14440
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 78709
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.652341946773449
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18196,
+      "max": 31150,
+      "mean": 20836.18093385214,
+      "std": 648.5213830572324,
+      "p95": 21812.0,
+      "p99": 22220.829999999998,
+      "p50": 20765.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.3633268482490272,
+      "std": 0.4810163388572294,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 619,
+      "max": 21966,
+      "mean": 13923.052893968872,
+      "std": 3795.2537687430569,
+      "p95": 17211.0,
+      "p99": 18017.0,
+      "p50": 15080.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 101.79616306954437,
+      "std": 59.16326676342266,
+      "p95": 154.0,
+      "p99": 156.64999999999999,
+      "p50": 146.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9318.00523288665,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 8487.342914226332,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 3332.3950067669709,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 186599
+    },
+    {
+      "name": "queued_predictions",
+      "count": 150
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 166092
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 25902
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 160697
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.6364664333678102
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18510,
+      "max": 31150,
+      "mean": 20839.107490272374,
+      "std": 614.457672032703,
+      "p95": 21835.35,
+      "p99": 22252.739999999998,
+      "p50": 20762.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.32028210116731517,
+      "std": 0.4666416533955044,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 580,
+      "max": 24045,
+      "mean": 14658.01811770428,
+      "std": 4344.724608523384,
+      "p95": 20839.0,
+      "p99": 23494.0,
+      "p50": 15796.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 108.34442270058709,
+      "std": 58.331680508305208,
+      "p95": 157.0,
+      "p99": 157.0,
+      "p50": 150.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9327.520180992851,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 8302.436800091737,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 2990.6989502830826,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 279599
+    },
+    {
+      "name": "queued_predictions",
+      "count": 300
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 259094
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 66067
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 213532
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.7323380984910533
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18510,
+      "max": 33942,
+      "mean": 20839.35335603113,
+      "std": 688.642034379191,
+      "p95": 21802.35,
+      "p99": 22245.659999999996,
+      "p50": 20765.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.545476653696498,
+      "std": 0.4979881357539408,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 495,
+      "max": 24045,
+      "mean": 12114.378647859921,
+      "std": 5090.486374764799,
+      "p95": 19390.0,
+      "p99": 23322.0,
+      "p50": 12824.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 82.06968641114983,
+      "std": 62.15153980543791,
+      "p95": 152.0,
+      "p99": 157.0,
+      "p50": 92.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9322.007662100315,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 8634.250254626304,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 5093.854307296507,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 372679
+    },
+    {
+      "name": "queued_predictions",
+      "count": 220
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 352103
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 106174
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 266506
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.7801384565847376
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 18510,
+      "max": 33942,
+      "mean": 20835.94430933852,
+      "std": 669.137308838769,
+      "p95": 21804.7,
+      "p99": 22247.739999999998,
+      "p50": 20761.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.6466439688715954,
+      "std": 0.4780702123051857,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 431,
+      "max": 24045,
+      "mean": 11039.223005836577,
+      "std": 4941.319542883485,
+      "p95": 18870.0,
+      "p99": 23277.5,
+      "p50": 10106.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 73.86259702118733,
+      "std": 61.203239708259648,
+      "p95": 150.0,
+      "p99": 157.0,
+      "p50": 70.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9316.319759146181,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 8800.302541876123,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 6141.999655161592,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 465749
+    },
+    {
+      "name": "queued_predictions",
+      "count": 150
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 445222
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 146299
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 319450
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8087660950426088
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19559,
+      "max": 33942,
+      "mean": 20836.156614785992,
+      "std": 643.8523408464444,
+      "p95": 21807.0,
+      "p99": 22229.739999999998,
+      "p50": 20758.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.7176556420233463,
+      "std": 0.4501947470131012,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 431,
+      "max": 24045,
+      "mean": 10353.562864785992,
+      "std": 4791.7350335070509,
+      "p95": 18535.0,
+      "p99": 23210.25,
+      "p50": 9885.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 69.71844660194175,
+      "std": 60.17065754407229,
+      "p95": 150.0,
+      "p99": 157.0,
+      "p50": 60.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9312.501757032418,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 8902.470518446811,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 6770.385361885568,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 558897
+    },
+    {
+      "name": "queued_predictions",
+      "count": 152
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 538244
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 186522
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 372375
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.828021979005076
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19559,
+      "max": 33942,
+      "mean": 20842.87670233463,
+      "std": 630.0704131203768,
+      "p95": 21817.35,
+      "p99": 22239.48,
+      "p50": 20773.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.7633754863813229,
+      "std": 0.4250615157875478,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 375,
+      "max": 24045,
+      "mean": 9881.21230544747,
+      "std": 4641.321084599821,
+      "p95": 18114.0,
+      "p99": 23151.0,
+      "p50": 9771.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 67.21812960419529,
+      "std": 59.42298713080757,
+      "p95": 150.0,
+      "p99": 157.0,
+      "p50": 55.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9312.450967500237,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 8970.060592021999,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 7191.59477558179,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 651944
+    },
+    {
+      "name": "queued_predictions",
+      "count": 255
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 631394
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 226713
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 425232
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8417688608701655
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19559,
+      "max": 33942,
+      "mean": 20841.009970817122,
+      "std": 636.6262257012318,
+      "p95": 21814.7,
+      "p99": 22235.22,
+      "p50": 20770.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.7937743190661478,
+      "std": 0.4046436316530245,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 375,
+      "max": 23843,
+      "mean": 9580.82076848249,
+      "std": 4470.057284661385,
+      "p95": 17345.0,
+      "p99": 23045.75,
+      "p50": 9683.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 65.78088521400778,
+      "std": 58.92959123593097,
+      "p95": 150.0,
+      "p99": 157.0,
+      "p50": 53.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9312.29481900799,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 9018.662550180246,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 7492.292854073527,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 745199
+    },
+    {
+      "name": "queued_predictions",
+      "count": 150
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 724661
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 266992
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 478207
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8521079604239942
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19559,
+      "max": 33942,
+      "mean": 20837.34022373541,
+      "std": 635.6292421320908,
+      "p95": 21816.35,
+      "p99": 22225.18,
+      "p50": 20766.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.8176070038910506,
+      "std": 0.3862150513649134,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 375,
+      "max": 23843,
+      "mean": 9388.92740758755,
+      "std": 4311.062079595245,
+      "p95": 17169.5,
+      "p99": 22832.5,
+      "p50": 9631.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 65.1153939688716,
+      "std": 58.80717039350155,
+      "p95": 150.0,
+      "p99": 155.75,
+      "p50": 51.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9312.323360690547,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 9056.059061502505,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 7717.877725121516,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 838499
+    },
+    {
+      "name": "queued_predictions",
+      "count": 150
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 817992
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 307381
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 531118
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.860305140495099
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19559,
+      "max": 33942,
+      "mean": 20830.0328307393,
+      "std": 614.0405791006446,
+      "p95": 21808.0,
+      "p99": 22202.87,
+      "p50": 20756.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.8365758754863814,
+      "std": 0.3697971556786824,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 431,
+      "max": 23843,
+      "mean": 9224.209387159533,
+      "std": 4208.0965550346659,
+      "p95": 17038.75,
+      "p99": 22361.25,
+      "p50": 9587.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 64.19528210116732,
+      "std": 58.65745782299734,
+      "p95": 150.0,
+      "p99": 154.0,
+      "p50": 48.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9313.988753597872,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 9086.198217619263,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 7895.033871770079,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_1_replicas_160906-181023",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 931649
+    },
+    {
+      "name": "queued_predictions",
+      "count": 287
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 911150
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 105915
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 3420255
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 157
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 7830848
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 283594
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 347419
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 584230
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8664980051500082
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19559,
+      "max": 33942,
+      "mean": 20824.774075875488,
+      "std": 597.0641061510277,
+      "p95": 21803.0,
+      "p99": 22186.61,
+      "p50": 20752.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.8499513618677043,
+      "std": 0.35716252177396776,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 431,
+      "max": 23843,
+      "mean": 9151.111502918287,
+      "std": 4084.381060074518,
+      "p95": 16957.0,
+      "p99": 20371.0,
+      "p50": 9578.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 170,
+      "mean": 63.6881079766537,
+      "std": 58.40996338855373,
+      "p95": 150.0,
+      "p99": 154.0,
+      "p50": 47.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 9313.820845222175,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 9108.88957442576,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 8035.2412346227179,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/sklearn_logreg_1_replicas_160906-181023_results.json
+INFO:clipper::server: ending input loop: prediction worker 11
+INFO:clipper::server: ending input loop: prediction worker 8
+INFO:clipper::server: ending input loop: prediction worker 1
+INFO:clipper::server: ending input loop: prediction worker 3
+INFO:clipper::server: ending input loop: prediction worker 9
+INFO:clipper::server: ending output loop: prediction worker 11
+INFO:clipper::server: ending input loop: prediction worker 5
+INFO:clipper::server: ending input loop: prediction worker 10
+INFO:clipper::server: ending output loop: prediction worker 8
+INFO:clipper::server: ending input loop: prediction worker 0
+INFO:clipper::server: ending input loop: prediction worker 4
+INFO:clipper::server: ending input loop: prediction worker 7
+INFO:clipper::server: ending input loop: prediction worker 6
+INFO:clipper::server: ending input loop: prediction worker 2
+INFO:clipper::server: ending output loop: prediction worker 9
+INFO:clipper::server: ending output loop: prediction worker 0
+INFO:clipper::server: ending output loop: prediction worker 7
+INFO:clipper::server: ending output loop: prediction worker 10
+INFO:clipper::server: ending output loop: prediction worker 4
+INFO:clipper::server: ending output loop: prediction worker 3
+INFO:clipper::server: ending output loop: prediction worker 6
+INFO:clipper::server: ending output loop: prediction worker 5
+INFO:clipper::server: ending output loop: prediction worker 2
+INFO:clipper::server: ending output loop: prediction worker 1
+INFO:clipper::server: Ending loop: update worker 0
+INFO:clipper::server: Dropping ClipperServer

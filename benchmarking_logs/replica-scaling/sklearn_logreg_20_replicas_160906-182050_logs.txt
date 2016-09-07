@@ -1,0 +1,4744 @@
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+/tmp/digits_bench.toml contains:
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 6000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 3000
+target_qps = 200000
+name = "sklearn_logreg_20_replicas_160906-182050"
+salt_cache = true
+num_predict_workers = 12
+redis_port = 6379
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = false
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001", "logistic_reg_r1:6001", "logistic_reg_r2:6001", "logistic_reg_r3:6001", "logistic_reg_r4:6001", "logistic_reg_r5:6001", "logistic_reg_r6:6001", "logistic_reg_r7:6001", "logistic_reg_r8:6001", "logistic_reg_r9:6001", "logistic_reg_r10:6001", "logistic_reg_r11:6001", "logistic_reg_r12:6001", "logistic_reg_r13:6001", "logistic_reg_r14:6001", "logistic_reg_r15:6001", "logistic_reg_r16:6001", "logistic_reg_r17:6001", "logistic_reg_r18:6001", "logistic_reg_r19:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+/tmp/digits_bench.toml contains:
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 6000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 3000
+target_qps = 200000
+name = "sklearn_logreg_20_replicas_160906-182050"
+salt_cache = true
+num_predict_workers = 12
+redis_port = 6379
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = false
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001", "logistic_reg_r1:6001", "logistic_reg_r2:6001", "logistic_reg_r3:6001", "logistic_reg_r4:6001", "logistic_reg_r5:6001", "logistic_reg_r6:6001", "logistic_reg_r7:6001", "logistic_reg_r8:6001", "logistic_reg_r9:6001", "logistic_reg_r10:6001", "logistic_reg_r11:6001", "logistic_reg_r12:6001", "logistic_reg_r13:6001", "logistic_reg_r14:6001", "logistic_reg_r15:6001", "logistic_reg_r16:6001", "logistic_reg_r17:6001", "logistic_reg_r18:6001", "logistic_reg_r19:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+INFO:clipper::configuration: logistic_reg_r0:6001
+strategy = "learned"
+INFO:clipper::configuration: logistic_reg_r1:6001
+INFO:clipper::configuration: logistic_reg_r2:6001
+INFO:clipper::configuration: logistic_reg_r3:6001
+INFO:clipper::configuration: logistic_reg_r4:6001
+INFO:clipper::configuration: logistic_reg_r5:6001
+INFO:clipper::configuration: logistic_reg_r6:6001
+INFO:clipper::configuration: logistic_reg_r7:6001
+INFO:clipper::configuration: logistic_reg_r8:6001
+INFO:clipper::configuration: logistic_reg_r9:6001
+INFO:clipper::configuration: logistic_reg_r10:6001
+INFO:clipper::configuration: logistic_reg_r11:6001
+INFO:clipper::configuration: logistic_reg_r12:6001
+INFO:clipper::configuration: logistic_reg_r13:6001
+INFO:clipper::configuration: logistic_reg_r14:6001
+INFO:clipper::configuration: logistic_reg_r15:6001
+INFO:clipper::configuration: logistic_reg_r16:6001
+INFO:clipper::configuration: logistic_reg_r17:6001
+INFO:clipper::configuration: logistic_reg_r18:6001
+INFO:clipper::configuration: logistic_reg_r19:6001
+INFO:clipper::configuration: quantilereg:7777
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.16:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.11:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.5:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.14:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.8:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.18:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.13:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.15:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.9:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.10:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.17:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.19:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.7:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.6:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.2:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.3:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.21:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.20:6001)
+INFO:clipper::batching: Couldn't connect to logistic_reg model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to logistic_reg model wrapper. Sleeping 1 second
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 8 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 9 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 10 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting prediction worker 8 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 11 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 9 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 10 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 11 
+INFO:clipper::server: starting update worker 0
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.22:6001)
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.23:6001)
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper::correction_policy: OLD correction state: [1], offline_model_order: ["logistic_reg"]
+INFO:clipper::correction_policy: New correction state: [2.2752987592934963], offline_model_order: ["logistic_reg"], labels: Some([1, -1])
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 389
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 65650,
+      "max": 65650,
+      "mean": 65650.0,
+      "std": null,
+      "p95": 65650.0,
+      "p99": 65650.0,
+      "p50": 65650.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 552,
+      "max": 6990,
+      "mean": 1984.3239074550129,
+      "std": 1385.2011048938437,
+      "p95": 4585.0,
+      "p99": 6584.10000000001,
+      "p50": 1478.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 2.701388888888889,
+      "std": 1.9721127824566283,
+      "p95": 7.0,
+      "p99": 8.100000000000023,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04990503819806481,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 19.41306664071604,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: SLEEP TIME: 15
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 104, alpha = 184.87499834264275, beta = 750.6250082047163
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 5205.824058394847, baseline: 1068.9470796378616, increase: 4.87004844071278
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 266, alpha = 69.12500025493999, beta = 1586.3749965140842
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 13317.56249270256, baseline: 604.0471168539183, increase: 22.047224663640364
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 147, alpha = 129.58333287944845, beta = 949.2500010392614
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 7350.735097650246, baseline: 926.9272357090053, increase: 7.930218052151288
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 159, alpha = 118.75000001830068, beta = 1073.7499992356131
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 7967.927836778022, baseline: 838.5744240047369, increase: 9.50175393941303
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 191, alpha = 98.16665797683505, beta = 1246.8333419451608
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 9551.592720673823, baseline: 743.494423834941, increase: 12.84689220856123
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 102, alpha = 188.20000012620136, beta = 868.9999978494151
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 5083.377353329425, baseline: 945.894818307656, increase: 5.374146527649163
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 158, alpha = 120.83332789674992, beta = 950.5000162735519
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 7883.379540304667, baseline: 933.4162942295554, increase: 8.445727366278335
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 190, alpha = 98.81818189291873, beta = 1258.8181799925135
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 9483.748298184897, baseline: 736.5742610276283, increase: 12.875481536584903
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 179, alpha = 104.28571450816757, beta = 1370.1428546759075
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 8933.345674594077, baseline: 678.2288548256928, increase: 13.171580081018492
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 149, alpha = 125.92307665688682, beta = 1233.6153860312406
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 7451.432982130729, baseline: 735.5437359401842, increase: 10.130509741349622
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 95, alpha = 202.68749962546553, beta = 709.9375007744864
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 4758.267498058759, baseline: 1095.7403090664366, increase: 4.342513877318953
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 165, alpha = 106.83333331816635, beta = 2355.4999997831483
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 8257.018466819505, baseline: 406.11885749054846, increase: 20.331531802882775
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 515, alpha = 33.14285721718836, beta = 2916.714283744198
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 25768.958544144734, baseline: 338.9994675044129, increase: 76.01474637658328
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 109, alpha = 175.2222222340697, beta = 873.6666660523668
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 5457.397805729679, baseline: 953.3898310560747, increase: 5.7242039173886425
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 114, alpha = 163.2500003547754, beta = 1444.4999935054354
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 5684.367978410204, baseline: 621.9872516366789, increase: 9.139042582388186
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 111, alpha = 173.90710114078936, beta = 648.4644952051221
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 5563.309460764988, baseline: 1215.9953048516686, increase: 4.575107682215616
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 172, alpha = 105.83332603276442, beta = 1787.33339207125
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 8604.015722270165, baseline: 528.2154975772493, increase: 16.288836207445552
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.4:7777)
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 134, alpha = 140.89999984691642, beta = 1149.8000009175896
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 6689.831462731216, baseline: 774.7733783277919, increase: 8.634565474061597
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 3309, alpha = 5.071428568544548, beta = 3214.4999995504686
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 165484.2789690401, baseline: 310.6003461411742, increase: 532.7884563715976
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 132, alpha = 141.63361024867552, beta = 1359.7202926522175
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 6581.782663705973, baseline: 666.0654746810964, increase: 9.8815850902004
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 738923
+    },
+    {
+      "name": "queued_predictions",
+      "count": 227076
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 904884
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 69125
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 1586375
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 266
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 13317562
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 604047
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 105833
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 1787333
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 172
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 8604016
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 528215
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 98818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 1258818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 190
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 9483748
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 736574
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 184875
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 750625
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 104
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 5205824
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 1068947
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 33143
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 2916714
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 515
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 25768959
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 338999
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 120833
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 950500
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 158
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 7883380
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 933416
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 129583
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 949250
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 7350735
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 926927
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 125923
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 1233615
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 149
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 7451433
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 735544
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 98167
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 1246833
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 191
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 9551593
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 743494
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 173907
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 648464
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 111
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 5563309
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 1215995
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 188200
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 869000
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 102
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 5083377
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 945895
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 104286
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 1370143
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 179
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 8933346
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 678229
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 118750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 1073750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 159
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 7967928
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 838574
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 106833
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 2355500
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 165
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 8257018
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 406119
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 5071
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 3214500
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 3309
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 165484279
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 310600
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 141634
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 1359720
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 132
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 6581783
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 666065
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 140900
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 1149800
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 134
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 6689831
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 774773
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 175222
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 873667
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 109
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 5457398
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 953390
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 57322
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 681604
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 202687
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 709938
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 95
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 4758267
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 1095740
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 163250
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 1444500
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 114
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 5684368
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 621987
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5762809807748002
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 28373,
+      "max": 2463910,
+      "mean": 1221475.0218871595,
+      "std": 685944.5047326079,
+      "p95": 2263418.95,
+      "p99": 2358475.96,
+      "p50": 1240122.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.1823929961089494,
+      "std": 0.38621505136494169,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 298,
+      "max": 26269,
+      "mean": 2008.7188715953308,
+      "std": 1506.4568127454839,
+      "p95": 4596.0,
+      "p99": 7199.75,
+      "p50": 1628.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 116,
+      "mean": 10.864178015564204,
+      "std": 9.709919422275439,
+      "p95": 29.0,
+      "p99": 46.0,
+      "p50": 8.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 73884.55790265383,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 90471.54448135867,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 13318.666830963552,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: Submitted 1000000 requests
+INFO:clipper_benchmarks: Submitted 1020000 requests
+INFO:clipper_benchmarks: Submitted 1040000 requests
+INFO:clipper_benchmarks: Submitted 1060000 requests
+INFO:clipper_benchmarks: Submitted 1080000 requests
+INFO:clipper_benchmarks: Submitted 1100000 requests
+INFO:clipper_benchmarks: Submitted 1120000 requests
+INFO:clipper_benchmarks: Submitted 1140000 requests
+INFO:clipper_benchmarks: Submitted 1160000 requests
+INFO:clipper_benchmarks: Submitted 1180000 requests
+INFO:clipper_benchmarks: Submitted 1200000 requests
+INFO:clipper_benchmarks: Submitted 1220000 requests
+INFO:clipper_benchmarks: Submitted 1240000 requests
+INFO:clipper_benchmarks: Submitted 1260000 requests
+INFO:clipper_benchmarks: Submitted 1280000 requests
+INFO:clipper_benchmarks: Submitted 1300000 requests
+INFO:clipper_benchmarks: Submitted 1320000 requests
+INFO:clipper_benchmarks: Submitted 1340000 requests
+INFO:clipper_benchmarks: Submitted 1360000 requests
+INFO:clipper_benchmarks: Submitted 1380000 requests
+INFO:clipper_benchmarks: Submitted 1400000 requests
+INFO:clipper_benchmarks: Submitted 1420000 requests
+INFO:clipper_benchmarks: Submitted 1440000 requests
+INFO:clipper_benchmarks: Submitted 1460000 requests
+INFO:clipper_benchmarks: Submitted 1480000 requests
+INFO:clipper_benchmarks: Submitted 1500000 requests
+INFO:clipper_benchmarks: Submitted 1520000 requests
+INFO:clipper_benchmarks: Submitted 1540000 requests
+INFO:clipper_benchmarks: Submitted 1560000 requests
+INFO:clipper_benchmarks: Submitted 1580000 requests
+INFO:clipper_benchmarks: Submitted 1600000 requests
+INFO:clipper_benchmarks: Submitted 1620000 requests
+INFO:clipper_benchmarks: Submitted 1640000 requests
+INFO:clipper_benchmarks: Submitted 1660000 requests
+INFO:clipper_benchmarks: Submitted 1680000 requests
+INFO:clipper_benchmarks: Submitted 1700000 requests
+INFO:clipper_benchmarks: Submitted 1720000 requests
+INFO:clipper_benchmarks: Submitted 1740000 requests
+INFO:clipper_benchmarks: Submitted 1760000 requests
+INFO:clipper_benchmarks: Submitted 1780000 requests
+INFO:clipper_benchmarks: Submitted 1800000 requests
+INFO:clipper_benchmarks: Submitted 1820000 requests
+INFO:clipper_benchmarks: Submitted 1840000 requests
+INFO:clipper_benchmarks: Submitted 1860000 requests
+INFO:clipper_benchmarks: Submitted 1880000 requests
+INFO:clipper_benchmarks: Submitted 1900000 requests
+INFO:clipper_benchmarks: Submitted 1920000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1476598
+    },
+    {
+      "name": "queued_predictions",
+      "count": 452401
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 1867939
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 69125
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 1586375
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 266
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 13317562
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 604047
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 105833
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 1787333
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 172
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 8604016
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 528215
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 98818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 1258818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 190
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 9483748
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 736574
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 184875
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 750625
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 104
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 5205824
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 1068947
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 33143
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 2916714
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 515
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 25768959
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 338999
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 120833
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 950500
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 158
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 7883380
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 933416
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 129583
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 949250
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 7350735
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 926927
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 125923
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 1233615
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 149
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 7451433
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 735544
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 98167
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 1246833
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 191
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 9551593
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 743494
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 173907
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 648464
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 111
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 5563309
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 1215995
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 188200
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 869000
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 102
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 5083377
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 945895
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 104286
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 1370143
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 179
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 8933346
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 678229
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 118750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 1073750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 159
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 7967928
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 838574
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 106833
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 2355500
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 165
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 8257018
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 406119
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 5071
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 3214500
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 3309
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 165484279
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 310600
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 141634
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 1359720
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 132
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 6581783
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 666065
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 140900
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 1149800
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 134
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 6689831
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 774773
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 175222
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 873667
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 109
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 5457398
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 953390
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 58076
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 1418525
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 202687
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 709938
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 95
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 4758267
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 1095740
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 163250
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 1444500
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 114
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 5684368
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 621987
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5386383999469051
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 30431,
+      "max": 4784915,
+      "mean": 2376642.893725681,
+      "std": 1356891.328319384,
+      "p95": 4503790.05,
+      "p99": 4691876.51,
+      "p50": 2347356.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.0958171206225681,
+      "std": 0.29437607623245767,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 298,
+      "max": 18172,
+      "mean": 1978.628769455253,
+      "std": 1356.4434310597792,
+      "p95": 4589.0,
+      "p99": 7052.75,
+      "p50": 1624.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 111,
+      "mean": 10.745622568093385,
+      "std": 9.340595685774125,
+      "p95": 29.0,
+      "p99": 44.0,
+      "p50": 8.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 73823.23906021891,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 93377.57882127352,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 6736.020842682663,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 1940000 requests
+INFO:clipper_benchmarks: Submitted 1960000 requests
+INFO:clipper_benchmarks: Submitted 1980000 requests
+INFO:clipper_benchmarks: Submitted 2000000 requests
+INFO:clipper_benchmarks: Submitted 2020000 requests
+INFO:clipper_benchmarks: Submitted 2040000 requests
+INFO:clipper_benchmarks: Submitted 2060000 requests
+INFO:clipper_benchmarks: Submitted 2080000 requests
+INFO:clipper_benchmarks: Submitted 2100000 requests
+INFO:clipper_benchmarks: Submitted 2120000 requests
+INFO:clipper_benchmarks: Submitted 2140000 requests
+INFO:clipper_benchmarks: Submitted 2160000 requests
+INFO:clipper_benchmarks: Submitted 2180000 requests
+INFO:clipper_benchmarks: Submitted 2200000 requests
+INFO:clipper_benchmarks: Submitted 2220000 requests
+INFO:clipper_benchmarks: Submitted 2240000 requests
+INFO:clipper_benchmarks: Submitted 2260000 requests
+INFO:clipper_benchmarks: Submitted 2280000 requests
+INFO:clipper_benchmarks: Submitted 2300000 requests
+INFO:clipper_benchmarks: Submitted 2320000 requests
+INFO:clipper_benchmarks: Submitted 2340000 requests
+INFO:clipper_benchmarks: Submitted 2360000 requests
+INFO:clipper_benchmarks: Submitted 2380000 requests
+INFO:clipper_benchmarks: Submitted 2400000 requests
+INFO:clipper_benchmarks: Submitted 2420000 requests
+INFO:clipper_benchmarks: Submitted 2440000 requests
+INFO:clipper_benchmarks: Submitted 2460000 requests
+INFO:clipper_benchmarks: Submitted 2480000 requests
+INFO:clipper_benchmarks: Submitted 2500000 requests
+INFO:clipper_benchmarks: Submitted 2520000 requests
+INFO:clipper_benchmarks: Submitted 2540000 requests
+INFO:clipper_benchmarks: Submitted 2560000 requests
+INFO:clipper_benchmarks: Submitted 2580000 requests
+INFO:clipper_benchmarks: Submitted 2600000 requests
+INFO:clipper_benchmarks: Submitted 2620000 requests
+INFO:clipper_benchmarks: Submitted 2640000 requests
+INFO:clipper_benchmarks: Submitted 2660000 requests
+INFO:clipper_benchmarks: Submitted 2680000 requests
+INFO:clipper_benchmarks: Submitted 2700000 requests
+INFO:clipper_benchmarks: Submitted 2720000 requests
+INFO:clipper_benchmarks: Submitted 2740000 requests
+INFO:clipper_benchmarks: Submitted 2760000 requests
+INFO:clipper_benchmarks: Submitted 2780000 requests
+INFO:clipper_benchmarks: Submitted 2800000 requests
+INFO:clipper_benchmarks: Submitted 2820000 requests
+INFO:clipper_benchmarks: Submitted 2840000 requests
+INFO:clipper_benchmarks: Submitted 2860000 requests
+INFO:clipper_benchmarks: Submitted 2880000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 2216729
+    },
+    {
+      "name": "queued_predictions",
+      "count": 668597
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 2823733
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 69125
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 1586375
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 266
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 13317562
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 604047
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 105833
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 1787333
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 172
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 8604016
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 528215
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 98818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 1258818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 190
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 9483748
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 736574
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 184875
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 750625
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 104
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 5205824
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 1068947
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 33143
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 2916714
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 515
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 25768959
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 338999
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 120833
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 950500
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 158
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 7883380
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 933416
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 129583
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 949250
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 7350735
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 926927
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 125923
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 1233615
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 149
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 7451433
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 735544
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 98167
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 1246833
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 191
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 9551593
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 743494
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 173907
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 648464
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 111
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 5563309
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 1215995
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 188200
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 869000
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 102
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 5083377
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 945895
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 104286
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 1370143
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 179
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 8933346
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 678229
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 118750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 1073750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 159
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 7967928
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 838574
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 106833
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 2355500
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 165
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 8257018
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 406119
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 5071
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 3214500
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 3309
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 165484279
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 310600
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 141634
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 1359720
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 132
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 6581783
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 666065
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 140900
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 1149800
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 134
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 6689831
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 774773
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 175222
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 873667
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 109
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 5457398
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 953390
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 58084
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 2158635
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 202687
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 709938
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 95
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 4758267
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 1095740
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 163250
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 1444500
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 114
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 5684368
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 621987
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5257680382583448
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 38763,
+      "max": 7090006,
+      "mean": 3604856.402723735,
+      "std": 2038752.7779831929,
+      "p95": 6693524.149999999,
+      "p99": 6932857.99,
+      "p50": 3665032.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.0629863813229572,
+      "std": 0.24296800916045814,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 297,
+      "max": 18172,
+      "mean": 1966.2582684824902,
+      "std": 1359.0781477096433,
+      "p95": 4614.75,
+      "p99": 6794.75,
+      "p50": 1594.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 111,
+      "mean": 10.724586575875487,
+      "std": 9.160699893885356,
+      "p95": 28.0,
+      "p99": 43.0,
+      "p50": 8.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 73878.63385983104,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 94116.31870350827,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 4489.821032458741,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 2900000 requests
+INFO:clipper_benchmarks: Submitted 2920000 requests
+INFO:clipper_benchmarks: Submitted 2940000 requests
+INFO:clipper_benchmarks: Submitted 2960000 requests
+INFO:clipper_benchmarks: Submitted 2980000 requests
+INFO:clipper_benchmarks: Submitted 3000000 requests
+INFO:clipper_benchmarks: Submitted 3020000 requests
+INFO:clipper_benchmarks: Submitted 3040000 requests
+INFO:clipper_benchmarks: Submitted 3060000 requests
+INFO:clipper_benchmarks: Submitted 3080000 requests
+INFO:clipper_benchmarks: Submitted 3100000 requests
+INFO:clipper_benchmarks: Submitted 3120000 requests
+INFO:clipper_benchmarks: Submitted 3140000 requests
+INFO:clipper_benchmarks: Submitted 3160000 requests
+INFO:clipper_benchmarks: Submitted 3180000 requests
+INFO:clipper_benchmarks: Submitted 3200000 requests
+INFO:clipper_benchmarks: Submitted 3220000 requests
+INFO:clipper_benchmarks: Submitted 3240000 requests
+INFO:clipper_benchmarks: Submitted 3260000 requests
+INFO:clipper_benchmarks: Submitted 3280000 requests
+INFO:clipper_benchmarks: Submitted 3300000 requests
+INFO:clipper_benchmarks: Submitted 3320000 requests
+INFO:clipper_benchmarks: Submitted 3340000 requests
+INFO:clipper_benchmarks: Submitted 3360000 requests
+INFO:clipper_benchmarks: Submitted 3380000 requests
+INFO:clipper_benchmarks: Submitted 3400000 requests
+INFO:clipper_benchmarks: Submitted 3420000 requests
+INFO:clipper_benchmarks: Submitted 3440000 requests
+INFO:clipper_benchmarks: Submitted 3460000 requests
+INFO:clipper_benchmarks: Submitted 3480000 requests
+INFO:clipper_benchmarks: Submitted 3500000 requests
+INFO:clipper_benchmarks: Submitted 3520000 requests
+INFO:clipper_benchmarks: Submitted 3540000 requests
+INFO:clipper_benchmarks: Submitted 3560000 requests
+INFO:clipper_benchmarks: Submitted 3580000 requests
+INFO:clipper_benchmarks: Submitted 3600000 requests
+INFO:clipper_benchmarks: Submitted 3620000 requests
+INFO:clipper_benchmarks: Submitted 3640000 requests
+INFO:clipper_benchmarks: Submitted 3660000 requests
+INFO:clipper_benchmarks: Submitted 3680000 requests
+INFO:clipper_benchmarks: Submitted 3700000 requests
+INFO:clipper_benchmarks: Submitted 3720000 requests
+INFO:clipper_benchmarks: Submitted 3740000 requests
+INFO:clipper_benchmarks: Submitted 3760000 requests
+INFO:clipper_benchmarks: Submitted 3780000 requests
+INFO:clipper_benchmarks: Submitted 3800000 requests
+INFO:clipper_benchmarks: Submitted 3820000 requests
+INFO:clipper_benchmarks: Submitted 3840000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 2959732
+    },
+    {
+      "name": "queued_predictions",
+      "count": 881212
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 3779514
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 69125
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 1586375
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 266
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 13317562
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 604047
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 105833
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 1787333
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 172
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 8604016
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 528215
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 98818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 1258818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 190
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 9483748
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 736574
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 184875
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 750625
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 104
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 5205824
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 1068947
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 33143
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 2916714
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 515
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 25768959
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 338999
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 120833
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 950500
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 158
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 7883380
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 933416
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 129583
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 949250
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 7350735
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 926927
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 125923
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 1233615
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 149
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 7451433
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 735544
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 98167
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 1246833
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 191
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 9551593
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 743494
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 173907
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 648464
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 111
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 5563309
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 1215995
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 188200
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 869000
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 102
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 5083377
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 945895
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 104286
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 1370143
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 179
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 8933346
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 678229
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 118750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 1073750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 159
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 7967928
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 838574
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 106833
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 2355500
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 165
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 8257018
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 406119
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 5071
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 3214500
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 3309
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 165484279
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 310600
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 141634
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 1359720
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 132
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 6581783
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 666065
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 140900
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 1149800
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 134
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 6689831
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 774773
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 175222
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 873667
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 109
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 5457398
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 953390
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 58084
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 2901646
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 202687
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 709938
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 95
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 4758267
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 1095740
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 163250
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 1444500
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 114
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 5684368
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 621987
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5192929760484909
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 38763,
+      "max": 9343898,
+      "mean": 4737876.655642023,
+      "std": 2656467.2614089159,
+      "p95": 8800369.549999999,
+      "p99": 9114982.15,
+      "p50": 4825731.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.047665369649805448,
+      "std": 0.21308313898074608,
+      "p95": 0.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 277,
+      "max": 18172,
+      "mean": 1953.3391293774319,
+      "std": 1340.0143119446464,
+      "p95": 4603.5,
+      "p99": 6737.0,
+      "p50": 1590.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 111,
+      "mean": 10.634727626459144,
+      "std": 9.022319681603646,
+      "p95": 28.0,
+      "p99": 42.0,
+      "p50": 8.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 73980.62006997866,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 94473.73996883689,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 3366.788991082648,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 3860000 requests
+INFO:clipper_benchmarks: Submitted 3880000 requests
+INFO:clipper_benchmarks: Submitted 3900000 requests
+INFO:clipper_benchmarks: Submitted 3920000 requests
+INFO:clipper_benchmarks: Submitted 3940000 requests
+INFO:clipper_benchmarks: Submitted 3960000 requests
+INFO:clipper_benchmarks: Submitted 3980000 requests
+INFO:clipper_benchmarks: Submitted 4000000 requests
+INFO:clipper_benchmarks: Submitted 4020000 requests
+INFO:clipper_benchmarks: Submitted 4040000 requests
+INFO:clipper_benchmarks: Submitted 4060000 requests
+INFO:clipper_benchmarks: Submitted 4080000 requests
+INFO:clipper_benchmarks: Submitted 4100000 requests
+INFO:clipper_benchmarks: Submitted 4120000 requests
+INFO:clipper_benchmarks: Submitted 4140000 requests
+INFO:clipper_benchmarks: Submitted 4160000 requests
+INFO:clipper_benchmarks: Submitted 4180000 requests
+INFO:clipper_benchmarks: Submitted 4200000 requests
+INFO:clipper_benchmarks: Submitted 4220000 requests
+INFO:clipper_benchmarks: Submitted 4240000 requests
+INFO:clipper_benchmarks: Submitted 4260000 requests
+INFO:clipper_benchmarks: Submitted 4280000 requests
+INFO:clipper_benchmarks: Submitted 4300000 requests
+INFO:clipper_benchmarks: Submitted 4320000 requests
+INFO:clipper_benchmarks: Submitted 4340000 requests
+INFO:clipper_benchmarks: Submitted 4360000 requests
+INFO:clipper_benchmarks: Submitted 4380000 requests
+INFO:clipper_benchmarks: Submitted 4400000 requests
+INFO:clipper_benchmarks: Submitted 4420000 requests
+INFO:clipper_benchmarks: Submitted 4440000 requests
+INFO:clipper_benchmarks: Submitted 4460000 requests
+INFO:clipper_benchmarks: Submitted 4480000 requests
+INFO:clipper_benchmarks: Submitted 4500000 requests
+INFO:clipper_benchmarks: Submitted 4520000 requests
+INFO:clipper_benchmarks: Submitted 4540000 requests
+INFO:clipper_benchmarks: Submitted 4560000 requests
+INFO:clipper_benchmarks: Submitted 4580000 requests
+INFO:clipper_benchmarks: Submitted 4600000 requests
+INFO:clipper_benchmarks: Submitted 4620000 requests
+INFO:clipper_benchmarks: Submitted 4640000 requests
+INFO:clipper_benchmarks: Submitted 4660000 requests
+INFO:clipper_benchmarks: Submitted 4680000 requests
+INFO:clipper_benchmarks: Submitted 4700000 requests
+INFO:clipper_benchmarks: Submitted 4720000 requests
+INFO:clipper_benchmarks: Submitted 4740000 requests
+INFO:clipper_benchmarks: Submitted 4760000 requests
+INFO:clipper_benchmarks: Submitted 4780000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 3705710
+    },
+    {
+      "name": "queued_predictions",
+      "count": 1088289
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 4732276
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 69125
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 1586375
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 266
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 13317562
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 604047
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 105833
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 1787333
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 172
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 8604016
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 528215
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 98818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 1258818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 190
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 9483748
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 736574
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 184875
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 750625
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 104
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 5205824
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 1068947
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 33143
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 2916714
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 515
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 25768959
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 338999
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 120833
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 950500
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 158
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 7883380
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 933416
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 129583
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 949250
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 7350735
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 926927
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 125923
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 1233615
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 149
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 7451433
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 735544
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 98167
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 1246833
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 191
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 9551593
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 743494
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 173907
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 648464
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 111
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 5563309
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 1215995
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 188200
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 869000
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 102
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 5083377
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 945895
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 104286
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 1370143
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 179
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 8933346
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 678229
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 118750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 1073750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 159
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 7967928
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 838574
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 106833
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 2355500
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 165
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 8257018
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 406119
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 5071
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 3214500
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 3309
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 165484279
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 310600
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 141634
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 1359720
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 132
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 6581783
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 666065
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 140900
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 1149800
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 134
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 6689831
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 774773
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 175222
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 873667
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 109
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 5457398
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 953390
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 58084
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 3647620
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 202687
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 709938
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 95
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 4758267
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 1095740
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 163250
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 1444500
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 114
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 5684368
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 621987
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5153989633278859
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 38980,
+      "max": 11533394,
+      "mean": 5880322.9182879379,
+      "std": 3273603.0464767424,
+      "p95": 10877029.4,
+      "p99": 11327405.24,
+      "p50": 5929658.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.03964007782101167,
+      "std": 0.1951358559207268,
+      "p95": 0.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 277,
+      "max": 13959,
+      "mean": 1943.6303501945525,
+      "std": 1288.0376677236419,
+      "p95": 4493.0,
+      "p99": 6572.0,
+      "p50": 1590.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 111,
+      "mean": 10.50012159533074,
+      "std": 8.878769219479678,
+      "p95": 27.0,
+      "p99": 41.75,
+      "p50": 8.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 74101.33604980544,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 94632.1654873483,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 2693.169766995906,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 4800000 requests
+INFO:clipper_benchmarks: Submitted 4820000 requests
+INFO:clipper_benchmarks: Submitted 4840000 requests
+INFO:clipper_benchmarks: Submitted 4860000 requests
+INFO:clipper_benchmarks: Submitted 4880000 requests
+INFO:clipper_benchmarks: Submitted 4900000 requests
+INFO:clipper_benchmarks: Submitted 4920000 requests
+INFO:clipper_benchmarks: Submitted 4940000 requests
+INFO:clipper_benchmarks: Submitted 4960000 requests
+INFO:clipper_benchmarks: Submitted 4980000 requests
+INFO:clipper_benchmarks: Submitted 5000000 requests
+INFO:clipper_benchmarks: Submitted 5020000 requests
+INFO:clipper_benchmarks: Submitted 5040000 requests
+INFO:clipper_benchmarks: Submitted 5060000 requests
+INFO:clipper_benchmarks: Submitted 5080000 requests
+INFO:clipper_benchmarks: Submitted 5100000 requests
+INFO:clipper_benchmarks: Submitted 5120000 requests
+INFO:clipper_benchmarks: Submitted 5140000 requests
+INFO:clipper_benchmarks: Submitted 5160000 requests
+INFO:clipper_benchmarks: Submitted 5180000 requests
+INFO:clipper_benchmarks: Submitted 5200000 requests
+INFO:clipper_benchmarks: Submitted 5220000 requests
+INFO:clipper_benchmarks: Submitted 5240000 requests
+INFO:clipper_benchmarks: Submitted 5260000 requests
+INFO:clipper_benchmarks: Submitted 5280000 requests
+INFO:clipper_benchmarks: Submitted 5300000 requests
+INFO:clipper_benchmarks: Submitted 5320000 requests
+INFO:clipper_benchmarks: Submitted 5340000 requests
+INFO:clipper_benchmarks: Submitted 5360000 requests
+INFO:clipper_benchmarks: Submitted 5380000 requests
+INFO:clipper_benchmarks: Submitted 5400000 requests
+INFO:clipper_benchmarks: Submitted 5420000 requests
+INFO:clipper_benchmarks: Submitted 5440000 requests
+INFO:clipper_benchmarks: Submitted 5460000 requests
+INFO:clipper_benchmarks: Submitted 5480000 requests
+INFO:clipper_benchmarks: Submitted 5500000 requests
+INFO:clipper_benchmarks: Submitted 5520000 requests
+INFO:clipper_benchmarks: Submitted 5540000 requests
+INFO:clipper_benchmarks: Submitted 5560000 requests
+INFO:clipper_benchmarks: Submitted 5580000 requests
+INFO:clipper_benchmarks: Submitted 5600000 requests
+INFO:clipper_benchmarks: Submitted 5620000 requests
+INFO:clipper_benchmarks: Submitted 5640000 requests
+INFO:clipper_benchmarks: Submitted 5660000 requests
+INFO:clipper_benchmarks: Submitted 5680000 requests
+INFO:clipper_benchmarks: Submitted 5700000 requests
+INFO:clipper_benchmarks: Submitted 5720000 requests
+INFO:clipper_benchmarks: Submitted 5740000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 4451194
+    },
+    {
+      "name": "queued_predictions",
+      "count": 1296805
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 5686778
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 69125
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 1586375
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 266
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 13317562
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 604047
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 105833
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 1787333
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 172
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 8604016
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 528215
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 98818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 1258818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 190
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 9483748
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 736574
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 184875
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 750625
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 104
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 5205824
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 1068947
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 33143
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 2916714
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 515
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 25768959
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 338999
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 120833
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 950500
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 158
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 7883380
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 933416
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 129583
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 949250
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 7350735
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 926927
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 125923
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 1233615
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 149
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 7451433
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 735544
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 98167
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 1246833
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 191
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 9551593
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 743494
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 173907
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 648464
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 111
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 5563309
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 1215995
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 188200
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 869000
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 102
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 5083377
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 945895
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 104286
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 1370143
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 179
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 8933346
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 678229
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 118750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 1073750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 159
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 7967928
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 838574
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 106833
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 2355500
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 165
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 8257018
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 406119
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 5071
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 3214500
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 3309
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 165484279
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 310600
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 141634
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 1359720
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 132
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 6581783
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 666065
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 140900
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 1149800
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 134
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 6689831
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 774773
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 175222
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 873667
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 109
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 5457398
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 953390
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 58084
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 4393110
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 202687
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 709938
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 95
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 4758267
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 1095740
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 163250
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 1444500
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 114
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 5684368
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 621987
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5128363311057662
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 38980,
+      "max": 13821985,
+      "mean": 7005319.849708172,
+      "std": 3904478.6371305079,
+      "p95": 13032942.15,
+      "p99": 13498851.19,
+      "p50": 7022169.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.033073929961089498,
+      "std": 0.17885140272907863,
+      "p95": 0.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 277,
+      "max": 13959,
+      "mean": 1934.5525291828795,
+      "std": 1285.4543876656006,
+      "p95": 4493.0,
+      "p99": 6604.0,
+      "p50": 1574.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 111,
+      "mean": 10.504377431906616,
+      "std": 8.917145626589259,
+      "p95": 28.0,
+      "p99": 42.0,
+      "p50": 8.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 74173.88004697224,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 94761.274915673,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 2244.166816522268,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 5760000 requests
+INFO:clipper_benchmarks: Submitted 5780000 requests
+INFO:clipper_benchmarks: Submitted 5800000 requests
+INFO:clipper_benchmarks: Submitted 5820000 requests
+INFO:clipper_benchmarks: Submitted 5840000 requests
+INFO:clipper_benchmarks: Submitted 5860000 requests
+INFO:clipper_benchmarks: Submitted 5880000 requests
+INFO:clipper_benchmarks: Submitted 5900000 requests
+INFO:clipper_benchmarks: Submitted 5920000 requests
+INFO:clipper_benchmarks: Submitted 5940000 requests
+INFO:clipper_benchmarks: Submitted 5960000 requests
+INFO:clipper_benchmarks: Submitted 5980000 requests
+INFO:clipper_benchmarks: {
+  "name": "sklearn_logreg_20_replicas_160906-182050",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 5454068
+    },
+    {
+      "name": "queued_predictions",
+      "count": 545932
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 5938804
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:alpha_gauge",
+      "count": 69125
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:beta_gauge",
+      "count": 1586375
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_batch_size_gauge",
+      "count": 266
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:max_thru_gauge",
+      "count": 13317562
+    },
+    {
+      "name": "logistic_reg:172.21.0.16:6001:base_thru_gauge",
+      "count": 604047
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:alpha_gauge",
+      "count": 105833
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:beta_gauge",
+      "count": 1787333
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_batch_size_gauge",
+      "count": 172
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:max_thru_gauge",
+      "count": 8604016
+    },
+    {
+      "name": "logistic_reg:172.21.0.11:6001:base_thru_gauge",
+      "count": 528215
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:alpha_gauge",
+      "count": 98818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:beta_gauge",
+      "count": 1258818
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 190
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:max_thru_gauge",
+      "count": 9483748
+    },
+    {
+      "name": "logistic_reg:172.21.0.5:6001:base_thru_gauge",
+      "count": 736574
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:alpha_gauge",
+      "count": 184875
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:beta_gauge",
+      "count": 750625
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_batch_size_gauge",
+      "count": 104
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:max_thru_gauge",
+      "count": 5205824
+    },
+    {
+      "name": "logistic_reg:172.21.0.14:6001:base_thru_gauge",
+      "count": 1068947
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:alpha_gauge",
+      "count": 33143
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:beta_gauge",
+      "count": 2916714
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_batch_size_gauge",
+      "count": 515
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:max_thru_gauge",
+      "count": 25768959
+    },
+    {
+      "name": "logistic_reg:172.21.0.8:6001:base_thru_gauge",
+      "count": 338999
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:alpha_gauge",
+      "count": 120833
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:beta_gauge",
+      "count": 950500
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_batch_size_gauge",
+      "count": 158
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:max_thru_gauge",
+      "count": 7883380
+    },
+    {
+      "name": "logistic_reg:172.21.0.18:6001:base_thru_gauge",
+      "count": 933416
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:alpha_gauge",
+      "count": 129583
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:beta_gauge",
+      "count": 949250
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_batch_size_gauge",
+      "count": 147
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:max_thru_gauge",
+      "count": 7350735
+    },
+    {
+      "name": "logistic_reg:172.21.0.13:6001:base_thru_gauge",
+      "count": 926927
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:alpha_gauge",
+      "count": 125923
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:beta_gauge",
+      "count": 1233615
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_batch_size_gauge",
+      "count": 149
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:max_thru_gauge",
+      "count": 7451433
+    },
+    {
+      "name": "logistic_reg:172.21.0.15:6001:base_thru_gauge",
+      "count": 735544
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:alpha_gauge",
+      "count": 98167
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:beta_gauge",
+      "count": 1246833
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_batch_size_gauge",
+      "count": 191
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:max_thru_gauge",
+      "count": 9551593
+    },
+    {
+      "name": "logistic_reg:172.21.0.9:6001:base_thru_gauge",
+      "count": 743494
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:alpha_gauge",
+      "count": 173907
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:beta_gauge",
+      "count": 648464
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_batch_size_gauge",
+      "count": 111
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:max_thru_gauge",
+      "count": 5563309
+    },
+    {
+      "name": "logistic_reg:172.21.0.10:6001:base_thru_gauge",
+      "count": 1215995
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:alpha_gauge",
+      "count": 188200
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:beta_gauge",
+      "count": 869000
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_batch_size_gauge",
+      "count": 102
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:max_thru_gauge",
+      "count": 5083377
+    },
+    {
+      "name": "logistic_reg:172.21.0.17:6001:base_thru_gauge",
+      "count": 945895
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:alpha_gauge",
+      "count": 104286
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:beta_gauge",
+      "count": 1370143
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_batch_size_gauge",
+      "count": 179
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:max_thru_gauge",
+      "count": 8933346
+    },
+    {
+      "name": "logistic_reg:172.21.0.19:6001:base_thru_gauge",
+      "count": 678229
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:alpha_gauge",
+      "count": 118750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:beta_gauge",
+      "count": 1073750
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 159
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:max_thru_gauge",
+      "count": 7967928
+    },
+    {
+      "name": "logistic_reg:172.21.0.7:6001:base_thru_gauge",
+      "count": 838574
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 106833
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 2355500
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 165
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 8257018
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 406119
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:alpha_gauge",
+      "count": 5071
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:beta_gauge",
+      "count": 3214500
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 3309
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:max_thru_gauge",
+      "count": 165484279
+    },
+    {
+      "name": "logistic_reg:172.21.0.2:6001:base_thru_gauge",
+      "count": 310600
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:alpha_gauge",
+      "count": 141634
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:beta_gauge",
+      "count": 1359720
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_batch_size_gauge",
+      "count": 132
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:max_thru_gauge",
+      "count": 6581783
+    },
+    {
+      "name": "logistic_reg:172.21.0.3:6001:base_thru_gauge",
+      "count": 666065
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:alpha_gauge",
+      "count": 140900
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:beta_gauge",
+      "count": 1149800
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_batch_size_gauge",
+      "count": 134
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:max_thru_gauge",
+      "count": 6689831
+    },
+    {
+      "name": "logistic_reg:172.21.0.21:6001:base_thru_gauge",
+      "count": 774773
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:alpha_gauge",
+      "count": 175222
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:beta_gauge",
+      "count": 873667
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_batch_size_gauge",
+      "count": 109
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:max_thru_gauge",
+      "count": 5457398
+    },
+    {
+      "name": "logistic_reg:172.21.0.20:6001:base_thru_gauge",
+      "count": 953390
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 58085
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 5395987
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:alpha_gauge",
+      "count": 202687
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:beta_gauge",
+      "count": 709938
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_batch_size_gauge",
+      "count": 95
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:max_thru_gauge",
+      "count": 4758267
+    },
+    {
+      "name": "logistic_reg:172.21.0.22:6001:base_thru_gauge",
+      "count": 1095740
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:alpha_gauge",
+      "count": 163250
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:beta_gauge",
+      "count": 1444500
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_batch_size_gauge",
+      "count": 114
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:max_thru_gauge",
+      "count": 5684368
+    },
+    {
+      "name": "logistic_reg:172.21.0.23:6001:base_thru_gauge",
+      "count": 621987
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5104724487552697
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 52791,
+      "max": 14428022,
+      "mean": 8255117.390564202,
+      "std": 4370960.045350347,
+      "p95": 13929363.5,
+      "p99": 14184530.94,
+      "p50": 8654730.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.02748054474708171,
+      "std": 0.1634988236884347,
+      "p95": 0.0,
+      "p99": 1.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 277,
+      "max": 13959,
+      "mean": 1932.8019212062257,
+      "std": 1285.8015589791795,
+      "p95": 4517.75,
+      "p99": 6629.0,
+      "p50": 1570.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 111,
+      "mean": 10.463399805447472,
+      "std": 8.857314648504527,
+      "p95": 28.0,
+      "p99": 41.75,
+      "p50": 8.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 77903.3505942217,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 84822.65516927307,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 1923.46978742595,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/sklearn_logreg_20_replicas_160906-182050_results.json
+INFO:clipper::server: ending input loop: prediction worker 9
+INFO:clipper::server: ending input loop: prediction worker 11
+INFO:clipper::server: ending input loop: prediction worker 5
+INFO:clipper::server: ending input loop: prediction worker 7
+INFO:clipper::server: ending input loop: prediction worker 3
+INFO:clipper::server: ending input loop: prediction worker 6
+INFO:clipper::server: ending input loop: prediction worker 4
+INFO:clipper::server: ending input loop: prediction worker 0
+INFO:clipper::server: ending input loop: prediction worker 2
+INFO:clipper::server: ending output loop: prediction worker 11
+INFO:clipper::server: ending output loop: prediction worker 0
+INFO:clipper::server: ending output loop: prediction worker 3
+INFO:clipper::server: ending input loop: prediction worker 8
+INFO:clipper::server: ending output loop: prediction worker 4
+INFO:clipper::server: ending output loop: prediction worker 5
+INFO:clipper::server: ending output loop: prediction worker 2
+INFO:clipper::server: ending output loop: prediction worker 7
+INFO:clipper::server: ending input loop: prediction worker 10
+INFO:clipper::server: ending input loop: prediction worker 1
+INFO:clipper::server: ending output loop: prediction worker 9
+INFO:clipper::server: ending output loop: prediction worker 6
+INFO:clipper::server: ending output loop: prediction worker 8
+INFO:clipper::server: ending output loop: prediction worker 1
+INFO:clipper::server: ending output loop: prediction worker 10
+INFO:clipper::server: Ending loop: update worker 0
+INFO:clipper::server: Dropping ClipperServer

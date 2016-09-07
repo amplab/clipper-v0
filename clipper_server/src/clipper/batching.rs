@@ -23,6 +23,7 @@ pub struct RpcPredictRequest {
     pub input: Arc<server::Input>,
     pub recv_time: time::PreciseTime,
     pub salt: Option<i32>,
+    pub ttl: bool, // okay to drop if this prediction is too old
 }
 
 #[derive(Debug, Serialize, PartialEq, Eq, Clone)]
@@ -218,6 +219,16 @@ impl<C> PredictionBatcher<C>
 
         // block until new request, then try to get more requests
         while let Ok(first_req) = receiver.recv() {
+            // Drop predictions we have no hope of evaluating in time.
+            // This is a crude way of implementing a TTL.
+            // NOTE: We only check the first request, because the request
+            // queue is in FIFO order so this is guaranteed to be the oldest
+            // request in the batch.
+            let delay =
+                first_req.recv_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
+            if first_req.ttl && delay > slo_micros as i64 {
+                continue;
+            }
             let mut batch: Vec<RpcPredictRequest> = Vec::new();
             batch.push(first_req);
             let start_time = time::PreciseTime::now();
