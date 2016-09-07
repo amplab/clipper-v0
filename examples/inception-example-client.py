@@ -8,12 +8,34 @@ from datetime import datetime
 import skimage
 import time
 from skimage.transform import resize
-
+import csv
 import numpy as np
 import skimage.io as skio
 import sklearn.linear_model
 
-DAISY_PATH = 'data/daisy'
+DAISY_PATH = '/crankshaw-local/flowers-data/raw-data/train/daisy'
+
+
+
+def preprocess_images(img_location):
+    imgs = []
+    img_files = os.listdir(img_location)
+    # Get all the jpg images (only the first 10 or so)
+    img_files = filter(lambda x: '.jpg' in x, img_files)
+    # Read in the images and reshape
+    out_file = "inception_input_data.csv"
+    with open(out_file, "wb") as f:
+        img_writer = csv.writer(f, delimiter=",")
+        for i in range(len(img_files)):
+            img = skio.imread(os.path.join(img_location, img_files[i]))
+            img = resize(img, (299, 299))
+            img = img.flatten().tolist()
+            img_writer.writerow(img)
+            print("Processed %d/%d: %s" % (i,len(img_files), img_files[i]))
+            
+            # imgs.append(img)
+
+
 
 def load_inception_imgs(img_location):
     imgs = []
@@ -50,12 +72,13 @@ def inception_prediction(host, uid, x):
     print("'%s', %f ms" % (r.text, latency))
 
 if __name__=='__main__':
-    args = sys.argv
-    x = load_inception_imgs(DAISY_PATH)
-    uid = 4
-    while True:
-        example_num = np.random.randint(0,len(x))
-        inception_prediction("localhost", uid, x[example_num])
-        time.sleep(1.5)
+    preprocess_images(DAISY_PATH)
+    # args = sys.argv
+    # x = load_inception_imgs(DAISY_PATH)
+    # uid = 4
+    # while True:
+    #     example_num = np.random.randint(0,len(x))
+    #     inception_prediction("localhost", uid, x[example_num])
+    #     time.sleep(1.5)
 
 

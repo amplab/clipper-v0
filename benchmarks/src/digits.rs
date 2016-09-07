@@ -23,6 +23,35 @@ pub struct TrainingData {
     pub ys: Vec<f64>,
 }
 
+pub fn load_imagenet_dense(fpath: &String) -> Result<Vec<Vec<f64>>, String> {
+    let path = Path::new(fpath);
+    let display = path.display();
+
+    let file = match File::open(&path) {
+        // The `description` method of `io::Error` returns a string that
+        // describes the error
+        Err(why) => {
+            return Err(format!("couldn't open {}: REASON: {}",
+                               display,
+                               Error::description(&why)))
+        }
+        Ok(file) => BufReader::new(file),
+    };
+
+    // pointer to first feature_node struct in each example
+    let mut xs: Vec<Vec<f64>> = Vec::new();
+    for line in file.lines().filter_map(|result| result.ok()) {
+        let mut split = line.split(",").collect::<Vec<&str>>();
+        // println!("{:?}", split);
+        let mut features: Vec<f64> = Vec::new();
+        for f in split.iter().map(|x| x.trim().parse::<f64>().unwrap()) {
+            features.push(f);
+        }
+        xs.push(features);
+    }
+    Ok(xs)
+}
+
 pub fn load_mnist_dense(fpath: &String) -> Result<TrainingData, String> {
     let path = Path::new(fpath);
     let display = path.display();
