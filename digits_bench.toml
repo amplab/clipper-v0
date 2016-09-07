@@ -1,30 +1,47 @@
+salt_update_cache = false
 num_message_encodes = 1
 use_lsh = false
-window_size = -1
+window_size = 100
 load_generator = "uniform"
 input_type = "float"
-request_generator = "balanced"
+request_generator = "cached_updates"
 results_path = "/tmp/benchmarking_logs"
 num_update_workers = 1
 input_length = 784
-num_benchmark_requests = 3000000
+num_benchmark_requests = 300000
 redis_ip = "redis"
 mnist_path = "/mnist_data/test.data"
-bench_batch_size = 1650
-target_qps = 110000
-name = "DEBUG_sklearn_logreg_1_local_replicas_10_remote_replicas_160906-211312"
-salt_cache = true
-num_predict_workers = 16
+bench_batch_size = 200
+target_qps = 10000
+name = "caching_on_window_100_160907-095850"
+wait_to_end = false
+salt_cache = false
+num_predict_workers = 8
 redis_port = 6379
-cache_size = 500000
+cache_size = 1000000
 slo_micros = 20000
 correction_policy = "logistic_regression"
-send_updates = false
+send_updates = true
 [[models]]
 version = 1
 num_outputs = 1
 name = "logistic_reg"
-addresses = [ "logistic_reg_r0:6001", "c69.millennium.berkeley.edu:7001", "c69.millennium.berkeley.edu:7002", "c69.millennium.berkeley.edu:7003", "c69.millennium.berkeley.edu:7004", "c69.millennium.berkeley.edu:7005", "c69.millennium.berkeley.edu:7006", "c69.millennium.berkeley.edu:7007", "c69.millennium.berkeley.edu:7008", "c69.millennium.berkeley.edu:7009", "c69.millennium.berkeley.edu:7010",]
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
 [batching]
 sample_size = 500
 opt_addr = "quantilereg:7777"

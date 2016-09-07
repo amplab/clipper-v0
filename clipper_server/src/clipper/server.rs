@@ -104,6 +104,7 @@ pub struct Update {
 pub struct UpdateRequest {
     recv_time: PreciseTime,
     uid: u32,
+    // TODO: crankshaw_benchmark_grep: add salt here ????
     updates: Vec<Update>, /* query: Input,
                            * label: Output */
     /// Specifies which offline models to use by name
@@ -431,6 +432,7 @@ struct UpdateMetrics {
     pub num_queued_updates_counter: Arc<metrics::Counter>,
     pub latency_hist: Arc<metrics::Histogram>,
     pub update_counter: Arc<metrics::Counter>,
+    pub cache_hit_counter: Arc<metrics::RatioCounter>,
     pub thruput_meter: Arc<metrics::Meter>, // accuracy_counter: Arc<metrics::RatioCounter>,
 }
 
@@ -452,6 +454,11 @@ impl UpdateMetrics {
             metrics_register.write().unwrap().create_meter(metric_name)
         };
 
+        let cache_hit_counter: Arc<metrics::RatioCounter> = {
+            let metric_name = format!("update_cache_hits");
+            metrics_register.write().unwrap().create_ratio_counter(metric_name)
+        };
+
         let queued_updates_counter: Arc<metrics::Counter> = {
             let metric_name = format!("queued_updates");
             metrics_register.write().unwrap().create_counter(metric_name)
@@ -461,6 +468,7 @@ impl UpdateMetrics {
             num_queued_updates_counter: queued_updates_counter,
             latency_hist: latency_hist,
             update_counter: update_counter,
+            cache_hit_counter: cache_hit_counter,
             thruput_meter: thruput_meter,
         }
     }
@@ -535,6 +543,7 @@ impl<P, S> ClipperServer<P, S>
                                                   conf.window_size,
                                                   conf.redis_ip.clone(),
                                                   conf.redis_port,
+                                                  conf.salt_update_cache,
                                                   update_metrics.clone()));
         }
         ClipperServer {
@@ -810,7 +819,8 @@ impl<P, S> PredictionWorker<P, S>
                                                               input: req.query.clone(),
                                                               recv_time: req.recv_time.clone(),
                                                               salt: req.salt.clone(),
-                                                              ttl: true,
+                                                              // ttl: true,
+                                                              ttl: false,
                                                           });
                                 num_requests += 1;
                                 prediction_metrics.cache_hit_counter.incr(0, 1);
@@ -999,6 +1009,7 @@ impl<P, S> UpdateWorker<P, S>
                window_size: isize,
                redis_ip: String,
                redis_port: u16,
+               salt_cache: bool,
                update_metrics: UpdateMetrics)
                -> UpdateWorker<P, S> {
 
@@ -1014,6 +1025,7 @@ impl<P, S> UpdateWorker<P, S>
                                           window_size,
                                           redis_ip,
                                           redis_port,
+                                          salt_cache,
                                           update_metrics);
             });
         }
@@ -1048,6 +1060,7 @@ impl<P, S> UpdateWorker<P, S>
            window_size: isize,
            redis_ip: String,
            redis_port: u16,
+           salt_cache: bool,
            update_metrics: UpdateMetrics) {
         // let mut cmt: RedisCMT<S> = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET,
         //                                                            REDIS_CMT_DB);
@@ -1085,7 +1098,9 @@ impl<P, S> UpdateWorker<P, S>
                                                                &mut waiting_updates,
                                                                &models,
                                                                &mut update_table,
-                                                               window_size)
+                                                               window_size,
+                                                               salt_cache,
+                                                               &update_metrics)
                         }
                         UpdateMessage::Shutdown => {
                             // info!("Update worker {} got shutdown message and is executing break",
@@ -1134,7 +1149,9 @@ impl<P, S> UpdateWorker<P, S>
                     waiting_updates: &mut Vec<Arc<RwLock<UpdateDependencies>>>,
                     models: &ModelSet,
                     update_table: &mut RedisUpdateTable,
-                    window_size: isize) {
+                    window_size: isize,
+                    salt_cache: bool,
+                    update_metrics: &UpdateMetrics) {
 
         // let window_size = 20;
         let num_new_updates = req.updates.len();
@@ -1169,22 +1186,32 @@ impl<P, S> UpdateWorker<P, S>
             for m in req.offline_models.as_ref().unwrap() {
                 let u = update_dependencies.clone();
                 let model_name = m.name.clone();
+                // TODO: crankshaw_benchmark_grep: add salt here
+                let cur_salt = if salt_cache {
+                    let mut rng = thread_rng();
+                    Some(rng.gen::<i32>())
+                } else {
+                    None
+                };
                 cache.add_listener(&m.name,
                                    &update.query,
-                                   None,
+                                   cur_salt,
                                    Box::new(move |o| {
                                        let mut deps = u.write().unwrap();
                                        deps.predictions[idx].insert(model_name.clone(), o);
                                    }));
-                if cache.fetch(&m.name, &update.query, None).is_none() {
+                if cache.fetch(&m.name, &update.query, cur_salt).is_none() {
+                    update_metrics.cache_hit_counter.incr(0, 1);
 
                     models.request_prediction(&m,
                                               RpcPredictRequest {
                                                   input: update.query.clone(),
                                                   recv_time: req.recv_time.clone(),
-                                                  salt: None,
+                                                  salt: cur_salt,
                                                   ttl: false,
                                               });
+                } else {
+                    update_metrics.cache_hit_counter.incr(1, 1);
                 }
             }
             idx += 1;
@@ -1229,7 +1256,10 @@ impl<P, S> UpdateWorker<P, S>
             let update_dep: UpdateDependencies =
                 match Arc::try_unwrap(waiting_updates.remove(i - offset)) {
                     Ok(u) => u.into_inner().unwrap(),
-                    Err(_) => panic!("Uh oh"),
+                    Err(u) => {
+                        warn!("Couldn't unwrap update deps");
+                        u.read().unwrap().clone()
+                    }
                 };
             ready_updates.push(update_dep);
             offset += 1;
@@ -1334,6 +1364,7 @@ enum UpdateMessage {
                      PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>),
 }
 
+#[derive(Clone)]
 struct UpdateDependencies {
     // state: Option<S>,
     req: UpdateRequest,

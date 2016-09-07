@@ -1,0 +1,1725 @@
+/tmp/digits_bench.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = 1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 300000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 200
+target_qps = 10000
+name = "caching_off_window_1_160907-095133"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+INFO:clipper_benchmarks: Args { flag_conf: "/tmp/digits_bench.toml", cmd_digits: true }
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+/tmp/digits_bench.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = 1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 300000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 200
+target_qps = 10000
+name = "caching_off_window_1_160907-095133"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+INFO:clipper::configuration: logistic_reg_r0:6001
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[batching]
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"
+INFO:clipper::configuration: rf_d16_r0:6001
+INFO:clipper::configuration: spark_svm_r0:6001
+INFO:clipper::configuration: linear_svm_r0:6001
+INFO:clipper::configuration: quantilereg:7777
+INFO:clipper::batching: Connected to logistic_reg model wrapper at V4(172.21.0.6:6001)
+INFO:clipper::batching: Connected to rf_d16 model wrapper at V4(172.21.0.7:6001)
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.2:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: starting update worker 0
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to spark_svm model wrapper at V4(172.21.0.5:6001)
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "caching_off_window_1_160907-095133",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:base_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:alpha_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:beta_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_thru_gauge",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:base_thru_gauge",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 223609,
+      "max": 223609,
+      "mean": 223609.0,
+      "std": null,
+      "p95": 223609.0,
+      "p99": 223609.0,
+      "p50": 223609.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 1323,
+      "max": 6064,
+      "mean": 4330.1975,
+      "std": 1202.5446780683993,
+      "p95": 6064.0,
+      "p99": 6064.0,
+      "p50": 4414.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 7433,
+      "max": 8752,
+      "mean": 8258.145,
+      "std": 308.21078614601017,
+      "p95": 8752.0,
+      "p99": 8752.0,
+      "p50": 8319.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 847,
+      "max": 6422,
+      "mean": 4848.9,
+      "std": 1355.4348912289757,
+      "p95": 6422.0,
+      "p99": 6422.0,
+      "p50": 5293.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 1332,
+      "max": 6548,
+      "mean": 4492.8425,
+      "std": 1413.464391720006,
+      "p95": 6548.0,
+      "p99": 6548.0,
+      "p50": 4540.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04993820646332228,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 19.97529754828691,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 19.975844210388588,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 19.97587014765514,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 19.975997839795597,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: SLEEP TIME: 20
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: linear_svm BATCHER: Updated batching model: max_batch_size: 107, alpha = 181.4545454891792, beta = 523.6363617284907
+INFO:clipper::batching: linear_svm BATCHER: Predicted max thruput: 5366.294019540555, baseline: 1418.25683718722, increase: 3.783725118634606
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: logistic_reg BATCHER: Updated batching model: max_batch_size: 133, alpha = 145.0384615667504, beta = 697.5769217198172
+INFO:clipper::batching: logistic_reg BATCHER: Predicted max thruput: 6654.094826785455, baseline: 1186.7810864069013, increase: 5.606842662896992
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: spark_svm BATCHER: Updated batching model: max_batch_size: 94, alpha = 207.21428572522117, beta = 563.3571421047928
+INFO:clipper::batching: spark_svm BATCHER: Predicted max thruput: 4690.2676944693485, baseline: 1297.7382289089978, increase: 3.6141862742322335
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper::batching: Connected to opt server at V4(172.21.0.3:7777)
+INFO:clipper::batching: rf_d16 BATCHER: Updated batching model: max_batch_size: 170, alpha = 75.21816027553527, beta = 7205.345519676424
+INFO:clipper::batching: rf_d16 BATCHER: Predicted max thruput: 8503.217291529907, baseline: 137.3520023942155, increase: 61.90821497545211
+INFO:clipper_benchmarks: {
+  "name": "caching_off_window_1_160907-095133",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 38781
+    },
+    {
+      "name": "queued_predictions",
+      "count": 52
+    },
+    {
+      "name": "update_counter",
+      "count": 17073
+    },
+    {
+      "name": "queued_updates",
+      "count": 14284
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 73049
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 73007
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 73049
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 73049
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 145038
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 697577
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 133
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 6654095
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 1186781
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:alpha_gauge",
+      "count": 75218
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:beta_gauge",
+      "count": 7205346
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 170
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_thru_gauge",
+      "count": 8503217
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:base_thru_gauge",
+      "count": 137352
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:alpha_gauge",
+      "count": 181455
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:beta_gauge",
+      "count": 523636
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 107
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_thru_gauge",
+      "count": 5366294
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:base_thru_gauge",
+      "count": 1418257
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 38683
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 100
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:alpha_gauge",
+      "count": 207214
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:beta_gauge",
+      "count": 563357
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 94
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_thru_gauge",
+      "count": 4690268
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:base_thru_gauge",
+      "count": 1297738
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9974215506794214
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17053,
+      "max": 21283,
+      "mean": 19038.04085603113,
+      "std": 973.3320413625198,
+      "p95": 20182.0,
+      "p99": 20327.0,
+      "p50": 19171.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 4,
+      "mean": 2.962548638132296,
+      "std": 0.5968033898429704,
+      "p95": 4.0,
+      "p99": 4.0,
+      "p50": 3.0
+    },
+    {
+      "name": "update_latency",
+      "min": 60396,
+      "max": 4562024,
+      "mean": 2382597.650291829,
+      "std": 1290214.3861296485,
+      "p95": 4351346.15,
+      "p99": 4520726.690000001,
+      "p50": 2332949.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 299,
+      "max": 19152,
+      "mean": 2850.084022373541,
+      "std": 2340.527501318169,
+      "p95": 6270.0,
+      "p99": 12555.0,
+      "p50": 2458.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 133,
+      "mean": 8.123662451361869,
+      "std": 14.19682885600501,
+      "p95": 41.0,
+      "p99": 63.0,
+      "p50": 2.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 6640,
+      "max": 31840,
+      "mean": 14173.255836575876,
+      "std": 3509.490022653929,
+      "p95": 18566.0,
+      "p99": 21035.0,
+      "p50": 13359.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 172,
+      "mean": 109.12855007473842,
+      "std": 40.05428473445978,
+      "p95": 170.0,
+      "p99": 170.0,
+      "p50": 101.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 194,
+      "max": 14295,
+      "mean": 4010.963642996109,
+      "std": 2834.622567142766,
+      "p95": 9324.0,
+      "p99": 12549.75,
+      "p50": 3639.5
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 125,
+      "mean": 9.013323464100667,
+      "std": 16.889182521696886,
+      "p95": 48.0,
+      "p99": 83.0,
+      "p50": 2.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 241,
+      "max": 13110,
+      "mean": 2757.74173151751,
+      "std": 2443.6715085337425,
+      "p95": 8140.0,
+      "p99": 11977.0,
+      "p50": 2251.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 107,
+      "mean": 6.972397859922179,
+      "std": 13.12918040564865,
+      "p95": 36.0,
+      "p99": 61.0,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 3879.2357247311995,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 1706.9113276197873,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 7299.850486675013,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7293.056876393539,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 7300.748815241627,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 7300.648919931912,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:cache_included_thruput",
+      "rate": 481.3087915235195,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:cache_included_thruput",
+      "rate": 3570.582317849298,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 3667.997614264918,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 3758.0986169284117,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: {
+  "name": "caching_off_window_1_160907-095133",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 77138
+    },
+    {
+      "name": "queued_predictions",
+      "count": 110
+    },
+    {
+      "name": "update_counter",
+      "count": 33524
+    },
+    {
+      "name": "queued_updates",
+      "count": 29618
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 144332
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 144186
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 144291
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 144332
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 145038
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 697577
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 133
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 6654095
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 1186781
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:alpha_gauge",
+      "count": 75218
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:beta_gauge",
+      "count": 7205346
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 170
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_thru_gauge",
+      "count": 8503217
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:base_thru_gauge",
+      "count": 137352
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:alpha_gauge",
+      "count": 181455
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:beta_gauge",
+      "count": 523636
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 107
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_thru_gauge",
+      "count": 5366294
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:base_thru_gauge",
+      "count": 1418257
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 77038
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 100
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:alpha_gauge",
+      "count": 207214
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:beta_gauge",
+      "count": 563357
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 94
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_thru_gauge",
+      "count": 4690268
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:base_thru_gauge",
+      "count": 1297738
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9987036220799087
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17053,
+      "max": 22340,
+      "mean": 19027.30763618677,
+      "std": 970.5096883487779,
+      "p95": 20171.35,
+      "p99": 20316.87,
+      "p50": 19154.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 4,
+      "mean": 3.21011673151751,
+      "std": 0.5919386995093395,
+      "p95": 4.0,
+      "p99": 4.0,
+      "p50": 3.0
+    },
+    {
+      "name": "update_latency",
+      "min": 60396,
+      "max": 9316377,
+      "mean": 4585668.932392996,
+      "std": 2619723.143396929,
+      "p95": 8799466.499999999,
+      "p99": 9216297.33,
+      "p50": 4417000.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 284,
+      "max": 19152,
+      "mean": 2527.0716196498058,
+      "std": 1975.5006436952688,
+      "p95": 5359.0,
+      "p99": 10690.5,
+      "p50": 2309.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 133,
+      "mean": 6.972154669260701,
+      "std": 12.464853292574605,
+      "p95": 37.0,
+      "p99": 58.0,
+      "p50": 2.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 6220,
+      "max": 31840,
+      "mean": 12973.72227626459,
+      "std": 3273.09508418195,
+      "p95": 18292.0,
+      "p99": 19468.0,
+      "p50": 12506.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 172,
+      "mean": 97.09152086137282,
+      "std": 36.16683706297795,
+      "p95": 170.0,
+      "p99": 170.0,
+      "p50": 93.5
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 194,
+      "max": 14295,
+      "mean": 3436.5249270428018,
+      "std": 2499.758953109656,
+      "p95": 8300.0,
+      "p99": 11570.0,
+      "p50": 3249.5
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 125,
+      "mean": 7.585359922178989,
+      "std": 14.465977720542739,
+      "p95": 42.0,
+      "p99": 66.0,
+      "p50": 2.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 249,
+      "max": 13110,
+      "mean": 2557.0626215953309,
+      "std": 2104.8643598429227,
+      "p95": 5936.0,
+      "p99": 11512.0,
+      "p50": 2260.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 107,
+      "mean": 6.657587548638133,
+      "std": 12.464107615947489,
+      "p95": 37.0,
+      "p99": 57.0,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 3856.2273218558445,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 1675.339152531138,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 7211.6507300487669,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7206.755582852939,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 7211.650369823356,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 7211.650369823356,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:cache_included_thruput",
+      "rate": 1084.2663028844214,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:cache_included_thruput",
+      "rate": 3701.730432719437,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 3750.3396467034247,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 3795.5451922194176,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: {
+  "name": "caching_off_window_1_160907-095133",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 115641
+    },
+    {
+      "name": "queued_predictions",
+      "count": 24
+    },
+    {
+      "name": "update_counter",
+      "count": 50584
+    },
+    {
+      "name": "queued_updates",
+      "count": 43741
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 216891
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 216772
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 216893
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 216893
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 145038
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 697577
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 133
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 6654095
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 1186781
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:alpha_gauge",
+      "count": 75218
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:beta_gauge",
+      "count": 7205346
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 170
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_thru_gauge",
+      "count": 8503217
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:base_thru_gauge",
+      "count": 137352
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:alpha_gauge",
+      "count": 181455
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:beta_gauge",
+      "count": 523636
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 107
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_thru_gauge",
+      "count": 5366294
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:base_thru_gauge",
+      "count": 1418257
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 115541
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 100
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:alpha_gauge",
+      "count": 207214
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:beta_gauge",
+      "count": 563357
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 94
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_thru_gauge",
+      "count": 4690268
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:base_thru_gauge",
+      "count": 1297738
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.999135254797174
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17053,
+      "max": 21283,
+      "mean": 19025.9141536965,
+      "std": 972.5117103066656,
+      "p95": 20171.0,
+      "p99": 20304.0,
+      "p50": 19179.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 4,
+      "mean": 3.265807392996109,
+      "std": 0.5567900931644645,
+      "p95": 4.0,
+      "p99": 4.0,
+      "p50": 3.0
+    },
+    {
+      "name": "update_latency",
+      "min": 60396,
+      "max": 13964698,
+      "mean": 7047010.288424125,
+      "std": 4070659.949998951,
+      "p95": 13334686.55,
+      "p99": 13807858.99,
+      "p50": 6975443.0
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 279,
+      "max": 19152,
+      "mean": 2448.8104328793776,
+      "std": 1849.7761607836858,
+      "p95": 5107.5,
+      "p99": 8896.0,
+      "p50": 2283.5
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 133,
+      "mean": 6.878891050583658,
+      "std": 12.280337355927254,
+      "p95": 36.0,
+      "p99": 57.0,
+      "p50": 2.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 6220,
+      "max": 31840,
+      "mean": 12889.145063229573,
+      "std": 3124.2872993336738,
+      "p95": 18200.0,
+      "p99": 19202.0,
+      "p50": 12582.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 172,
+      "mean": 96.86065207682,
+      "std": 34.64270922867324,
+      "p95": 170.0,
+      "p99": 170.0,
+      "p50": 94.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 183,
+      "max": 14295,
+      "mean": 3297.8266050583658,
+      "std": 2345.1283394436015,
+      "p95": 7235.0,
+      "p99": 10543.0,
+      "p50": 3154.5
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 125,
+      "mean": 7.282465953307393,
+      "std": 13.916774705945219,
+      "p95": 41.0,
+      "p99": 64.0,
+      "p50": 2.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 242,
+      "max": 13110,
+      "mean": 2447.6798394941636,
+      "std": 1974.513877986638,
+      "p95": 5414.0,
+      "p99": 11012.5,
+      "p50": 2199.5
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 107,
+      "mean": 6.372689688715953,
+      "std": 11.814080780773809,
+      "p95": 35.0,
+      "p99": 55.0,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 3851.682469115444,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 1685.0964552301246,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 7224.439376504654,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7221.875251313407,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 7224.672478794769,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 7225.0718421234209,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:cache_included_thruput",
+      "rate": 1148.6008133978547,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:cache_included_thruput",
+      "rate": 3748.6175242129249,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 3780.8457100507418,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 3811.105450514612,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: {
+  "name": "caching_off_window_1_160907-095133",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 154473
+    },
+    {
+      "name": "queued_predictions",
+      "count": 110
+    },
+    {
+      "name": "update_counter",
+      "count": 67547
+    },
+    {
+      "name": "queued_updates",
+      "count": 59060
+    },
+    {
+      "name": "logistic_reg:prediction_counter",
+      "count": 289709
+    },
+    {
+      "name": "rf_d16:prediction_counter",
+      "count": 289606
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 289690
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 289723
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:alpha_gauge",
+      "count": 145038
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:beta_gauge",
+      "count": 697577
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_batch_size_gauge",
+      "count": 133
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:max_thru_gauge",
+      "count": 6654095
+    },
+    {
+      "name": "logistic_reg:172.21.0.6:6001:base_thru_gauge",
+      "count": 1186781
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:alpha_gauge",
+      "count": 75218
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:beta_gauge",
+      "count": 7205346
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_batch_size_gauge",
+      "count": 170
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:max_thru_gauge",
+      "count": 8503217
+    },
+    {
+      "name": "rf_d16:172.21.0.7:6001:base_thru_gauge",
+      "count": 137352
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:alpha_gauge",
+      "count": 181455
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:beta_gauge",
+      "count": 523636
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_batch_size_gauge",
+      "count": 107
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:max_thru_gauge",
+      "count": 5366294
+    },
+    {
+      "name": "linear_svm:172.21.0.2:6001:base_thru_gauge",
+      "count": 1418257
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 154373
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 100
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:alpha_gauge",
+      "count": 207214
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:beta_gauge",
+      "count": 563357
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_batch_size_gauge",
+      "count": 94
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:max_thru_gauge",
+      "count": 4690268
+    },
+    {
+      "name": "spark_svm:172.21.0.5:6001:base_thru_gauge",
+      "count": 1297738
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9993526376777819
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17053,
+      "max": 22213,
+      "mean": 19037.081955252917,
+      "std": 971.2469068020402,
+      "p95": 20179.7,
+      "p99": 20310.87,
+      "p50": 19191.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 4,
+      "mean": 3.2835603112840467,
+      "std": 0.5347038584670073,
+      "p95": 4.0,
+      "p99": 4.0,
+      "p50": 3.0
+    },
+    {
+      "name": "update_latency",
+      "min": 60396,
+      "max": 18640968,
+      "mean": 9447046.475194553,
+      "std": 5379669.763346648,
+      "p95": 17646751.45,
+      "p99": 18480189.57,
+      "p50": 9873214.5
+    },
+    {
+      "name": "logistic_reg:model_latency",
+      "min": 279,
+      "max": 19152,
+      "mean": 2445.2599708171208,
+      "std": 1819.0290551321899,
+      "p95": 5047.0,
+      "p99": 8864.0,
+      "p50": 2302.0
+    },
+    {
+      "name": "logistic_reg:model_batch_size",
+      "min": 1,
+      "max": 133,
+      "mean": 6.721303501945525,
+      "std": 12.157701585705694,
+      "p95": 36.0,
+      "p99": 57.0,
+      "p50": 2.0
+    },
+    {
+      "name": "rf_d16:model_latency",
+      "min": 6220,
+      "max": 31840,
+      "mean": 12768.240272373541,
+      "std": 3076.730699114021,
+      "p95": 18157.5,
+      "p99": 19266.0,
+      "p50": 12564.0
+    },
+    {
+      "name": "rf_d16:model_batch_size",
+      "min": 1,
+      "max": 172,
+      "mean": 95.95957587806494,
+      "std": 34.14382547571933,
+      "p95": 167.0,
+      "p99": 170.0,
+      "p50": 93.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 183,
+      "max": 14295,
+      "mean": 3261.237475680934,
+      "std": 2305.5052401073019,
+      "p95": 7091.0,
+      "p99": 10340.5,
+      "p50": 3136.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 117,
+      "mean": 7.172543774319066,
+      "std": 13.752304751438626,
+      "p95": 41.0,
+      "p99": 64.0,
+      "p50": 2.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 239,
+      "max": 13110,
+      "mean": 2296.1750972762649,
+      "std": 1830.14192499601,
+      "p95": 5014.0,
+      "p99": 10095.75,
+      "p50": 2112.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 107,
+      "mean": 6.062986381322958,
+      "std": 11.44282602451316,
+      "p95": 34.0,
+      "p99": 53.75,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 3859.3654309919027,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 1687.3484505795044,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:model_thruput",
+      "rate": 7236.884431628733,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:model_thruput",
+      "rate": 7232.963146993069,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 7236.8842508862139,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 7236.8842508862139,
+      "unit": "events per second"
+    },
+    {
+      "name": "rf_d16:cache_included_thruput",
+      "rate": 1224.5277169714732,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:cache_included_thruput",
+      "rate": 3780.035479438198,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 3806.1764169441146,
+      "unit": "events per second"
+    },
+    {
+      "name": "logistic_reg:cache_included_thruput",
+      "rate": 3826.24330980279,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/caching_off_window_1_160907-095133_results.json

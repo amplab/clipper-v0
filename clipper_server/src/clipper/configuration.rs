@@ -25,6 +25,7 @@ pub struct ClipperConf {
     pub policy_name: String,
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
+    pub salt_update_cache: bool,
     pub input_type: InputType,
     // pub batch_size: i32,
     pub batch_strategy: BatchStrategy,
@@ -57,7 +58,8 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.redis_ip == other.redis_ip &&
         self.redis_port == other.redis_port &&
         self.batch_strategy == other.batch_strategy &&
-        self.num_message_encodes == other.num_message_encodes
+        self.num_message_encodes == other.num_message_encodes &&
+        self.salt_update_cache == other.salt_update_cache
     }
 }
 
@@ -167,6 +169,10 @@ impl ClipperConf {
                 .as_table()
                 .unwrap()),
             use_lsh: pc.get("use_lsh")
+                .unwrap_or(&Value::Boolean(false))
+                .as_bool()
+                .unwrap(),
+            salt_update_cache: pc.get("salt_update_cache")
                 .unwrap_or(&Value::Boolean(false))
                 .as_bool()
                 .unwrap(),
@@ -332,6 +338,7 @@ pub struct ClipperConfBuilder {
     pub policy_name: String,
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
+    pub salt_update_cache: bool,
     pub input_type: InputType,
     pub window_size: isize,
     pub redis_ip: String,
@@ -354,6 +361,7 @@ impl ClipperConfBuilder {
             policy_name: "default".to_string(),
             models: Vec::new(),
             use_lsh: false,
+            salt_update_cache: false,
             input_type: InputType::Integer(-1),
             num_predict_workers: 2,
             num_update_workers: 1,
@@ -494,6 +502,7 @@ impl ClipperConfBuilder {
             policy_name: self.policy_name.clone(),
             models: self.models.drain(..).collect(),
             use_lsh: self.use_lsh,
+            salt_update_cache: self.salt_update_cache,
             num_predict_workers: self.num_predict_workers,
             num_update_workers: self.num_update_workers,
             cache_size: self.cache_size,

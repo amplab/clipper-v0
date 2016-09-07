@@ -15,7 +15,7 @@ from fabric.contrib.files import append
 
 class DigitsBenchmarker:
 
-    def __init__(self, experiment_name, log_dest, target_qps, batch_size, num_requests):
+    def __init__(self, experiment_name, log_dest, target_qps, batch_size, num_requests, window_size = -1, salt_cache=True):
         self.remote_node = "c69.millennium.berkeley.edu"
         env.key_filename = "~/.ssh/c70.millenium"
         env.user = "crankshaw"
@@ -40,13 +40,13 @@ class DigitsBenchmarker:
                 "use_lsh" : False,
                 "input_type" : "float",
                 "input_length" : 784,
-                "window_size" : -1,
+                "window_size" : window_size,
                 "redis_ip" : "redis",
                 "redis_port" : 6379,
                 "results_path" : "/tmp/benchmarking_logs",
-                "num_predict_workers" : 16,
+                "num_predict_workers" : 8,
                 "num_update_workers" : 1,
-                "cache_size" : 500000,
+                "cache_size" : 1000000,
                 "mnist_path" : "/mnist_data/test.data",
                 # "num_benchmark_requests" : 10000000,
                 "num_benchmark_requests" : num_requests,
@@ -54,10 +54,13 @@ class DigitsBenchmarker:
                 "target_qps" : target_qps,
                 # "bench_batch_size" : 150*self.NUM_REPS,
                 "bench_batch_size" : batch_size,
-                "salt_cache" : True,
-                "send_updates": False,
+                # "salt_cache" : False,
+                "salt_cache" : salt_cache,
+                "salt_update_cache" : salt_cache,
+                "send_updates": True,
                 "load_generator": "uniform",
-                "request_generator": "balanced",
+                "request_generator": "cached_updates",
+                "wait_to_end": False,
                 # "cache_hit_rate": 1.0,
                 # "batching": { "strategy": "aimd" },
                 # "batching": { "strategy": "static", "batch_size": 1 },
@@ -76,7 +79,7 @@ class DigitsBenchmarker:
                     "redis": {"image": "redis:alpine", "cpuset": self.reserve_cores(1)},
                     "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
                     "clipper": {"image": "cl-dev-digits",
-                        "cpuset": self.reserve_cores(24),
+                        "cpuset": self.reserve_cores(20),
                         "depends_on": ["redis", "quantilereg"],
                         "volumes": [
                             "${MNIST_PATH}:/mnist_data:ro",
@@ -311,28 +314,37 @@ class DigitsBenchmarker:
 #
 
 if __name__=='__main__':
-    # gen_configs()
 
-    # num_reps = 1
-    # for num_reps in [1,2] + range(4,37,4):
-    local_num_reps = 1
-    remote_num_reps = 10
-    # for remote_reps in [1,2] + range(4,25,4):
-    print("STARTING RUN WITH %d LOCAL REPLICAS AND %d REMOTE REPLICAS" % (local_num_reps, remote_num_reps))
-    time.sleep(10)
-    total_num_reps = local_num_reps + remote_num_reps
-    exp_name = "DEBUG_sklearn_logreg_%d_local_replicas_%d_remote_replicas" % (local_num_reps, remote_num_reps)
-    log_dest = "benchmarking_logs/replica-scaling"
-    # every 4 replicas add another million to the number of requests
-    # to let things stabilize
-    num_requests = 1000000 * (total_num_reps / 4 + 1)
-    benchmarker = DigitsBenchmarker(exp_name, log_dest, 10000*total_num_reps, 150*total_num_reps, num_requests)
-    benchmarker.add_sklearn_log_regression(local_replicas=local_num_reps, remote_replicas = remote_num_reps)
-    # print(toml.dumps(benchmarker.clipper_conf_dict))
-    # print(yaml.dump(benchmarker.remote_dc_dict))
-    # print(yaml.dump(benchmarker.dc_dict))
-    benchmarker.run_clipper()
-    time.sleep(5)
+    # Turns cache off if True
+    # salt_cache = False
+
+    for window in [1, 20, 100]:
+        for salt_cache in [True, False]:
+            print("STARTING EXPERIMENT. CACHING: %s, WINDOW: %d" % (not salt_cache, window))
+            time.sleep(10)
+            num_reps = 1
+            # window = 1
+            debug = ""
+            # debug = "DEBUG_"
+            if salt_cache:
+                exp_name = "%scaching_off_window_%d" % (debug, window)
+            else:
+                exp_name = "%scaching_on_window_%d" % (debug, window)
+            log_dest = "benchmarking_logs/caching_feedback"
+            num_requests = 300000
+            benchmarker = DigitsBenchmarker(exp_name,
+                                            log_dest,
+                                            10000,
+                                            200,
+                                            num_requests,
+                                            window_size=window,
+                                            salt_cache=salt_cache)
+            benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
+            benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+            benchmarker.add_spark_svm(num_replicas=num_reps)
+            benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+            benchmarker.run_clipper()
+        # time.sleep(5)
 
 
 

@@ -230,8 +230,9 @@ impl CachedUpdatesRequestGenerator {
 impl RequestGenerator for CachedUpdatesRequestGenerator {
     fn get_next_request(&mut self, _: usize) -> (Vec<f64>, f64) {
         let input = self.random_features(784);
-        let label = self.rng.gen::<bool>();
-        let y = if label { 1.0 } else { -1.0 };
+        // let label = self.rng.gen::<bool>();
+        // let y = if label { 1.0 } else { -1.0 };
+        let y = 1.0;
         self.sent_predictions.push_back((input.clone(), y));
         (input, y)
     }
@@ -315,6 +316,10 @@ fn start_digits_benchmark(conf_path: &String) {
         .as_integer()
         .unwrap() as usize;
     let salt_cache = pc.get("salt_cache")
+        .unwrap_or(&Value::Boolean(true))
+        .as_bool()
+        .unwrap();
+    let wait_to_end = pc.get("wait_to_end")
         .unwrap_or(&Value::Boolean(true))
         .as_bool()
         .unwrap();
@@ -542,47 +547,9 @@ fn start_digits_benchmark(conf_path: &String) {
             events_fired += 1;
         }
     }
-    // while events_fired < num_requests {
-    //     for _ in 0..batch_size {
-    //         if events_fired % 20000 == 0 {
-    //             info!("Submitted {} requests", events_fired);
-    //         }
-    //         let idx = if events_fired % 2 == 0 {
-    //             rng.gen_range::<usize>(last_three_pos as usize + 10, norm_test_data.ys.len())
-    //         } else {
-    //             rng.gen_range::<usize>(first_three_pos as usize, last_three_pos as usize)
-    //         };
-    //         let input_data = norm_test_data.xs[idx].clone();
-    //         // make each input unique so there are no cache hits
-    //         // input_data[783] = events_fired as f64;
-    //         let label = norm_test_data.ys[idx];
-    //         let y = if label == LABEL { 1.0 } else { -1.0 };
-    //         let input = Input::Floats {
-    //             f: input_data,
-    //             length: 784,
-    //         };
-    //         // let user = rng.gen_range::<u32>(0, num_users);
-    //         {
-    //             let sender = sender.clone();
-    //             // let req_num = events_fired;
-    //             let on_pred = Box::new(move |pred_y| {
-    //                 match sender.send((pred_y, pred_y == y)) {
-    //                     Ok(_) => {}
-    //                     Err(e) => warn!("error in on_pred: {}", e.description()),
-    //                 };
-    //                 // if req_num % 100 == 0 {
-    //                 //     info!("completed prediction {}", req_num);
-    //                 // }
-    //             });
-    //             let r = PredictionRequest::new(user, input, on_pred, salt_cache);
-    //             clipper.schedule_prediction(r);
-    //         }
-    //         events_fired += 1;
-    //     }
-    //     thread::sleep(Duration::from_millis(inter_batch_sleep_time_ms));
-    // }
 
-    receiver_jh.join().unwrap();
+    // Record mid-workload metrics as soon as we finish sending requests,
+    // instead of waiting for all requests to finish
     {
         let metrics_register = clipper.get_metrics();
         let m = metrics_register.read().unwrap();
@@ -594,22 +561,12 @@ fn start_digits_benchmark(conf_path: &String) {
         let res_path = Path::new(&results_fname);
         let mut results_writer = BufWriter::new(File::create(res_path).unwrap());
         results_writer.write(&final_metrics.into_bytes()).unwrap();
-
-        // let config_fname = format!("{}/{}_config.toml", results_path, timestamp);
-        // // info!("writing results to: {}", results_fname);
-        // let config_path = Path::new(&config_fname);
-        // let mut config_writer = BufWriter::new(File::create(config_path).unwrap());
-        // config_writer.write(&toml_string.into_bytes()).unwrap();
+    }
+    if wait_to_end {
+        receiver_jh.join().unwrap();
+    } else {
+        std::process::exit(0);
 
     }
 
-    // for _ in 0..num_requests {
-    //     let correct = receiver.recv().unwrap();
-    //     if correct {
-    //         accuracy_counter.incr(1,1);
-    //     } else {
-    //         accuracy_counter.incr(0,1);
-    //     }
-    // }
-    // let _ = receiver.iter().take(num_requests).collect::<Vec<_>>();
 }

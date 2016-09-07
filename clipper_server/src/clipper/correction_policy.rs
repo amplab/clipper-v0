@@ -209,13 +209,13 @@ impl CorrectionPolicy<LinearCorrectionState> for LogisticRegressionPolicy {
         };
         let prob = linear::Problem::from_training_data(&xs, &labels);
         let model = linear::train_logistic_regression(prob, params);
-        info!("OLD correction state: {:?}, offline_model_order: {:?}",
-              state.linear_model.w,
-              state.offline_model_order);
-        info!("New correction state: {:?}, offline_model_order: {:?}, labels: {:?}",
-              model.w,
-              state.offline_model_order,
-              model.label);
+        debug!("OLD correction state: {:?}, offline_model_order: {:?}",
+               state.linear_model.w,
+               state.offline_model_order);
+        debug!("New correction state: {:?}, offline_model_order: {:?}, labels: {:?}",
+               model.w,
+               state.offline_model_order,
+               model.label);
         if state.offline_model_order.len() > model.w.len() {
             warn!("Correction model has {} weights, expected {}. Offline model state: {:?}",
                   model.w.len(),
