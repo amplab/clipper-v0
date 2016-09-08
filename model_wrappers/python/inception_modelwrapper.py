@@ -36,21 +36,41 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
         return self.predict_floats(inputs)
 
     def predict_floats(self, inputs):
+        num_inputs = len(inputs)
+        num_batches = num_inputs / self.batch_size
         inputs = np.array(inputs)
-        inputs = inputs.reshape(
-            (len(inputs), self.image_size, self.image_size, 3))
+        padded_inputs = inputs.reshape((len(inputs), self.image_size, self.image_size, 3))
+        # find how much padding we need
+        if num_batches * self.batch_size < num_inputs:
+            padding = self.batch_size - num_inputs % self.batch_size
+            top_img = padded_inputs[0].reshape((1,) + padded_inputs[0].shape)
+            pad_imgs = np.repeat(top_img, padding, axis=0)
+            padded_inputs = np.concatenate((padded_inputs, pad_imgs), axis=0)
+            assert len(padded_inputs) / self.batch_size == num_batches + 1
+
+        assert len(padded_inputs) % self.batch_size == 0
+        num_batches = len(padded_inputs) / self.batch_size
+
+        # num_inputs = len(inputs)
+        # inputs = np.array(inputs)
+        # inputs = inputs.reshape(
+        #     (len(inputs), self.image_size, self.image_size, 3))
         # Pad the inputs ndarray with the first image if necessary
-        if len(inputs) < self.batch_size:
-            top_img = inputs[0].reshape((1,) + inputs[0].shape)
-            pad_imgs = np.repeat(top_img, self.batch_size - len(inputs), axis=0)
-            inputs = np.concatenate((inputs, pad_imgs), axis=0)
-        with tf.variable_scope("", reuse=self.reuse_scope) as scope:
-            top_1 = self.sess.run([self.top_1_op],
-                                  feed_dict={self.jpegs: inputs})
+        # if len(inputs) < self.batch_size:
+        #     top_img = inputs[0].reshape((1,) + inputs[0].shape)
+        #     pad_imgs = np.repeat(top_img, self.batch_size - len(inputs), axis=0)
+        #     inputs = np.concatenate((inputs, pad_imgs), axis=0)
+        preds = []
+        for b in range(num_batches):
+            with tf.variable_scope("", reuse=self.reuse_scope) as scope:
+                top_1 = self.sess.run([self.top_1_op],
+                        feed_dict={self.jpegs: padded_inputs[b*self.batch_size: (b+1)*self.batch_size]})
+                cur_preds = top_1[0].indices.flatten()
+                preds.extend(cur_preds.astype(np.float64))
         # Mark reuse_scope as True for future reuse of inception variables
         self.reuse_scope = True
-        preds = top_1[0].indices.flatten()
-        preds = preds.astype(np.float64)
+        preds = np.array(preds[:num_inputs])
+        print("Predicted: %s" % preds)
         return preds
 
     def preprocess_image(self, image_buffer):
@@ -83,5 +103,5 @@ class InceptionModelWrapper(rpc.ModelWrapperBase):
 if __name__=='__main__':
     model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path, file=sys.stderr)
-    model = InceptionModelWrapper(1, 299, 1000, model_path)
+    model = InceptionModelWrapper(3, 299, 1000, model_path)
     rpc.start(model, 6001)

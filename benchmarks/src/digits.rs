@@ -41,7 +41,7 @@ pub fn load_imagenet_dense(fpath: &String) -> Result<Vec<Vec<f64>>, String> {
     // pointer to first feature_node struct in each example
     let mut xs: Vec<Vec<f64>> = Vec::new();
     for line in file.lines().filter_map(|result| result.ok()) {
-        let mut split = line.split(",").collect::<Vec<&str>>();
+        let split = line.split(",").collect::<Vec<&str>>();
         // println!("{:?}", split);
         let mut features: Vec<f64> = Vec::new();
         for f in split.iter().map(|x| x.trim().parse::<f64>().unwrap()) {

@@ -17,6 +17,8 @@ RUN apt-get update \
 
 ENV RUST_LOG=info
 ENV RUST_BACKTRACE=1
+ENV CLIPPER_CONF_PATH="/tmp/digits_bench.toml"
+ENV CLIPPER_BENCH_COMMAND="digits"
 # EXPOSE 1337
 
 # COPY test.toml /rust/clipper/clipper_server/conf/test.toml
@@ -24,6 +26,6 @@ ENV RUST_BACKTRACE=1
 # CMD ["--conf=/rust/clipper/clipper_server/conf/test.toml"]
 
 # COPY digits_bench.toml /rust/clipper/benchmarks/digits_bench.toml
-ENTRYPOINT ["/rust/clipper/benchmarks/target/release/clipper-benchmarks", "digits"]
-CMD ["--conf=/tmp/digits_bench.toml"]
+ENTRYPOINT ["/rust/clipper/benchmarks/target/release/clipper-benchmarks"]
+# CMD ["digits", "--conf=/tmp/digits_bench.toml"]
 

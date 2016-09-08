@@ -23,7 +23,7 @@ use std::thread;
 use std::time::Duration;
 // use time;
 use std::sync::{mpsc, Arc, RwLock};
-use docopt::Docopt;
+// use docopt::Docopt;
 use toml::{Parser, Value};
 use std::fs::File;
 use std::io::prelude::*;
@@ -31,21 +31,23 @@ use std::path::Path;
 use std::io::{BufReader, BufWriter};
 use std::error::Error;
 use std::collections::VecDeque;
+use std::env;
 
 mod digits;
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
-const USAGE: &'static str = "
-Clipper Server
-
-Usage:
-  clipper digits --conf=</path/to/conf.toml>
-  clipper -h
-
-Options:
-  -h --help                             Show this screen.
-  --conf=</path/to/conf.toml>           Path to features config file.
-";
+// #[cfg_attr(rustfmt, rustfmt_skip)]
+// const USAGE: &'static str = "
+// Clipper Server
+//
+// Usage:
+//   clipper digits --conf=</path/to/conf.toml>
+//   clipper imagenet --conf=</path/to/conf.toml>
+//   clipper -h
+//
+// Options:
+//   -h --help                             Show this screen.
+//   --conf=</path/to/conf.toml>           Path to features config file.
+// ";
 
 const LABEL: f64 = 3.0;
 
@@ -53,19 +55,32 @@ const LABEL: f64 = 3.0;
 struct Args {
     flag_conf: String,
     cmd_digits: bool,
+    cmd_imagenet: bool,
 }
 
 fn main() {
     env_logger::init().unwrap();
 
-    let args: Args = Docopt::new(USAGE)
-        .and_then(|d| d.decode())
-        .unwrap_or_else(|e| e.exit());
+    let conf_key = "CLIPPER_CONF_PATH";
+    let command_key = "CLIPPER_BENCH_COMMAND";
 
-    info!("{:?}", args);
-    if args.cmd_digits {
-        start_digits_benchmark(&args.flag_conf);
+    // let args: Args = Docopt::new(USAGE)
+    //     .and_then(|d| d.decode())
+    //     .unwrap_or_else(|e| e.exit());
+
+    // info!("{:?}", args);
+    let conf = env::var(conf_key).unwrap();
+    match env::var(command_key).unwrap().as_str() {
+        "digits" => start_digits_benchmark(&conf),
+        "imagenet" => start_imagenet_benchmark(&conf),
+        _ => panic!("Invalid benchmark command"),
     }
+
+    // if args.cmd_digits {
+    //     start_digits_benchmark(&args.flag_conf);
+    // } else if args.cmd_imagenet {
+    //     start_imagenet_benchmark(&args.flag_conf);
+    // }
 }
 
 // #[allow(dead_code)]
@@ -262,7 +277,7 @@ impl BalancedRequestGenerator {
     }
 }
 
-//////////////////////////////
+/// ///////////////////////////
 
 struct RandomRequestGenerator {
     rng: ThreadRng,
@@ -279,7 +294,7 @@ impl RandomRequestGenerator {
 }
 
 impl RequestGenerator for RandomRequestGenerator {
-    fn get_next_request(&mut self, request_num: usize) -> (Vec<f64>, f64) {
+    fn get_next_request(&mut self, _: usize) -> (Vec<f64>, f64) {
         let idx = self.rng.gen_range::<usize>(0, self.data.len());
         let input_data = self.data[idx].clone();
         let y = 1.0;
@@ -288,7 +303,7 @@ impl RequestGenerator for RandomRequestGenerator {
 }
 
 
-////////////////
+/// /////////////
 
 impl RequestGenerator for BalancedRequestGenerator {
     fn get_next_request(&mut self, request_num: usize) -> (Vec<f64>, f64) {
@@ -306,6 +321,7 @@ impl RequestGenerator for BalancedRequestGenerator {
 }
 
 
+#[allow(unused_variables)] // needed for metrics shutdown signal
 fn start_imagenet_benchmark(conf_path: &String) {
     let path = Path::new(conf_path);
     let display = path.display();
@@ -326,7 +342,11 @@ fn start_imagenet_benchmark(conf_path: &String) {
         Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
         Ok(_) => print!("{} contains:\n{}", display, toml_string),
     }
-    let pc = Parser::new(&toml_string).parse().unwrap();
+    let mut parser = Parser::new(&toml_string);
+    let pc = match parser.parse() {
+        Some(pc) => pc,
+        None => panic!(format!("TOML PARSE ERROR: {:?}", parser.errors)),
+    };
     let imagenet_path = pc.get("imagenet_path").unwrap().as_str().unwrap().to_string();
     let results_path = pc.get("results_path").unwrap().as_str().unwrap().to_string();
     let num_requests = pc.get("num_benchmark_requests")
@@ -354,10 +374,9 @@ fn start_imagenet_benchmark(conf_path: &String) {
 
     // info!("MNIST data loaded: {} points", norm_test_data.ys.len());
     // let input_type = InputType::Integer(784);
-    // let input_data = 
+    // let input_data =
     let input_data = digits::load_imagenet_dense(&imagenet_path).unwrap();
-
-
+    info!("Loaded imagenet data");
 
     let config = configuration::ClipperConf::parse_from_toml(conf_path);
     let instance_name = config.name.clone();
@@ -381,8 +400,8 @@ fn start_imagenet_benchmark(conf_path: &String) {
     });
 
     let mut events_fired = 0;
-    let mut rng = thread_rng();
-    let num_users = 1;
+    // let mut rng = thread_rng();
+    // let num_users = 1;
     // let batch_size = 200;
     // let inter_batch_sleep_time_ms = 1000 / (target_qps / batch_size) as u64;
 
@@ -407,18 +426,22 @@ fn start_imagenet_benchmark(conf_path: &String) {
     //     } else {
     //         -1.0
     //     };
-    //     let input = Input::Floats {
-    //         f: input_data,
-    //         length: 784,
-    //     };
-      updates.push(Update {
-          query: Arc::new(input_data[0].clone()),
-          label: 1.0,
-      });
-      updates.push(Update {
-          query: Arc::new(input_data[1].clone()),
-          label: 1.0,
-      });
+    let input0 = Input::Floats {
+        f: input_data[0].clone(),
+        length: 268203,
+    };
+    updates.push(Update {
+        query: Arc::new(input0),
+        label: 1.0,
+    });
+    let input1 = Input::Floats {
+        f: input_data[1].clone(),
+        length: 268203,
+    };
+    updates.push(Update {
+        query: Arc::new(input1),
+        label: 1.0,
+    });
     // }
     // let user = rng.gen_range::<u32>(0, num_users);
     let user = 1;
@@ -438,7 +461,8 @@ fn start_imagenet_benchmark(conf_path: &String) {
 
     let mut load_gen = UniformLoadGenerator::new(batch_size, num_requests, target_qps);
 
-    let mut request_generator: Box<RequestGenerator> = Box::new(RandomRequestGenerator(input_data));
+    let mut request_generator: Box<RequestGenerator> =
+        Box::new(RandomRequestGenerator::new(input_data));
 
     while load_gen.next_request() {
         if events_fired % 20000 == 0 {
