@@ -599,9 +599,20 @@ impl<P, S> ClipperServer<P, S>
 
     pub fn schedule_update(&self, req: UpdateRequest) {
         self.server_metrics.num_queued_updates_counter.incr(1);
+        // TODO TODO TODO: add this back
         // Ensure that all updates for a given user ID go to the same
         // update worker.
-        self.update_workers[req.uid as usize % self.update_workers.len()].update(req);
+        // self.update_workers[req.uid as usize % self.update_workers.len()].update(req);
+
+        let mut rng = thread_rng();
+        // randomly pick a worker
+
+        let w: usize = if self.update_workers.len() > 1 {
+            rng.gen_range::<usize>(0, self.update_workers.len())
+        } else {
+            0
+        };
+        self.update_workers[w].update(req);
     }
 
 

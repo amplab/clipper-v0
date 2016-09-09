@@ -45,7 +45,7 @@ class DigitsBenchmarker:
                 "redis_port" : 6379,
                 "results_path" : "/tmp/benchmarking_logs",
                 "num_predict_workers" : 8,
-                "num_update_workers" : 1,
+                "num_update_workers" : 10,
                 "cache_size" : 1000000,
                 "mnist_path" : "/mnist_data/test.data",
                 # "num_benchmark_requests" : 10000000,
@@ -330,7 +330,7 @@ if __name__=='__main__':
                 exp_name = "%scaching_off_window_%d" % (debug, window)
             else:
                 exp_name = "%scaching_on_window_%d" % (debug, window)
-            log_dest = "benchmarking_logs/caching_feedback"
+            log_dest = "benchmarking_logs/faster_caching_feedback"
             num_requests = 300000
             benchmarker = DigitsBenchmarker(exp_name,
                                             log_dest,
