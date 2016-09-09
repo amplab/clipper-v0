@@ -1,29 +1,34 @@
-
-name = "clipper-test"
-slo_micros = 10000
-# correction_policy = "hello world"
-correction_policy = "logistic_regression"
-use_lsh = true
-input_type = "int"
-input_length = 784
-window_size = -1
-redis_ip = "localhost"
-redis_port = 6379
-
-num_predict_workers = 4
+num_message_encodes = 1
+use_lsh = false
+window_size = 100
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
 num_update_workers = 1
-# largest prime less than 50000
-cache_size = 49999
+input_length = 784
+num_benchmark_requests = 5000000
+redis_ip = "localhost"
 mnist_path = "/crankshaw-local/mnist/data/test.data"
-num_benchmark_requests = 1000
+bench_batch_size = 500
+target_qps = 80000
+name = "tf-mnist-convnet-eval"
+wait_to_end = true
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = false
 
+[batching]
+strategy = "aimd"
+batch_size = 64
 
 [[models]]
-name = "m1"
-addresses = ["localhost:6001"]
-num_outputs = 1
 version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "127.0.0.1:6001"]
 
-# [[models]]
-# name = "m2"
-# addresses = ["127.0.0.1:6004"]

@@ -97,7 +97,7 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                     total_bytes_expected = 8*input_len*num_inputs
                     while len(data) < total_bytes_expected:
                         data += self.request.recv(4096)
-                    input_doubles = np.array(array.array('d', bytes(data)))
+                    input_doubles = np.array(array.array('d', bytes(data[:total_bytes_expected])))
                     inputs = np.split(input_doubles, num_inputs)
                     for i in inputs:
                         assert len(i) == input_len
