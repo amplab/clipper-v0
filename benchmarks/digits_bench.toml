@@ -4,7 +4,7 @@ window_size = 100
 load_generator = "uniform"
 input_type = "float"
 request_generator = "balanced"
-results_path = "/tmp/benchmarking_logs"
+results_path = "/crankshaw-local/clipper/benchmarks"
 num_update_workers = 1
 input_length = 784
 num_benchmark_requests = 1000000
@@ -12,7 +12,7 @@ redis_ip = "localhost"
 mnist_path = "/crankshaw-local/mnist/data/test.data"
 bench_batch_size = 500
 target_qps = 80000
-name = "tf-mnist-convnet-eval"
+name = "digits-bench-python-noop"
 wait_to_end = true
 salt_cache = true
 num_predict_workers = 8
@@ -29,6 +29,6 @@ batch_size = 250
 [[models]]
 version = 1
 num_outputs = 1
-name = "noop-rust"
+name = "noop-python"
 addresses = [ "127.0.0.1:7777"]
 
