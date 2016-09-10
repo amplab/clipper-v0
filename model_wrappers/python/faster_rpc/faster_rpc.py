@@ -74,13 +74,16 @@ class ModelWrapperServer:
             lib.wait_for_connection(self.obj)
             self.handle_connection()
 
+    def serve_once(self):
+        lib.wait_for_connection(self.obj)
+        self.handle_connection()
+
 
     def handle_connection(self):
         print("new connection (Python)")
         shutdown = False
         while not shutdown:
             header = lib.get_next_request_header(self.obj)
-            print("got header: %s (Python)" % header)
             if header.code == SHUTDOWN_CODE:
                 shutdown = True
                 lib.send_shutdown_message(self.obj)
@@ -91,22 +94,20 @@ class ModelWrapperServer:
                 buffer_pointer = input_buffer.ctypes.data_as(POINTER(c_double))
                 lib.get_fixed_floats_payload(self.obj, buffer_pointer, c_uint32(len(input_buffer)))
                 input_buffer = input_buffer.reshape(header.num_inputs, header.input_len)
-                print("got payload: shape: %s, buffer: %s (PYTHON)" % (input_buffer.shape, input_buffer))
                 if np.sum(input_buffer) == 0.0:
                     print("Uh oh, input buffer is still zeroed")
                 preds = self.model.predict_floats(input_buffer)
-                print("got preds: %s (PYTHON)" % preds)
                 assert preds.dtype == np.dtype("float64")
                 response_buffer_ptr = preds.ctypes.data_as(POINTER(c_double))
                 lib.send_response(self.obj, response_buffer_ptr, c_uint32(len(preds)))
-                print("sent response: (PYTHON)")
 
 
 def start(model, port):
     ip = "0.0.0.0"
     with ModelWrapperServer(ip, port, model) as server:
         print("Starting to serve (Python)", file=sys.stderr)
-        server.serve_forever()
+        # server.serve_forever()
+        server.serve_once()
 
 class ModelWrapperBase(object):
     def predict_ints(self, inputs):

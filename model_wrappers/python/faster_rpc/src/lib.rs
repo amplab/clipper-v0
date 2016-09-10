@@ -45,7 +45,7 @@ impl ModelWrapperServer {
             stream: None,
             header: None,
         };
-        println!("Starting to serve");
+        println!("Starting to serve (Rust)");
         mw
     }
 
@@ -55,7 +55,7 @@ impl ModelWrapperServer {
             Some(_) => println!("Already listening on a stream"),
             None => {
                 self.stream = Some(self.listener.accept().unwrap().0);
-                println!("Handling new connection");
+                println!("Handling new connection (Rust)");
             }
         };
     }
@@ -68,9 +68,6 @@ impl ModelWrapperServer {
         self.stream.as_ref().unwrap().read_exact(&mut header_buffer).unwrap();
         let mut header_cursor = Cursor::new(header_buffer);
         let code = header_cursor.read_u8().unwrap();
-        // self.header = Some(header_buffer);
-        // println!("read type code");
-        // assert_eq!(code, FIXEDFLOAT_CODE);
         let num_inputs = header_cursor.read_u32::<LittleEndian>().unwrap();
         let input_len = header_cursor.read_u32::<LittleEndian>().unwrap();
         let h = Header {
@@ -192,7 +189,6 @@ pub extern "C" fn send_response(ptr: *mut ModelWrapperServer,
         // v[..].clone_from_slice(slice);
         slice
     };
-    println!("SENDING RESPONSE: {:?} (Rust)", response_buffer);
     server.send_response(response_buffer);
 }
 
@@ -204,48 +200,3 @@ pub extern "C" fn send_shutdown_message(ptr: *mut ModelWrapperServer) {
     };
     server.send_shutdown_message();
 }
-
-
-
-// fn start_listening() {
-//     let listener = TcpListener::bind("0.0.0.0:7777").unwrap();
-//     let (mut stream, _) = listener.accept().unwrap();
-//     // let mut response_message: Vec<u8> = Vec::new();
-//     // for i in 0..100 {
-//     //     response_message.write_u32::<LittleEndian>(i).unwrap();
-//     // }
-//     // assert_eq!(response_message.len(), 100 * mem::size_of::<u32>());
-//     loop {
-//         let header_bytes = 2 * mem::size_of::<u32>() + 1;
-//         let mut header_buffer: Vec<u8> = vec![0; header_bytes];
-//         stream.read_exact(&mut header_buffer).unwrap();
-//         let mut header_cursor = Cursor::new(header_buffer);
-//         let code = header_cursor.read_u8().unwrap();
-//         // println!("read type code");
-//         assert_eq!(code, FIXEDFLOAT_CODE);
-//         let num_inputs = header_cursor.read_u32::<LittleEndian>().unwrap() as usize;
-//         let input_len = header_cursor.read_u32::<LittleEndian>().unwrap() as usize;
-//         assert_eq!(input_len, 784);
-//         // println!("read header");
-//
-//         let payload_bytes = num_inputs * input_len * mem::size_of::<f64>();
-//         let mut payload_buffer: Vec<u8> = vec![0; payload_bytes];
-//         stream.read_exact(&mut payload_buffer).unwrap();
-//         let mut cursor = Cursor::new(payload_buffer);
-//         let mut inputs = Vec::with_capacity(num_inputs);
-//         for _ in 0..num_inputs {
-//             let mut cur_input = Vec::with_capacity(input_len as usize);
-//             for _ in 0..input_len {
-//                 cur_input.push(cursor.read_f64::<LittleEndian>().unwrap());
-//             }
-//             inputs.push(cur_input);
-//         }
-//         let mut response_message: Vec<u8> = Vec::new();
-//         for _ in 0..num_inputs {
-//             response_message.write_f64::<LittleEndian>(1.0).unwrap();
-//         }
-//         // thread::sleep(Duration::from_millis(15));
-//         stream.write_all(&response_message[..]).unwrap();
-//         stream.flush();
-//     }
-// }
