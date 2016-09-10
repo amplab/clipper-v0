@@ -1,15 +1,15 @@
 services:
   clipper:
     cpuset: 2-21
-    depends_on: [redis, quantilereg, cpp-noop_r0]
+    depends_on: [redis, quantilereg, noop_r0]
     environment: {CLIPPER_BENCH_COMMAND: thruput, CLIPPER_CONF_PATH: /tmp/exp_conf.toml}
     image: cl-dev-digits
     volumes: ['${MNIST_PATH}:/mnist_data:ro', '${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro',
       '${CLIPPER_ROOT}/benchmarking_logs/rpc_latency_breakdown:/tmp/benchmarking_logs']
-  cpp-noop_r0:
-    # cpuset: 22-22
-    image: clipper/cpp-noop-mw
-    # volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
+  noop_r0:
+    cpuset: 22-22
+    image: clipper/noop-mw
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
   quantilereg: {cpuset: 1-1, image: clipper/quantile-reg}
   redis: {cpuset: 0-0, image: 'redis:alpine'}
 version: '2'

@@ -106,8 +106,9 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                     total_bytes_expected = 8*input_len*num_inputs
                     while len(data) < total_bytes_expected:
                         data += self.request.recv(RECV_SIZE)
-                        print("Received %d bytes of %d expected" % (len(data), total_bytes_expected))
-                    input_doubles = np.array(array.array('d', bytes(data[:total_bytes_expected])))
+                        # print("Received %d bytes of %d expected" % (len(data), total_bytes_expected))
+                    # input_doubles = np.array(array.array('d', bytes(data[:total_bytes_expected])))
+                    input_doubles = np.array(array.array('d', bytes(data)))
                     inputs = np.split(input_doubles, num_inputs)
                     for i in inputs:
                         assert len(i) == input_len
@@ -126,7 +127,7 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
             elif input_type == STRING_CODE:
                 raise NotImplementedError
             else:
-                raise RuntimeError("Invalid input type: " + input)
+                raise RuntimeError("Invalid input type: %d" % input_type)
 
             t2 = datetime.now()
             recv_time_buf.append((t2 - t1).microseconds)

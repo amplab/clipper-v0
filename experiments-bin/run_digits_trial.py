@@ -369,7 +369,7 @@ if __name__=='__main__':
                                     num_requests=num_reqs,
                                     # message_size=message_size,
                                     batch_size = 250)
-    benchmarker.add_cpp_noop(num_replicas=num_reps)
+    benchmarker.add_noop(num_replicas=num_reps)
     # benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
     # benchmarker.add_spark_svm(num_replicas=num_reps)
     # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)

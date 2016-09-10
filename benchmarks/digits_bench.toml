@@ -23,12 +23,12 @@ correction_policy = "logistic_regression"
 send_updates = false
 
 [batching]
-strategy = "aimd"
-batch_size = 64
+strategy = "static"
+batch_size = 250
 
 [[models]]
 version = 1
 num_outputs = 1
-name = "noop"
-addresses = [ "127.0.0.1:6001"]
+name = "noop-rust"
+addresses = [ "127.0.0.1:7777"]
 

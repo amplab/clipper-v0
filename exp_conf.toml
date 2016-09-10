@@ -12,7 +12,7 @@ num_benchmark_requests = 25000000
 redis_ip = "redis"
 mnist_path = "/mnist_data/test.data"
 target_qps = 1000000
-name = "latency_breakdown_160909-182718"
+name = "latency_breakdown_160910-005620"
 wait_to_end = false
 salt_cache = true
 num_predict_workers = 8
@@ -24,8 +24,8 @@ send_updates = true
 [[models]]
 version = 1
 num_outputs = 1
-name = "cpp-noop"
-addresses = [ "cpp-noop_r0:6001",]
+name = "noop"
+addresses = [ "noop_r0:6001",]
 [batching]
 batch_size = 250
 strategy = "static"
