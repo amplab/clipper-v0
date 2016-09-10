@@ -1,0 +1,883 @@
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 10
+num_benchmark_requests = 3000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 100000
+name = "DEBUG_caching_off_message_10_160909-112500"
+wait_to_end = false
+INFO:clipper::configuration: noop_r0:6001
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 1
+strategy = "static"
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 10
+num_benchmark_requests = 3000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 100000
+name = "DEBUG_caching_off_message_10_160909-112500"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 1
+strategy = "static"
+INFO:clipper::batching: Connected to noop model wrapper at V4(172.21.0.4:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "DEBUG_caching_off_message_10_160909-112500",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 2
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 11724,
+      "max": 11724,
+      "mean": 11724.0,
+      "std": null,
+      "p95": 11724.0,
+      "p99": 11724.0,
+      "p50": 11724.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 287,
+      "max": 779,
+      "mean": 533.0,
+      "std": 347.8965363437814,
+      "p95": 779.0,
+      "p99": 779.0,
+      "p50": 533.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04995376778791229,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 0.09990756052961997,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: Submitted 1000000 requests
+INFO:clipper_benchmarks: Submitted 1020000 requests
+INFO:clipper_benchmarks: Submitted 1040000 requests
+INFO:clipper_benchmarks: Submitted 1060000 requests
+INFO:clipper_benchmarks: Submitted 1080000 requests
+INFO:clipper_benchmarks: Submitted 1100000 requests
+INFO:clipper_benchmarks: Submitted 1120000 requests
+INFO:clipper_benchmarks: Submitted 1140000 requests
+INFO:clipper_benchmarks: Submitted 1160000 requests
+INFO:clipper_benchmarks: Submitted 1180000 requests
+INFO:clipper_benchmarks: Submitted 1200000 requests
+INFO:clipper_benchmarks: Submitted 1220000 requests
+INFO:clipper_benchmarks: Submitted 1240000 requests
+INFO:clipper_benchmarks: Submitted 1260000 requests
+INFO:clipper_benchmarks: Submitted 1280000 requests
+INFO:clipper_benchmarks: Submitted 1300000 requests
+INFO:clipper_benchmarks: Submitted 1320000 requests
+INFO:clipper_benchmarks: Submitted 1340000 requests
+INFO:clipper_benchmarks: Submitted 1360000 requests
+INFO:clipper_benchmarks: Submitted 1380000 requests
+INFO:clipper_benchmarks: Submitted 1400000 requests
+INFO:clipper_benchmarks: Submitted 1420000 requests
+INFO:clipper_benchmarks: Submitted 1440000 requests
+INFO:clipper_benchmarks: Submitted 1460000 requests
+INFO:clipper_benchmarks: Submitted 1480000 requests
+INFO:clipper_benchmarks: Submitted 1500000 requests
+INFO:clipper_benchmarks: Submitted 1520000 requests
+INFO:clipper_benchmarks: Submitted 1540000 requests
+INFO:clipper_benchmarks: Submitted 1560000 requests
+INFO:clipper_benchmarks: Submitted 1580000 requests
+INFO:clipper_benchmarks: Submitted 1600000 requests
+INFO:clipper_benchmarks: Submitted 1620000 requests
+INFO:clipper_benchmarks: Submitted 1640000 requests
+INFO:clipper_benchmarks: Submitted 1660000 requests
+INFO:clipper_benchmarks: Submitted 1680000 requests
+INFO:clipper_benchmarks: Submitted 1700000 requests
+INFO:clipper_benchmarks: Submitted 1720000 requests
+INFO:clipper_benchmarks: Submitted 1740000 requests
+INFO:clipper_benchmarks: Submitted 1760000 requests
+INFO:clipper_benchmarks: Submitted 1780000 requests
+INFO:clipper_benchmarks: Submitted 1800000 requests
+INFO:clipper_benchmarks: Submitted 1820000 requests
+INFO:clipper_benchmarks: Submitted 1840000 requests
+INFO:clipper_benchmarks: Submitted 1860000 requests
+INFO:clipper_benchmarks: Submitted 1880000 requests
+INFO:clipper_benchmarks: Submitted 1900000 requests
+INFO:clipper_benchmarks: Submitted 1920000 requests
+INFO:clipper_benchmarks: Submitted 1940000 requests
+INFO:clipper_benchmarks: Submitted 1960000 requests
+INFO:clipper_benchmarks: Submitted 1980000 requests
+INFO:clipper_benchmarks: Submitted 2000000 requests
+INFO:clipper_benchmarks: Submitted 2020000 requests
+INFO:clipper_benchmarks: Submitted 2040000 requests
+INFO:clipper_benchmarks: Submitted 2060000 requests
+INFO:clipper_benchmarks: Submitted 2080000 requests
+INFO:clipper_benchmarks: Submitted 2100000 requests
+INFO:clipper_benchmarks: Submitted 2120000 requests
+INFO:clipper_benchmarks: Submitted 2140000 requests
+INFO:clipper_benchmarks: Submitted 2160000 requests
+INFO:clipper_benchmarks: Submitted 2180000 requests
+INFO:clipper_benchmarks: Submitted 2200000 requests
+INFO:clipper_benchmarks: Submitted 2220000 requests
+INFO:clipper_benchmarks: Submitted 2240000 requests
+INFO:clipper_benchmarks: Submitted 2260000 requests
+INFO:clipper_benchmarks: Submitted 2280000 requests
+INFO:clipper_benchmarks: Submitted 2300000 requests
+INFO:clipper_benchmarks: Submitted 2320000 requests
+INFO:clipper_benchmarks: Submitted 2340000 requests
+INFO:clipper_benchmarks: Submitted 2360000 requests
+INFO:clipper_benchmarks: Submitted 2380000 requests
+INFO:clipper_benchmarks: Submitted 2400000 requests
+INFO:clipper_benchmarks: Submitted 2420000 requests
+INFO:clipper_benchmarks: Submitted 2440000 requests
+INFO:clipper_benchmarks: Submitted 2460000 requests
+INFO:clipper_benchmarks: Submitted 2480000 requests
+INFO:clipper_benchmarks: Submitted 2500000 requests
+INFO:clipper_benchmarks: Submitted 2520000 requests
+INFO:clipper_benchmarks: Submitted 2540000 requests
+INFO:clipper_benchmarks: Submitted 2560000 requests
+INFO:clipper_benchmarks: Submitted 2580000 requests
+INFO:clipper_benchmarks: Submitted 2600000 requests
+INFO:clipper_benchmarks: Submitted 2620000 requests
+INFO:clipper_benchmarks: Submitted 2640000 requests
+INFO:clipper_benchmarks: Submitted 2660000 requests
+INFO:clipper_benchmarks: Submitted 2680000 requests
+INFO:clipper_benchmarks: Submitted 2700000 requests
+INFO:clipper_benchmarks: Submitted 2720000 requests
+INFO:clipper_benchmarks: Submitted 2740000 requests
+INFO:clipper_benchmarks: Submitted 2760000 requests
+INFO:clipper_benchmarks: Submitted 2780000 requests
+INFO:clipper_benchmarks: Submitted 2800000 requests
+INFO:clipper_benchmarks: Submitted 2820000 requests
+INFO:clipper_benchmarks: Submitted 2840000 requests
+INFO:clipper_benchmarks: Submitted 2860000 requests
+INFO:clipper_benchmarks: Submitted 2880000 requests
+INFO:clipper_benchmarks: Submitted 2900000 requests
+INFO:clipper_benchmarks: Submitted 2920000 requests
+INFO:clipper_benchmarks: Submitted 2940000 requests
+INFO:clipper_benchmarks: Submitted 2960000 requests
+INFO:clipper_benchmarks: Submitted 2980000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/DEBUG_caching_off_message_10_160909-112500_batch_10_results.json
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 20
+num_benchmark_requests = 3000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 100000
+name = "DEBUG_caching_off_message_20_160909-112542"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+INFO:clipper::configuration: noop_r0:6001
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 1
+strategy = "static"
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 20
+num_benchmark_requests = 3000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 100000
+name = "DEBUG_caching_off_message_20_160909-112542"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 1
+strategy = "static"
+INFO:clipper::batching: Connected to noop model wrapper at V4(172.21.0.2:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "DEBUG_caching_off_message_20_160909-112542",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 2
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 7775,
+      "max": 7775,
+      "mean": 7775.0,
+      "std": null,
+      "p95": 7775.0,
+      "p99": 7775.0,
+      "p50": 7775.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 358,
+      "max": 787,
+      "mean": 572.5,
+      "std": 303.3488091290289,
+      "p95": 787.0,
+      "p99": 787.0,
+      "p50": 572.5
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.049954049767321529,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 0.09990814944280975,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: Submitted 1000000 requests
+INFO:clipper_benchmarks: Submitted 1020000 requests
+INFO:clipper_benchmarks: Submitted 1040000 requests
+INFO:clipper_benchmarks: Submitted 1060000 requests
+INFO:clipper_benchmarks: Submitted 1080000 requests
+INFO:clipper_benchmarks: Submitted 1100000 requests
+INFO:clipper_benchmarks: Submitted 1120000 requests
+INFO:clipper_benchmarks: Submitted 1140000 requests
+INFO:clipper_benchmarks: Submitted 1160000 requests
+INFO:clipper_benchmarks: Submitted 1180000 requests
+INFO:clipper_benchmarks: Submitted 1200000 requests
+INFO:clipper_benchmarks: Submitted 1220000 requests
+INFO:clipper_benchmarks: Submitted 1240000 requests
+INFO:clipper_benchmarks: Submitted 1260000 requests
+INFO:clipper_benchmarks: Submitted 1280000 requests
+INFO:clipper_benchmarks: Submitted 1300000 requests
+INFO:clipper_benchmarks: Submitted 1320000 requests
+INFO:clipper_benchmarks: Submitted 1340000 requests
+INFO:clipper_benchmarks: Submitted 1360000 requests
+INFO:clipper_benchmarks: Submitted 1380000 requests
+INFO:clipper_benchmarks: Submitted 1400000 requests
+INFO:clipper_benchmarks: Submitted 1420000 requests
+INFO:clipper_benchmarks: Submitted 1440000 requests
+INFO:clipper_benchmarks: Submitted 1460000 requests
+INFO:clipper_benchmarks: Submitted 1480000 requests
+INFO:clipper_benchmarks: Submitted 1500000 requests
+INFO:clipper_benchmarks: Submitted 1520000 requests
+INFO:clipper_benchmarks: Submitted 1540000 requests
+INFO:clipper_benchmarks: Submitted 1560000 requests
+INFO:clipper_benchmarks: Submitted 1580000 requests
+INFO:clipper_benchmarks: Submitted 1600000 requests
+INFO:clipper_benchmarks: Submitted 1620000 requests
+INFO:clipper_benchmarks: Submitted 1640000 requests
+INFO:clipper_benchmarks: Submitted 1660000 requests
+INFO:clipper_benchmarks: Submitted 1680000 requests
+INFO:clipper_benchmarks: Submitted 1700000 requests
+INFO:clipper_benchmarks: Submitted 1720000 requests
+INFO:clipper_benchmarks: Submitted 1740000 requests
+INFO:clipper_benchmarks: Submitted 1760000 requests
+INFO:clipper_benchmarks: Submitted 1780000 requests
+INFO:clipper_benchmarks: Submitted 1800000 requests
+INFO:clipper_benchmarks: Submitted 1820000 requests
+INFO:clipper_benchmarks: Submitted 1840000 requests
+INFO:clipper_benchmarks: Submitted 1860000 requests
+INFO:clipper_benchmarks: Submitted 1880000 requests
+INFO:clipper_benchmarks: Submitted 1900000 requests
+INFO:clipper_benchmarks: Submitted 1920000 requests
+INFO:clipper_benchmarks: Submitted 1940000 requests
+INFO:clipper_benchmarks: Submitted 1960000 requests
+INFO:clipper_benchmarks: Submitted 1980000 requests
+INFO:clipper_benchmarks: Submitted 2000000 requests
+INFO:clipper_benchmarks: Submitted 2020000 requests
+INFO:clipper_benchmarks: Submitted 2040000 requests
+INFO:clipper_benchmarks: Submitted 2060000 requests
+INFO:clipper_benchmarks: Submitted 2080000 requests
+INFO:clipper_benchmarks: Submitted 2100000 requests
+INFO:clipper_benchmarks: Submitted 2120000 requests
+INFO:clipper_benchmarks: Submitted 2140000 requests
+INFO:clipper_benchmarks: Submitted 2160000 requests
+INFO:clipper_benchmarks: Submitted 2180000 requests
+INFO:clipper_benchmarks: Submitted 2200000 requests
+INFO:clipper_benchmarks: Submitted 2220000 requests
+INFO:clipper_benchmarks: Submitted 2240000 requests
+INFO:clipper_benchmarks: Submitted 2260000 requests
+INFO:clipper_benchmarks: Submitted 2280000 requests
+INFO:clipper_benchmarks: Submitted 2300000 requests
+INFO:clipper_benchmarks: Submitted 2320000 requests
+INFO:clipper_benchmarks: Submitted 2340000 requests
+INFO:clipper_benchmarks: Submitted 2360000 requests
+INFO:clipper_benchmarks: Submitted 2380000 requests
+INFO:clipper_benchmarks: Submitted 2400000 requests
+INFO:clipper_benchmarks: Submitted 2420000 requests
+INFO:clipper_benchmarks: Submitted 2440000 requests
+INFO:clipper_benchmarks: Submitted 2460000 requests
+INFO:clipper_benchmarks: Submitted 2480000 requests
+INFO:clipper_benchmarks: Submitted 2500000 requests
+INFO:clipper_benchmarks: Submitted 2520000 requests
+INFO:clipper_benchmarks: Submitted 2540000 requests
+INFO:clipper_benchmarks: Submitted 2560000 requests
+INFO:clipper_benchmarks: Submitted 2580000 requests
+INFO:clipper_benchmarks: Submitted 2600000 requests
+INFO:clipper_benchmarks: Submitted 2620000 requests
+INFO:clipper_benchmarks: Submitted 2640000 requests
+INFO:clipper_benchmarks: Submitted 2660000 requests
+INFO:clipper_benchmarks: Submitted 2680000 requests
+INFO:clipper_benchmarks: Submitted 2700000 requests
+INFO:clipper_benchmarks: Submitted 2720000 requests
+INFO:clipper_benchmarks: Submitted 2740000 requests
+INFO:clipper_benchmarks: {
+  "name": "DEBUG_caching_off_message_20_160909-112542",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 978418
+    },
+    {
+      "name": "queued_predictions",
+      "count": 1767099
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 118908
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 22027,
+      "max": 6307207,
+      "mean": 3214177.432636187,
+      "std": 1791025.08650429,
+      "p95": 5991341.7,
+      "p99": 6223679.72,
+      "p50": 3224761.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 73,
+      "max": 189,
+      "mean": 79.91755836575875,
+      "std": 7.148943589871954,
+      "p95": 90.0,
+      "p99": 103.0,
+      "p50": 79.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 97823.33048817705,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 11888.476981681886,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 12.01957026430434,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 2760000 requests
+INFO:clipper_benchmarks: Submitted 2780000 requests
+INFO:clipper_benchmarks: Submitted 2800000 requests
+INFO:clipper_benchmarks: Submitted 2820000 requests
+INFO:clipper_benchmarks: Submitted 2840000 requests
+INFO:clipper_benchmarks: Submitted 2860000 requests
+INFO:clipper_benchmarks: Submitted 2880000 requests
+INFO:clipper_benchmarks: Submitted 2900000 requests
+INFO:clipper_benchmarks: Submitted 2920000 requests
+INFO:clipper_benchmarks: Submitted 2940000 requests
+INFO:clipper_benchmarks: Submitted 2960000 requests
+INFO:clipper_benchmarks: Submitted 2980000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/DEBUG_caching_off_message_20_160909-112542_batch_20_results.json

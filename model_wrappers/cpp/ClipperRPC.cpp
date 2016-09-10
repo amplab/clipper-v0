@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
+#include <memory>
 #include "ClipperRPC.h"
 #include "Model.h"
 #define SHUTDOWN_CODE   0
@@ -43,7 +44,7 @@ void ClipperRPC::handle(int newsockfd) {
     vector<vector<string> > v_str;
     vector<double> predictions;
 
-    printf("Handling new connection\n");
+    fprintf(stderr, "Handling new connection\n");
     while (true) {
         bytes_read = 0;
         while (bytes_read < header_bytes) {
@@ -54,15 +55,18 @@ void ClipperRPC::handle(int newsockfd) {
             bytes_read += n;
         }
 
+        fprintf(stderr, "Read header\n");
+
         input_type = buffer[0];
         memcpy(&num_inputs, &buffer[1], 4);
         if (input_type == SHUTDOWN_CODE) {
-            printf("Shutting down connection\n");
+            fprintf(stderr, "Shutting down connection\n");
             shutdown_msg = 1234;
             write(newsockfd, &shutdown_msg, 4);
             return;
         }
         if (is_fixed_format(input_type)) {
+            fprintf(stderr, "AAAAAAAA\n");
             additional_header_bytes = 4;
             while (bytes_read < header_bytes + additional_header_bytes) {
                 n = read(newsockfd, &buffer[bytes_read], header_bytes);
@@ -71,6 +75,7 @@ void ClipperRPC::handle(int newsockfd) {
                 }
                 bytes_read += n;
             }
+            fprintf(stderr, "BBBBBBBBBBBBB\n");
             memcpy(&input_len, &buffer[header_bytes], additional_header_bytes);
             bytes_read -= (header_bytes + additional_header_bytes);
             if (input_type == FIXEDBYTE_CODE) {
@@ -94,12 +99,15 @@ void ClipperRPC::handle(int newsockfd) {
                     }
                 }
             } else if (input_type == FIXEDFLOAT_CODE) {
+                fprintf(stderr, "CCCCCCCCCCCCCCC\n");
                 total_bytes_expected = 8*input_len*num_inputs;
                 char data[total_bytes_expected];
                 memset(data, 0, total_bytes_expected);
                 memcpy(data, &buffer[header_bytes + additional_header_bytes],
                        bytes_read);
+
                 while (bytes_read < total_bytes_expected) {
+                    fprintf(stderr, "read %d bytes of %d expected bytes\n", bytes_read, total_bytes_expected);
                     n = read(newsockfd, &data[bytes_read], 256);
                     if (n < 0) {
                         error("ERROR reading from socket");
@@ -142,6 +150,7 @@ void ClipperRPC::handle(int newsockfd) {
             error("ERROR: Invalid input type");
         }
 
+        fprintf(stderr, "Read message\n");
         if (input_type == FIXEDBYTE_CODE || input_type == VARBYTE_CODE) {
             predictions = model->predict_bytes(v_byte);
         } else if (input_type == FIXEDFLOAT_CODE || input_type == VARFLOAT_CODE) {
@@ -159,6 +168,7 @@ void ClipperRPC::handle(int newsockfd) {
 }
 
 void ClipperRPC::serve_forever() {
+    fprintf(stderr, "Starting clipper rpc\n");
     int sockfd, newsockfd, pid;
     socklen_t clilen;
     struct sockaddr_in serv_addr, cli_addr;
@@ -182,7 +192,7 @@ void ClipperRPC::serve_forever() {
         }
         handle(newsockfd);
         close(newsockfd);
-        printf("Closing connection\n");
+        fprintf(stderr, "Closing connection\n");
     }
 }
 

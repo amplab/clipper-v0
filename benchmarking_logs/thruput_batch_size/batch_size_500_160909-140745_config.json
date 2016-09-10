@@ -1,0 +1,79 @@
+{
+    "clipper_conf": {
+        "salt_update_cache": true, 
+        "num_message_encodes": 1, 
+        "use_lsh": false, 
+        "window_size": -1, 
+        "load_generator": "uniform", 
+        "input_type": "float", 
+        "request_generator": "cached_updates", 
+        "results_path": "/tmp/benchmarking_logs", 
+        "num_update_workers": 1, 
+        "batching": {
+            "batch_size": 500, 
+            "strategy": "static"
+        }, 
+        "input_length": 400, 
+        "num_benchmark_requests": 10000000, 
+        "models": [
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "noop", 
+                "addresses": [
+                    "noop_r0:6001"
+                ]
+            }
+        ], 
+        "redis_ip": "redis", 
+        "mnist_path": "/mnist_data/test.data", 
+        "target_qps": 1000000, 
+        "name": "batch_size_500_160909-140745", 
+        "wait_to_end": false, 
+        "salt_cache": true, 
+        "num_predict_workers": 8, 
+        "redis_port": 6379, 
+        "cache_size": 1000000, 
+        "slo_micros": 20000, 
+        "correction_policy": "logistic_regression", 
+        "send_updates": true
+    }, 
+    "docker_compose_conf": {
+        "services": {
+            "quantilereg": {
+                "cpuset": "1-1", 
+                "image": "clipper/quantile-reg"
+            }, 
+            "clipper": {
+                "cpuset": "2-21", 
+                "depends_on": [
+                    "redis", 
+                    "quantilereg", 
+                    "noop_r0"
+                ], 
+                "image": "cl-dev-digits", 
+                "volumes": [
+                    "${MNIST_PATH}:/mnist_data:ro", 
+                    "${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro", 
+                    "${CLIPPER_ROOT}/benchmarking_logs/thruput_batch_size:/tmp/benchmarking_logs"
+                ], 
+                "environment": {
+                    "CLIPPER_CONF_PATH": "/tmp/exp_conf.toml", 
+                    "CLIPPER_BENCH_COMMAND": "thruput"
+                }
+            }, 
+            "noop_r0": {
+                "cpuset": "22-22", 
+                "image": "clipper/noop-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "redis": {
+                "cpuset": "0-0", 
+                "image": "redis:alpine"
+            }
+        }, 
+        "version": "2"
+    }
+}

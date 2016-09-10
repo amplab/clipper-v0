@@ -1,0 +1,24 @@
+Starting to serve
+HANDLING NEW CONNECTION kjsdhfjkdhs
+Mean recv time: 14959.059000 microseconds
+Mean recv time: 14664.266000 microseconds
+Mean recv time: 14674.969000 microseconds
+Mean recv time: 15009.371000 microseconds
+Traceback (most recent call last):
+  File "/opt/conda/lib/python2.7/SocketServer.py", line 290, in _handle_request_noblock
+    self.process_request(request, client_address)
+  File "/opt/conda/lib/python2.7/SocketServer.py", line 318, in process_request
+    self.finish_request(request, client_address)
+  File "/opt/conda/lib/python2.7/SocketServer.py", line 331, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/opt/conda/lib/python2.7/SocketServer.py", line 652, in __init__
+    self.handle()
+  File "/tmp/rpc.py", line 81, in handle
+    data += self.request.recv(4096)
+error: [Errno 104] Connection reset by peer
+Starting to serve
+HANDLING NEW CONNECTION kjsdhfjkdhs
+Mean recv time: 14676.536000 microseconds
+Mean recv time: 14581.335000 microseconds
+Mean recv time: 14397.562000 microseconds
+Mean recv time: 14410.666000 microseconds

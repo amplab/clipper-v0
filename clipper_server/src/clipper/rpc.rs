@@ -5,6 +5,7 @@ use std::io::{Read, Write, Cursor};
 use std::mem;
 use server::{Input, Output, InputType};
 use batching::RpcPredictRequest;
+use time;
 
 
 
@@ -55,7 +56,8 @@ const STRING_CODE: u8 = 7;
 pub fn send_batch(stream: &mut TcpStream,
                   inputs: &Vec<RpcPredictRequest>,
                   input_type: &InputType)
-                  -> Vec<Output> {
+                  -> (Vec<Output>, u64, u64, u64) {
+    let t1 = time::precise_time_ns();
     assert!(inputs.len() > 0);
     let message = match input_type {
         &InputType::Integer(l) => {
@@ -81,8 +83,12 @@ pub fn send_batch(stream: &mut TcpStream,
         }
         &InputType::Str => encode_strs(inputs),
     };
+    let t2 = time::precise_time_ns();
+    let ser_time = t2 - t1;
     stream.write_all(&message[..]).unwrap();
     stream.flush().unwrap();
+    let t3 = time::precise_time_ns();
+    let send_time = t3 - t2;
 
     let num_response_bytes = inputs.len() * mem::size_of::<Output>();
     let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
@@ -92,7 +98,9 @@ pub fn send_batch(stream: &mut TcpStream,
     for i in 0..inputs.len() {
         responses.push(cursor.read_f64::<LittleEndian>().unwrap());
     }
-    responses
+    let t4 = time::precise_time_ns();
+    let recv_time = t4 - t3;
+    (responses, ser_time, send_time, recv_time)
 }
 
 pub fn shutdown(stream: &mut TcpStream) -> bool {

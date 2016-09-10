@@ -1,0 +1,35 @@
+
+name = "thruput-test"
+correction_policy = "logistic_regression"
+redis_port = 6379
+salt_update_cache = false
+num_message_encodes = 1
+use_lsh = false
+window_size = 10
+# load_generator = "uniform"
+input_type = "float"
+# request_generator = "cached_updates"
+results_path = "/crankshaw-local/clipper/benchmarks/thruput_logs"
+num_update_workers = 1
+input_length = 20
+num_benchmark_requests = 2000000
+redis_ip = "localhost"
+bench_batch_size = 5
+target_qps = 100
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+cache_size = 1000000
+slo_micros = 20000
+
+
+[batching]
+strategy = "static"
+batch_size = 1
+
+[[models]]
+name = "pong"
+addresses = ["127.0.0.1:6001"]
+num_outputs = 1
+version = 1
+

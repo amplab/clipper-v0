@@ -1,6 +1,7 @@
 #ifndef __CLIPPERRPC_H__
 #define __CLIPPERRPC_H__
 #include "Model.h"
+#include <memory>
 
 class ClipperRPC {
     public:

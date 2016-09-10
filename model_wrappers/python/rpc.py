@@ -5,6 +5,7 @@ import SocketServer
 import numpy as np
 import time
 import datetime
+from datetime import datetime
 import sys
 import os
 
@@ -17,6 +18,9 @@ VARFLOAT_CODE = 5
 VARBYTE_CODE = 6
 STRING_CODE = 7
 
+TIMING_ON = True
+
+RECV_SIZE = 4096
 
 # class NoopModelWrapper(ModelWrapperBase):
 #
@@ -62,8 +66,12 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
 
 
     def handle(self):
-        print("HANDLING NEW CONNECTION", file=sys.stderr)
+        print("HANDLING NEW CONNECTION kjsdhfjkdhs", file=sys.stderr)
+        recv_time_buf = []
         while True:
+            if len(recv_time_buf) >= 1000:
+                print("Mean recv time: %f microseconds" % np.mean(np.array(recv_time_buf)), file=sys.stderr)
+                recv_time_buf = []
             header_bytes = 5
             data = ""
             # self.request.settimeout(0.5)
@@ -72,6 +80,7 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
             while len(data) < header_bytes:
                 data += self.request.recv(4096)
 
+            t1 = datetime.now()
             header, data = (data[:header_bytes], data[header_bytes:])
             input_type, num_inputs = struct.unpack("<BI", header)
             if input_type == SHUTDOWN_CODE:
@@ -81,14 +90,14 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
             if is_fixed_format(input_type):
                 additional_header_bytes = 4
                 while len(data) < additional_header_bytes:
-                    data += self.request.recv(4096)
+                    data += self.request.recv(RECV_SIZE)
                 input_len = struct.unpack("<I", data[:additional_header_bytes])[0]
                 data = data[additional_header_bytes:]
                 inputs = []
                 if input_type == FIXEDBYTE_CODE:
                     total_bytes_expected = input_len*num_inputs
                     while len(data) < total_bytes_expected:
-                        data += self.request.recv(4096)
+                        data += self.request.recv(RECV_SIZE)
                     input_bytes = np.array(array.array('B', bytes(data)))
                     inputs = np.split(input_bytes, num_inputs)
                     for i in inputs:
@@ -96,7 +105,8 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                 elif input_type == FIXEDFLOAT_CODE:
                     total_bytes_expected = 8*input_len*num_inputs
                     while len(data) < total_bytes_expected:
-                        data += self.request.recv(4096)
+                        data += self.request.recv(RECV_SIZE)
+                        print("Received %d bytes of %d expected" % (len(data), total_bytes_expected))
                     input_doubles = np.array(array.array('d', bytes(data[:total_bytes_expected])))
                     inputs = np.split(input_doubles, num_inputs)
                     for i in inputs:
@@ -105,7 +115,7 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                     assert input_type == FIXEDINT_CODE
                     total_bytes_expected = 4*input_len*num_inputs
                     while len(data) < total_bytes_expected:
-                        data += self.request.recv(4096)
+                        data += self.request.recv(RECV_SIZE)
                     input_ints = np.array(array.array('i', bytes(data)))
                     inputs = np.split(input_ints, num_inputs)
                     for i in inputs:
@@ -117,6 +127,9 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
                 raise NotImplementedError
             else:
                 raise RuntimeError("Invalid input type: " + input)
+
+            t2 = datetime.now()
+            recv_time_buf.append((t2 - t1).microseconds)
 
             if input_type == FIXEDINT_CODE or input_type == VARINT_CODE:
                 predictions = self.server.model.predict_ints(inputs)
@@ -135,6 +148,7 @@ class ClipperRpc(SocketServer.BaseRequestHandler):
 
 def start(model_wrapper, port):
     ip = "0.0.0.0"
+    # ip = "localhost"
     server = SocketServer.TCPServer((ip, port), ClipperRpc)
     server.model = model_wrapper
     # server.handle_request()

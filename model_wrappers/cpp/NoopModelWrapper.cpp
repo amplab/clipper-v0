@@ -1,4 +1,5 @@
 #include<vector>
+#include <memory>
 #include "ClipperRPC.h"
 #include "Model.h"
 
@@ -73,6 +74,6 @@ vector<double>& NoopModelWrapper::predict_strings(
 int main() {
     std::unique_ptr<Model> model(new NoopModelWrapper());
     ClipperRPC *clipper_rpc_server =
-        new ClipperRPC(model, (char *) "127.0.0.1", 6001);
+        new ClipperRPC(model, (char *) "0.0.0.0", 6001);
     clipper_rpc_server->serve_forever();
 }

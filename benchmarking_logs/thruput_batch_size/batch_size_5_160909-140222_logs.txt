@@ -1,0 +1,1041 @@
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 200000
+num_benchmark_requests = 20000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+target_qps = 1000000
+name = "batch_size_1_160909-140038"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+INFO:clipper::configuration: noop_r0:6001
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 1
+strategy = "static"
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 200000
+num_benchmark_requests = 20000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+target_qps = 1000000
+name = "batch_size_1_160909-140038"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 1
+strategy = "static"
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::batching: Connected to noop model wrapper at V4(172.21.0.3:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "batch_size_1_160909-140038",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 2
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 121171,
+      "max": 121171,
+      "mean": 121171.0,
+      "std": null,
+      "p95": 121171.0,
+      "p99": 121171.0,
+      "p50": 121171.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 26667,
+      "max": 40788,
+      "mean": 33727.5,
+      "std": 9985.054857135237,
+      "p95": 40788.0,
+      "p99": 40788.0,
+      "p50": 33727.5
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.049891249548796017,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 0.09978254390207421,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: {
+  "name": "batch_size_1_160909-140038",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 13399
+    },
+    {
+      "name": "queued_predictions",
+      "count": 37
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 420
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 19123,
+      "max": 51566,
+      "mean": 23907.58414396887,
+      "std": 2944.1245323857485,
+      "p95": 29519.45,
+      "p99": 34756.83,
+      "p50": 23135.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 15359,
+      "max": 38868,
+      "mean": 20899.966666666667,
+      "std": 2721.784767151016,
+      "p95": 24520.149999999998,
+      "p99": 28121.530000000053,
+      "p50": 21262.5
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 1339.6524941430194,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 41.989099629736127,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/batch_size_1_160909-140038_results.json
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 100000
+num_benchmark_requests = 40000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+target_qps = 1000000
+name = "batch_size_2_160909-140131"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+INFO:clipper::configuration: noop_r0:6001
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 2
+strategy = "static"
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 100000
+num_benchmark_requests = 40000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+target_qps = 1000000
+name = "batch_size_2_160909-140131"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 2
+strategy = "static"
+INFO:clipper::batching: Connected to noop model wrapper at V4(172.21.0.4:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "batch_size_2_160909-140131",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 2
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 68546,
+      "max": 68546,
+      "mean": 68546.0,
+      "std": null,
+      "p95": 68546.0,
+      "p99": 68546.0,
+      "p50": 68546.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 16319,
+      "max": 21564,
+      "mean": 18941.5,
+      "std": 3708.775067323442,
+      "p95": 21564.0,
+      "p99": 21564.0,
+      "p50": 18941.5
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04992110967038788,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 0.09984225921466675,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: {
+  "name": "batch_size_2_160909-140131",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 32357
+    },
+    {
+      "name": "queued_predictions",
+      "count": 66
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 827
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17828,
+      "max": 28403,
+      "mean": 20622.76629377432,
+      "std": 1317.0011633697503,
+      "p95": 22674.1,
+      "p99": 24618.319999999996,
+      "p50": 20928.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 17418,
+      "max": 38384,
+      "mean": 21861.451027811367,
+      "std": 1809.864890268047,
+      "p95": 24611.0,
+      "p99": 26561.040000000037,
+      "p50": 21588.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 2,
+      "mean": 1.997584541062802,
+      "std": 0.04914731871829909,
+      "p95": 2.0,
+      "p99": 2.0,
+      "p50": 2.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 3235.0476019859754,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 82.67562722509403,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 0.10020204740839429,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/batch_size_2_160909-140131_results.json
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 40000
+num_benchmark_requests = 100000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+INFO:clipper::configuration: noop_r0:6001
+target_qps = 1000000
+name = "batch_size_5_160909-140222"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 5
+strategy = "static"
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 40000
+num_benchmark_requests = 100000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+target_qps = 1000000
+name = "batch_size_5_160909-140222"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 5
+strategy = "static"
+INFO:clipper::batching: Connected to noop model wrapper at V4(172.21.0.3:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "batch_size_5_160909-140222",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 2
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 32609,
+      "max": 32609,
+      "mean": 32609.0,
+      "std": null,
+      "p95": 32609.0,
+      "p99": 32609.0,
+      "p50": 32609.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 6679,
+      "max": 9155,
+      "mean": 7917.0,
+      "std": 1750.7963902178918,
+      "p95": 9155.0,
+      "p99": 9155.0,
+      "p50": 7917.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04994561671523961,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 0.09989131325661115,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: {
+  "name": "batch_size_5_160909-140222",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 79302
+    },
+    {
+      "name": "queued_predictions",
+      "count": 174
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 2286
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17355,
+      "max": 26888,
+      "mean": 19558.382538910504,
+      "std": 1139.463343030829,
+      "p95": 21104.35,
+      "p99": 22107.639999999992,
+      "p50": 19651.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 7564,
+      "max": 41693,
+      "mean": 19146.59842519685,
+      "std": 2054.2235528221065,
+      "p95": 22020.0,
+      "p99": 22907.0,
+      "p50": 18998.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 5,
+      "mean": 4.991266375545852,
+      "std": 0.1869077254063987,
+      "p95": 5.0,
+      "p99": 5.0,
+      "p50": 5.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 7929.131896525179,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 228.54606312910154,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 0.1001891571286589,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/batch_size_5_160909-140222_results.json

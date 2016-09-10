@@ -1,0 +1,2674 @@
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 25000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+target_qps = 1000000
+name = "latency_breakdown_160909-180148"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 250
+strategy = "static"
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "cached_updates"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+input_length = 784
+num_benchmark_requests = 25000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+target_qps = 1000000
+name = "latency_breakdown_160909-180148"
+wait_to_end = false
+salt_cache = true
+num_predict_workers = 8
+redis_port = 6379
+cache_size = 1000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+send_updates = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
+[batching]
+batch_size = 250
+strategy = "static"
+INFO:clipper::configuration: noop_r0:6001
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::batching: Connected to noop model wrapper at V4(172.21.0.2:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 2
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 11728,
+      "max": 11728,
+      "mean": 11728.0,
+      "std": null,
+      "p95": 11728.0,
+      "p99": 11728.0,
+      "p50": 11728.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 518,
+      "max": 1120,
+      "mean": 819.0,
+      "std": 425.67828227430166,
+      "p95": 1120.0,
+      "p99": 1120.0,
+      "p50": 819.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 1,
+      "max": 1,
+      "mean": 1.0,
+      "std": 0.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 1199,
+      "max": 1566,
+      "mean": 1382.5,
+      "std": 259.50818869546296,
+      "p95": 1566.0,
+      "p99": 1566.0,
+      "p50": 1382.5
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 517825,
+      "max": 1122137,
+      "mean": 819981.0,
+      "std": 427313.1131524049,
+      "p95": 1122137.0,
+      "p99": 1122137.0,
+      "p50": 819981.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 6221,
+      "max": 41061,
+      "mean": 23641.0,
+      "std": 24635.600256539317,
+      "p95": 41061.0,
+      "p99": 41061.0,
+      "p50": 23641.0
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 33700,
+      "max": 67801,
+      "mean": 50750.5,
+      "std": 24113.048345242456,
+      "p95": 67801.0,
+      "p99": 67801.0,
+      "p50": 50750.5
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 475204,
+      "max": 1007100,
+      "mean": 741152.0,
+      "std": 376107.2684859999,
+      "p95": 1007100.0,
+      "p99": 1007100.0,
+      "p50": 741152.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04994733053994563,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 0.09989471596410962,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: Submitted 1000000 requests
+INFO:clipper_benchmarks: Submitted 1020000 requests
+INFO:clipper_benchmarks: Submitted 1040000 requests
+INFO:clipper_benchmarks: Submitted 1060000 requests
+INFO:clipper_benchmarks: Submitted 1080000 requests
+INFO:clipper_benchmarks: Submitted 1100000 requests
+INFO:clipper_benchmarks: Submitted 1120000 requests
+INFO:clipper_benchmarks: Submitted 1140000 requests
+INFO:clipper_benchmarks: Submitted 1160000 requests
+INFO:clipper_benchmarks: Submitted 1180000 requests
+INFO:clipper_benchmarks: Submitted 1200000 requests
+INFO:clipper_benchmarks: Submitted 1220000 requests
+INFO:clipper_benchmarks: Submitted 1240000 requests
+INFO:clipper_benchmarks: Submitted 1260000 requests
+INFO:clipper_benchmarks: Submitted 1280000 requests
+INFO:clipper_benchmarks: Submitted 1300000 requests
+INFO:clipper_benchmarks: Submitted 1320000 requests
+INFO:clipper_benchmarks: Submitted 1340000 requests
+INFO:clipper_benchmarks: Submitted 1360000 requests
+INFO:clipper_benchmarks: Submitted 1380000 requests
+INFO:clipper_benchmarks: Submitted 1400000 requests
+INFO:clipper_benchmarks: Submitted 1420000 requests
+INFO:clipper_benchmarks: Submitted 1440000 requests
+INFO:clipper_benchmarks: Submitted 1460000 requests
+INFO:clipper_benchmarks: Submitted 1480000 requests
+INFO:clipper_benchmarks: Submitted 1500000 requests
+INFO:clipper_benchmarks: Submitted 1520000 requests
+INFO:clipper_benchmarks: Submitted 1540000 requests
+INFO:clipper_benchmarks: Submitted 1560000 requests
+INFO:clipper_benchmarks: Submitted 1580000 requests
+INFO:clipper_benchmarks: Submitted 1600000 requests
+INFO:clipper_benchmarks: Submitted 1620000 requests
+INFO:clipper_benchmarks: Submitted 1640000 requests
+INFO:clipper_benchmarks: Submitted 1660000 requests
+INFO:clipper_benchmarks: Submitted 1680000 requests
+INFO:clipper_benchmarks: Submitted 1700000 requests
+INFO:clipper_benchmarks: Submitted 1720000 requests
+INFO:clipper_benchmarks: Submitted 1740000 requests
+INFO:clipper_benchmarks: Submitted 1760000 requests
+INFO:clipper_benchmarks: Submitted 1780000 requests
+INFO:clipper_benchmarks: Submitted 1800000 requests
+INFO:clipper_benchmarks: Submitted 1820000 requests
+INFO:clipper_benchmarks: Submitted 1840000 requests
+INFO:clipper_benchmarks: Submitted 1860000 requests
+INFO:clipper_benchmarks: Submitted 1880000 requests
+INFO:clipper_benchmarks: Submitted 1900000 requests
+INFO:clipper_benchmarks: Submitted 1920000 requests
+INFO:clipper_benchmarks: Submitted 1940000 requests
+INFO:clipper_benchmarks: Submitted 1960000 requests
+INFO:clipper_benchmarks: Submitted 1980000 requests
+INFO:clipper_benchmarks: Submitted 2000000 requests
+INFO:clipper_benchmarks: Submitted 2020000 requests
+INFO:clipper_benchmarks: Submitted 2040000 requests
+INFO:clipper_benchmarks: Submitted 2060000 requests
+INFO:clipper_benchmarks: Submitted 2080000 requests
+INFO:clipper_benchmarks: Submitted 2100000 requests
+INFO:clipper_benchmarks: Submitted 2120000 requests
+INFO:clipper_benchmarks: Submitted 2140000 requests
+INFO:clipper_benchmarks: Submitted 2160000 requests
+INFO:clipper_benchmarks: Submitted 2180000 requests
+INFO:clipper_benchmarks: Submitted 2200000 requests
+INFO:clipper_benchmarks: Submitted 2220000 requests
+INFO:clipper_benchmarks: Submitted 2240000 requests
+INFO:clipper_benchmarks: Submitted 2260000 requests
+INFO:clipper_benchmarks: Submitted 2280000 requests
+INFO:clipper_benchmarks: Submitted 2300000 requests
+INFO:clipper_benchmarks: Submitted 2320000 requests
+INFO:clipper_benchmarks: Submitted 2340000 requests
+INFO:clipper_benchmarks: Submitted 2360000 requests
+INFO:clipper_benchmarks: Submitted 2380000 requests
+INFO:clipper_benchmarks: Submitted 2400000 requests
+INFO:clipper_benchmarks: Submitted 2420000 requests
+INFO:clipper_benchmarks: Submitted 2440000 requests
+INFO:clipper_benchmarks: Submitted 2460000 requests
+INFO:clipper_benchmarks: Submitted 2480000 requests
+INFO:clipper_benchmarks: Submitted 2500000 requests
+INFO:clipper_benchmarks: Submitted 2520000 requests
+INFO:clipper_benchmarks: Submitted 2540000 requests
+INFO:clipper_benchmarks: Submitted 2560000 requests
+INFO:clipper_benchmarks: Submitted 2580000 requests
+INFO:clipper_benchmarks: Submitted 2600000 requests
+INFO:clipper_benchmarks: Submitted 2620000 requests
+INFO:clipper_benchmarks: Submitted 2640000 requests
+INFO:clipper_benchmarks: Submitted 2660000 requests
+INFO:clipper_benchmarks: Submitted 2680000 requests
+INFO:clipper_benchmarks: Submitted 2700000 requests
+INFO:clipper_benchmarks: Submitted 2720000 requests
+INFO:clipper_benchmarks: Submitted 2740000 requests
+INFO:clipper_benchmarks: Submitted 2760000 requests
+INFO:clipper_benchmarks: Submitted 2780000 requests
+INFO:clipper_benchmarks: Submitted 2800000 requests
+INFO:clipper_benchmarks: Submitted 2820000 requests
+INFO:clipper_benchmarks: Submitted 2840000 requests
+INFO:clipper_benchmarks: Submitted 2860000 requests
+INFO:clipper_benchmarks: Submitted 2880000 requests
+INFO:clipper_benchmarks: Submitted 2900000 requests
+INFO:clipper_benchmarks: Submitted 2920000 requests
+INFO:clipper_benchmarks: Submitted 2940000 requests
+INFO:clipper_benchmarks: Submitted 2960000 requests
+INFO:clipper_benchmarks: Submitted 2980000 requests
+INFO:clipper_benchmarks: Submitted 3000000 requests
+INFO:clipper_benchmarks: Submitted 3020000 requests
+INFO:clipper_benchmarks: Submitted 3040000 requests
+INFO:clipper_benchmarks: Submitted 3060000 requests
+INFO:clipper_benchmarks: Submitted 3080000 requests
+INFO:clipper_benchmarks: Submitted 3100000 requests
+INFO:clipper_benchmarks: Submitted 3120000 requests
+INFO:clipper_benchmarks: Submitted 3140000 requests
+INFO:clipper_benchmarks: Submitted 3160000 requests
+INFO:clipper_benchmarks: Submitted 3180000 requests
+INFO:clipper_benchmarks: Submitted 3200000 requests
+INFO:clipper_benchmarks: Submitted 3220000 requests
+INFO:clipper_benchmarks: Submitted 3240000 requests
+INFO:clipper_benchmarks: Submitted 3260000 requests
+INFO:clipper_benchmarks: Submitted 3280000 requests
+INFO:clipper_benchmarks: Submitted 3300000 requests
+INFO:clipper_benchmarks: Submitted 3320000 requests
+INFO:clipper_benchmarks: Submitted 3340000 requests
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 918443
+    },
+    {
+      "name": "queued_predictions",
+      "count": 2426944
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 133503
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.000015842706436443248
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 34616,
+      "max": 7184610,
+      "mean": 3658017.098978599,
+      "std": 2062053.061372585,
+      "p95": 6867685.35,
+      "p99": 7125552.32,
+      "p50": 3683694.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 14477,
+      "max": 39653,
+      "mean": 16286.07405155642,
+      "std": 1698.9232722646032,
+      "p95": 17958.0,
+      "p99": 22159.0,
+      "p50": 15881.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 3,
+      "max": 250,
+      "mean": 249.53831775700935,
+      "std": 10.67874121882789,
+      "p95": 250.0,
+      "p99": 250.0,
+      "p50": 250.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 3240,
+      "max": 78672,
+      "mean": 40861.31343283582,
+      "std": 8793.850838553899,
+      "p95": 56414.84999999999,
+      "p99": 69451.06999999999,
+      "p50": 39911.0
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 2860088,
+      "max": 39611264,
+      "mean": 16244046.418691589,
+      "std": 1738696.9008128963,
+      "p95": 17915616.2,
+      "p99": 21919223.959999995,
+      "p50": 15891834.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 37269,
+      "max": 1919756,
+      "mean": 1068225.4411214954,
+      "std": 168101.62541352839,
+      "p95": 1454928.5999999999,
+      "p99": 1642453.3199999992,
+      "p50": 1015647.0
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 88114,
+      "max": 989216,
+      "mean": 472868.9364485981,
+      "std": 63168.57421852418,
+      "p95": 595232.7999999999,
+      "p99": 671477.7599999998,
+      "p50": 458369.0
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 2730464,
+      "max": 36457966,
+      "mean": 14585894.813084113,
+      "std": 1619263.8354789883,
+      "p95": 16219535.2,
+      "p99": 19873163.239999989,
+      "p50": 14237075.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 91826.63182455249,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 13345.999918826155,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 1.8032245260975677,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 3360000 requests
+INFO:clipper_benchmarks: Submitted 3380000 requests
+INFO:clipper_benchmarks: Submitted 3400000 requests
+INFO:clipper_benchmarks: Submitted 3420000 requests
+INFO:clipper_benchmarks: Submitted 3440000 requests
+INFO:clipper_benchmarks: Submitted 3460000 requests
+INFO:clipper_benchmarks: Submitted 3480000 requests
+INFO:clipper_benchmarks: Submitted 3500000 requests
+INFO:clipper_benchmarks: Submitted 3520000 requests
+INFO:clipper_benchmarks: Submitted 3540000 requests
+INFO:clipper_benchmarks: Submitted 3560000 requests
+INFO:clipper_benchmarks: Submitted 3580000 requests
+INFO:clipper_benchmarks: Submitted 3600000 requests
+INFO:clipper_benchmarks: Submitted 3620000 requests
+INFO:clipper_benchmarks: Submitted 3640000 requests
+INFO:clipper_benchmarks: Submitted 3660000 requests
+INFO:clipper_benchmarks: Submitted 3680000 requests
+INFO:clipper_benchmarks: Submitted 3700000 requests
+INFO:clipper_benchmarks: Submitted 3720000 requests
+INFO:clipper_benchmarks: Submitted 3740000 requests
+INFO:clipper_benchmarks: Submitted 3760000 requests
+INFO:clipper_benchmarks: Submitted 3780000 requests
+INFO:clipper_benchmarks: Submitted 3800000 requests
+INFO:clipper_benchmarks: Submitted 3820000 requests
+INFO:clipper_benchmarks: Submitted 3840000 requests
+INFO:clipper_benchmarks: Submitted 3860000 requests
+INFO:clipper_benchmarks: Submitted 3880000 requests
+INFO:clipper_benchmarks: Submitted 3900000 requests
+INFO:clipper_benchmarks: Submitted 3920000 requests
+INFO:clipper_benchmarks: Submitted 3940000 requests
+INFO:clipper_benchmarks: Submitted 3960000 requests
+INFO:clipper_benchmarks: Submitted 3980000 requests
+INFO:clipper_benchmarks: Submitted 4000000 requests
+INFO:clipper_benchmarks: Submitted 4020000 requests
+INFO:clipper_benchmarks: Submitted 4040000 requests
+INFO:clipper_benchmarks: Submitted 4060000 requests
+INFO:clipper_benchmarks: Submitted 4080000 requests
+INFO:clipper_benchmarks: Submitted 4100000 requests
+INFO:clipper_benchmarks: Submitted 4120000 requests
+INFO:clipper_benchmarks: Submitted 4140000 requests
+INFO:clipper_benchmarks: Submitted 4160000 requests
+INFO:clipper_benchmarks: Submitted 4180000 requests
+INFO:clipper_benchmarks: Submitted 4200000 requests
+INFO:clipper_benchmarks: Submitted 4220000 requests
+INFO:clipper_benchmarks: Submitted 4240000 requests
+INFO:clipper_benchmarks: Submitted 4260000 requests
+INFO:clipper_benchmarks: Submitted 4280000 requests
+INFO:clipper_benchmarks: Submitted 4300000 requests
+INFO:clipper_benchmarks: Submitted 4320000 requests
+INFO:clipper_benchmarks: Submitted 4340000 requests
+INFO:clipper_benchmarks: Submitted 4360000 requests
+INFO:clipper_benchmarks: Submitted 4380000 requests
+INFO:clipper_benchmarks: Submitted 4400000 requests
+INFO:clipper_benchmarks: Submitted 4420000 requests
+INFO:clipper_benchmarks: Submitted 4440000 requests
+INFO:clipper_benchmarks: Submitted 4460000 requests
+INFO:clipper_benchmarks: Submitted 4480000 requests
+INFO:clipper_benchmarks: Submitted 4500000 requests
+INFO:clipper_benchmarks: Submitted 4520000 requests
+INFO:clipper_benchmarks: Submitted 4540000 requests
+INFO:clipper_benchmarks: Submitted 4560000 requests
+INFO:clipper_benchmarks: Submitted 4580000 requests
+INFO:clipper_benchmarks: Submitted 4600000 requests
+INFO:clipper_benchmarks: Submitted 4620000 requests
+INFO:clipper_benchmarks: Submitted 4640000 requests
+INFO:clipper_benchmarks: Submitted 4660000 requests
+INFO:clipper_benchmarks: Submitted 4680000 requests
+INFO:clipper_benchmarks: Submitted 4700000 requests
+INFO:clipper_benchmarks: Submitted 4720000 requests
+INFO:clipper_benchmarks: Submitted 4740000 requests
+INFO:clipper_benchmarks: Submitted 4760000 requests
+INFO:clipper_benchmarks: Submitted 4780000 requests
+INFO:clipper_benchmarks: Submitted 4800000 requests
+INFO:clipper_benchmarks: Submitted 4820000 requests
+INFO:clipper_benchmarks: Submitted 4840000 requests
+INFO:clipper_benchmarks: Submitted 4860000 requests
+INFO:clipper_benchmarks: Submitted 4880000 requests
+INFO:clipper_benchmarks: Submitted 4900000 requests
+INFO:clipper_benchmarks: Submitted 4920000 requests
+INFO:clipper_benchmarks: Submitted 4940000 requests
+INFO:clipper_benchmarks: Submitted 4960000 requests
+INFO:clipper_benchmarks: Submitted 4980000 requests
+INFO:clipper_benchmarks: Submitted 5000000 requests
+INFO:clipper_benchmarks: Submitted 5020000 requests
+INFO:clipper_benchmarks: Submitted 5040000 requests
+INFO:clipper_benchmarks: Submitted 5060000 requests
+INFO:clipper_benchmarks: Submitted 5080000 requests
+INFO:clipper_benchmarks: Submitted 5100000 requests
+INFO:clipper_benchmarks: Submitted 5120000 requests
+INFO:clipper_benchmarks: Submitted 5140000 requests
+INFO:clipper_benchmarks: Submitted 5160000 requests
+INFO:clipper_benchmarks: Submitted 5180000 requests
+INFO:clipper_benchmarks: Submitted 5200000 requests
+INFO:clipper_benchmarks: Submitted 5220000 requests
+INFO:clipper_benchmarks: Submitted 5240000 requests
+INFO:clipper_benchmarks: Submitted 5260000 requests
+INFO:clipper_benchmarks: Submitted 5280000 requests
+INFO:clipper_benchmarks: Submitted 5300000 requests
+INFO:clipper_benchmarks: Submitted 5320000 requests
+INFO:clipper_benchmarks: Submitted 5340000 requests
+INFO:clipper_benchmarks: Submitted 5360000 requests
+INFO:clipper_benchmarks: Submitted 5380000 requests
+INFO:clipper_benchmarks: Submitted 5400000 requests
+INFO:clipper_benchmarks: Submitted 5420000 requests
+INFO:clipper_benchmarks: Submitted 5440000 requests
+INFO:clipper_benchmarks: Submitted 5460000 requests
+INFO:clipper_benchmarks: Submitted 5480000 requests
+INFO:clipper_benchmarks: Submitted 5500000 requests
+INFO:clipper_benchmarks: Submitted 5520000 requests
+INFO:clipper_benchmarks: Submitted 5540000 requests
+INFO:clipper_benchmarks: Submitted 5560000 requests
+INFO:clipper_benchmarks: Submitted 5580000 requests
+INFO:clipper_benchmarks: Submitted 5600000 requests
+INFO:clipper_benchmarks: Submitted 5620000 requests
+INFO:clipper_benchmarks: Submitted 5640000 requests
+INFO:clipper_benchmarks: Submitted 5660000 requests
+INFO:clipper_benchmarks: Submitted 5680000 requests
+INFO:clipper_benchmarks: Submitted 5700000 requests
+INFO:clipper_benchmarks: Submitted 5720000 requests
+INFO:clipper_benchmarks: Submitted 5740000 requests
+INFO:clipper_benchmarks: Submitted 5760000 requests
+INFO:clipper_benchmarks: Submitted 5780000 requests
+INFO:clipper_benchmarks: Submitted 5800000 requests
+INFO:clipper_benchmarks: Submitted 5820000 requests
+INFO:clipper_benchmarks: Submitted 5840000 requests
+INFO:clipper_benchmarks: Submitted 5860000 requests
+INFO:clipper_benchmarks: Submitted 5880000 requests
+INFO:clipper_benchmarks: Submitted 5900000 requests
+INFO:clipper_benchmarks: Submitted 5920000 requests
+INFO:clipper_benchmarks: Submitted 5940000 requests
+INFO:clipper_benchmarks: Submitted 5960000 requests
+INFO:clipper_benchmarks: Submitted 5980000 requests
+INFO:clipper_benchmarks: Submitted 6000000 requests
+INFO:clipper_benchmarks: Submitted 6020000 requests
+INFO:clipper_benchmarks: Submitted 6040000 requests
+INFO:clipper_benchmarks: Submitted 6060000 requests
+INFO:clipper_benchmarks: Submitted 6080000 requests
+INFO:clipper_benchmarks: Submitted 6100000 requests
+INFO:clipper_benchmarks: Submitted 6120000 requests
+INFO:clipper_benchmarks: Submitted 6140000 requests
+INFO:clipper_benchmarks: Submitted 6160000 requests
+INFO:clipper_benchmarks: Submitted 6180000 requests
+INFO:clipper_benchmarks: Submitted 6200000 requests
+INFO:clipper_benchmarks: Submitted 6220000 requests
+INFO:clipper_benchmarks: Submitted 6240000 requests
+INFO:clipper_benchmarks: Submitted 6260000 requests
+INFO:clipper_benchmarks: Submitted 6280000 requests
+INFO:clipper_benchmarks: Submitted 6300000 requests
+INFO:clipper_benchmarks: Submitted 6320000 requests
+INFO:clipper_benchmarks: Submitted 6340000 requests
+INFO:clipper_benchmarks: Submitted 6360000 requests
+INFO:clipper_benchmarks: Submitted 6380000 requests
+INFO:clipper_benchmarks: Submitted 6400000 requests
+INFO:clipper_benchmarks: Submitted 6420000 requests
+INFO:clipper_benchmarks: Submitted 6440000 requests
+INFO:clipper_benchmarks: Submitted 6460000 requests
+INFO:clipper_benchmarks: Submitted 6480000 requests
+INFO:clipper_benchmarks: Submitted 6500000 requests
+INFO:clipper_benchmarks: Submitted 6520000 requests
+INFO:clipper_benchmarks: Submitted 6540000 requests
+INFO:clipper_benchmarks: Submitted 6560000 requests
+INFO:clipper_benchmarks: Submitted 6580000 requests
+INFO:clipper_benchmarks: Submitted 6600000 requests
+INFO:clipper_benchmarks: Submitted 6620000 requests
+INFO:clipper_benchmarks: Submitted 6640000 requests
+INFO:clipper_benchmarks: Submitted 6660000 requests
+INFO:clipper_benchmarks: Submitted 6680000 requests
+INFO:clipper_benchmarks: Submitted 6700000 requests
+INFO:clipper_benchmarks: Submitted 6720000 requests
+INFO:clipper_benchmarks: Submitted 6740000 requests
+INFO:clipper_benchmarks: Submitted 6760000 requests
+INFO:clipper_benchmarks: Submitted 6780000 requests
+INFO:clipper_benchmarks: Submitted 6800000 requests
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1859571
+    },
+    {
+      "name": "queued_predictions",
+      "count": 4948673
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 270003
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.000027466761179742926
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 34616,
+      "max": 14403178,
+      "mean": 7230562.412937744,
+      "std": 4122120.9600588774,
+      "p95": 13686042.2,
+      "p99": 14254833.59,
+      "p50": 7218410.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 14470,
+      "max": 39653,
+      "mean": 16084.47714007782,
+      "std": 1244.9487766035073,
+      "p95": 17752.0,
+      "p99": 19820.0,
+      "p50": 15789.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 3,
+      "max": 250,
+      "mean": 249.77150786308975,
+      "std": 7.512493448704864,
+      "p95": 250.0,
+      "p99": 250.0,
+      "p50": 250.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 3240,
+      "max": 78672,
+      "mean": 40466.807763401106,
+      "std": 8598.369149200078,
+      "p95": 56131.2,
+      "p99": 68630.97000000005,
+      "p50": 39766.0
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 2860088,
+      "max": 39611264,
+      "mean": 16070763.086031452,
+      "std": 1358066.782320852,
+      "p95": 17744053.099999999,
+      "p99": 19808243.56,
+      "p50": 15793838.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 37269,
+      "max": 1919756,
+      "mean": 1064156.5615171139,
+      "std": 149788.17223133424,
+      "p95": 1387794.2,
+      "p99": 1596462.3400000004,
+      "p50": 1023580.0
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 88114,
+      "max": 989216,
+      "mean": 471737.1961147086,
+      "std": 55262.25966530146,
+      "p95": 582893.6,
+      "p99": 661099.9600000001,
+      "p50": 460776.0
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 2730464,
+      "max": 36457966,
+      "mean": 14420667.396854764,
+      "std": 1266114.3842688893,
+      "p95": 16004960.6,
+      "p99": 17989092.860000004,
+      "p50": 14145987.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 92963.15162897215,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 13496.128153810163,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 2.8521596552909864,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 6820000 requests
+INFO:clipper_benchmarks: Submitted 6840000 requests
+INFO:clipper_benchmarks: Submitted 6860000 requests
+INFO:clipper_benchmarks: Submitted 6880000 requests
+INFO:clipper_benchmarks: Submitted 6900000 requests
+INFO:clipper_benchmarks: Submitted 6920000 requests
+INFO:clipper_benchmarks: Submitted 6940000 requests
+INFO:clipper_benchmarks: Submitted 6960000 requests
+INFO:clipper_benchmarks: Submitted 6980000 requests
+INFO:clipper_benchmarks: Submitted 7000000 requests
+INFO:clipper_benchmarks: Submitted 7020000 requests
+INFO:clipper_benchmarks: Submitted 7040000 requests
+INFO:clipper_benchmarks: Submitted 7060000 requests
+INFO:clipper_benchmarks: Submitted 7080000 requests
+INFO:clipper_benchmarks: Submitted 7100000 requests
+INFO:clipper_benchmarks: Submitted 7120000 requests
+INFO:clipper_benchmarks: Submitted 7140000 requests
+INFO:clipper_benchmarks: Submitted 7160000 requests
+INFO:clipper_benchmarks: Submitted 7180000 requests
+INFO:clipper_benchmarks: Submitted 7200000 requests
+INFO:clipper_benchmarks: Submitted 7220000 requests
+INFO:clipper_benchmarks: Submitted 7240000 requests
+INFO:clipper_benchmarks: Submitted 7260000 requests
+INFO:clipper_benchmarks: Submitted 7280000 requests
+INFO:clipper_benchmarks: Submitted 7300000 requests
+INFO:clipper_benchmarks: Submitted 7320000 requests
+INFO:clipper_benchmarks: Submitted 7340000 requests
+INFO:clipper_benchmarks: Submitted 7360000 requests
+INFO:clipper_benchmarks: Submitted 7380000 requests
+INFO:clipper_benchmarks: Submitted 7400000 requests
+INFO:clipper_benchmarks: Submitted 7420000 requests
+INFO:clipper_benchmarks: Submitted 7440000 requests
+INFO:clipper_benchmarks: Submitted 7460000 requests
+INFO:clipper_benchmarks: Submitted 7480000 requests
+INFO:clipper_benchmarks: Submitted 7500000 requests
+INFO:clipper_benchmarks: Submitted 7520000 requests
+INFO:clipper_benchmarks: Submitted 7540000 requests
+INFO:clipper_benchmarks: Submitted 7560000 requests
+INFO:clipper_benchmarks: Submitted 7580000 requests
+INFO:clipper_benchmarks: Submitted 7600000 requests
+INFO:clipper_benchmarks: Submitted 7620000 requests
+INFO:clipper_benchmarks: Submitted 7640000 requests
+INFO:clipper_benchmarks: Submitted 7660000 requests
+INFO:clipper_benchmarks: Submitted 7680000 requests
+INFO:clipper_benchmarks: Submitted 7700000 requests
+INFO:clipper_benchmarks: Submitted 7720000 requests
+INFO:clipper_benchmarks: Submitted 7740000 requests
+INFO:clipper_benchmarks: Submitted 7760000 requests
+INFO:clipper_benchmarks: Submitted 7780000 requests
+INFO:clipper_benchmarks: Submitted 7800000 requests
+INFO:clipper_benchmarks: Submitted 7820000 requests
+INFO:clipper_benchmarks: Submitted 7840000 requests
+INFO:clipper_benchmarks: Submitted 7860000 requests
+INFO:clipper_benchmarks: Submitted 7880000 requests
+INFO:clipper_benchmarks: Submitted 7900000 requests
+INFO:clipper_benchmarks: Submitted 7920000 requests
+INFO:clipper_benchmarks: Submitted 7940000 requests
+INFO:clipper_benchmarks: Submitted 7960000 requests
+INFO:clipper_benchmarks: Submitted 7980000 requests
+INFO:clipper_benchmarks: Submitted 8000000 requests
+INFO:clipper_benchmarks: Submitted 8020000 requests
+INFO:clipper_benchmarks: Submitted 8040000 requests
+INFO:clipper_benchmarks: Submitted 8060000 requests
+INFO:clipper_benchmarks: Submitted 8080000 requests
+INFO:clipper_benchmarks: Submitted 8100000 requests
+INFO:clipper_benchmarks: Submitted 8120000 requests
+INFO:clipper_benchmarks: Submitted 8140000 requests
+INFO:clipper_benchmarks: Submitted 8160000 requests
+INFO:clipper_benchmarks: Submitted 8180000 requests
+INFO:clipper_benchmarks: Submitted 8200000 requests
+INFO:clipper_benchmarks: Submitted 8220000 requests
+INFO:clipper_benchmarks: Submitted 8240000 requests
+INFO:clipper_benchmarks: Submitted 8260000 requests
+INFO:clipper_benchmarks: Submitted 8280000 requests
+INFO:clipper_benchmarks: Submitted 8300000 requests
+INFO:clipper_benchmarks: Submitted 8320000 requests
+INFO:clipper_benchmarks: Submitted 8340000 requests
+INFO:clipper_benchmarks: Submitted 8360000 requests
+INFO:clipper_benchmarks: Submitted 8380000 requests
+INFO:clipper_benchmarks: Submitted 8400000 requests
+INFO:clipper_benchmarks: Submitted 8420000 requests
+INFO:clipper_benchmarks: Submitted 8440000 requests
+INFO:clipper_benchmarks: Submitted 8460000 requests
+INFO:clipper_benchmarks: Submitted 8480000 requests
+INFO:clipper_benchmarks: Submitted 8500000 requests
+INFO:clipper_benchmarks: Submitted 8520000 requests
+INFO:clipper_benchmarks: Submitted 8540000 requests
+INFO:clipper_benchmarks: Submitted 8560000 requests
+INFO:clipper_benchmarks: Submitted 8580000 requests
+INFO:clipper_benchmarks: Submitted 8600000 requests
+INFO:clipper_benchmarks: Submitted 8620000 requests
+INFO:clipper_benchmarks: Submitted 8640000 requests
+INFO:clipper_benchmarks: Submitted 8660000 requests
+INFO:clipper_benchmarks: Submitted 8680000 requests
+INFO:clipper_benchmarks: Submitted 8700000 requests
+INFO:clipper_benchmarks: Submitted 8720000 requests
+INFO:clipper_benchmarks: Submitted 8740000 requests
+INFO:clipper_benchmarks: Submitted 8760000 requests
+INFO:clipper_benchmarks: Submitted 8780000 requests
+INFO:clipper_benchmarks: Submitted 8800000 requests
+INFO:clipper_benchmarks: Submitted 8820000 requests
+INFO:clipper_benchmarks: Submitted 8840000 requests
+INFO:clipper_benchmarks: Submitted 8860000 requests
+INFO:clipper_benchmarks: Submitted 8880000 requests
+INFO:clipper_benchmarks: Submitted 8900000 requests
+INFO:clipper_benchmarks: Submitted 8920000 requests
+INFO:clipper_benchmarks: Submitted 8940000 requests
+INFO:clipper_benchmarks: Submitted 8960000 requests
+INFO:clipper_benchmarks: Submitted 8980000 requests
+INFO:clipper_benchmarks: Submitted 9000000 requests
+INFO:clipper_benchmarks: Submitted 9020000 requests
+INFO:clipper_benchmarks: Submitted 9040000 requests
+INFO:clipper_benchmarks: Submitted 9060000 requests
+INFO:clipper_benchmarks: Submitted 9080000 requests
+INFO:clipper_benchmarks: Submitted 9100000 requests
+INFO:clipper_benchmarks: Submitted 9120000 requests
+INFO:clipper_benchmarks: Submitted 9140000 requests
+INFO:clipper_benchmarks: Submitted 9160000 requests
+INFO:clipper_benchmarks: Submitted 9180000 requests
+INFO:clipper_benchmarks: Submitted 9200000 requests
+INFO:clipper_benchmarks: Submitted 9220000 requests
+INFO:clipper_benchmarks: Submitted 9240000 requests
+INFO:clipper_benchmarks: Submitted 9260000 requests
+INFO:clipper_benchmarks: Submitted 9280000 requests
+INFO:clipper_benchmarks: Submitted 9300000 requests
+INFO:clipper_benchmarks: Submitted 9320000 requests
+INFO:clipper_benchmarks: Submitted 9340000 requests
+INFO:clipper_benchmarks: Submitted 9360000 requests
+INFO:clipper_benchmarks: Submitted 9380000 requests
+INFO:clipper_benchmarks: Submitted 9400000 requests
+INFO:clipper_benchmarks: Submitted 9420000 requests
+INFO:clipper_benchmarks: Submitted 9440000 requests
+INFO:clipper_benchmarks: Submitted 9460000 requests
+INFO:clipper_benchmarks: Submitted 9480000 requests
+INFO:clipper_benchmarks: Submitted 9500000 requests
+INFO:clipper_benchmarks: Submitted 9520000 requests
+INFO:clipper_benchmarks: Submitted 9540000 requests
+INFO:clipper_benchmarks: Submitted 9560000 requests
+INFO:clipper_benchmarks: Submitted 9580000 requests
+INFO:clipper_benchmarks: Submitted 9600000 requests
+INFO:clipper_benchmarks: Submitted 9620000 requests
+INFO:clipper_benchmarks: Submitted 9640000 requests
+INFO:clipper_benchmarks: Submitted 9660000 requests
+INFO:clipper_benchmarks: Submitted 9680000 requests
+INFO:clipper_benchmarks: Submitted 9700000 requests
+INFO:clipper_benchmarks: Submitted 9720000 requests
+INFO:clipper_benchmarks: Submitted 9740000 requests
+INFO:clipper_benchmarks: Submitted 9760000 requests
+INFO:clipper_benchmarks: Submitted 9780000 requests
+INFO:clipper_benchmarks: Submitted 9800000 requests
+INFO:clipper_benchmarks: Submitted 9820000 requests
+INFO:clipper_benchmarks: Submitted 9840000 requests
+INFO:clipper_benchmarks: Submitted 9860000 requests
+INFO:clipper_benchmarks: Submitted 9880000 requests
+INFO:clipper_benchmarks: Submitted 9900000 requests
+INFO:clipper_benchmarks: Submitted 9920000 requests
+INFO:clipper_benchmarks: Submitted 9940000 requests
+INFO:clipper_benchmarks: Submitted 9960000 requests
+INFO:clipper_benchmarks: Submitted 9980000 requests
+INFO:clipper_benchmarks: Submitted 10000000 requests
+INFO:clipper_benchmarks: Submitted 10020000 requests
+INFO:clipper_benchmarks: Submitted 10040000 requests
+INFO:clipper_benchmarks: Submitted 10060000 requests
+INFO:clipper_benchmarks: Submitted 10080000 requests
+INFO:clipper_benchmarks: Submitted 10100000 requests
+INFO:clipper_benchmarks: Submitted 10120000 requests
+INFO:clipper_benchmarks: Submitted 10140000 requests
+INFO:clipper_benchmarks: Submitted 10160000 requests
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 2783642
+    },
+    {
+      "name": "queued_predictions",
+      "count": 7384498
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 404253
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.00004071553120491419
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 34969,
+      "max": 21662504,
+      "mean": 10877329.422665369,
+      "std": 6218909.311923337,
+      "p95": 20564694.4,
+      "p99": 21390638.75,
+      "p50": 10923598.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 14470,
+      "max": 39653,
+      "mean": 16136.231395914398,
+      "std": 1147.7132424137224,
+      "p95": 17851.0,
+      "p99": 19155.75,
+      "p50": 15805.5
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 3,
+      "max": 250,
+      "mean": 249.84743668931439,
+      "std": 6.138659278649351,
+      "p95": 250.0,
+      "p99": 250.0,
+      "p50": 250.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 3240,
+      "max": 78672,
+      "mean": 40197.49289684991,
+      "std": 8687.198925629958,
+      "p95": 56086.0,
+      "p99": 68971.79999999998,
+      "p50": 39483.0
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 2860088,
+      "max": 39611264,
+      "mean": 16136829.639283508,
+      "std": 1238914.5955078635,
+      "p95": 17850439.0,
+      "p99": 19125093.0,
+      "p50": 15817633.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 37269,
+      "max": 1919756,
+      "mean": 1058984.5929586164,
+      "std": 149308.34008672427,
+      "p95": 1381320.0,
+      "p99": 1595023.4,
+      "p50": 1019642.0
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 88114,
+      "max": 989216,
+      "mean": 470079.8424953675,
+      "std": 53731.39320650002,
+      "p95": 581614.0,
+      "p99": 659876.5999999998,
+      "p50": 458710.0
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 2730464,
+      "max": 36457966,
+      "mean": 14495214.71155034,
+      "std": 1164641.7297708523,
+      "p95": 16138845.0,
+      "p99": 17323019.4,
+      "p50": 14167131.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 92768.79199165428,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 13479.750665451533,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 3.6682449902111218,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 10180000 requests
+INFO:clipper_benchmarks: Submitted 10200000 requests
+INFO:clipper_benchmarks: Submitted 10220000 requests
+INFO:clipper_benchmarks: Submitted 10240000 requests
+INFO:clipper_benchmarks: Submitted 10260000 requests
+INFO:clipper_benchmarks: Submitted 10280000 requests
+INFO:clipper_benchmarks: Submitted 10300000 requests
+INFO:clipper_benchmarks: Submitted 10320000 requests
+INFO:clipper_benchmarks: Submitted 10340000 requests
+INFO:clipper_benchmarks: Submitted 10360000 requests
+INFO:clipper_benchmarks: Submitted 10380000 requests
+INFO:clipper_benchmarks: Submitted 10400000 requests
+INFO:clipper_benchmarks: Submitted 10420000 requests
+INFO:clipper_benchmarks: Submitted 10440000 requests
+INFO:clipper_benchmarks: Submitted 10460000 requests
+INFO:clipper_benchmarks: Submitted 10480000 requests
+INFO:clipper_benchmarks: Submitted 10500000 requests
+INFO:clipper_benchmarks: Submitted 10520000 requests
+INFO:clipper_benchmarks: Submitted 10540000 requests
+INFO:clipper_benchmarks: Submitted 10560000 requests
+INFO:clipper_benchmarks: Submitted 10580000 requests
+INFO:clipper_benchmarks: Submitted 10600000 requests
+INFO:clipper_benchmarks: Submitted 10620000 requests
+INFO:clipper_benchmarks: Submitted 10640000 requests
+INFO:clipper_benchmarks: Submitted 10660000 requests
+INFO:clipper_benchmarks: Submitted 10680000 requests
+INFO:clipper_benchmarks: Submitted 10700000 requests
+INFO:clipper_benchmarks: Submitted 10720000 requests
+INFO:clipper_benchmarks: Submitted 10740000 requests
+INFO:clipper_benchmarks: Submitted 10760000 requests
+INFO:clipper_benchmarks: Submitted 10780000 requests
+INFO:clipper_benchmarks: Submitted 10800000 requests
+INFO:clipper_benchmarks: Submitted 10820000 requests
+INFO:clipper_benchmarks: Submitted 10840000 requests
+INFO:clipper_benchmarks: Submitted 10860000 requests
+INFO:clipper_benchmarks: Submitted 10880000 requests
+INFO:clipper_benchmarks: Submitted 10900000 requests
+INFO:clipper_benchmarks: Submitted 10920000 requests
+INFO:clipper_benchmarks: Submitted 10940000 requests
+INFO:clipper_benchmarks: Submitted 10960000 requests
+INFO:clipper_benchmarks: Submitted 10980000 requests
+INFO:clipper_benchmarks: Submitted 11000000 requests
+INFO:clipper_benchmarks: Submitted 11020000 requests
+INFO:clipper_benchmarks: Submitted 11040000 requests
+INFO:clipper_benchmarks: Submitted 11060000 requests
+INFO:clipper_benchmarks: Submitted 11080000 requests
+INFO:clipper_benchmarks: Submitted 11100000 requests
+INFO:clipper_benchmarks: Submitted 11120000 requests
+INFO:clipper_benchmarks: Submitted 11140000 requests
+INFO:clipper_benchmarks: Submitted 11160000 requests
+INFO:clipper_benchmarks: Submitted 11180000 requests
+INFO:clipper_benchmarks: Submitted 11200000 requests
+INFO:clipper_benchmarks: Submitted 11220000 requests
+INFO:clipper_benchmarks: Submitted 11240000 requests
+INFO:clipper_benchmarks: Submitted 11260000 requests
+INFO:clipper_benchmarks: Submitted 11280000 requests
+INFO:clipper_benchmarks: Submitted 11300000 requests
+INFO:clipper_benchmarks: Submitted 11320000 requests
+INFO:clipper_benchmarks: Submitted 11340000 requests
+INFO:clipper_benchmarks: Submitted 11360000 requests
+INFO:clipper_benchmarks: Submitted 11380000 requests
+INFO:clipper_benchmarks: Submitted 11400000 requests
+INFO:clipper_benchmarks: Submitted 11420000 requests
+INFO:clipper_benchmarks: Submitted 11440000 requests
+INFO:clipper_benchmarks: Submitted 11460000 requests
+INFO:clipper_benchmarks: Submitted 11480000 requests
+INFO:clipper_benchmarks: Submitted 11500000 requests
+INFO:clipper_benchmarks: Submitted 11520000 requests
+INFO:clipper_benchmarks: Submitted 11540000 requests
+INFO:clipper_benchmarks: Submitted 11560000 requests
+INFO:clipper_benchmarks: Submitted 11580000 requests
+INFO:clipper_benchmarks: Submitted 11600000 requests
+INFO:clipper_benchmarks: Submitted 11620000 requests
+INFO:clipper_benchmarks: Submitted 11640000 requests
+INFO:clipper_benchmarks: Submitted 11660000 requests
+INFO:clipper_benchmarks: Submitted 11680000 requests
+INFO:clipper_benchmarks: Submitted 11700000 requests
+INFO:clipper_benchmarks: Submitted 11720000 requests
+INFO:clipper_benchmarks: Submitted 11740000 requests
+INFO:clipper_benchmarks: Submitted 11760000 requests
+INFO:clipper_benchmarks: Submitted 11780000 requests
+INFO:clipper_benchmarks: Submitted 11800000 requests
+INFO:clipper_benchmarks: Submitted 11820000 requests
+INFO:clipper_benchmarks: Submitted 11840000 requests
+INFO:clipper_benchmarks: Submitted 11860000 requests
+INFO:clipper_benchmarks: Submitted 11880000 requests
+INFO:clipper_benchmarks: Submitted 11900000 requests
+INFO:clipper_benchmarks: Submitted 11920000 requests
+INFO:clipper_benchmarks: Submitted 11940000 requests
+INFO:clipper_benchmarks: Submitted 11960000 requests
+INFO:clipper_benchmarks: Submitted 11980000 requests
+INFO:clipper_benchmarks: Submitted 12000000 requests
+INFO:clipper_benchmarks: Submitted 12020000 requests
+INFO:clipper_benchmarks: Submitted 12040000 requests
+INFO:clipper_benchmarks: Submitted 12060000 requests
+INFO:clipper_benchmarks: Submitted 12080000 requests
+INFO:clipper_benchmarks: Submitted 12100000 requests
+INFO:clipper_benchmarks: Submitted 12120000 requests
+INFO:clipper_benchmarks: Submitted 12140000 requests
+INFO:clipper_benchmarks: Submitted 12160000 requests
+INFO:clipper_benchmarks: Submitted 12180000 requests
+INFO:clipper_benchmarks: Submitted 12200000 requests
+INFO:clipper_benchmarks: Submitted 12220000 requests
+INFO:clipper_benchmarks: Submitted 12240000 requests
+INFO:clipper_benchmarks: Submitted 12260000 requests
+INFO:clipper_benchmarks: Submitted 12280000 requests
+INFO:clipper_benchmarks: Submitted 12300000 requests
+INFO:clipper_benchmarks: Submitted 12320000 requests
+INFO:clipper_benchmarks: Submitted 12340000 requests
+INFO:clipper_benchmarks: Submitted 12360000 requests
+INFO:clipper_benchmarks: Submitted 12380000 requests
+INFO:clipper_benchmarks: Submitted 12400000 requests
+INFO:clipper_benchmarks: Submitted 12420000 requests
+INFO:clipper_benchmarks: Submitted 12440000 requests
+INFO:clipper_benchmarks: Submitted 12460000 requests
+INFO:clipper_benchmarks: Submitted 12480000 requests
+INFO:clipper_benchmarks: Submitted 12500000 requests
+INFO:clipper_benchmarks: Submitted 12520000 requests
+INFO:clipper_benchmarks: Submitted 12540000 requests
+INFO:clipper_benchmarks: Submitted 12560000 requests
+INFO:clipper_benchmarks: Submitted 12580000 requests
+INFO:clipper_benchmarks: Submitted 12600000 requests
+INFO:clipper_benchmarks: Submitted 12620000 requests
+INFO:clipper_benchmarks: Submitted 12640000 requests
+INFO:clipper_benchmarks: Submitted 12660000 requests
+INFO:clipper_benchmarks: Submitted 12680000 requests
+INFO:clipper_benchmarks: Submitted 12700000 requests
+INFO:clipper_benchmarks: Submitted 12720000 requests
+INFO:clipper_benchmarks: Submitted 12740000 requests
+INFO:clipper_benchmarks: Submitted 12760000 requests
+INFO:clipper_benchmarks: Submitted 12780000 requests
+INFO:clipper_benchmarks: Submitted 12800000 requests
+INFO:clipper_benchmarks: Submitted 12820000 requests
+INFO:clipper_benchmarks: Submitted 12840000 requests
+INFO:clipper_benchmarks: Submitted 12860000 requests
+INFO:clipper_benchmarks: Submitted 12880000 requests
+INFO:clipper_benchmarks: Submitted 12900000 requests
+INFO:clipper_benchmarks: Submitted 12920000 requests
+INFO:clipper_benchmarks: Submitted 12940000 requests
+INFO:clipper_benchmarks: Submitted 12960000 requests
+INFO:clipper_benchmarks: Submitted 12980000 requests
+INFO:clipper_benchmarks: Submitted 13000000 requests
+INFO:clipper_benchmarks: Submitted 13020000 requests
+INFO:clipper_benchmarks: Submitted 13040000 requests
+INFO:clipper_benchmarks: Submitted 13060000 requests
+INFO:clipper_benchmarks: Submitted 13080000 requests
+INFO:clipper_benchmarks: Submitted 13100000 requests
+INFO:clipper_benchmarks: Submitted 13120000 requests
+INFO:clipper_benchmarks: Submitted 13140000 requests
+INFO:clipper_benchmarks: Submitted 13160000 requests
+INFO:clipper_benchmarks: Submitted 13180000 requests
+INFO:clipper_benchmarks: Submitted 13200000 requests
+INFO:clipper_benchmarks: Submitted 13220000 requests
+INFO:clipper_benchmarks: Submitted 13240000 requests
+INFO:clipper_benchmarks: Submitted 13260000 requests
+INFO:clipper_benchmarks: Submitted 13280000 requests
+INFO:clipper_benchmarks: Submitted 13300000 requests
+INFO:clipper_benchmarks: Submitted 13320000 requests
+INFO:clipper_benchmarks: Submitted 13340000 requests
+INFO:clipper_benchmarks: Submitted 13360000 requests
+INFO:clipper_benchmarks: Submitted 13380000 requests
+INFO:clipper_benchmarks: Submitted 13400000 requests
+INFO:clipper_benchmarks: Submitted 13420000 requests
+INFO:clipper_benchmarks: Submitted 13440000 requests
+INFO:clipper_benchmarks: Submitted 13460000 requests
+INFO:clipper_benchmarks: Submitted 13480000 requests
+INFO:clipper_benchmarks: Submitted 13500000 requests
+INFO:clipper_benchmarks: Submitted 13520000 requests
+INFO:clipper_benchmarks: Submitted 13540000 requests
+INFO:clipper_benchmarks: Submitted 13560000 requests
+INFO:clipper_benchmarks: Submitted 13580000 requests
+INFO:clipper_benchmarks: Submitted 13600000 requests
+INFO:clipper_benchmarks: Submitted 13620000 requests
+INFO:clipper_benchmarks: Submitted 13640000 requests
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 3707965
+    },
+    {
+      "name": "queued_predictions",
+      "count": 9939643
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 543253
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.00005143758525303482
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 34969,
+      "max": 28907235,
+      "mean": 14274418.361624513,
+      "std": 8243392.974888989,
+      "p95": 27407888.65,
+      "p99": 28665635.55,
+      "p50": 14442858.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 14470,
+      "max": 39653,
+      "mean": 15997.724343385215,
+      "std": 1060.022989345376,
+      "p95": 17711.0,
+      "p99": 18406.0,
+      "p50": 15711.5
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 3,
+      "max": 250,
+      "mean": 249.8863845446182,
+      "std": 5.29745386759562,
+      "p95": 250.0,
+      "p99": 250.0,
+      "p50": 250.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 3240,
+      "max": 81750,
+      "mean": 40032.47494252874,
+      "std": 8615.241017547056,
+      "p95": 56087.0,
+      "p99": 67398.75999999998,
+      "p50": 39159.0
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 2860088,
+      "max": 39611264,
+      "mean": 16004108.375344987,
+      "std": 1125682.8349236896,
+      "p95": 17749736.0,
+      "p99": 18383019.5,
+      "p50": 15723469.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 37269,
+      "max": 1919756,
+      "mean": 1053816.2828886845,
+      "std": 150885.23789157859,
+      "p95": 1387080.5,
+      "p99": 1593275.5,
+      "p50": 1016303.5
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 88114,
+      "max": 989216,
+      "mean": 463343.5165593376,
+      "std": 54399.65302856794,
+      "p95": 578908.75,
+      "p99": 650832.5,
+      "p50": 452908.0
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 2730464,
+      "max": 36457966,
+      "mean": 14374886.909843607,
+      "std": 1051651.1713039384,
+      "p95": 16032087.25,
+      "p99": 16665635.25,
+      "p50": 14093838.5
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 92679.97141983382,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 13577.603039566779,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 4.876236125857905,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 13660000 requests
+INFO:clipper_benchmarks: Submitted 13680000 requests
+INFO:clipper_benchmarks: Submitted 13700000 requests
+INFO:clipper_benchmarks: Submitted 13720000 requests
+INFO:clipper_benchmarks: Submitted 13740000 requests
+INFO:clipper_benchmarks: Submitted 13760000 requests
+INFO:clipper_benchmarks: Submitted 13780000 requests
+INFO:clipper_benchmarks: Submitted 13800000 requests
+INFO:clipper_benchmarks: Submitted 13820000 requests
+INFO:clipper_benchmarks: Submitted 13840000 requests
+INFO:clipper_benchmarks: Submitted 13860000 requests
+INFO:clipper_benchmarks: Submitted 13880000 requests
+INFO:clipper_benchmarks: Submitted 13900000 requests
+INFO:clipper_benchmarks: Submitted 13920000 requests
+INFO:clipper_benchmarks: Submitted 13940000 requests
+INFO:clipper_benchmarks: Submitted 13960000 requests
+INFO:clipper_benchmarks: Submitted 13980000 requests
+INFO:clipper_benchmarks: Submitted 14000000 requests
+INFO:clipper_benchmarks: Submitted 14020000 requests
+INFO:clipper_benchmarks: Submitted 14040000 requests
+INFO:clipper_benchmarks: Submitted 14060000 requests
+INFO:clipper_benchmarks: Submitted 14080000 requests
+INFO:clipper_benchmarks: Submitted 14100000 requests
+INFO:clipper_benchmarks: Submitted 14120000 requests
+INFO:clipper_benchmarks: Submitted 14140000 requests
+INFO:clipper_benchmarks: Submitted 14160000 requests
+INFO:clipper_benchmarks: Submitted 14180000 requests
+INFO:clipper_benchmarks: Submitted 14200000 requests
+INFO:clipper_benchmarks: Submitted 14220000 requests
+INFO:clipper_benchmarks: Submitted 14240000 requests
+INFO:clipper_benchmarks: Submitted 14260000 requests
+INFO:clipper_benchmarks: Submitted 14280000 requests
+INFO:clipper_benchmarks: Submitted 14300000 requests
+INFO:clipper_benchmarks: Submitted 14320000 requests
+INFO:clipper_benchmarks: Submitted 14340000 requests
+INFO:clipper_benchmarks: Submitted 14360000 requests
+INFO:clipper_benchmarks: Submitted 14380000 requests
+INFO:clipper_benchmarks: Submitted 14400000 requests
+INFO:clipper_benchmarks: Submitted 14420000 requests
+INFO:clipper_benchmarks: Submitted 14440000 requests
+INFO:clipper_benchmarks: Submitted 14460000 requests
+INFO:clipper_benchmarks: Submitted 14480000 requests
+INFO:clipper_benchmarks: Submitted 14500000 requests
+INFO:clipper_benchmarks: Submitted 14520000 requests
+INFO:clipper_benchmarks: Submitted 14540000 requests
+INFO:clipper_benchmarks: Submitted 14560000 requests
+INFO:clipper_benchmarks: Submitted 14580000 requests
+INFO:clipper_benchmarks: Submitted 14600000 requests
+INFO:clipper_benchmarks: Submitted 14620000 requests
+INFO:clipper_benchmarks: Submitted 14640000 requests
+INFO:clipper_benchmarks: Submitted 14660000 requests
+INFO:clipper_benchmarks: Submitted 14680000 requests
+INFO:clipper_benchmarks: Submitted 14700000 requests
+INFO:clipper_benchmarks: Submitted 14720000 requests
+INFO:clipper_benchmarks: Submitted 14740000 requests
+INFO:clipper_benchmarks: Submitted 14760000 requests
+INFO:clipper_benchmarks: Submitted 14780000 requests
+INFO:clipper_benchmarks: Submitted 14800000 requests
+INFO:clipper_benchmarks: Submitted 14820000 requests
+INFO:clipper_benchmarks: Submitted 14840000 requests
+INFO:clipper_benchmarks: Submitted 14860000 requests
+INFO:clipper_benchmarks: Submitted 14880000 requests
+INFO:clipper_benchmarks: Submitted 14900000 requests
+INFO:clipper_benchmarks: Submitted 14920000 requests
+INFO:clipper_benchmarks: Submitted 14940000 requests
+INFO:clipper_benchmarks: Submitted 14960000 requests
+INFO:clipper_benchmarks: Submitted 14980000 requests
+INFO:clipper_benchmarks: Submitted 15000000 requests
+INFO:clipper_benchmarks: Submitted 15020000 requests
+INFO:clipper_benchmarks: Submitted 15040000 requests
+INFO:clipper_benchmarks: Submitted 15060000 requests
+INFO:clipper_benchmarks: Submitted 15080000 requests
+INFO:clipper_benchmarks: Submitted 15100000 requests
+INFO:clipper_benchmarks: Submitted 15120000 requests
+INFO:clipper_benchmarks: Submitted 15140000 requests
+INFO:clipper_benchmarks: Submitted 15160000 requests
+INFO:clipper_benchmarks: Submitted 15180000 requests
+INFO:clipper_benchmarks: Submitted 15200000 requests
+INFO:clipper_benchmarks: Submitted 15220000 requests
+INFO:clipper_benchmarks: Submitted 15240000 requests
+INFO:clipper_benchmarks: Submitted 15260000 requests
+INFO:clipper_benchmarks: Submitted 15280000 requests
+INFO:clipper_benchmarks: Submitted 15300000 requests
+INFO:clipper_benchmarks: Submitted 15320000 requests
+INFO:clipper_benchmarks: Submitted 15340000 requests
+INFO:clipper_benchmarks: Submitted 15360000 requests
+INFO:clipper_benchmarks: Submitted 15380000 requests
+INFO:clipper_benchmarks: Submitted 15400000 requests
+INFO:clipper_benchmarks: Submitted 15420000 requests
+INFO:clipper_benchmarks: Submitted 15440000 requests
+INFO:clipper_benchmarks: Submitted 15460000 requests
+INFO:clipper_benchmarks: Submitted 15480000 requests
+INFO:clipper_benchmarks: Submitted 15500000 requests
+INFO:clipper_benchmarks: Submitted 15520000 requests
+INFO:clipper_benchmarks: Submitted 15540000 requests
+INFO:clipper_benchmarks: Submitted 15560000 requests
+INFO:clipper_benchmarks: Submitted 15580000 requests
+INFO:clipper_benchmarks: Submitted 15600000 requests
+INFO:clipper_benchmarks: Submitted 15620000 requests
+INFO:clipper_benchmarks: Submitted 15640000 requests
+INFO:clipper_benchmarks: Submitted 15660000 requests
+INFO:clipper_benchmarks: Submitted 15680000 requests
+INFO:clipper_benchmarks: Submitted 15700000 requests
+INFO:clipper_benchmarks: Submitted 15720000 requests
+INFO:clipper_benchmarks: Submitted 15740000 requests
+INFO:clipper_benchmarks: Submitted 15760000 requests
+INFO:clipper_benchmarks: Submitted 15780000 requests
+INFO:clipper_benchmarks: Submitted 15800000 requests
+INFO:clipper_benchmarks: Submitted 15820000 requests
+INFO:clipper_benchmarks: Submitted 15840000 requests
+INFO:clipper_benchmarks: Submitted 15860000 requests
+INFO:clipper_benchmarks: Submitted 15880000 requests
+INFO:clipper_benchmarks: Submitted 15900000 requests
+INFO:clipper_benchmarks: Submitted 15920000 requests
+INFO:clipper_benchmarks: Submitted 15940000 requests
+INFO:clipper_benchmarks: Submitted 15960000 requests
+INFO:clipper_benchmarks: Submitted 15980000 requests
+INFO:clipper_benchmarks: Submitted 16000000 requests
+INFO:clipper_benchmarks: Submitted 16020000 requests
+INFO:clipper_benchmarks: Submitted 16040000 requests
+INFO:clipper_benchmarks: Submitted 16060000 requests
+INFO:clipper_benchmarks: Submitted 16080000 requests
+INFO:clipper_benchmarks: Submitted 16100000 requests
+INFO:clipper_benchmarks: Submitted 16120000 requests
+INFO:clipper_benchmarks: Submitted 16140000 requests
+INFO:clipper_benchmarks: Submitted 16160000 requests
+INFO:clipper_benchmarks: Submitted 16180000 requests
+INFO:clipper_benchmarks: Submitted 16200000 requests
+INFO:clipper_benchmarks: Submitted 16220000 requests
+INFO:clipper_benchmarks: Submitted 16240000 requests
+INFO:clipper_benchmarks: Submitted 16260000 requests
+INFO:clipper_benchmarks: Submitted 16280000 requests
+INFO:clipper_benchmarks: Submitted 16300000 requests
+INFO:clipper_benchmarks: Submitted 16320000 requests
+INFO:clipper_benchmarks: Submitted 16340000 requests
+INFO:clipper_benchmarks: Submitted 16360000 requests
+INFO:clipper_benchmarks: Submitted 16380000 requests
+INFO:clipper_benchmarks: Submitted 16400000 requests
+INFO:clipper_benchmarks: Submitted 16420000 requests
+INFO:clipper_benchmarks: Submitted 16440000 requests
+INFO:clipper_benchmarks: Submitted 16460000 requests
+INFO:clipper_benchmarks: Submitted 16480000 requests
+INFO:clipper_benchmarks: Submitted 16500000 requests
+INFO:clipper_benchmarks: Submitted 16520000 requests
+INFO:clipper_benchmarks: Submitted 16540000 requests
+INFO:clipper_benchmarks: Submitted 16560000 requests
+INFO:clipper_benchmarks: Submitted 16580000 requests
+INFO:clipper_benchmarks: Submitted 16600000 requests
+INFO:clipper_benchmarks: Submitted 16620000 requests
+INFO:clipper_benchmarks: Submitted 16640000 requests
+INFO:clipper_benchmarks: Submitted 16660000 requests
+INFO:clipper_benchmarks: Submitted 16680000 requests
+INFO:clipper_benchmarks: Submitted 16700000 requests
+INFO:clipper_benchmarks: Submitted 16720000 requests
+INFO:clipper_benchmarks: Submitted 16740000 requests
+INFO:clipper_benchmarks: Submitted 16760000 requests
+INFO:clipper_benchmarks: Submitted 16780000 requests
+INFO:clipper_benchmarks: Submitted 16800000 requests
+INFO:clipper_benchmarks: Submitted 16820000 requests
+INFO:clipper_benchmarks: Submitted 16840000 requests
+INFO:clipper_benchmarks: Submitted 16860000 requests
+INFO:clipper_benchmarks: Submitted 16880000 requests
+INFO:clipper_benchmarks: Submitted 16900000 requests
+INFO:clipper_benchmarks: Submitted 16920000 requests
+INFO:clipper_benchmarks: Submitted 16940000 requests
+INFO:clipper_benchmarks: Submitted 16960000 requests
+INFO:clipper_benchmarks: Submitted 16980000 requests
+INFO:clipper_benchmarks: Submitted 17000000 requests
+INFO:clipper_benchmarks: Submitted 17020000 requests
+INFO:clipper_benchmarks: Submitted 17040000 requests
+INFO:clipper_benchmarks: Submitted 17060000 requests
+INFO:clipper_benchmarks: Submitted 17080000 requests
+INFO:clipper_benchmarks: Submitted 17100000 requests
+INFO:clipper_benchmarks: Submitted 17120000 requests
+INFO:clipper_benchmarks: Submitted 17140000 requests
+INFO:clipper_benchmarks: Submitted 17160000 requests
+INFO:clipper_benchmarks: Submitted 17180000 requests
+INFO:clipper_benchmarks: Submitted 17200000 requests
+INFO:clipper_benchmarks: Submitted 17220000 requests
+INFO:clipper_benchmarks: Submitted 17240000 requests
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 4639613
+    },
+    {
+      "name": "queued_predictions",
+      "count": 12615680
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 680003
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.00006432827402082949
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 34969,
+      "max": 36394704,
+      "mean": 18043675.748540857,
+      "std": 10523599.270582967,
+      "p95": 34712102.3,
+      "p99": 36052266.38,
+      "p50": 17688106.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.00024319066147859923,
+      "std": 0.015594571538795134,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 14470,
+      "max": 39653,
+      "mean": 15977.155155642024,
+      "std": 1011.8493035106,
+      "p95": 17622.0,
+      "p99": 18274.25,
+      "p50": 15691.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 3,
+      "max": 250,
+      "mean": 249.90922454979788,
+      "std": 4.735138456257353,
+      "p95": 250.0,
+      "p99": 250.0,
+      "p50": 250.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 3240,
+      "max": 81750,
+      "mean": 39857.38317413667,
+      "std": 8553.880283228053,
+      "p95": 55766.25,
+      "p99": 67329.29,
+      "p50": 38936.5
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 2860088,
+      "max": 39611264,
+      "mean": 15976634.538404998,
+      "std": 1067249.5336624366,
+      "p95": 17631639.6,
+      "p99": 18284218.76,
+      "p50": 15687287.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 37269,
+      "max": 2040301,
+      "mean": 1052671.4891583976,
+      "std": 150241.6515654227,
+      "p95": 1381682.7,
+      "p99": 1592180.0400000003,
+      "p50": 1014059.0
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 88114,
+      "max": 989216,
+      "mean": 460947.8324145535,
+      "std": 53828.85356170511,
+      "p95": 578082.3000000002,
+      "p99": 649385.22,
+      "p50": 448913.0
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 2730464,
+      "max": 36457966,
+      "mean": 14351540.498713708,
+      "std": 998734.0952749506,
+      "p95": 15950840.5,
+      "p99": 16418354.780000003,
+      "p50": 14073400.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 92771.87521062487,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 13596.017088358605,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 5.740715982097288,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 17260000 requests
+INFO:clipper_benchmarks: Submitted 17280000 requests
+INFO:clipper_benchmarks: Submitted 17300000 requests
+INFO:clipper_benchmarks: Submitted 17320000 requests
+INFO:clipper_benchmarks: Submitted 17340000 requests
+INFO:clipper_benchmarks: Submitted 17360000 requests
+INFO:clipper_benchmarks: Submitted 17380000 requests
+INFO:clipper_benchmarks: Submitted 17400000 requests
+INFO:clipper_benchmarks: Submitted 17420000 requests
+INFO:clipper_benchmarks: Submitted 17440000 requests
+INFO:clipper_benchmarks: Submitted 17460000 requests
+INFO:clipper_benchmarks: Submitted 17480000 requests
+INFO:clipper_benchmarks: Submitted 17500000 requests
+INFO:clipper_benchmarks: Submitted 17520000 requests
+INFO:clipper_benchmarks: Submitted 17540000 requests
+INFO:clipper_benchmarks: Submitted 17560000 requests
+INFO:clipper_benchmarks: Submitted 17580000 requests
+INFO:clipper_benchmarks: Submitted 17600000 requests
+INFO:clipper_benchmarks: Submitted 17620000 requests
+INFO:clipper_benchmarks: Submitted 17640000 requests
+INFO:clipper_benchmarks: Submitted 17660000 requests
+INFO:clipper_benchmarks: Submitted 17680000 requests
+INFO:clipper_benchmarks: Submitted 17700000 requests
+INFO:clipper_benchmarks: Submitted 17720000 requests
+INFO:clipper_benchmarks: Submitted 17740000 requests
+INFO:clipper_benchmarks: Submitted 17760000 requests
+INFO:clipper_benchmarks: Submitted 17780000 requests
+INFO:clipper_benchmarks: Submitted 17800000 requests
+INFO:clipper_benchmarks: Submitted 17820000 requests
+INFO:clipper_benchmarks: Submitted 17840000 requests
+INFO:clipper_benchmarks: Submitted 17860000 requests
+INFO:clipper_benchmarks: Submitted 17880000 requests
+INFO:clipper_benchmarks: Submitted 17900000 requests
+INFO:clipper_benchmarks: Submitted 17920000 requests
+INFO:clipper_benchmarks: Submitted 17940000 requests
+INFO:clipper_benchmarks: Submitted 17960000 requests
+INFO:clipper_benchmarks: Submitted 17980000 requests
+INFO:clipper_benchmarks: Submitted 18000000 requests
+INFO:clipper_benchmarks: Submitted 18020000 requests
+INFO:clipper_benchmarks: Submitted 18040000 requests
+INFO:clipper_benchmarks: Submitted 18060000 requests
+INFO:clipper_benchmarks: Submitted 18080000 requests
+INFO:clipper_benchmarks: Submitted 18100000 requests
+INFO:clipper_benchmarks: Submitted 18120000 requests
+INFO:clipper_benchmarks: Submitted 18140000 requests
+INFO:clipper_benchmarks: Submitted 18160000 requests
+INFO:clipper_benchmarks: Submitted 18180000 requests
+INFO:clipper_benchmarks: Submitted 18200000 requests
+INFO:clipper_benchmarks: Submitted 18220000 requests
+INFO:clipper_benchmarks: Submitted 18240000 requests
+INFO:clipper_benchmarks: Submitted 18260000 requests
+INFO:clipper_benchmarks: Submitted 18280000 requests
+INFO:clipper_benchmarks: Submitted 18300000 requests
+INFO:clipper_benchmarks: Submitted 18320000 requests
+INFO:clipper_benchmarks: Submitted 18340000 requests
+INFO:clipper_benchmarks: Submitted 18360000 requests
+INFO:clipper_benchmarks: Submitted 18380000 requests
+INFO:clipper_benchmarks: Submitted 18400000 requests
+INFO:clipper_benchmarks: Submitted 18420000 requests
+INFO:clipper_benchmarks: Submitted 18440000 requests
+INFO:clipper_benchmarks: Submitted 18460000 requests
+INFO:clipper_benchmarks: Submitted 18480000 requests
+INFO:clipper_benchmarks: Submitted 18500000 requests
+INFO:clipper_benchmarks: Submitted 18520000 requests
+INFO:clipper_benchmarks: Submitted 18540000 requests
+INFO:clipper_benchmarks: Submitted 18560000 requests
+INFO:clipper_benchmarks: Submitted 18580000 requests
+INFO:clipper_benchmarks: Submitted 18600000 requests
+INFO:clipper_benchmarks: Submitted 18620000 requests
+INFO:clipper_benchmarks: Submitted 18640000 requests
+INFO:clipper_benchmarks: Submitted 18660000 requests
+INFO:clipper_benchmarks: Submitted 18680000 requests
+INFO:clipper_benchmarks: Submitted 18700000 requests
+INFO:clipper_benchmarks: Submitted 18720000 requests
+INFO:clipper_benchmarks: Submitted 18740000 requests
+INFO:clipper_benchmarks: Submitted 18760000 requests
+INFO:clipper_benchmarks: Submitted 18780000 requests
+INFO:clipper_benchmarks: Submitted 18800000 requests
+INFO:clipper_benchmarks: Submitted 18820000 requests
+INFO:clipper_benchmarks: Submitted 18840000 requests
+INFO:clipper_benchmarks: Submitted 18860000 requests
+INFO:clipper_benchmarks: Submitted 18880000 requests
+INFO:clipper_benchmarks: Submitted 18900000 requests
+INFO:clipper_benchmarks: Submitted 18920000 requests
+INFO:clipper_benchmarks: Submitted 18940000 requests
+INFO:clipper_benchmarks: Submitted 18960000 requests
+INFO:clipper_benchmarks: Submitted 18980000 requests
+INFO:clipper_benchmarks: Submitted 19000000 requests
+INFO:clipper_benchmarks: Submitted 19020000 requests
+INFO:clipper_benchmarks: Submitted 19040000 requests
+INFO:clipper_benchmarks: Submitted 19060000 requests
+INFO:clipper_benchmarks: Submitted 19080000 requests
+INFO:clipper_benchmarks: Submitted 19100000 requests
+INFO:clipper_benchmarks: Submitted 19120000 requests
+INFO:clipper_benchmarks: Submitted 19140000 requests
+INFO:clipper_benchmarks: Submitted 19160000 requests
+INFO:clipper_benchmarks: Submitted 19180000 requests
+INFO:clipper_benchmarks: Submitted 19200000 requests
+INFO:clipper_benchmarks: Submitted 19220000 requests
+INFO:clipper_benchmarks: Submitted 19240000 requests
+INFO:clipper_benchmarks: Submitted 19260000 requests
+INFO:clipper_benchmarks: Submitted 19280000 requests
+INFO:clipper_benchmarks: Submitted 19300000 requests
+INFO:clipper_benchmarks: Submitted 19320000 requests
+INFO:clipper_benchmarks: Submitted 19340000 requests
+INFO:clipper_benchmarks: Submitted 19360000 requests
+INFO:clipper_benchmarks: Submitted 19380000 requests
+INFO:clipper_benchmarks: Submitted 19400000 requests
+INFO:clipper_benchmarks: Submitted 19420000 requests
+INFO:clipper_benchmarks: Submitted 19440000 requests
+INFO:clipper_benchmarks: Submitted 19460000 requests
+INFO:clipper_benchmarks: Submitted 19480000 requests
+INFO:clipper_benchmarks: Submitted 19500000 requests
+INFO:clipper_benchmarks: Submitted 19520000 requests
+INFO:clipper_benchmarks: Submitted 19540000 requests
+INFO:clipper_benchmarks: Submitted 19560000 requests
+INFO:clipper_benchmarks: Submitted 19580000 requests
+INFO:clipper_benchmarks: Submitted 19600000 requests
+INFO:clipper_benchmarks: Submitted 19620000 requests
+INFO:clipper_benchmarks: Submitted 19640000 requests
+INFO:clipper_benchmarks: Submitted 19660000 requests
+INFO:clipper_benchmarks: Submitted 19680000 requests
+INFO:clipper_benchmarks: Submitted 19700000 requests
+INFO:clipper_benchmarks: Submitted 19720000 requests
+INFO:clipper_benchmarks: Submitted 19740000 requests
+INFO:clipper_benchmarks: Submitted 19760000 requests
+INFO:clipper_benchmarks: Submitted 19780000 requests
+INFO:clipper_benchmarks: Submitted 19800000 requests
+INFO:clipper_benchmarks: Submitted 19820000 requests
+INFO:clipper_benchmarks: Submitted 19840000 requests
+INFO:clipper_benchmarks: Submitted 19860000 requests
+INFO:clipper_benchmarks: Submitted 19880000 requests
+INFO:clipper_benchmarks: Submitted 19900000 requests
+INFO:clipper_benchmarks: Submitted 19920000 requests
+INFO:clipper_benchmarks: Submitted 19940000 requests
+INFO:clipper_benchmarks: Submitted 19960000 requests
+INFO:clipper_benchmarks: Submitted 19980000 requests
+INFO:clipper_benchmarks: Submitted 20000000 requests
+INFO:clipper_benchmarks: Submitted 20020000 requests
+INFO:clipper_benchmarks: Submitted 20040000 requests
+INFO:clipper_benchmarks: Submitted 20060000 requests
+INFO:clipper_benchmarks: Submitted 20080000 requests
+INFO:clipper_benchmarks: Submitted 20100000 requests
+INFO:clipper_benchmarks: Submitted 20120000 requests
+INFO:clipper_benchmarks: Submitted 20140000 requests
+INFO:clipper_benchmarks: Submitted 20160000 requests
+INFO:clipper_benchmarks: Submitted 20180000 requests
+INFO:clipper_benchmarks: Submitted 20200000 requests
+INFO:clipper_benchmarks: Submitted 20220000 requests
+INFO:clipper_benchmarks: Submitted 20240000 requests
+INFO:clipper_benchmarks: Submitted 20260000 requests
+INFO:clipper_benchmarks: Submitted 20280000 requests
+INFO:clipper_benchmarks: Submitted 20300000 requests
+INFO:clipper_benchmarks: Submitted 20320000 requests
+INFO:clipper_benchmarks: Submitted 20340000 requests
+INFO:clipper_benchmarks: Submitted 20360000 requests
+INFO:clipper_benchmarks: Submitted 20380000 requests
+INFO:clipper_benchmarks: Submitted 20400000 requests
+INFO:clipper_benchmarks: Submitted 20420000 requests
+INFO:clipper_benchmarks: Submitted 20440000 requests
+INFO:clipper_benchmarks: Submitted 20460000 requests
+INFO:clipper_benchmarks: Submitted 20480000 requests
+INFO:clipper_benchmarks: Submitted 20500000 requests
+INFO:clipper_benchmarks: Submitted 20520000 requests
+INFO:clipper_benchmarks: Submitted 20540000 requests
+INFO:clipper_benchmarks: Submitted 20560000 requests
+INFO:clipper_benchmarks: Submitted 20580000 requests
+INFO:clipper_benchmarks: Submitted 20600000 requests
+INFO:clipper_benchmarks: Submitted 20620000 requests
+INFO:clipper_benchmarks: Submitted 20640000 requests
+INFO:clipper_benchmarks: Submitted 20660000 requests
+INFO:clipper_benchmarks: Submitted 20680000 requests
+INFO:clipper_benchmarks: Submitted 20700000 requests
+INFO:clipper_benchmarks: Submitted 20720000 requests
+INFO:clipper_benchmarks: Submitted 20740000 requests
+INFO:clipper_benchmarks: Submitted 20760000 requests
+INFO:clipper_benchmarks: Submitted 20780000 requests
+INFO:clipper_benchmarks: Submitted 20800000 requests
+INFO:clipper_benchmarks: Submitted 20820000 requests
+INFO:clipper_benchmarks: Submitted 20840000 requests
+INFO:clipper_benchmarks: Submitted 20860000 requests
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 5568157
+    },
+    {
+      "name": "queued_predictions",
+      "count": 15297491
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 818003
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.00007490781019597378
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 34969,
+      "max": 43615939,
+      "mean": 21421295.229085603,
+      "std": 12604050.433895747,
+      "p95": 41423472.9,
+      "p99": 43089175.91,
+      "p50": 20896464.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 14470,
+      "max": 39653,
+      "mean": 15940.842777237354,
+      "std": 986.2169939236763,
+      "p95": 17541.0,
+      "p99": 18148.0,
+      "p50": 15669.5
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 3,
+      "max": 250,
+      "mean": 249.92453406660557,
+      "std": 4.317416536358908,
+      "p95": 250.0,
+      "p99": 250.0,
+      "p50": 250.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 3240,
+      "max": 81750,
+      "mean": 40019.41386682956,
+      "std": 8590.751051766554,
+      "p95": 56135.75,
+      "p99": 67393.75,
+      "p50": 39178.0
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 2860088,
+      "max": 39611264,
+      "mean": 15933084.185456768,
+      "std": 1012413.9974035126,
+      "p95": 17567321.0,
+      "p99": 18209416.62,
+      "p50": 15654203.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 37269,
+      "max": 2040301,
+      "mean": 1050107.4912923924,
+      "std": 149296.16871943893,
+      "p95": 1385827.3999999997,
+      "p99": 1591468.6799999998,
+      "p50": 1009947.0
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 88114,
+      "max": 989216,
+      "mean": 459404.3877176902,
+      "std": 53551.7851302171,
+      "p95": 578601.2,
+      "p99": 650325.7799999999,
+      "p50": 445967.0
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 2730464,
+      "max": 36457966,
+      "mean": 14312461.71219065,
+      "std": 946690.3888225698,
+      "p95": 15869636.099999998,
+      "p99": 16365874.68,
+      "p50": 14061421.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 92779.42844640173,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 13629.041574988927,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 6.750223882425433,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 20880000 requests
+INFO:clipper_benchmarks: Submitted 20900000 requests
+INFO:clipper_benchmarks: Submitted 20920000 requests
+INFO:clipper_benchmarks: Submitted 20940000 requests
+INFO:clipper_benchmarks: Submitted 20960000 requests
+INFO:clipper_benchmarks: Submitted 20980000 requests
+INFO:clipper_benchmarks: Submitted 21000000 requests
+INFO:clipper_benchmarks: Submitted 21020000 requests
+INFO:clipper_benchmarks: Submitted 21040000 requests
+INFO:clipper_benchmarks: Submitted 21060000 requests
+INFO:clipper_benchmarks: Submitted 21080000 requests
+INFO:clipper_benchmarks: Submitted 21100000 requests
+INFO:clipper_benchmarks: Submitted 21120000 requests
+INFO:clipper_benchmarks: Submitted 21140000 requests
+INFO:clipper_benchmarks: Submitted 21160000 requests
+INFO:clipper_benchmarks: Submitted 21180000 requests
+INFO:clipper_benchmarks: Submitted 21200000 requests
+INFO:clipper_benchmarks: Submitted 21220000 requests
+INFO:clipper_benchmarks: Submitted 21240000 requests
+INFO:clipper_benchmarks: Submitted 21260000 requests
+INFO:clipper_benchmarks: Submitted 21280000 requests
+INFO:clipper_benchmarks: Submitted 21300000 requests
+INFO:clipper_benchmarks: Submitted 21320000 requests
+INFO:clipper_benchmarks: Submitted 21340000 requests
+INFO:clipper_benchmarks: Submitted 21360000 requests
+INFO:clipper_benchmarks: Submitted 21380000 requests
+INFO:clipper_benchmarks: Submitted 21400000 requests
+INFO:clipper_benchmarks: Submitted 21420000 requests
+INFO:clipper_benchmarks: Submitted 21440000 requests
+INFO:clipper_benchmarks: Submitted 21460000 requests
+INFO:clipper_benchmarks: Submitted 21480000 requests
+INFO:clipper_benchmarks: Submitted 21500000 requests
+INFO:clipper_benchmarks: Submitted 21520000 requests
+INFO:clipper_benchmarks: Submitted 21540000 requests
+INFO:clipper_benchmarks: Submitted 21560000 requests
+INFO:clipper_benchmarks: Submitted 21580000 requests
+INFO:clipper_benchmarks: Submitted 21600000 requests
+INFO:clipper_benchmarks: Submitted 21620000 requests
+INFO:clipper_benchmarks: Submitted 21640000 requests
+INFO:clipper_benchmarks: Submitted 21660000 requests
+INFO:clipper_benchmarks: Submitted 21680000 requests
+INFO:clipper_benchmarks: Submitted 21700000 requests
+INFO:clipper_benchmarks: Submitted 21720000 requests
+INFO:clipper_benchmarks: Submitted 21740000 requests
+INFO:clipper_benchmarks: Submitted 21760000 requests
+INFO:clipper_benchmarks: Submitted 21780000 requests
+INFO:clipper_benchmarks: Submitted 21800000 requests
+INFO:clipper_benchmarks: Submitted 21820000 requests
+INFO:clipper_benchmarks: Submitted 21840000 requests
+INFO:clipper_benchmarks: Submitted 21860000 requests
+INFO:clipper_benchmarks: Submitted 21880000 requests
+INFO:clipper_benchmarks: Submitted 21900000 requests
+INFO:clipper_benchmarks: Submitted 21920000 requests
+INFO:clipper_benchmarks: Submitted 21940000 requests
+INFO:clipper_benchmarks: Submitted 21960000 requests
+INFO:clipper_benchmarks: Submitted 21980000 requests
+INFO:clipper_benchmarks: Submitted 22000000 requests
+INFO:clipper_benchmarks: Submitted 22020000 requests
+INFO:clipper_benchmarks: Submitted 22040000 requests
+INFO:clipper_benchmarks: Submitted 22060000 requests
+INFO:clipper_benchmarks: Submitted 22080000 requests
+INFO:clipper_benchmarks: Submitted 22100000 requests
+INFO:clipper_benchmarks: Submitted 22120000 requests
+INFO:clipper_benchmarks: Submitted 22140000 requests
+INFO:clipper_benchmarks: Submitted 22160000 requests
+INFO:clipper_benchmarks: Submitted 22180000 requests
+INFO:clipper_benchmarks: Submitted 22200000 requests
+INFO:clipper_benchmarks: Submitted 22220000 requests
+INFO:clipper_benchmarks: Submitted 22240000 requests
+INFO:clipper_benchmarks: Submitted 22260000 requests
+INFO:clipper_benchmarks: Submitted 22280000 requests
+INFO:clipper_benchmarks: Submitted 22300000 requests
+INFO:clipper_benchmarks: Submitted 22320000 requests
+INFO:clipper_benchmarks: Submitted 22340000 requests
+INFO:clipper_benchmarks: Submitted 22360000 requests
+INFO:clipper_benchmarks: Submitted 22380000 requests
+INFO:clipper_benchmarks: Submitted 22400000 requests
+INFO:clipper_benchmarks: Submitted 22420000 requests
+INFO:clipper_benchmarks: Submitted 22440000 requests
+INFO:clipper_benchmarks: Submitted 22460000 requests
+INFO:clipper_benchmarks: Submitted 22480000 requests
+INFO:clipper_benchmarks: Submitted 22500000 requests
+INFO:clipper_benchmarks: Submitted 22520000 requests
+INFO:clipper_benchmarks: Submitted 22540000 requests
+INFO:clipper_benchmarks: Submitted 22560000 requests
+INFO:clipper_benchmarks: Submitted 22580000 requests
+INFO:clipper_benchmarks: Submitted 22600000 requests
+INFO:clipper_benchmarks: Submitted 22620000 requests
+INFO:clipper_benchmarks: Submitted 22640000 requests
+INFO:clipper_benchmarks: Submitted 22660000 requests
+INFO:clipper_benchmarks: Submitted 22680000 requests
+INFO:clipper_benchmarks: Submitted 22700000 requests
+INFO:clipper_benchmarks: Submitted 22720000 requests
+INFO:clipper_benchmarks: Submitted 22740000 requests
+INFO:clipper_benchmarks: Submitted 22760000 requests
+INFO:clipper_benchmarks: Submitted 22780000 requests
+INFO:clipper_benchmarks: Submitted 22800000 requests
+INFO:clipper_benchmarks: Submitted 22820000 requests
+INFO:clipper_benchmarks: Submitted 22840000 requests
+INFO:clipper_benchmarks: Submitted 22860000 requests
+INFO:clipper_benchmarks: Submitted 22880000 requests
+INFO:clipper_benchmarks: Submitted 22900000 requests
+INFO:clipper_benchmarks: Submitted 22920000 requests
+INFO:clipper_benchmarks: Submitted 22940000 requests
+INFO:clipper_benchmarks: Submitted 22960000 requests
+INFO:clipper_benchmarks: Submitted 22980000 requests
+INFO:clipper_benchmarks: Submitted 23000000 requests
+INFO:clipper_benchmarks: Submitted 23020000 requests
+INFO:clipper_benchmarks: Submitted 23040000 requests
+INFO:clipper_benchmarks: Submitted 23060000 requests
+INFO:clipper_benchmarks: Submitted 23080000 requests
+INFO:clipper_benchmarks: Submitted 23100000 requests
+INFO:clipper_benchmarks: Submitted 23120000 requests
+INFO:clipper_benchmarks: Submitted 23140000 requests
+INFO:clipper_benchmarks: Submitted 23160000 requests
+INFO:clipper_benchmarks: Submitted 23180000 requests
+INFO:clipper_benchmarks: Submitted 23200000 requests
+INFO:clipper_benchmarks: Submitted 23220000 requests
+INFO:clipper_benchmarks: Submitted 23240000 requests
+INFO:clipper_benchmarks: Submitted 23260000 requests
+INFO:clipper_benchmarks: Submitted 23280000 requests
+INFO:clipper_benchmarks: Submitted 23300000 requests
+INFO:clipper_benchmarks: Submitted 23320000 requests
+INFO:clipper_benchmarks: Submitted 23340000 requests
+INFO:clipper_benchmarks: Submitted 23360000 requests
+INFO:clipper_benchmarks: Submitted 23380000 requests
+INFO:clipper_benchmarks: Submitted 23400000 requests
+INFO:clipper_benchmarks: Submitted 23420000 requests
+INFO:clipper_benchmarks: Submitted 23440000 requests
+INFO:clipper_benchmarks: Submitted 23460000 requests
+INFO:clipper_benchmarks: Submitted 23480000 requests
+INFO:clipper_benchmarks: Submitted 23500000 requests
+INFO:clipper_benchmarks: Submitted 23520000 requests
+INFO:clipper_benchmarks: Submitted 23540000 requests
+INFO:clipper_benchmarks: Submitted 23560000 requests
+INFO:clipper_benchmarks: Submitted 23580000 requests
+INFO:clipper_benchmarks: Submitted 23600000 requests
+INFO:clipper_benchmarks: Submitted 23620000 requests
+INFO:clipper_benchmarks: Submitted 23640000 requests
+INFO:clipper_benchmarks: Submitted 23660000 requests
+INFO:clipper_benchmarks: Submitted 23680000 requests
+INFO:clipper_benchmarks: Submitted 23700000 requests
+INFO:clipper_benchmarks: Submitted 23720000 requests
+INFO:clipper_benchmarks: Submitted 23740000 requests
+INFO:clipper_benchmarks: Submitted 23760000 requests
+INFO:clipper_benchmarks: Submitted 23780000 requests
+INFO:clipper_benchmarks: Submitted 23800000 requests
+INFO:clipper_benchmarks: Submitted 23820000 requests
+INFO:clipper_benchmarks: Submitted 23840000 requests
+INFO:clipper_benchmarks: Submitted 23860000 requests
+INFO:clipper_benchmarks: Submitted 23880000 requests
+INFO:clipper_benchmarks: Submitted 23900000 requests
+INFO:clipper_benchmarks: Submitted 23920000 requests
+INFO:clipper_benchmarks: Submitted 23940000 requests
+INFO:clipper_benchmarks: Submitted 23960000 requests
+INFO:clipper_benchmarks: Submitted 23980000 requests
+INFO:clipper_benchmarks: Submitted 24000000 requests
+INFO:clipper_benchmarks: Submitted 24020000 requests
+INFO:clipper_benchmarks: Submitted 24040000 requests
+INFO:clipper_benchmarks: Submitted 24060000 requests
+INFO:clipper_benchmarks: Submitted 24080000 requests
+INFO:clipper_benchmarks: Submitted 24100000 requests
+INFO:clipper_benchmarks: Submitted 24120000 requests
+INFO:clipper_benchmarks: Submitted 24140000 requests
+INFO:clipper_benchmarks: Submitted 24160000 requests
+INFO:clipper_benchmarks: Submitted 24180000 requests
+INFO:clipper_benchmarks: Submitted 24200000 requests
+INFO:clipper_benchmarks: Submitted 24220000 requests
+INFO:clipper_benchmarks: Submitted 24240000 requests
+INFO:clipper_benchmarks: Submitted 24260000 requests
+INFO:clipper_benchmarks: Submitted 24280000 requests
+INFO:clipper_benchmarks: Submitted 24300000 requests
+INFO:clipper_benchmarks: Submitted 24320000 requests
+INFO:clipper_benchmarks: Submitted 24340000 requests
+INFO:clipper_benchmarks: Submitted 24360000 requests
+INFO:clipper_benchmarks: Submitted 24380000 requests
+INFO:clipper_benchmarks: Submitted 24400000 requests
+INFO:clipper_benchmarks: Submitted 24420000 requests
+INFO:clipper_benchmarks: Submitted 24440000 requests
+INFO:clipper_benchmarks: {
+  "name": "latency_breakdown_160909-180148",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 6498526
+    },
+    {
+      "name": "queued_predictions",
+      "count": 17940181
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "noop:prediction_counter",
+      "count": 956003
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.00008412893692531159
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 34969,
+      "max": 50895565,
+      "mean": 25228411.934581713,
+      "std": 14825500.632547804,
+      "p95": 48580216.15,
+      "p99": 50447104.02,
+      "p50": 25066805.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "noop:model_latency",
+      "min": 14470,
+      "max": 39653,
+      "mean": 15912.912451361868,
+      "std": 939.2811469213107,
+      "p95": 17456.25,
+      "p99": 18063.5,
+      "p50": 15654.0
+    },
+    {
+      "name": "noop:model_batch_size",
+      "min": 3,
+      "max": 250,
+      "mean": 249.9354248366013,
+      "std": 3.993753292265386,
+      "p95": 250.0,
+      "p99": 250.0,
+      "p50": 250.0
+    },
+    {
+      "name": "noop:batch_setup_hist:",
+      "min": 3240,
+      "max": 81750,
+      "mean": 40024.251176163096,
+      "std": 8546.28913187778,
+      "p95": 55892.79999999997,
+      "p99": 67191.65,
+      "p50": 39178.0
+    },
+    {
+      "name": "noop:rpc_time_hist:",
+      "min": 2860088,
+      "max": 39611264,
+      "mean": 15907185.768627452,
+      "std": 969469.1446946313,
+      "p95": 17497001.3,
+      "p99": 18119450.859999993,
+      "p50": 15647782.0
+    },
+    {
+      "name": "noop:ser_time_hist:",
+      "min": 37269,
+      "max": 2040301,
+      "mean": 1046242.7527443805,
+      "std": 146662.78449998995,
+      "p95": 1372199.65,
+      "p99": 1584449.79,
+      "p50": 1006934.0
+    },
+    {
+      "name": "noop:send_time_hist:",
+      "min": 88114,
+      "max": 989216,
+      "mean": 457709.0454783063,
+      "std": 52194.28019673155,
+      "p95": 573930.6499999997,
+      "p99": 647061.1,
+      "p50": 444440.5
+    },
+    {
+      "name": "noop:recv_time_hist:",
+      "min": 2730464,
+      "max": 36457966,
+      "mean": 14292232.725039205,
+      "std": 906741.226451068,
+      "p95": 15796927.85,
+      "p99": 16310945.05,
+      "p50": 14058475.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 92810.73605797014,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:model_thruput",
+      "rate": 13656.091636692978,
+      "unit": "events per second"
+    },
+    {
+      "name": "noop:cache_included_thruput",
+      "rate": 7.713975943051773,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 24460000 requests
+INFO:clipper_benchmarks: Submitted 24480000 requests
+INFO:clipper_benchmarks: Submitted 24500000 requests
+INFO:clipper_benchmarks: Submitted 24520000 requests
+INFO:clipper_benchmarks: Submitted 24540000 requests
+INFO:clipper_benchmarks: Submitted 24560000 requests
+INFO:clipper_benchmarks: Submitted 24580000 requests
+INFO:clipper_benchmarks: Submitted 24600000 requests
+INFO:clipper_benchmarks: Submitted 24620000 requests
+INFO:clipper_benchmarks: Submitted 24640000 requests
+INFO:clipper_benchmarks: Submitted 24660000 requests
+INFO:clipper_benchmarks: Submitted 24680000 requests
+INFO:clipper_benchmarks: Submitted 24700000 requests
+INFO:clipper_benchmarks: Submitted 24720000 requests
+INFO:clipper_benchmarks: Submitted 24740000 requests
+INFO:clipper_benchmarks: Submitted 24760000 requests
+INFO:clipper_benchmarks: Submitted 24780000 requests
+INFO:clipper_benchmarks: Submitted 24800000 requests
+INFO:clipper_benchmarks: Submitted 24820000 requests
+INFO:clipper_benchmarks: Submitted 24840000 requests
+INFO:clipper_benchmarks: Submitted 24860000 requests
+INFO:clipper_benchmarks: Submitted 24880000 requests
+INFO:clipper_benchmarks: Submitted 24900000 requests
+INFO:clipper_benchmarks: Submitted 24920000 requests
+INFO:clipper_benchmarks: Submitted 24940000 requests
+INFO:clipper_benchmarks: Submitted 24960000 requests
+INFO:clipper_benchmarks: Submitted 24980000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/latency_breakdown_160909-180148_results.json
