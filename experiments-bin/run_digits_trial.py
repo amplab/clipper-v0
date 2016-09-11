@@ -91,9 +91,12 @@ class DigitsBenchmarker:
                     "redis": {"image": "redis:alpine", "cpuset": self.reserve_cores(1)},
                     "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
                     "clipper": {"image": "cl-dev-digits",
-                        "cpuset": self.reserve_cores(20),
+                        "cpuset": self.reserve_cores(18),
                         "depends_on": ["redis", "quantilereg"],
-                        "environment": {"CLIPPER_BENCH_COMMAND": "digits", "CLIPPER_CONF_PATH":"/tmp/exp_conf.toml"},
+                        "environment": {
+                            "CLIPPER_BENCH_COMMAND": "digits",
+                            "CLIPPER_CONF_PATH":"/tmp/exp_conf.toml",
+                            },
                         "volumes": [
                             "${MNIST_PATH}:/mnist_data:ro",
                             "${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro",
@@ -330,32 +333,35 @@ if __name__=='__main__':
             { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
         ]
 
-    for bs in batch_strats:
 
-    
-        strat_name = bs["strategy"]
-        print("STARTING EXPERIMENT: %s" % strat_name)
-        time.sleep(5)
-        num_reqs = 25000000
-        num_reps = 1
-        debug = ""
-        # debug = "DEBUG_"
-        exp_name = "%s%s_batching" % (debug, strat_name)
-        log_dest = "experiments_logs/batching_strategy_comparison"
-        benchmarker = DigitsBenchmarker(exp_name,
-                                        log_dest,
-                                        target_qps=500000,
-                                        bench_batch_size=10000,
-                                        num_requests=num_reqs,
-                                        batch_strategy=bs)
-        # benchmarker.add_noop(num_replicas=num_reps)
-        benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-        benchmarker.add_spark_svm(num_replicas=num_reps)
-        benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
-        benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
-        benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
-        benchmarker.add_noop(num_replicas=num_reps)
-        benchmarker.run_clipper()
+    # bs = { "strategy": "learned",
+    #         "sample_size": 1000,
+    #         "opt_addr": "quantilereg:7777"}
+
+    bs = { "strategy": "static", "batch_size": 1 }
+
+    strat_name = bs["strategy"]
+    # print("STARTING EXPERIMENT: %s" % strat_name)
+    # time.sleep(5)
+    num_reqs = 10000000
+    num_reps = 1
+    debug = ""
+    # debug = "DEBUG_"
+    exp_name = "%sno-contention" % (debug)
+    log_dest = "experiments_logs/mw-contention"
+    benchmarker = DigitsBenchmarker(exp_name,
+                                    log_dest,
+                                    target_qps=500000,
+                                    bench_batch_size=10000,
+                                    num_requests=num_reqs,
+                                    batch_strategy=bs)
+    benchmarker.add_noop(num_replicas=num_reps)
+    benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+    benchmarker.add_spark_svm(num_replicas=num_reps)
+    # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+    # benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
+    # benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
+    benchmarker.run_clipper()
         # sys.exit(0)
 
 
