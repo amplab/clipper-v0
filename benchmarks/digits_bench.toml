@@ -12,7 +12,7 @@ redis_ip = "localhost"
 mnist_path = "/crankshaw-local/mnist/data/test.data"
 bench_batch_size = 500
 target_qps = 80000
-name = "digits-bench-fast-python-noop"
+name = "tf-conv"
 wait_to_end = true
 salt_cache = true
 num_predict_workers = 8
@@ -23,12 +23,12 @@ correction_policy = "logistic_regression"
 send_updates = false
 
 [batching]
-strategy = "static"
-batch_size = 250
+strategy = "aimd"
+# batch_size = 512
 
 [[models]]
 version = 1
 num_outputs = 1
-name = "noop-fast-python"
-addresses = [ "127.0.0.1:7777"]
+name = "tf-conv"
+addresses = [ "127.0.0.1:6001"]
 

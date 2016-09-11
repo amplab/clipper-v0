@@ -30,7 +30,7 @@ class ModelWrapperServerS(Structure):
 
 
 cur_dir = os.path.dirname(__file__)
-dll_path = os.path.join(cur_dir, "target/release")
+dll_path = os.path.join(cur_dir, "faster_rpc_rs/target/release")
 prefix = {'win32': ''}.get(sys.platform, 'lib')
 extension = {'darwin': '.dylib', 'win32': '.dll'}.get(sys.platform, '.so')
 lib_path = os.path.join(dll_path, prefix + "socketserver" + extension)

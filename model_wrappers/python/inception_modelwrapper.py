@@ -4,14 +4,15 @@ import skimage
 import skimage.io as skio
 import sys
 import os
-import rpc
+# import rpc
+import faster_rpc
 import tensorflow as tf
 import pandas as pd
 
 from inception import inception_model as inception
 from skimage.transform import resize
 
-class InceptionModelWrapper(rpc.ModelWrapperBase):
+class InceptionModelWrapper(faster_rpc.ModelWrapperBase):
 
     def __init__(self, batch_size, image_size, num_classes, checkpoint_path):
         self.batch_size = batch_size
@@ -109,4 +110,4 @@ if __name__=='__main__':
     model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path, file=sys.stderr)
     model = InceptionModelWrapper(3, 299, 1000, model_path)
-    rpc.start(model, 6001)
+    faster_rpc.start(model, 6001)

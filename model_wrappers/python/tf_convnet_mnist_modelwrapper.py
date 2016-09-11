@@ -4,14 +4,15 @@ import skimage
 import skimage.io as skio
 import sys
 import os
-import rpc
+# import rpc
+import faster_rpc
 import tensorflow as tf
 import pandas as pd
 import datetime
 
 from skimage.transform import resize
 
-class ConvNetMnistModelWrapper(rpc.ModelWrapperBase):
+class ConvNetMnistModelWrapper(faster_rpc.ModelWrapperBase):
 
     def __init__(self, batch_size, image_size, num_classes, checkpoint_path):
         self.batch_size = batch_size
@@ -73,7 +74,8 @@ class ConvNetMnistModelWrapper(rpc.ModelWrapperBase):
         preds = np.array(preds[:num_inputs])
         # print("Predicted: %s" % preds)
         t4 = datetime.datetime.now()
-        return (preds, (t4-t3).microseconds, (t3-t2).microseconds, (t2-t1).microseconds)
+        # return (preds, (t4-t3).microseconds, (t3-t2).microseconds, (t2-t1).microseconds)
+        return preds
 
 
 
@@ -202,12 +204,12 @@ if __name__=='__main__':
     print(model_path, file=sys.stderr)
     batch_size = int(os.environ["TF_CONV_BATCH_SIZE"])
     model = ConvNetMnistModelWrapper(batch_size, 28, 10, model_path)
-    start = datetime.datetime.now()
-    num_reqs = 1000000
-    (num_preds, st, it, tt, tct) = local_test(model, num_reqs, batch_size) # see penalty for going over batch size
-    end = datetime.datetime.now()
-    total_time = (end-start).total_seconds()
-    throughput = float(num_preds) / total_time
-    print("Made %d predictions in %f seconds. Throughput: %f" % (num_preds, total_time, throughput))
-    print("MEANS (microseconds): setup: %f, inference: %f, teardown: %f, call time %f" % (np.mean(st), np.mean(it), np.mean(tt), np.mean(tct)))
-    # rpc.start(model, 6001)
+    faster_rpc.start(model, 6001)
+    # start = datetime.datetime.now()
+    # num_reqs = 1000000
+    # (num_preds, st, it, tt, tct) = local_test(model, num_reqs, batch_size) # see penalty for going over batch size
+    # end = datetime.datetime.now()
+    # total_time = (end-start).total_seconds()
+    # throughput = float(num_preds) / total_time
+    # print("Made %d predictions in %f seconds. Throughput: %f" % (num_preds, total_time, throughput))
+    # print("MEANS (microseconds): setup: %f, inference: %f, teardown: %f, call time %f" % (np.mean(st), np.mean(it), np.mean(tt), np.mean(tct)))
