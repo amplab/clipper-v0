@@ -15,7 +15,7 @@ target_qps = 80000
 name = "tf-conv"
 wait_to_end = true
 salt_cache = true
-num_predict_workers = 8
+num_predict_workers = 12
 redis_port = 6379
 cache_size = 1000000
 slo_micros = 20000
@@ -23,8 +23,8 @@ correction_policy = "logistic_regression"
 send_updates = false
 
 [batching]
-strategy = "aimd"
-# batch_size = 512
+strategy = "static"
+batch_size = 512
 
 [[models]]
 version = 1
