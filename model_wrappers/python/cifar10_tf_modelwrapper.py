@@ -66,6 +66,7 @@ class Cifar10TfModelWrapper(faster_rpc.ModelWrapperBase):
 
 if __name__=='__main__':
     model_path = os.environ["CLIPPER_MODEL_PATH"]
+    batch_size = int(os.environ["TF_CIFAR_BATCH_SIZE"])
     print(model_path, file=sys.stderr)
-    model = Cifar10TfModelWrapper(32, 32, 10, model_path)
+    model = Cifar10TfModelWrapper(batch_size, 32, 10, model_path)
     faster_rpc.start(model, 6001)
