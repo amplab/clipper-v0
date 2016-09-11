@@ -1,0 +1,33 @@
+[package]
+name = "rpc-perf-tuning"
+version = "0.1.0"
+authors = ["Dan Crankshaw <dscrankshaw@gmail.com>"]
+
+[profile.release]
+opt-level = 3
+debug = true
+rpath = false
+lto = false
+debug-assertions = false
+codegen-units = 1
+panic = 'unwind'
+
+[[bin]]
+name="client"
+path="src/client.rs"
+
+[[bin]]
+name="server"
+path="src/server.rs"
+
+[[bin]]
+name="clippermw"
+path="src/rpc.rs"
+
+[dependencies]
+rand = "0.3"
+time = "0.1"
+# toml = "0.1"
+# log = "0.3"
+# env_logger = "0.3"
+byteorder = "0.4"

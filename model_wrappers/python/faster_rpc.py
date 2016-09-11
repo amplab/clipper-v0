@@ -86,6 +86,7 @@ class ModelWrapperServer:
             header = lib.get_next_request_header(self.obj)
             if header.code == SHUTDOWN_CODE:
                 shutdown = True
+                print("Got shutdown message (Python)")
                 lib.send_shutdown_message(self.obj)
             else:
                 assert header.code == FIXEDFLOAT_CODE
@@ -106,8 +107,8 @@ def start(model, port):
     ip = "0.0.0.0"
     with ModelWrapperServer(ip, port, model) as server:
         print("Starting to serve (Python)", file=sys.stderr)
-        # server.serve_forever()
-        server.serve_once()
+        server.serve_forever()
+        # server.serve_once()
 
 class ModelWrapperBase(object):
     def predict_ints(self, inputs):
