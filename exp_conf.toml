@@ -1,21 +1,22 @@
-salt_update_cache = true
+salt_update_cache = false
 num_message_encodes = 1
 use_lsh = false
 window_size = -1
 load_generator = "uniform"
 input_type = "float"
-request_generator = "balanced"
+request_generator = "cache_hits"
 results_path = "/tmp/benchmarking_logs"
 num_update_workers = 1
 input_length = 784
-num_benchmark_requests = 10000000
+num_benchmark_requests = 100000
 redis_ip = "redis"
 mnist_path = "/mnist_data/test.data"
-bench_batch_size = 10000
-target_qps = 500000
-name = "no-contention_160910-232452"
+bench_batch_size = 4
+target_qps = 250
+name = "DEBUG_sklearn-kernel-svm_hit_rate_20_160910-235750"
+cache_hit_rate = 0.2
 wait_to_end = false
-salt_cache = true
+salt_cache = false
 num_predict_workers = 8
 redis_port = 6379
 cache_size = 1000000
@@ -25,18 +26,9 @@ send_updates = false
 [[models]]
 version = 1
 num_outputs = 1
-name = "noop"
-addresses = [ "noop_r0:6001",]
-[[models]]
-version = 1
-num_outputs = 1
-name = "rf_d16"
-addresses = [ "rf_d16_r0:6001",]
-[[models]]
-version = 1
-num_outputs = 1
-name = "spark_svm"
-addresses = [ "spark_svm_r0:6001",]
+name = "kernel_svm"
+addresses = [ "kernel_svm_r0:6001",]
 [batching]
-batch_size = 1
-strategy = "static"
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"

@@ -23,6 +23,7 @@ class DigitsBenchmarker:
                  num_requests=3000000,
                  # message_size=200000,
                  # batch_size=100,
+                 cache_hit_rate = 0.0,
                  window_size = -1,
                  salt_cache=True,
                  batch_strategy = { "strategy": "aimd" },
@@ -70,10 +71,11 @@ class DigitsBenchmarker:
                 "salt_update_cache" : salt_cache,
                 "send_updates": False,
                 "load_generator": "uniform",
-                "request_generator": "balanced",
+                # "request_generator": "balanced",
+                "request_generator": "cache_hits",
                 "wait_to_end": False,
                 "batching": batch_strategy,
-                # "cache_hit_rate": 1.0,
+                "cache_hit_rate": cache_hit_rate,
                 # "batching": { "strategy": "aimd" },
                 # "batching": { "strategy": "static", "batch_size": batch_size },
                 # "batching": { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
@@ -334,32 +336,37 @@ if __name__=='__main__':
         ]
 
 
-    # bs = { "strategy": "learned",
-    #         "sample_size": 1000,
-    #         "opt_addr": "quantilereg:7777"}
+    bs = { "strategy": "learned",
+            "sample_size": 500,
+            "opt_addr": "quantilereg:7777"}
 
-    bs = { "strategy": "static", "batch_size": 1 }
+    # bs = { "strategy": "static", "batch_size": 1 }
 
     strat_name = bs["strategy"]
     # print("STARTING EXPERIMENT: %s" % strat_name)
     # time.sleep(5)
-    num_reqs = 10000000
+    num_reqs = 100000
     num_reps = 1
-    debug = ""
-    # debug = "DEBUG_"
-    exp_name = "%sno-contention" % (debug)
-    log_dest = "experiments_logs/mw-contention"
+    # debug = ""
+    debug = "DEBUG_"
+    hit_rate = 0.0
+    exp_name = "%ssklearn-kernel-svm_hit_rate_%d" % (debug, int(hit_rate*100))
+    log_dest = "experiments_logs/caching-pred-thruput"
     benchmarker = DigitsBenchmarker(exp_name,
                                     log_dest,
-                                    target_qps=500000,
-                                    bench_batch_size=10000,
+                                    target_qps=250,
+                                    bench_batch_size=4,
                                     num_requests=num_reqs,
-                                    batch_strategy=bs)
-    benchmarker.add_noop(num_replicas=num_reps)
-    benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-    benchmarker.add_spark_svm(num_replicas=num_reps)
+                                    batch_strategy=bs,
+                                    salt_cache=False,
+                                    cache_hit_rate = hit_rate,
+                                    )
+
+    # benchmarker.add_noop(num_replicas=num_reps)
+    # benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+    # benchmarker.add_spark_svm(num_replicas=num_reps)
     # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
-    # benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
+    benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
     # benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
     benchmarker.run_clipper()
         # sys.exit(0)
