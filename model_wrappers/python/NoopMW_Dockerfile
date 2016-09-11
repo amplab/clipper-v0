@@ -2,13 +2,11 @@ FROM continuumio/anaconda:latest
 
 MAINTAINER Dan Crankshaw <dscrankshaw@gmail.com>
 
-COPY __init__.py rpc.py noop_modelwrapper.py /tmp/
+FROM clipper/fast-rpc
 
-ENV CLIPPER_MODEL_PATH=/model
+MAINTAINER Dan Crankshaw <dscrankshaw@gmail.com>
 
-RUN mkdir -p /model \
+COPY noop_modelwrapper_fast_rpc.py /modelwrapper/
 
-EXPOSE 6001
-
-CMD ["python", "/tmp/noop_modelwrapper.py"]
+CMD ["python", "/modelwrapper/noop_modelwrapper_fast_rpc.py"]
 

@@ -2,11 +2,11 @@ services:
   clipper:
     cpuset: 2-21
     depends_on: [redis, quantilereg, rf_d16_r0, spark_svm_r0, linear_svm_r0, kernel_svm_r0,
-      logistic_reg_r0]
+      logistic_reg_r0, noop_r0]
     environment: {CLIPPER_BENCH_COMMAND: digits, CLIPPER_CONF_PATH: /tmp/exp_conf.toml}
     image: cl-dev-digits
     volumes: ['${MNIST_PATH}:/mnist_data:ro', '${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro',
-      '${CLIPPER_ROOT}/experiments_logs/debug-new-rpc:/tmp/benchmarking_logs']
+      '${CLIPPER_ROOT}/experiments_logs/batching_strategy_comparison:/tmp/benchmarking_logs']
   kernel_svm_r0:
     cpuset: 25-25
     image: clipper/sklearn-mw-dev
@@ -19,6 +19,10 @@ services:
     cpuset: 26-26
     image: clipper/sklearn-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro']
+  noop_r0:
+    cpuset: 27-27
+    image: clipper/noop-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
   quantilereg: {cpuset: 1-1, image: clipper/quantile-reg}
   redis: {cpuset: 0-0, image: 'redis:alpine'}
   rf_d16_r0:

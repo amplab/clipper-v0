@@ -13,7 +13,7 @@ redis_ip = "redis"
 mnist_path = "/mnist_data/test.data"
 bench_batch_size = 10000
 target_qps = 500000
-name = "DEBUG_fast-rpc-debug-mws_160910-212745"
+name = "learned_batching_160910-223238"
 wait_to_end = false
 salt_cache = true
 num_predict_workers = 8
@@ -47,6 +47,11 @@ version = 1
 num_outputs = 1
 name = "logistic_reg"
 addresses = [ "logistic_reg_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "noop"
+addresses = [ "noop_r0:6001",]
 [batching]
 sample_size = 500
 opt_addr = "quantilereg:7777"

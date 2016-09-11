@@ -22,9 +22,11 @@ class DigitsBenchmarker:
                  bench_batch_size=100,
                  num_requests=3000000,
                  # message_size=200000,
-                 batch_size=100,
+                 # batch_size=100,
                  window_size = -1,
-                 salt_cache=True):
+                 salt_cache=True,
+                 batch_strategy = { "strategy": "aimd" },
+                 ):
         self.remote_node = "c69.millennium.berkeley.edu"
         env.key_filename = "~/.ssh/c70.millenium"
         env.user = "crankshaw"
@@ -70,10 +72,11 @@ class DigitsBenchmarker:
                 "load_generator": "uniform",
                 "request_generator": "balanced",
                 "wait_to_end": False,
+                "batching": batch_strategy,
                 # "cache_hit_rate": 1.0,
                 # "batching": { "strategy": "aimd" },
                 # "batching": { "strategy": "static", "batch_size": batch_size },
-                "batching": { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
+                # "batching": { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
                 "models": []
                 }
 
@@ -221,13 +224,13 @@ class DigitsBenchmarker:
         container_mp = "/model"
         self.add_model(name_base, image, mp, container_mp, num_replicas)
 
-    # def add_noop(self, num_replicas=1):
-    #     name_base = "noop"
-    #     image = "clipper/noop-mw"
-    #     # these values don't matter
-    #     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
-    #     container_mp = "/model"
-    #     self.add_model(name_base, image, mp, container_mp, num_replicas)
+    def add_noop(self, num_replicas=1):
+        name_base = "noop"
+        image = "clipper/noop-mw-dev"
+        # these values don't matter
+        mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
+        container_mp = "/model"
+        self.add_model(name_base, image, mp, container_mp, num_replicas)
 
 
     def add_spark_svm(self, num_replicas=1):
@@ -320,25 +323,40 @@ if __name__=='__main__':
     # print("STARTING EXPERIMENT. BATCH SIZE: %d, num requests: %d" % (batch_size, num_reqs))
     # time.sleep(10)
     # window = 1
-    num_reqs = 25000000
-    num_reps = 1
-    # debug = ""
-    debug = "DEBUG_"
-    exp_name = "%sfast-rpc-debug-mws" % (debug)
-    log_dest = "experiments_logs/debug-new-rpc"
-    benchmarker = DigitsBenchmarker(exp_name,
-                                    log_dest,
-                                    target_qps=500000,
-                                    bench_batch_size=10000,
-                                    num_requests=num_reqs)
-    # benchmarker.add_noop(num_replicas=num_reps)
-    benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-    benchmarker.add_spark_svm(num_replicas=num_reps)
-    benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
-    benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
-    benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
-    benchmarker.run_clipper()
-    # time.sleep(5)
+
+    batch_strats = [
+            { "strategy": "aimd" },
+            { "strategy": "static", "batch_size": 1 },
+            { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
+        ]
+
+    for bs in batch_strats:
+
+    
+        strat_name = bs["strategy"]
+        print("STARTING EXPERIMENT: %s" % strat_name)
+        time.sleep(5)
+        num_reqs = 25000000
+        num_reps = 1
+        debug = ""
+        # debug = "DEBUG_"
+        exp_name = "%s%s_batching" % (debug, strat_name)
+        log_dest = "experiments_logs/batching_strategy_comparison"
+        benchmarker = DigitsBenchmarker(exp_name,
+                                        log_dest,
+                                        target_qps=500000,
+                                        bench_batch_size=10000,
+                                        num_requests=num_reqs,
+                                        batch_strategy=bs)
+        # benchmarker.add_noop(num_replicas=num_reps)
+        benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+        benchmarker.add_spark_svm(num_replicas=num_reps)
+        benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+        benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
+        benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
+        benchmarker.add_noop(num_replicas=num_reps)
+        benchmarker.run_clipper()
+        # sys.exit(0)
 
 
 
