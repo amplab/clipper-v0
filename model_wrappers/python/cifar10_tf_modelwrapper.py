@@ -1,16 +1,16 @@
 from __future__ import print_function
+import faster_rpc
 import numpy as np
 import skimage
 import skimage.io as skio
 import sys
 import os
-import rpc
 import tensorflow as tf
 
 from skimage.transform import resize
 from cifar10_net import cifar10
 
-class Cifar10TfModelWrapper(rpc.ModelWrapperBase):
+class Cifar10TfModelWrapper(faster_rpc.ModelWrapperBase):
 
     def __init__(self, batch_size, image_size, num_classes, checkpoint_path):
         self.batch_size = batch_size
@@ -68,4 +68,4 @@ if __name__=='__main__':
     model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path, file=sys.stderr)
     model = Cifar10TfModelWrapper(32, 32, 10, model_path)
-    rpc.start(model, 6001)
+    faster_rpc.start(model, 6001)
