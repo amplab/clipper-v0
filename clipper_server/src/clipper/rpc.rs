@@ -3,6 +3,7 @@ use std::net::TcpStream;
 use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
 use std::io::{Read, Write, Cursor};
 use std::mem;
+use std::slice;
 use server::{Input, Output, InputType};
 use batching::RpcPredictRequest;
 use time;
@@ -71,7 +72,7 @@ pub fn send_batch(stream: &mut TcpStream,
             if l < 0 {
                 encode_var_floats(inputs)
             } else {
-                encode_fixed_floats(inputs, l)
+                fast_encode_fixed_floats(inputs, l)
             }
         }
         &InputType::Byte(l) => {
@@ -206,6 +207,28 @@ pub fn decode_fixed_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
     responses
 }
 
+fn fast_encode_fixed_floats(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
+    let header_bytes = 9; // 1 for type code + 4 num_inputs + 4 input len
+    let num_bytes_total = header_bytes + inputs.len() * length as usize * mem::size_of::<f64>();
+    let mut message: Vec<u8> = Vec::with_capacity(num_bytes_total);
+    message.push(FIXEDFLOAT_CODE);
+    message.write_u32::<LittleEndian>(inputs.len() as u32).unwrap();
+    message.write_u32::<LittleEndian>(length as u32).unwrap();
+    for x in inputs.iter() {
+        match *x.input {
+            Input::Floats { ref f, length: _ } => {
+                let ptr = f.as_ptr();
+                let u8_amount = f.len() * mem::size_of::<f64>();
+                let f_u8: &[u8] = unsafe { slice::from_raw_parts(ptr as *const u8, u8_amount) };
+                message.extend_from_slice(f_u8);
+            }
+            _ => unreachable!(),
+        }
+    }
+    message
+}
+
+#[allow(dead_code)]
 fn encode_fixed_floats(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
     let mut message = Vec::new();
     message.push(FIXEDFLOAT_CODE);
