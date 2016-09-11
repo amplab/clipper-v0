@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-time docker build -f DigitsBenchDockerFile -t cl-dev-digits ./
+sudo time docker build -f DigitsBenchDockerFile -t cl-dev-digits ./

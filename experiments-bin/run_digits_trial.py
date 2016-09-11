@@ -54,7 +54,7 @@ class DigitsBenchmarker:
                 "redis_port" : 6379,
                 "results_path" : "/tmp/benchmarking_logs",
                 "num_predict_workers" : 8,
-                "num_update_workers" : 10,
+                "num_update_workers" : 1,
                 "cache_size" : 1000000,
                 "mnist_path" : "/mnist_data/test.data",
                 # "num_benchmark_requests" : 10000000,
@@ -62,18 +62,18 @@ class DigitsBenchmarker:
                 # "target_qps" : 10000*self.NUM_REPS,
                 "target_qps" : target_qps,
                 # "bench_batch_size" : 150*self.NUM_REPS,
-                # "bench_batch_size" : bench_batch_size,
+                "bench_batch_size" : bench_batch_size,
                 # "salt_cache" : False,
                 "salt_cache" : salt_cache,
                 "salt_update_cache" : salt_cache,
-                "send_updates": True,
+                "send_updates": False,
                 "load_generator": "uniform",
-                "request_generator": "cached_updates",
+                "request_generator": "balanced",
                 "wait_to_end": False,
                 # "cache_hit_rate": 1.0,
                 # "batching": { "strategy": "aimd" },
-                "batching": { "strategy": "static", "batch_size": batch_size },
-                # "batching": { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
+                # "batching": { "strategy": "static", "batch_size": batch_size },
+                "batching": { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
                 "models": []
                 }
 
@@ -90,7 +90,7 @@ class DigitsBenchmarker:
                     "clipper": {"image": "cl-dev-digits",
                         "cpuset": self.reserve_cores(20),
                         "depends_on": ["redis", "quantilereg"],
-                        "environment": {"CLIPPER_BENCH_COMMAND": "thruput", "CLIPPER_CONF_PATH":"/tmp/exp_conf.toml"},
+                        "environment": {"CLIPPER_BENCH_COMMAND": "digits", "CLIPPER_CONF_PATH":"/tmp/exp_conf.toml"},
                         "volumes": [
                             "${MNIST_PATH}:/mnist_data:ro",
                             "${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro",
@@ -221,22 +221,13 @@ class DigitsBenchmarker:
         container_mp = "/model"
         self.add_model(name_base, image, mp, container_mp, num_replicas)
 
-    def add_noop(self, num_replicas=1):
-        name_base = "noop"
-        image = "clipper/noop-mw"
-        # these values don't matter
-        mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
-        container_mp = "/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas)
-
-    def add_cpp_noop(self, num_replicas=1):
-        name_base = "cpp-noop"
-        image = "clipper/cpp-noop-mw"
-        # these values don't matter
-        mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
-        container_mp = "/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas)
-
+    # def add_noop(self, num_replicas=1):
+    #     name_base = "noop"
+    #     image = "clipper/noop-mw"
+    #     # these values don't matter
+    #     mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
+    #     container_mp = "/model"
+    #     self.add_model(name_base, image, mp, container_mp, num_replicas)
 
 
     def add_spark_svm(self, num_replicas=1):
@@ -274,10 +265,6 @@ class DigitsBenchmarker:
         with open(os.path.join(self.CLIPPER_ROOT, self.benchmarking_logs, "%s_logs.txt" % self.experiment_name), "w") as f:
             subprocess.call(["sudo", "docker", "logs", "experimentsbin_clipper_1"], stdout=f, stderr=subprocess.STDOUT, universal_newlines=True)
 
-        with open(os.path.join(self.CLIPPER_ROOT, self.benchmarking_logs, "%s_noop_logs.txt" % self.experiment_name), "w") as f:
-            subprocess.call(["sudo", "docker", "logs", "experimentsbin_noop_r0_1"], stdout=f, stderr=subprocess.STDOUT, universal_newlines=True)
-
-
 
     def run_with_docker(self):
         """
@@ -312,30 +299,6 @@ class DigitsBenchmarker:
                 sudo("docker-compose stop")
 
 
-# def gen_configs():
-#
-#     num_reps = 1
-#     exp_name = "DEBUG_sklearn_logreg_%d_replicas" % num_reps
-#     log_dest = "benchmarking_logs/replica-scaling"
-#     # every 4 replicas add another million to the number of requests
-#     # to let things stabilize
-#     num_requests = 1000000 * (num_reps / 4 + 1)
-#     benchmarker = DigitsBenchmarker(exp_name, log_dest, 10000*num_reps, 150*num_reps, num_requests)
-#     benchmarker.add_sklearn_log_regression(num_replicas=num_reps)
-#     benchmarker.run_clipper()
-#
-#     ## SKLEARN RF
-#     # global cur_model_core_num
-#     # num_reps = NUM_REPS
-#     # add_spark_svm(num_replicas=num_reps)
-#     # add_sklearn_rf(depth=16, num_replicas=num_reps)
-#     # add_sklearn_linear_svm(num_replicas=num_reps)
-#     # add_sklearn_rf(depth=8, num_replicas=num_reps)
-#     # add_sklearn_kernel_svm(num_replicas=num_reps)
-#
-#
-#     # cur_model_core_num = 0
-#
 
 if __name__=='__main__':
 
@@ -354,25 +317,26 @@ if __name__=='__main__':
         # else:
         #     num_reqs = 10000
     # for batch_size in [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 50000, 100000]:
-    num_reqs = 25000000
     # print("STARTING EXPERIMENT. BATCH SIZE: %d, num requests: %d" % (batch_size, num_reqs))
     # time.sleep(10)
-    num_reps = 1
     # window = 1
-    debug = ""
-    # debug = "DEBUG_"
-    exp_name = "%slatency_breakdown" % (debug)
-    log_dest = "benchmarking_logs/rpc_latency_breakdown"
+    num_reqs = 25000000
+    num_reps = 1
+    # debug = ""
+    debug = "DEBUG_"
+    exp_name = "%sfast-rpc-debug-mws" % (debug)
+    log_dest = "experiments_logs/debug-new-rpc"
     benchmarker = DigitsBenchmarker(exp_name,
                                     log_dest,
-                                    target_qps=1000000,
-                                    num_requests=num_reqs,
-                                    # message_size=message_size,
-                                    batch_size = 250)
-    benchmarker.add_noop(num_replicas=num_reps)
-    # benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-    # benchmarker.add_spark_svm(num_replicas=num_reps)
-    # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+                                    target_qps=500000,
+                                    bench_batch_size=10000,
+                                    num_requests=num_reqs)
+    # benchmarker.add_noop(num_replicas=num_reps)
+    benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+    benchmarker.add_spark_svm(num_replicas=num_reps)
+    benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+    benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
+    benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
     benchmarker.run_clipper()
     # time.sleep(5)
 

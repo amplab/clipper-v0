@@ -4,7 +4,8 @@ import time
 import datetime
 import sys
 import os
-import rpc
+# import rpc
+import faster_rpc
 import findspark
 findspark.init()
 import pyspark
@@ -15,7 +16,7 @@ from pyspark.mllib.tree import RandomForestModel
 
 
 
-class PySparkModelWrapper(rpc.ModelWrapperBase):
+class PySparkModelWrapper(faster_rpc.ModelWrapperBase):
 
 
     def __init__(self, path):
@@ -66,5 +67,5 @@ if __name__=='__main__':
     model_path = os.environ["CLIPPER_MODEL_PATH"]
     print(model_path)
     model = PySparkModelWrapper(model_path)
-    rpc.start(model, 6001)
+    faster_rpc.start(model, 6001)
 

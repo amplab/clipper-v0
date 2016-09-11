@@ -4,15 +4,16 @@ use_lsh = false
 window_size = -1
 load_generator = "uniform"
 input_type = "float"
-request_generator = "cached_updates"
+request_generator = "balanced"
 results_path = "/tmp/benchmarking_logs"
 num_update_workers = 1
 input_length = 784
 num_benchmark_requests = 25000000
 redis_ip = "redis"
 mnist_path = "/mnist_data/test.data"
-target_qps = 1000000
-name = "latency_breakdown_160910-005620"
+bench_batch_size = 10000
+target_qps = 500000
+name = "DEBUG_fast-rpc-debug-mws_160910-212745"
 wait_to_end = false
 salt_cache = true
 num_predict_workers = 8
@@ -20,12 +21,33 @@ redis_port = 6379
 cache_size = 1000000
 slo_micros = 20000
 correction_policy = "logistic_regression"
-send_updates = true
+send_updates = false
 [[models]]
 version = 1
 num_outputs = 1
-name = "noop"
-addresses = [ "noop_r0:6001",]
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "kernel_svm"
+addresses = [ "kernel_svm_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001",]
 [batching]
-batch_size = 250
-strategy = "static"
+sample_size = 500
+opt_addr = "quantilereg:7777"
+strategy = "learned"

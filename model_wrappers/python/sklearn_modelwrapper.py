@@ -5,7 +5,8 @@ import time
 import datetime
 import sys
 import os
-import rpc
+# import rpc
+import faster_rpc
 import pandas as pd
 from sklearn import linear_model as lm
 from sklearn import svm
@@ -16,7 +17,7 @@ import sys
 
 
 
-class SklearnModelWrapper(rpc.ModelWrapperBase):
+class SklearnModelWrapper(faster_rpc.ModelWrapperBase):
 
 
     def __init__(self, path):
@@ -57,4 +58,4 @@ if __name__=='__main__':
     pkl_path = os.path.join(model_path, pkl_names[0])
     print(pkl_path, file=sys.stderr)
     model = SklearnModelWrapper(pkl_path)
-    rpc.start(model, 6001)
+    faster_rpc.start(model, 6001)

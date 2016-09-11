@@ -1,0 +1,541 @@
+{
+    "clipper_conf": {
+        "batching": {
+            "sample_size": 1000, 
+            "strategy": "learned"
+        }, 
+        "num_benchmark_requests": 50000, 
+        "num_message_encodes": 1, 
+        "name": "kernelsvm-thru_160819-093340", 
+        "bench_batch_size": 50, 
+        "models": [
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "spark_svm", 
+                "addresses": [
+                    "spark_svm_r0:6001", 
+                    "spark_svm_r1:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "linear_svm", 
+                "addresses": [
+                    "linear_svm_r0:6001", 
+                    "linear_svm_r1:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "logistic_reg", 
+                "addresses": [
+                    "logistic_reg_r0:6001", 
+                    "logistic_reg_r1:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "rf_d16", 
+                "addresses": [
+                    "rf_d16_r0:6001", 
+                    "rf_d16_r1:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "kernel_svm", 
+                "addresses": [
+                    "kernel_svm_r0:6001", 
+                    "kernel_svm_r1:6001", 
+                    "kernel_svm_r2:6001", 
+                    "kernel_svm_r3:6001", 
+                    "kernel_svm_r4:6001", 
+                    "kernel_svm_r5:6001", 
+                    "kernel_svm_r6:6001", 
+                    "kernel_svm_r7:6001", 
+                    "kernel_svm_r8:6001", 
+                    "kernel_svm_r9:6001", 
+                    "kernel_svm_r10:6001", 
+                    "kernel_svm_r11:6001", 
+                    "kernel_svm_r12:6001", 
+                    "kernel_svm_r13:6001", 
+                    "kernel_svm_r14:6001", 
+                    "kernel_svm_r15:6001", 
+                    "kernel_svm_r16:6001", 
+                    "kernel_svm_r17:6001", 
+                    "kernel_svm_r18:6001", 
+                    "kernel_svm_r19:6001", 
+                    "kernel_svm_r20:6001", 
+                    "kernel_svm_r21:6001", 
+                    "kernel_svm_r22:6001", 
+                    "kernel_svm_r23:6001", 
+                    "kernel_svm_r24:6001", 
+                    "kernel_svm_r25:6001", 
+                    "kernel_svm_r26:6001", 
+                    "kernel_svm_r27:6001", 
+                    "kernel_svm_r28:6001", 
+                    "kernel_svm_r29:6001"
+                ]
+            }
+        ], 
+        "input_type": "float", 
+        "redis_port": 6379, 
+        "target_qps": 1000, 
+        "results_path": "/tmp/benchmarking_logs", 
+        "mnist_path": "/mnist_data/test.data", 
+        "num_update_workers": 1, 
+        "window_size": -1, 
+        "num_predict_workers": 8, 
+        "redis_ip": "redis", 
+        "cache_size": 49999, 
+        "slo_micros": 20000, 
+        "correction_policy": "logistic_regression", 
+        "salt_cache": true, 
+        "use_lsh": false, 
+        "input_length": 784
+    }, 
+    "docker_compose_conf": {
+        "services": {
+            "kernel_svm_r7": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "21-21", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r18": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "32-32", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r19": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "33-33", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r14": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "28-28", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r15": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "29-29", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r16": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "30-30", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r17": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "31-31", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "rf_d16_r0": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl"
+                ], 
+                "cpuset": "12-12", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "rf_d16_r1": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/50rf_pred3_depth16.pkl"
+                ], 
+                "cpuset": "13-13", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r12": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "26-26", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r13": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "27-27", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r29": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "43-43", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "clipper": {
+                "cpuset": "1-5", 
+                "depends_on": [
+                    "redis", 
+                    "spark_svm_r0", 
+                    "spark_svm_r1", 
+                    "linear_svm_r0", 
+                    "linear_svm_r1", 
+                    "logistic_reg_r0", 
+                    "logistic_reg_r1", 
+                    "rf_d16_r0", 
+                    "rf_d16_r1", 
+                    "kernel_svm_r0", 
+                    "kernel_svm_r1", 
+                    "kernel_svm_r2", 
+                    "kernel_svm_r3", 
+                    "kernel_svm_r4", 
+                    "kernel_svm_r5", 
+                    "kernel_svm_r6", 
+                    "kernel_svm_r7", 
+                    "kernel_svm_r8", 
+                    "kernel_svm_r9", 
+                    "kernel_svm_r10", 
+                    "kernel_svm_r11", 
+                    "kernel_svm_r12", 
+                    "kernel_svm_r13", 
+                    "kernel_svm_r14", 
+                    "kernel_svm_r15", 
+                    "kernel_svm_r16", 
+                    "kernel_svm_r17", 
+                    "kernel_svm_r18", 
+                    "kernel_svm_r19", 
+                    "kernel_svm_r20", 
+                    "kernel_svm_r21", 
+                    "kernel_svm_r22", 
+                    "kernel_svm_r23", 
+                    "kernel_svm_r24", 
+                    "kernel_svm_r25", 
+                    "kernel_svm_r26", 
+                    "kernel_svm_r27", 
+                    "kernel_svm_r28", 
+                    "kernel_svm_r29"
+                ], 
+                "image": "cl-dev-digits", 
+                "volumes": [
+                    "${MNIST_PATH}:/mnist_data:ro", 
+                    "${CLIPPER_ROOT}/digits_bench.toml:/tmp/digits_bench.toml:ro", 
+                    "${CLIPPER_ROOT}/benchmarking_logs/thruput_mw_debug:/tmp/benchmarking_logs"
+                ]
+            }, 
+            "redis": {
+                "cpuset": "0-0", 
+                "image": "redis:alpine"
+            }, 
+            "kernel_svm_r10": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "24-24", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r11": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "25-25", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r21": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "35-35", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r20": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "34-34", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "spark_svm_r1": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model"
+                ], 
+                "cpuset": "7-7", 
+                "image": "clipper/spark-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+                ]
+            }, 
+            "spark_svm_r0": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model"
+                ], 
+                "cpuset": "6-6", 
+                "image": "clipper/spark-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r25": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "39-39", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r24": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "38-38", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "linear_svm_r0": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl"
+                ], 
+                "cpuset": "8-8", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "linear_svm_r1": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/linearsvm_pred3.pkl"
+                ], 
+                "cpuset": "9-9", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r27": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "41-41", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r28": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "42-42", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r8": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "22-22", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r9": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "23-23", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r2": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "16-16", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r3": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "17-17", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r0": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "14-14", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r1": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "15-15", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r6": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "20-20", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r23": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "37-37", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r4": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "18-18", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r5": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "19-19", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r22": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "36-36", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "kernel_svm_r26": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/svm_pred3.pkl"
+                ], 
+                "cpuset": "40-40", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r1": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl"
+                ], 
+                "cpuset": "11-11", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r0": {
+                "environment": [
+                    "CLIPPER_MODEL_PATH=/model/log_regression_pred3.pkl"
+                ], 
+                "cpuset": "10-10", 
+                "image": "clipper/sklearn-mw", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }
+        }, 
+        "version": "2"
+    }
+}

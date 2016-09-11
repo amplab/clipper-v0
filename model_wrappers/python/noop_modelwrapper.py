@@ -46,4 +46,4 @@ if __name__=='__main__':
     # model_path = os.environ["CLIPPER_MODEL_PATH"]
     # print(model_path, file=sys.stderr)
     model = NoopModelWrapper()
-    rpc.start(model, 7777)
+    rpc.start(model, 6001)

@@ -74,7 +74,7 @@ fn main() {
     match env::var(command_key).unwrap().as_str() {
         "digits" => start_digits_benchmark(&conf),
         "imagenet" => start_imagenet_benchmark(&conf),
-        "thruput" => start_thruput_benchmark(&conf),
+        "thruputjkdshfkjsdhfds" => start_thruput_benchmark(&conf),
         _ => panic!("Invalid benchmark command"),
     }
 
@@ -348,6 +348,9 @@ impl RequestGenerator for BalancedRequestGenerator {
 
 #[allow(unused_variables)] // needed for metrics shutdown signal
 fn start_thruput_benchmark(conf_path: &String) {
+    if true {
+        panic!("THIS BENCHMARK IS BROKEN");
+    }
     let path = Path::new(conf_path);
     let display = path.display();
     // let message_size_key = "CLIPPER_MESSAGE_SIZE";

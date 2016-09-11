@@ -217,30 +217,30 @@ impl<C> PredictionBatcher<C>
             }
         };
 
-        let batch_setup_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("{}:batch_setup_hist:", name);
-            metric_register.write().unwrap().create_histogram(metric_name, 8224)
-        };
-
-        let rpc_time_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("{}:rpc_time_hist:", name);
-            metric_register.write().unwrap().create_histogram(metric_name, 8224)
-        };
-
-        let ser_time_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("{}:ser_time_hist:", name);
-            metric_register.write().unwrap().create_histogram(metric_name, 8224)
-        };
-
-        let send_time_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("{}:send_time_hist:", name);
-            metric_register.write().unwrap().create_histogram(metric_name, 8224)
-        };
-
-        let recv_time_hist: Arc<metrics::Histogram> = {
-            let metric_name = format!("{}:recv_time_hist:", name);
-            metric_register.write().unwrap().create_histogram(metric_name, 8224)
-        };
+        // let batch_setup_hist: Arc<metrics::Histogram> = {
+        //     let metric_name = format!("{}:batch_setup_hist:", name);
+        //     metric_register.write().unwrap().create_histogram(metric_name, 8224)
+        // };
+        //
+        // let rpc_time_hist: Arc<metrics::Histogram> = {
+        //     let metric_name = format!("{}:rpc_time_hist:", name);
+        //     metric_register.write().unwrap().create_histogram(metric_name, 8224)
+        // };
+        //
+        // let ser_time_hist: Arc<metrics::Histogram> = {
+        //     let metric_name = format!("{}:ser_time_hist:", name);
+        //     metric_register.write().unwrap().create_histogram(metric_name, 8224)
+        // };
+        //
+        // let send_time_hist: Arc<metrics::Histogram> = {
+        //     let metric_name = format!("{}:send_time_hist:", name);
+        //     metric_register.write().unwrap().create_histogram(metric_name, 8224)
+        // };
+        //
+        // let recv_time_hist: Arc<metrics::Histogram> = {
+        //     let metric_name = format!("{}:recv_time_hist:", name);
+        //     metric_register.write().unwrap().create_histogram(metric_name, 8224)
+        // };
 
         // block until new request, then try to get more requests
         while let Ok(first_req) = receiver.recv() {
@@ -249,7 +249,7 @@ impl<C> PredictionBatcher<C>
             // NOTE: We only check the first request, because the request
             // queue is in FIFO order so this is guaranteed to be the oldest
             // request in the batch.
-            let t1 = time::precise_time_ns();
+            // let t1 = time::precise_time_ns();
             let delay =
                 first_req.recv_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
             if first_req.ttl && delay > slo_micros as i64 {
@@ -271,15 +271,14 @@ impl<C> PredictionBatcher<C>
             }
             assert!(batch.len() > 0);
 
-            let t2 = time::precise_time_ns();
-            let batch_setup_time = t2 - t1;
-            batch_setup_hist.insert(batch_setup_time as i64);
-            let (response_floats, ser_time, send_time, recv_time) =
-                rpc::send_batch(&mut stream, &batch, &input_type);
+            // let t2 = time::precise_time_ns();
+            // let batch_setup_time = t2 - t1;
+            // batch_setup_hist.insert(batch_setup_time as i64);
+            let (response_floats, _, _, _) = rpc::send_batch(&mut stream, &batch, &input_type);
 
-            ser_time_hist.insert(ser_time as i64);
-            send_time_hist.insert(send_time as i64);
-            recv_time_hist.insert(recv_time as i64);
+            // ser_time_hist.insert(ser_time as i64);
+            // send_time_hist.insert(send_time as i64);
+            // recv_time_hist.insert(recv_time as i64);
 
             let end_time = time::PreciseTime::now();
             let latency = start_time.to(end_time).num_microseconds().unwrap();
@@ -288,8 +287,8 @@ impl<C> PredictionBatcher<C>
             }
 
             let measurement_time = time::precise_time_ns();
-            let rpc_time = measurement_time - t2;
-            rpc_time_hist.insert(rpc_time as i64);
+            // let rpc_time = measurement_time - t2;
+            // rpc_time_hist.insert(rpc_time as i64);
             for b in batch.iter() {
                 let var_load_batch_metric = VariableLoadBatchResponseMetrics {
                     measurement_time_nanos: measurement_time,

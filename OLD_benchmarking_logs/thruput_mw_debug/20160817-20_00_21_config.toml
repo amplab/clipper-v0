@@ -1,0 +1,42 @@
+num_benchmark_requests = 1000000
+num_message_encodes = 1
+name = "clipper-test"
+bench_batch_size = 300
+input_type = "float"
+redis_port = 6379
+target_qps = 40000
+results_path = "/tmp/benchmarking_logs"
+mnist_path = "/mnist_data/test.data"
+num_update_workers = 1
+window_size = -1
+num_predict_workers = 8
+redis_ip = "redis"
+cache_size = 49999
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+use_lsh = false
+input_length = 784
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+addresses = [ "spark_svm_r0:6001", "spark_svm_r1:6001", "spark_svm_r2:6001", "spark_svm_r3:6001", "spark_svm_r4:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+addresses = [ "linear_svm_r0:6001", "linear_svm_r1:6001", "linear_svm_r2:6001", "linear_svm_r3:6001", "linear_svm_r4:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "logistic_reg"
+addresses = [ "logistic_reg_r0:6001", "logistic_reg_r1:6001", "logistic_reg_r2:6001", "logistic_reg_r3:6001", "logistic_reg_r4:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "rf_d16"
+addresses = [ "rf_d16_r0:6001", "rf_d16_r1:6001", "rf_d16_r2:6001", "rf_d16_r3:6001", "rf_d16_r4:6001", "rf_d16_r5:6001", "rf_d16_r6:6001",]
+[batching]
+sample_size = 1000
+strategy = "learned"
