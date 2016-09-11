@@ -80,6 +80,17 @@ impl ModelWrapperServer {
 
     }
 
+    pub fn fast_deserialize_fixed_floats(&mut self, input_buffer: &mut [f64]) {
+        let h = self.header.as_ref().unwrap();
+        let total_inputs = (h.num_inputs * h.input_len) as usize;
+        let payload_bytes = total_inputs * mem::size_of::<f64>();
+        let buffer_ptr = input_buffer.as_ptr();
+        let payload_buffer: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(buffer_ptr as *mut u8, payload_bytes) };
+        self.stream.as_ref().unwrap().read_exact(payload_buffer).unwrap();
+    }
+
+    #[allow(dead_code)]
     pub fn get_fixed_floats_payload(&mut self, input_buffer: &mut [f64]) {
 
         let h = self.header.as_ref().unwrap();
@@ -171,7 +182,9 @@ pub extern "C" fn get_fixed_floats_payload(ptr: *mut ModelWrapperServer,
         // v[..].clone_from_slice(slice);
         slice
     };
-    server.get_fixed_floats_payload(input_buffer);
+    // server.get_fixed_floats_payload(input_buffer);
+    server.fast_deserialize_fixed_floats(input_buffer);
+
 }
 
 #[no_mangle]
