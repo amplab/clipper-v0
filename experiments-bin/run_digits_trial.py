@@ -345,17 +345,17 @@ if __name__=='__main__':
     strat_name = bs["strategy"]
     # print("STARTING EXPERIMENT: %s" % strat_name)
     # time.sleep(5)
-    num_reqs = 100000
+    num_reqs = 1000000
     num_reps = 1
-    # debug = ""
+    debug = ""
     debug = "DEBUG_"
-    hit_rate = 0.0
+    hit_rate = 0.2
     exp_name = "%ssklearn-kernel-svm_hit_rate_%d" % (debug, int(hit_rate*100))
     log_dest = "experiments_logs/caching-pred-thruput"
     benchmarker = DigitsBenchmarker(exp_name,
                                     log_dest,
-                                    target_qps=250,
-                                    bench_batch_size=4,
+                                    target_qps=50000,
+                                    bench_batch_size=500,
                                     num_requests=num_reqs,
                                     batch_strategy=bs,
                                     salt_cache=False,
