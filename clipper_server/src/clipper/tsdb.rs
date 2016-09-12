@@ -23,6 +23,18 @@ pub fn write_counter(db_name: &str, counter: &Arc<Counter>) {
     send_post_request(encoded_url.as_str(), &body);
 }
 
+pub fn write_ratio(db_name: &str, ratio: &Arc<RatioCounter>) {
+
+}
+
+pub fn write_meter(db_name: &str, meter: &Arc<Meter>) {
+
+}
+
+pub fn write_histogram(db_name: &str, histogram: &Arc<Histogram>) {
+	
+}
+
 fn send_post_request(url: &str, body: &str) {
 	let mut data = body.as_bytes();
 
