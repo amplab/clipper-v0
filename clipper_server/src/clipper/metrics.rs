@@ -3,7 +3,7 @@ use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
-use tsdb::{Tsdb};
+use tsdb;
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
@@ -438,8 +438,9 @@ pub struct Registry {
 }
 
 impl Registry {
-    pub fn new(name: String, db_ip: String, db_port: u16) -> Registry {
+    pub fn new(name: String) -> Registry {
         // Create a new time series database to store these metrics
+        tsdb::create(&name);
         Registry {
             name: name.clone(),
             db: Tsdb::new(name.clone(), db_ip.to_string(), db_port),
@@ -512,21 +513,16 @@ impl Registry {
     }
 
     pub fn persist(&self) {
-        let mut write = self.db.new_write();
-        for x in self.counters.iter() {
-            write.append_counter(x);
+        if self.counters.len() > 0 {
+            for x in self.counters.iter() {
+                tsdb::write_counter(&self.name, x);
+            }
         }
-        for x in self.meters.iter() {
-            write.append_meter(x);
-        }
-        for x in self.ratio_counters.iter() {
-            write.append_ratio(x);
-        }
-        for x in self.histograms.iter() {
-            write.append_histogram(x);
-        }
-        write.execute();
     }
+
+    // pub fn report_and_reset(&self) -> String {
+    //
+    // }
 
     pub fn reset(&self) {
         for x in self.counters.iter() {
