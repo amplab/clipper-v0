@@ -72,7 +72,7 @@ pub fn send_batch(stream: &mut TcpStream,
             if l < 0 {
                 encode_var_floats(inputs)
             } else {
-                fast_encode_fixed_floats(inputs, l)
+                encode_fixed_floats(inputs, l)
             }
         }
         &InputType::Byte(l) => {
@@ -93,7 +93,9 @@ pub fn send_batch(stream: &mut TcpStream,
 
     let num_response_bytes = inputs.len() * mem::size_of::<Output>();
     let mut response_buffer: Vec<u8> = vec![0; num_response_bytes];
+    // println!("AAAAAAAAAAAAAA: NUM RESPONSE BYTES: {}", num_response_bytes);
     stream.read_exact(&mut response_buffer).unwrap();
+    // println!("BBBBBBBBBBBBBBBB");
     let mut cursor = Cursor::new(response_buffer);
     let mut responses: Vec<Output> = Vec::with_capacity(inputs.len());
     for i in 0..inputs.len() {
@@ -207,6 +209,7 @@ pub fn decode_fixed_ints(bytes: &mut Vec<u8>) -> Vec<Vec<i32>> {
     responses
 }
 
+#[allow(dead_code)]
 fn fast_encode_fixed_floats(inputs: &Vec<RpcPredictRequest>, length: i32) -> Vec<u8> {
     let header_bytes = 9; // 1 for type code + 4 num_inputs + 4 input len
     let num_bytes_total = header_bytes + inputs.len() * length as usize * mem::size_of::<f64>();

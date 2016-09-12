@@ -60,7 +60,6 @@ class Cifar10TfModelWrapper(faster_rpc.ModelWrapperBase):
         # Mark reuse_scope as True for future reuse of inception variables
         self.reuse_scope = True
         preds = np.array(preds[:num_inputs])
-        print("Predicted: %s" % preds)
         return preds
 
 

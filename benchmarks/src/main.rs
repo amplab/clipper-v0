@@ -74,6 +74,7 @@ fn main() {
     match env::var(command_key).unwrap().as_str() {
         "digits" => start_digits_benchmark(&conf),
         "imagenet" => start_imagenet_benchmark(&conf),
+        "cifar" => start_cifar_benchmark(&conf),
         "thruputjkdshfkjsdhfds" => start_thruput_benchmark(&conf),
         _ => panic!("Invalid benchmark command"),
     }
@@ -515,8 +516,179 @@ fn start_thruput_benchmark(conf_path: &String) {
 
 }
 
+/// /////////////////////////////////////////////////////////
+#[allow(unused_variables)] // needed for metrics shutdown signal
+fn start_cifar_benchmark(conf_path: &String) {
+    let path = Path::new(conf_path);
+    let display = path.display();
+
+    let mut file = match File::open(&path) {
+        // The `description` method of `io::Error` returns a string that
+        // describes the error
+        Err(why) => {
+            panic!(format!("couldn't open {}: REASON: {}",
+                           display,
+                           Error::description(&why)))
+        }
+        Ok(file) => BufReader::new(file),
+    };
+
+    let mut toml_string = String::new();
+    match file.read_to_string(&mut toml_string) {
+        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
+        Ok(_) => print!("{} contains:\n{}", display, toml_string),
+    }
+    let mut parser = Parser::new(&toml_string);
+    let pc = match parser.parse() {
+        Some(pc) => pc,
+        None => panic!(format!("TOML PARSE ERROR: {:?}", parser.errors)),
+    };
+    let cifar_path = pc.get("cifar_path").unwrap().as_str().unwrap().to_string();
+    let results_path = pc.get("results_path").unwrap().as_str().unwrap().to_string();
+    let num_requests = pc.get("num_benchmark_requests")
+        .unwrap_or(&Value::Integer(100000))
+        .as_integer()
+        .unwrap() as usize;
+    let target_qps = pc.get("target_qps")
+        .unwrap_or(&Value::Integer(1000))
+        .as_integer()
+        .unwrap() as usize;
+    let batch_size = pc.get("bench_batch_size")
+        .unwrap_or(&Value::Integer(100))
+        .as_integer()
+        .unwrap() as usize;
+    let salt_cache = pc.get("salt_cache")
+        .unwrap_or(&Value::Boolean(true))
+        .as_bool()
+        .unwrap();
+    let wait_to_end = pc.get("wait_to_end")
+        .unwrap_or(&Value::Boolean(true))
+        .as_bool()
+        .unwrap();
 
 
+
+    let input_data = digits::load_imagenet_dense(&cifar_path).unwrap();
+    info!("Loaded CIFAR10 data");
+
+    let config = configuration::ClipperConf::parse_from_toml(conf_path);
+    let instance_name = config.name.clone();
+    let clipper = Arc::new(ClipperServer::<LogisticRegressionPolicy,
+                                           LinearCorrectionState>::new(config));
+    // let clipper = Arc::new(ClipperServer::<AveragePolicy,
+    //                                        ()>::new(config));
+
+    let report_interval_secs = 10;
+    let (metrics_signal_tx, metrics_signal_rx) = mpsc::channel::<()>();
+
+
+    info!("starting benchmark");
+    let (sender, receiver) = mpsc::channel::<(f64)>();
+
+
+    let receiver_jh = thread::spawn(move || {
+        for _ in 0..num_requests {
+            let _ = receiver.recv().unwrap();
+        }
+    });
+
+    let mut events_fired = 0;
+
+    thread::sleep(Duration::from_secs(10));
+
+    let mut updates = Vec::new();
+    let input0 = Input::Floats {
+        f: input_data[0].clone(),
+        length: input_data[0].len() as i32,
+    };
+    updates.push(Update {
+        query: Arc::new(input0),
+        label: 1.0,
+    });
+    let input1 = Input::Floats {
+        f: input_data[1].clone(),
+        length: input_data[0].len() as i32,
+    };
+    updates.push(Update {
+        query: Arc::new(input1),
+        label: 1.0,
+    });
+    // }
+    // let user = rng.gen_range::<u32>(0, num_users);
+    let user = 1;
+    let input_length = input_data[0].len() as i32;
+
+    let update_req = UpdateRequest::new(user, updates);
+    clipper.schedule_update(update_req);
+    thread::sleep(Duration::from_secs(10));
+    {
+        let metrics_register = clipper.get_metrics();
+        let m = metrics_register.read().unwrap();
+        info!("{}", m.report());
+        m.reset();
+    }
+    let _ = launch_monitor_thread(clipper.get_metrics(),
+                                  report_interval_secs,
+                                  metrics_signal_rx);
+
+    let mut load_gen = UniformLoadGenerator::new(batch_size, num_requests, target_qps);
+
+    let mut request_generator: Box<RequestGenerator> =
+        Box::new(RandomRequestGenerator::new(input_data));
+
+    while load_gen.next_request() {
+        if events_fired % 20000 == 0 {
+            info!("Submitted {} requests", events_fired);
+        }
+
+        let (input_data, _) = request_generator.get_next_request(events_fired);
+        let input = Input::Floats {
+            f: input_data,
+            length: input_length,
+        };
+        // let user = rng.gen_range::<u32>(0, num_users);
+        {
+            let sender = sender.clone();
+            // let req_num = events_fired;
+            let on_pred = Box::new(move |pred_y| {
+                match sender.send(pred_y) {
+                    Ok(_) => {}
+                    Err(e) => warn!("error in on_pred: {}", e.description()),
+                };
+            });
+            let r = PredictionRequest::new(user, input, on_pred, salt_cache);
+            clipper.schedule_prediction(r);
+        }
+        events_fired += 1;
+
+    }
+
+    // Record mid-workload metrics as soon as we finish sending requests,
+    // instead of waiting for all requests to finish
+    {
+        let metrics_register = clipper.get_metrics();
+        let m = metrics_register.read().unwrap();
+        let final_metrics = m.report();
+        // let timestamp = time::strftime("%Y%m%d-%H_%M_%S", &time::now()).unwrap();
+        // let results_fname = format!("{}/{}_results.json", results_path, timestamp);
+        let results_fname = format!("{}/{}_results.json", results_path, instance_name);
+        info!("writing results to: {}", results_fname);
+        let res_path = Path::new(&results_fname);
+        let mut results_writer = BufWriter::new(File::create(res_path).unwrap());
+        results_writer.write(&final_metrics.into_bytes()).unwrap();
+    }
+    if wait_to_end {
+        receiver_jh.join().unwrap();
+    } else {
+        std::process::exit(0);
+
+    }
+
+}
+
+
+
+/// //////////////////////////////////////////////////////////
 #[allow(unused_variables)] // needed for metrics shutdown signal
 fn start_imagenet_benchmark(conf_path: &String) {
     let path = Path::new(conf_path);

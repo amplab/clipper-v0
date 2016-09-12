@@ -27,7 +27,7 @@ fn main() {
     // let bytes_proc = (num_messages * (message_size_bytes + 4)) as f64;
 
     let (duration, batch_lat_tracker, ser_lat_tracker, send_lat_tracker, bp) =
-        send_clipper_messages(num_messages);
+        send_clipper_messages(num_messages, 3072, 128);
     let bytes_proc = bp as f64;
 
     let duration_sec = duration as f64 / (1000.0 * 1000.0 * 1000.0);
@@ -58,11 +58,14 @@ fn compute_mean_lat_micros(latencies: &Vec<u64>) -> f64 {
 }
 
 
-fn send_clipper_messages(num_messages: usize) -> (u64, Vec<u64>, Vec<u64>, Vec<u64>, u64) {
+fn send_clipper_messages(num_messages: usize,
+                         input_len: usize,
+                         batch_size: usize)
+                         -> (u64, Vec<u64>, Vec<u64>, Vec<u64>, u64) {
     let mut inputs = Vec::new();
     let mut rng = thread_rng();
-    for _ in 0..500 {
-        inputs.push(rng.gen_iter::<f64>().take(784).collect::<Vec<f64>>());
+    for _ in 0..batch_size {
+        inputs.push(rng.gen_iter::<f64>().take(input_len).collect::<Vec<f64>>());
     }
 
     // let message = encode_fixed_floats(&inputs);
@@ -72,7 +75,7 @@ fn send_clipper_messages(num_messages: usize) -> (u64, Vec<u64>, Vec<u64>, Vec<u
     let expected_response: Vec<f64> = vec![1.0; inputs.len()];
     // let expected_response = (0..100).collect::<Vec<u32>>();
 
-    let mut stream: TcpStream = TcpStream::connect("127.0.0.1:7777").unwrap();
+    let mut stream: TcpStream = TcpStream::connect("127.0.0.1:6001").unwrap();
     stream.set_nodelay(true).unwrap();
     let mut batch_lat_tracker = Vec::new();
     let mut ser_lat_tracker = Vec::new();
@@ -135,10 +138,9 @@ fn send_clipper_messages(num_messages: usize) -> (u64, Vec<u64>, Vec<u64>, Vec<u
      total_bytes_sent)
 }
 
-
 fn fast_encode_fixed_floats(inputs: &Vec<Vec<f64>>) -> (Vec<u8>, u64) {
     let ser_start = time::precise_time_ns();
-    let length = 784;
+    let length = inputs[0].len();
     let num_bytes_total = 9 + inputs.len() * length * mem::size_of::<f64>();
     let mut message: Vec<u8> = Vec::with_capacity(num_bytes_total);
     // message.write_u32::<LittleEndian>((inputs.len() * 784 * 8) as u32 + 9).unwrap();
@@ -179,6 +181,9 @@ fn baseline_encode_fixed_floats(inputs: &Vec<Vec<f64>>) -> (Vec<u8>, u64) {
     let ser_end = time::precise_time_ns();
     (message, ser_end - ser_start)
 }
+
+
+
 
 
 #[allow(dead_code)]
