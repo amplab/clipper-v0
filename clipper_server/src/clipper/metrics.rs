@@ -3,6 +3,7 @@ use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
+use tsdb;
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
@@ -56,6 +57,10 @@ impl Counter {
 
     pub fn decr(&self, decrement: isize) {
         self.count.fetch_sub(decrement, Ordering::Relaxed);
+    }
+
+    pub fn value(&self) -> isize {
+        self.count.load(Ordering::SeqCst)
     }
 }
 
@@ -425,6 +430,8 @@ pub struct Registry {
 
 impl Registry {
     pub fn new(name: String) -> Registry {
+        // Create a new time series database to store these metrics
+        tsdb::create(&name);
         Registry {
             name: name,
             counters: Vec::new(),
@@ -493,6 +500,14 @@ impl Registry {
 
         debug!("{}", report_string);
         report_string
+    }
+
+    pub fn persist(&self) {
+        if self.counters.len() > 0 {
+            for x in self.counters.iter() {
+                tsdb::write_counter(&self.name, x);
+            }
+        }
     }
 
     // pub fn report_and_reset(&self) -> String {
