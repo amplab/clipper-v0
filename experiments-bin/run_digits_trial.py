@@ -71,8 +71,8 @@ class DigitsBenchmarker:
                 "salt_update_cache" : salt_cache,
                 "send_updates": False,
                 "load_generator": "uniform",
-                # "request_generator": "balanced",
-                "request_generator": "cache_hits",
+                "request_generator": "balanced",
+                # "request_generator": "cache_hits",
                 "wait_to_end": False,
                 "batching": batch_strategy,
                 "cache_hit_rate": cache_hit_rate,
@@ -93,7 +93,7 @@ class DigitsBenchmarker:
                     "redis": {"image": "redis:alpine", "cpuset": self.reserve_cores(1)},
                     "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
                     "clipper": {"image": "cl-dev-digits",
-                        "cpuset": self.reserve_cores(18),
+                        "cpuset": self.reserve_cores(24),
                         "depends_on": ["redis", "quantilereg"],
                         "environment": {
                             "CLIPPER_BENCH_COMMAND": "digits",
@@ -337,37 +337,36 @@ if __name__=='__main__':
 
 
     bs = { "strategy": "learned",
-            "sample_size": 500,
+            "sample_size": 1000,
             "opt_addr": "quantilereg:7777"}
 
     # bs = { "strategy": "static", "batch_size": 1 }
 
+    # for bs in batch_strats:
     strat_name = bs["strategy"]
-    # print("STARTING EXPERIMENT: %s" % strat_name)
-    # time.sleep(5)
-    num_reqs = 1000000
+    print("STARTING EXPERIMENT: %s" % strat_name)
+    time.sleep(5)
+    num_reqs = 10000000
     num_reps = 1
     debug = ""
     debug = "DEBUG_"
-    hit_rate = 0.2
-    exp_name = "%ssklearn-kernel-svm_hit_rate_%d" % (debug, int(hit_rate*100))
-    log_dest = "experiments_logs/caching-pred-thruput"
+    hit_rate = 0.0
+    exp_name = "%s%s_batching" % (debug, strat_name)
+    log_dest = "experiments_logs/batching_strat_comparison"
     benchmarker = DigitsBenchmarker(exp_name,
                                     log_dest,
-                                    target_qps=50000,
-                                    bench_batch_size=500,
+                                    target_qps=100000,
                                     num_requests=num_reqs,
                                     batch_strategy=bs,
-                                    salt_cache=False,
-                                    cache_hit_rate = hit_rate,
+                                    salt_cache=True,
                                     )
 
-    # benchmarker.add_noop(num_replicas=num_reps)
-    # benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-    # benchmarker.add_spark_svm(num_replicas=num_reps)
-    # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+    benchmarker.add_noop(num_replicas=num_reps)
+    benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+    benchmarker.add_spark_svm(num_replicas=num_reps)
+    benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
     benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
-    # benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
+    benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
     benchmarker.run_clipper()
         # sys.exit(0)
 

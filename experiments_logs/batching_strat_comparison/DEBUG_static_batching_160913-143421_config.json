@@ -1,0 +1,161 @@
+{
+    "clipper_conf": {
+        "salt_update_cache": true, 
+        "num_message_encodes": 1, 
+        "use_lsh": false, 
+        "window_size": -1, 
+        "load_generator": "uniform", 
+        "input_type": "float", 
+        "request_generator": "balanced", 
+        "results_path": "/tmp/benchmarking_logs", 
+        "num_update_workers": 1, 
+        "batching": {
+            "batch_size": 1, 
+            "strategy": "static"
+        }, 
+        "input_length": 784, 
+        "num_benchmark_requests": 10000000, 
+        "models": [
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "noop", 
+                "addresses": [
+                    "noop_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "rf_d16", 
+                "addresses": [
+                    "rf_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "spark_svm", 
+                "addresses": [
+                    "spark_svm_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "linear_svm", 
+                "addresses": [
+                    "linear_svm_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "kernel_svm", 
+                "addresses": [
+                    "kernel_svm_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "logistic_reg", 
+                "addresses": [
+                    "logistic_reg_r0:6001"
+                ]
+            }
+        ], 
+        "redis_ip": "redis", 
+        "mnist_path": "/mnist_data/test.data", 
+        "bench_batch_size": 100, 
+        "target_qps": 100000, 
+        "name": "DEBUG_static_batching_160913-143421", 
+        "cache_hit_rate": 0.0, 
+        "wait_to_end": false, 
+        "salt_cache": true, 
+        "num_predict_workers": 8, 
+        "redis_port": 6379, 
+        "cache_size": 1000000, 
+        "slo_micros": 20000, 
+        "correction_policy": "logistic_regression", 
+        "send_updates": false
+    }, 
+    "docker_compose_conf": {
+        "services": {
+            "quantilereg": {
+                "cpuset": "1-1", 
+                "image": "clipper/quantile-reg"
+            }, 
+            "clipper": {
+                "cpuset": "2-25", 
+                "depends_on": [
+                    "redis", 
+                    "quantilereg", 
+                    "noop_r0", 
+                    "rf_d16_r0", 
+                    "spark_svm_r0", 
+                    "linear_svm_r0", 
+                    "kernel_svm_r0", 
+                    "logistic_reg_r0"
+                ], 
+                "image": "cl-dev-digits", 
+                "volumes": [
+                    "${MNIST_PATH}:/mnist_data:ro", 
+                    "${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro", 
+                    "${CLIPPER_ROOT}/experiments_logs/batching_strat_comparison:/tmp/benchmarking_logs"
+                ], 
+                "environment": {
+                    "CLIPPER_CONF_PATH": "/tmp/exp_conf.toml", 
+                    "CLIPPER_BENCH_COMMAND": "digits"
+                }
+            }, 
+            "spark_svm_r0": {
+                "cpuset": "28-28", 
+                "image": "clipper/spark-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro"
+                ]
+            }, 
+            "linear_svm_r0": {
+                "cpuset": "29-29", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "rf_d16_r0": {
+                "cpuset": "27-27", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "noop_r0": {
+                "cpuset": "26-26", 
+                "image": "clipper/noop-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro"
+                ]
+            }, 
+            "redis": {
+                "cpuset": "0-0", 
+                "image": "redis:alpine"
+            }, 
+            "kernel_svm_r0": {
+                "cpuset": "30-30", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/svm_pred3/:/model:ro"
+                ]
+            }, 
+            "logistic_reg_r0": {
+                "cpuset": "31-31", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/:/model:ro"
+                ]
+            }
+        }, 
+        "version": "2"
+    }
+}

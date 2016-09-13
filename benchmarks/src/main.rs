@@ -113,7 +113,8 @@ trait LoadGenerator {
     fn next_request(&mut self) -> bool;
 }
 
-struct UniformLoadGenerator {
+#[allow(dead_code)]
+struct BatchedUniformLoadGenerator {
     bench_batch_size: usize,
     total_requests: usize,
     // requested_load_qps: usize,
@@ -124,15 +125,16 @@ struct UniformLoadGenerator {
     total_count: usize,
 }
 
-impl UniformLoadGenerator {
+impl BatchedUniformLoadGenerator {
+    #[allow(dead_code)]
     pub fn new(batch_size: usize,
                total_reqs: usize,
                requested_load_qps: usize)
-               -> UniformLoadGenerator {
+               -> BatchedUniformLoadGenerator {
 
         let sleep_time = 1000 / (requested_load_qps / batch_size) as u64;
         info!("SLEEP TIME: {}", sleep_time);
-        UniformLoadGenerator {
+        BatchedUniformLoadGenerator {
             bench_batch_size: batch_size,
             total_requests: total_reqs,
             current_batch_count: 0,
@@ -143,7 +145,7 @@ impl UniformLoadGenerator {
     }
 }
 
-impl LoadGenerator for UniformLoadGenerator {
+impl LoadGenerator for BatchedUniformLoadGenerator {
     fn next_request(&mut self) -> bool {
         if self.total_count < self.total_requests {
             self.total_count += 1;
@@ -160,6 +162,43 @@ impl LoadGenerator for UniformLoadGenerator {
     }
 }
 
+
+
+struct UniformLoadGenerator {
+    total_requests: usize,
+    spin_time_nanos: u64,
+    total_count: usize,
+}
+
+impl UniformLoadGenerator {
+    pub fn new(total_reqs: usize, requested_load_qps: usize) -> UniformLoadGenerator {
+
+        // let sleep_time = 1000 / (requested_load_qps / batch_size) as u64;
+        // info!("SLEEP TIME: {}", sleep_time);
+        let nanos_per_sec: u64 = 1000 * 1000 * 1000;
+        let spin_time_nanos: u64 = nanos_per_sec / (requested_load_qps as u64);
+        info!("SPIN TIME: {}", spin_time_nanos);
+        UniformLoadGenerator {
+            total_requests: total_reqs,
+            spin_time_nanos: spin_time_nanos,
+            total_count: 0,
+        }
+    }
+}
+
+impl LoadGenerator for UniformLoadGenerator {
+    fn next_request(&mut self) -> bool {
+        if self.total_count < self.total_requests {
+            self.total_count += 1;
+            let spin_end = time::precise_time_ns() + self.spin_time_nanos;
+            while time::precise_time_ns() < spin_end {
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
 
 
 trait RequestGenerator {
@@ -553,10 +592,10 @@ fn start_cifar_benchmark(conf_path: &String) {
         .unwrap_or(&Value::Integer(1000))
         .as_integer()
         .unwrap() as usize;
-    let batch_size = pc.get("bench_batch_size")
-        .unwrap_or(&Value::Integer(100))
-        .as_integer()
-        .unwrap() as usize;
+    // let batch_size = pc.get("bench_batch_size")
+    //     .unwrap_or(&Value::Integer(100))
+    //     .as_integer()
+    //     .unwrap() as usize;
     let salt_cache = pc.get("salt_cache")
         .unwrap_or(&Value::Boolean(true))
         .as_bool()
@@ -631,7 +670,7 @@ fn start_cifar_benchmark(conf_path: &String) {
                                   report_interval_secs,
                                   metrics_signal_rx);
 
-    let mut load_gen = UniformLoadGenerator::new(batch_size, num_requests, target_qps);
+    let mut load_gen = UniformLoadGenerator::new(num_requests, target_qps);
 
     let mut request_generator: Box<RequestGenerator> =
         Box::new(RandomRequestGenerator::new(input_data));
@@ -827,7 +866,7 @@ fn start_imagenet_benchmark(conf_path: &String) {
                                   report_interval_secs,
                                   metrics_signal_rx);
 
-    let mut load_gen = UniformLoadGenerator::new(batch_size, num_requests, target_qps);
+    let mut load_gen = UniformLoadGenerator::new(num_requests, target_qps);
 
     let mut request_generator: Box<RequestGenerator> =
         Box::new(RandomRequestGenerator::new(input_data));
@@ -1074,7 +1113,7 @@ fn start_digits_benchmark(conf_path: &String) {
                                   metrics_signal_rx);
 
     let mut load_gen = match load_generator_name.as_str() {
-        "uniform" => UniformLoadGenerator::new(batch_size, num_requests, target_qps),
+        "uniform" => UniformLoadGenerator::new(num_requests, target_qps),
         _ => panic!("{} is unsupported load generator type", load_generator_name),
     };
 
