@@ -34,6 +34,7 @@ impl <'a> Write<'a> {
 
 	pub fn append_counter(&mut self, counter: &Arc<Counter>) {
 		let op = format!("{} value={} {}", counter.name, counter.value(), self.timestamp);
+		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
 	}
 
@@ -45,7 +46,7 @@ impl <'a> Write<'a> {
 		let re = Regex::new(r"\s").unwrap();
 		let unit = format!("units={}", re.replace_all(&meter.unit, "-"));
 		let op = format!("{},{} value={} {}", meter.name, unit, meter.get_rate_secs(), self.timestamp);
-		info!("{}", op);
+		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
 	}
 
@@ -56,7 +57,7 @@ impl <'a> Write<'a> {
 	pub fn execute(&mut self) {
 		let raw_url = &format!("http://localhost:8086/write?db={}", self.db_name);
 		let encoded_url = Url::parse(raw_url).unwrap();	
-		let body = self.write_ops.join(" ");
+		let body = self.write_ops.join("\n");
 		send_post_request(encoded_url.as_str(), &body);
 	}
 }
