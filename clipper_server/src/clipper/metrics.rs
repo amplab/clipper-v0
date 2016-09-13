@@ -513,11 +513,14 @@ impl Registry {
     }
 
     pub fn persist(&self) {
-        if self.counters.len() > 0 {
-            for x in self.counters.iter() {
-                tsdb::write_counter(&self.name, x);
-            }
+        let mut write = tsdb::Write::new(&self.name);
+        for x in self.counters.iter() {
+            write.append_counter(x);
         }
+        // for x in self.meters.iter() {
+        //     write.append_meter(x);
+        // }
+        write.execute();
     }
 
     // pub fn report_and_reset(&self) -> String {
