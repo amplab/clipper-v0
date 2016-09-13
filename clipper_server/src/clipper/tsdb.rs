@@ -25,9 +25,11 @@ pub struct Write<'a> {
 
 impl <'a> Write<'a> {
 	pub fn new(db_name: &str) -> Write {
+		let sys_time = time::get_time();
+		let ts = ((sys_time.sec as i64) * 1000) + ((sys_time.nsec as i64) / 1000);
 		Write {
 			db_name: db_name,
-			timestamp: time::get_time().nsec.to_string(),
+			timestamp: ts.to_string(),
 			write_ops: Vec::new(),
 		}
 	}
