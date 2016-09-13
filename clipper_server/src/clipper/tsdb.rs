@@ -4,6 +4,7 @@ use url::{Url, form_urlencoded};
 use metrics::{Counter, Meter};
 use std::sync::{Arc};
 use time;
+use regex::Regex;
 
 //const BASE_URL: &'static str = "http://localhost:8086";
 //const CREATE_DB_BODY: &'static str = "CREATE DATABASE";
@@ -41,7 +42,10 @@ impl <'a> Write<'a> {
 	// }
 
 	pub fn append_meter(&mut self, meter: &Arc<Meter>) {
-		let op = format!("{},{} value={} {}", meter.name, meter.unit, meter.get_rate_secs(), self.timestamp);
+		let re = Regex::new(r"\s").unwrap();
+		let unit = format!("units={}", re.replace_all(&meter.unit, "-"));
+		let op = format!("{},{} value={} {}", meter.name, unit, meter.get_rate_secs(), self.timestamp);
+		info!("{}", op);
 		self.write_ops.push(op);
 	}
 
