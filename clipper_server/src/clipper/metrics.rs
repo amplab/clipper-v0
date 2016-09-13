@@ -509,9 +509,9 @@ impl Registry {
         for x in self.counters.iter() {
             write.append_counter(x);
         }
-        // for x in self.meters.iter() {
-        //     write.append_meter(x);
-        // }
+        for x in self.meters.iter() {
+            write.append_meter(x);
+        }
         write.execute();
     }
 
