@@ -25,6 +25,7 @@ class DigitsBenchmarker:
                  # batch_size=100,
                  cache_hit_rate = 0.0,
                  window_size = -1,
+                 send_updates = False,
                  salt_cache=True,
                  batch_strategy = { "strategy": "aimd" },
                  ):
@@ -56,9 +57,9 @@ class DigitsBenchmarker:
                 "redis_ip" : "redis",
                 "redis_port" : 6379,
                 "results_path" : "/tmp/benchmarking_logs",
-                "num_predict_workers" : 8,
-                "num_update_workers" : 1,
-                "cache_size" : 1000000,
+                "num_predict_workers" : 10,
+                "num_update_workers" : 8,
+                "cache_size" : 10000000,
                 "mnist_path" : "/mnist_data/test.data",
                 # "num_benchmark_requests" : 10000000,
                 "num_benchmark_requests" : num_requests,
@@ -69,9 +70,9 @@ class DigitsBenchmarker:
                 # "salt_cache" : False,
                 "salt_cache" : salt_cache,
                 "salt_update_cache" : salt_cache,
-                "send_updates": False,
+                "send_updates": send_updates,
                 "load_generator": "uniform",
-                "request_generator": "balanced",
+                "request_generator": "cached_updates",
                 # "request_generator": "cache_hits",
                 "wait_to_end": False,
                 "batching": batch_strategy,
@@ -245,6 +246,13 @@ class DigitsBenchmarker:
         container_mp ="/model"
         self.add_model(name_base, image, mp, container_mp, num_replicas)
 
+    def add_spark_rf(self, num_replicas=1):
+        name_base = "spark_svm"
+        image = "clipper/spark-mw-dev"
+        mp = "${CLIPPER_ROOT}/model_wrappers/python/spark_models/50rf_pred_3_depth_4",
+        container_mp ="/model"
+        self.add_model(name_base, image, mp, container_mp, num_replicas)
+
     def run_clipper(self):
 
         print("CORES USED: %d" % self.cur_model_core_num)
@@ -309,65 +317,50 @@ class DigitsBenchmarker:
 
 
 if __name__=='__main__':
-
-    # Turns cache off if True
-    # salt_cache = False
-# range(300, 1000, 100) + range(1000, 10000, 1000) +
-    # message_size = 200000
-    # num_messages_to_send = 20000
-    # for ms in range(75000, 100000, 25000) + range(100000, 500001, 50000):
-        # if ms < 1000:
-        #     num_reqs = 1000000
-        # elif ms < 10000:
-        #     num_reqs = 500000
-        # elif ms < 100000:
-        #     num_reqs = 50000
-        # else:
-        #     num_reqs = 10000
-    # for batch_size in [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 50000, 100000]:
-    # print("STARTING EXPERIMENT. BATCH SIZE: %d, num requests: %d" % (batch_size, num_reqs))
-    # time.sleep(10)
-    # window = 1
-
     batch_strats = [
             { "strategy": "aimd" },
             { "strategy": "static", "batch_size": 1 },
             { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
         ]
 
+    bs = { "strategy": "aimd" }
+    # window = 1
+    # salt_cache = False
+    for window in [1, 20, 100]:
+        for salt_cache in [False, True]:
 
-    bs = { "strategy": "learned",
-            "sample_size": 1000,
-            "opt_addr": "quantilereg:7777"}
+            cache_str = "ON"
+            if salt_cache:
+                cache_str = "OFF"
+            print("STARTING EXPERIMENT: WINDOW %d CACHING %s" % (window, cache_str))
+            time.sleep(5)
+            num_reqs = 2000000
+            num_reps = 1
+            debug = ""
+            debug = "DEBUG_"
+            exp_name = "%swindow_%d_caching_%s" % (debug, window, cache_str)
+            log_dest = "experiments_logs/feedback_caching"
+            benchmarker = DigitsBenchmarker(exp_name,
+                                            log_dest,
+                                            target_qps=500000,
+                                            window_size=window,
+                                            num_requests=num_reqs,
+                                            send_updates=True,
+                                            batch_strategy=bs,
+                                            salt_cache=salt_cache,
+                                            )
 
-    # bs = { "strategy": "static", "batch_size": 1 }
+            # benchmarker.add_noop(num_replicas=num_reps)
 
-    # for bs in batch_strats:
-    strat_name = bs["strategy"]
-    print("STARTING EXPERIMENT: %s" % strat_name)
-    time.sleep(5)
-    num_reqs = 10000000
-    num_reps = 1
-    debug = ""
-    debug = "DEBUG_"
-    hit_rate = 0.0
-    exp_name = "%s%s_batching" % (debug, strat_name)
-    log_dest = "experiments_logs/batching_strat_comparison"
-    benchmarker = DigitsBenchmarker(exp_name,
-                                    log_dest,
-                                    target_qps=100000,
-                                    num_requests=num_reqs,
-                                    batch_strategy=bs,
-                                    salt_cache=True,
-                                    )
 
-    benchmarker.add_noop(num_replicas=num_reps)
-    benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-    benchmarker.add_spark_svm(num_replicas=num_reps)
-    benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
-    benchmarker.add_sklearn_kernel_svm(num_replicas=num_reps)
-    benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
-    benchmarker.run_clipper()
+
+            # benchmarker.add_spark_rf(num_replicas=num_reps)
+            benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+            benchmarker.add_spark_svm(num_replicas=num_reps)
+            benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+            benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
+            benchmarker.run_clipper()
+
         # sys.exit(0)
 
 

@@ -264,7 +264,7 @@ impl CachedUpdatesRequestGenerator {
     pub fn new() -> CachedUpdatesRequestGenerator {
         CachedUpdatesRequestGenerator {
             rng: thread_rng(),
-            sent_predictions: VecDeque::with_capacity(5000),
+            sent_predictions: VecDeque::with_capacity(100000),
         }
     }
 
@@ -284,7 +284,12 @@ impl RequestGenerator for CachedUpdatesRequestGenerator {
     }
 
     fn get_next_update(&mut self) -> Option<(Vec<f64>, f64)> {
-        self.sent_predictions.pop_front()
+        // let the prediction cache warm up first
+        if self.sent_predictions.len() > 100000 {
+            self.sent_predictions.pop_front()
+        } else {
+            None
+        }
     }
 }
 
@@ -942,7 +947,11 @@ fn start_digits_benchmark(conf_path: &String) {
         Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
         Ok(_) => print!("{} contains:\n{}", display, toml_string),
     }
-    let pc = Parser::new(&toml_string).parse().unwrap();
+    let mut parser = Parser::new(&toml_string);
+    let pc = match parser.parse() {
+        Some(t) => t,
+        None => panic!("ERROR Parsing toml: {:?}", parser.errors),
+    };
     let mnist_path = pc.get("mnist_path").unwrap().as_str().unwrap().to_string();
     let results_path = pc.get("results_path").unwrap().as_str().unwrap().to_string();
     let num_requests = pc.get("num_benchmark_requests")

@@ -27,7 +27,7 @@ fn main() {
     // let bytes_proc = (num_messages * (message_size_bytes + 4)) as f64;
 
     let (duration, batch_lat_tracker, ser_lat_tracker, send_lat_tracker, bp) =
-        send_clipper_messages(num_messages, 3072, 128);
+        send_clipper_messages(num_messages, 784, 500);
     let bytes_proc = bp as f64;
 
     let duration_sec = duration as f64 / (1000.0 * 1000.0 * 1000.0);

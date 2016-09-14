@@ -242,6 +242,7 @@ impl<C> PredictionBatcher<C>
         //     metric_register.write().unwrap().create_histogram(metric_name, 8224)
         // };
 
+        let wait_time_nanos = 1000 * 1000; // 1 ms
         // block until new request, then try to get more requests
         while let Ok(first_req) = receiver.recv() {
             // Drop predictions we have no hope of evaluating in time.
@@ -255,6 +256,7 @@ impl<C> PredictionBatcher<C>
             if first_req.ttl && delay > slo_micros as i64 {
                 continue;
             }
+            let batch_start_time = time::precise_time_ns();
             let mut batch: Vec<RpcPredictRequest> = Vec::new();
             batch.push(first_req);
             let start_time = time::PreciseTime::now();
@@ -265,7 +267,7 @@ impl<C> PredictionBatcher<C>
                     // let req_latency = req.req_start_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
                     // println!("req->features latency {} (ms)", (req_latency as f64 / 1000.0));
                     batch.push(req);
-                } else {
+                } else if time::precise_time_ns() > batch_start_time + wait_time_nanos {
                     break;
                 }
             }

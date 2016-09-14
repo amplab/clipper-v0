@@ -1,0 +1,20 @@
+rm DEBUG_window_1_caching_OFF_160913-194830_config.json \
+DEBUG_window_1_caching_OFF_160913-194830_logs.txt \
+DEBUG_window_1_caching_OFF_160913-194830_results.json \
+DEBUG_window_1_caching_ON_160913-182223_config.json \
+DEBUG_window_1_caching_ON_160913-182223_logs.txt \
+DEBUG_window_1_caching_ON_160913-184009_config.json \
+DEBUG_window_1_caching_ON_160913-184009_logs.txt \
+DEBUG_window_1_caching_ON_160913-184357_config.json \
+DEBUG_window_1_caching_ON_160913-184357_logs.txt \
+DEBUG_window_1_caching_ON_160913-184357_results.json \
+DEBUG_window_1_caching_ON_160913-185001_config.json \
+DEBUG_window_1_caching_ON_160913-185347_config.json \
+DEBUG_window_1_caching_ON_160913-185648_config.json \
+DEBUG_window_1_caching_ON_160913-192051_config.json \
+DEBUG_window_1_caching_ON_160913-192353_config.json \
+DEBUG_window_1_caching_ON_160913-192353_logs.txt \
+DEBUG_window_1_caching_ON_160913-192353_results.json \
+DEBUG_window_1_caching_ON_160913-192912_config.json \
+DEBUG_window_1_caching_ON_160913-194234_config.json \
+DEBUG_window_1_caching_ON_160913-194555_config.json
