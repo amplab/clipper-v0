@@ -1,0 +1,202 @@
+{
+    "clipper_conf": {
+        "salt_update_cache": true, 
+        "num_message_encodes": 1, 
+        "use_lsh": false, 
+        "batching": {
+            "strategy": "aimd"
+        }, 
+        "window_size": -1, 
+        "load_generator": "uniform", 
+        "input_type": "float", 
+        "request_generator": "balanced", 
+        "results_path": "/tmp/benchmarking_logs", 
+        "num_update_workers": 1, 
+        "track_blocking_latency": true, 
+        "input_length": 784, 
+        "num_benchmark_requests": 2000000, 
+        "models": [
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_0_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_0_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_1_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_1_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_2_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_2_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_3_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_3_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_4_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_4_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_5_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_5_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_6_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_6_d16_r0:6001"
+                ]
+            }, 
+            {
+                "version": 1, 
+                "num_outputs": 1, 
+                "name": "sklearn_rf_comp_7_d16", 
+                "wait_time_nanos": 4000000, 
+                "addresses": [
+                    "sklearn_rf_comp_7_d16_r0:6001"
+                ]
+            }
+        ], 
+        "redis_ip": "redis", 
+        "mnist_path": "/mnist_data/test.data", 
+        "bench_batch_size": 100, 
+        "target_qps": 15000, 
+        "name": "ensemble_size_8_trial_4_160914-120421", 
+        "cache_hit_rate": 0.0, 
+        "wait_to_end": false, 
+        "send_updates": false, 
+        "report_interval_secs": 30, 
+        "num_predict_workers": 10, 
+        "redis_port": 6379, 
+        "cache_size": 10000000, 
+        "slo_micros": 20000, 
+        "correction_policy": "logistic_regression", 
+        "salt_cache": true
+    }, 
+    "docker_compose_conf": {
+        "services": {
+            "clipper": {
+                "cpuset": "2-21", 
+                "depends_on": [
+                    "redis", 
+                    "quantilereg", 
+                    "sklearn_rf_comp_0_d16_r0", 
+                    "sklearn_rf_comp_1_d16_r0", 
+                    "sklearn_rf_comp_2_d16_r0", 
+                    "sklearn_rf_comp_3_d16_r0", 
+                    "sklearn_rf_comp_4_d16_r0", 
+                    "sklearn_rf_comp_5_d16_r0", 
+                    "sklearn_rf_comp_6_d16_r0", 
+                    "sklearn_rf_comp_7_d16_r0"
+                ], 
+                "image": "cl-dev-digits", 
+                "volumes": [
+                    "${MNIST_PATH}:/mnist_data:ro", 
+                    "${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro", 
+                    "${CLIPPER_ROOT}/experiments_logs/straggler_mitigation:/tmp/benchmarking_logs"
+                ], 
+                "environment": {
+                    "CLIPPER_CONF_PATH": "/tmp/exp_conf.toml", 
+                    "CLIPPER_BENCH_COMMAND": "digits"
+                }
+            }, 
+            "sklearn_rf_comp_3_d16_r0": {
+                "cpuset": "25-25", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "sklearn_rf_comp_4_d16_r0": {
+                "cpuset": "26-26", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "sklearn_rf_comp_0_d16_r0": {
+                "cpuset": "22-22", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "redis": {
+                "cpuset": "0-0", 
+                "image": "redis:alpine"
+            }, 
+            "quantilereg": {
+                "cpuset": "1-1", 
+                "image": "clipper/quantile-reg"
+            }, 
+            "sklearn_rf_comp_6_d16_r0": {
+                "cpuset": "28-28", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "sklearn_rf_comp_7_d16_r0": {
+                "cpuset": "29-29", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "sklearn_rf_comp_2_d16_r0": {
+                "cpuset": "24-24", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "sklearn_rf_comp_5_d16_r0": {
+                "cpuset": "27-27", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }, 
+            "sklearn_rf_comp_1_d16_r0": {
+                "cpuset": "23-23", 
+                "image": "clipper/sklearn-mw-dev", 
+                "volumes": [
+                    "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro"
+                ]
+            }
+        }, 
+        "version": "2"
+    }
+}

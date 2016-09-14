@@ -1,15 +1,97 @@
 services:
   clipper:
     cpuset: 2-21
-    depends_on: [redis, quantilereg, linear_svm_r0]
+    depends_on: [redis, quantilereg, sklearn_rf_comp_0_d16_r0, sklearn_rf_comp_1_d16_r0,
+      sklearn_rf_comp_2_d16_r0, sklearn_rf_comp_3_d16_r0, sklearn_rf_comp_4_d16_r0,
+      sklearn_rf_comp_5_d16_r0, sklearn_rf_comp_6_d16_r0, sklearn_rf_comp_7_d16_r0,
+      sklearn_rf_comp_8_d16_r0, sklearn_rf_comp_9_d16_r0, sklearn_rf_comp_10_d16_r0,
+      sklearn_rf_comp_11_d16_r0, sklearn_rf_comp_12_d16_r0, sklearn_rf_comp_13_d16_r0,
+      sklearn_rf_comp_14_d16_r0, sklearn_rf_comp_15_d16_r0, sklearn_rf_comp_16_d16_r0,
+      sklearn_rf_comp_17_d16_r0, sklearn_rf_comp_18_d16_r0, sklearn_rf_comp_19_d16_r0]
     environment: {CLIPPER_BENCH_COMMAND: digits, CLIPPER_CONF_PATH: /tmp/exp_conf.toml}
     image: cl-dev-digits
     volumes: ['${MNIST_PATH}:/mnist_data:ro', '${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro',
-      '${CLIPPER_ROOT}/experiments_logs/batch_wait_time:/tmp/benchmarking_logs']
-  linear_svm_r0:
-    cpuset: 22-22
-    image: clipper/sklearn-mw-dev
-    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/:/model:ro']
+      '${CLIPPER_ROOT}/experiments_logs/straggler_mitigation:/tmp/benchmarking_logs']
   quantilereg: {cpuset: 1-1, image: clipper/quantile-reg}
   redis: {cpuset: 0-0, image: 'redis:alpine'}
+  sklearn_rf_comp_0_d16_r0:
+    cpuset: 22-22
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_10_d16_r0:
+    cpuset: 32-32
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_11_d16_r0:
+    cpuset: 33-33
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_12_d16_r0:
+    cpuset: 34-34
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_13_d16_r0:
+    cpuset: 35-35
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_14_d16_r0:
+    cpuset: 36-36
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_15_d16_r0:
+    cpuset: 37-37
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_16_d16_r0:
+    cpuset: 38-38
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_17_d16_r0:
+    cpuset: 39-39
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_18_d16_r0:
+    cpuset: 40-40
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_19_d16_r0:
+    cpuset: 41-41
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_1_d16_r0:
+    cpuset: 23-23
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_2_d16_r0:
+    cpuset: 24-24
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_3_d16_r0:
+    cpuset: 25-25
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_4_d16_r0:
+    cpuset: 26-26
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_5_d16_r0:
+    cpuset: 27-27
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_6_d16_r0:
+    cpuset: 28-28
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_7_d16_r0:
+    cpuset: 29-29
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_8_d16_r0:
+    cpuset: 30-30
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
+  sklearn_rf_comp_9_d16_r0:
+    cpuset: 31-31
+    image: clipper/sklearn-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth16/:/model:ro']
 version: '2'

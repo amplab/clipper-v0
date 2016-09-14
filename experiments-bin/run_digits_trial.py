@@ -11,6 +11,7 @@ from fabric.api import *
 from fabric.colors import green as _green, yellow as _yellow
 from fabric.contrib.console import confirm
 from fabric.contrib.files import append
+from datetime import datetime
 
 
 class DigitsBenchmarker:
@@ -321,48 +322,46 @@ class DigitsBenchmarker:
 
 
 
-if __name__=='__main__':
-    # batch_strats = [
-    #         { "strategy": "aimd" },
-    #         { "strategy": "static", "batch_size": 1 },
-    #         { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
-    #     ]
-
+def straggler_mitigation_exp():
     bs = { "strategy": "aimd" }
     # window = 1
     # salt_cache = False
     # ensemble_size = 1
-    # for wt in range(12):
-    for wt in range(11):
-        for mw in ["spark_svm", "sklearn_svm"]:
-            print("STARTING EXPERIMENT: MODEL: %s, WAIT TIME (MS): %d" % (mw, wt))
+
+    # trial = 2
+
+    for trial in range(1,6):
+        trial_start = datetime.now()
+        for ensemble_size in [1,] + range(2,21,2):
+            print("STARTING EXPERIMENT: STRAGGLER MITIGATION WITH ENSEMBLE SIZE: %d TRIAL %d" % (ensemble_size, trial))
             time.sleep(5)
-            num_reqs = 1000000
+            num_reqs = 2000000
             num_reps = 1
             debug = ""
             # debug = "DEBUG_"
-            exp_name = "%swait_time_%d_%s" % (debug, wt, mw)
-            log_dest = "experiments_logs/batch_wait_time"
+            exp_name = "%sensemble_size_%d_trial_%d" % (debug, ensemble_size, trial)
+            log_dest = "experiments_logs/straggler_mitigation"
             benchmarker = DigitsBenchmarker(exp_name,
                                             log_dest,
-                                            target_qps=20000,
+                                            target_qps=15000,
                                             num_requests=num_reqs,
                                             send_updates=False,
                                             batch_strategy=bs,
                                             salt_cache=True,
-                                            # track_blocking_latency=True,
+                                            track_blocking_latency=True,
                                             )
-            if mw == "spark_svm":
-                benchmarker.add_spark_svm(name_base="spark_svm", num_replicas=num_reps, wait_time_nanos=wt*1000*1000)
-            else:
-                benchmarker.add_sklearn_linear_svm(num_replicas=num_reps, wait_time_nanos=wt*1000*1000)
+            for comp_num in range(ensemble_size):
+                # benchmarker.add_spark_svm(name_base="spark_svm_comp_%d" % comp_num, num_replicas=num_reps)
+                benchmarker.add_sklearn_rf(depth=16, name_base="sklearn_rf_comp_%d" % comp_num, num_replicas=num_reps)
             benchmarker.run_clipper()
+        trial_end = datetime.now()
+        with open("exp_status.log", "a") as f:
+            print("TRIAL %d COMPLETED IN %f SECONDS" % (trial, (trial_end-trial_start).total_seconds()))
+            print("TRIAL %d COMPLETED IN %f SECONDS" % (trial, (trial_end-trial_start).total_seconds()), file=f)
 
-    # benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-    # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
-    # benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
-    # benchmarker.add_noop(num_replicas=num_reps)
-    # benchmarker.add_spark_rf(num_replicas=num_reps)
 
+
+if __name__=='__main__':
+    straggler_mitigation_exp()
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

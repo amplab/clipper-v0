@@ -1,0 +1,1812 @@
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+track_blocking_latency = true
+input_length = 784
+num_benchmark_requests = 2000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 15000
+name = "ensemble_size_6_trial_2_160914-105329"
+cache_hit_rate = 0.0
+wait_to_end = false
+send_updates = false
+report_interval_secs = 30
+num_predict_workers = 10
+redis_port = 6379
+cache_size = 10000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_0_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_0_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_1_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_1_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_2_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_2_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_3_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_3_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_4_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_4_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_5_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_5_d16_r0:6001",]
+[batching]
+strategy = "aimd"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+track_blocking_latency = true
+input_length = 784
+num_benchmark_requests = 2000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 15000
+name = "ensemble_size_6_trial_2_160914-105329"
+cache_hit_rate = 0.0
+wait_to_end = false
+send_updates = false
+report_interval_secs = 30
+num_predict_workers = 10
+redis_port = 6379
+cache_size = 10000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_0_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_0_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_1_d16"
+wait_time_nanos = 4000000
+INFO:clipper::configuration: sklearn_rf_comp_0_d16_r0:6001
+addresses = [ "sklearn_rf_comp_1_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_2_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_2_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_3_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_3_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_4_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_4_d16_r0:6001",]
+[[models]]
+version = 1
+num_outputs = 1
+name = "sklearn_rf_comp_5_d16"
+wait_time_nanos = 4000000
+addresses = [ "sklearn_rf_comp_5_d16_r0:6001",]
+[batching]
+strategy = "aimd"
+INFO:clipper::configuration: sklearn_rf_comp_1_d16_r0:6001
+INFO:clipper::configuration: sklearn_rf_comp_2_d16_r0:6001
+INFO:clipper::configuration: sklearn_rf_comp_3_d16_r0:6001
+INFO:clipper::configuration: sklearn_rf_comp_4_d16_r0:6001
+INFO:clipper::configuration: sklearn_rf_comp_5_d16_r0:6001
+INFO:clipper::batching: Connected to sklearn_rf_comp_0_d16 model wrapper at V4(172.21.0.4:6001)
+INFO:clipper::batching: Connected to sklearn_rf_comp_2_d16 model wrapper at V4(172.21.0.9:6001)
+INFO:clipper::batching: Connected to sklearn_rf_comp_1_d16 model wrapper at V4(172.21.0.7:6001)
+INFO:clipper::batching: Connected to sklearn_rf_comp_4_d16 model wrapper at V4(172.21.0.3:6001)
+INFO:clipper::batching: Connected to sklearn_rf_comp_3_d16 model wrapper at V4(172.21.0.5:6001)
+INFO:clipper::batching: Connected to sklearn_rf_comp_5_d16 model wrapper at V4(172.21.0.8:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::server: starting prediction worker 8 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 8 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting prediction worker 9 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 9 
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "ensemble_size_6_trial_2_160914-105329",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 188432,
+      "max": 188432,
+      "mean": 188432.0,
+      "std": null,
+      "p95": 188432.0,
+      "p99": 188432.0,
+      "p50": 188432.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_latency",
+      "min": 6186,
+      "max": 7416,
+      "mean": 6559.7075,
+      "std": 245.86139694963277,
+      "p95": 6943.0,
+      "p99": 7010.320000000001,
+      "p50": 6604.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_latency",
+      "min": 6159,
+      "max": 7647,
+      "mean": 6504.3625,
+      "std": 195.53044899698438,
+      "p95": 6878.0,
+      "p99": 7090.850000000002,
+      "p50": 6500.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_latency",
+      "min": 5413,
+      "max": 11223,
+      "mean": 5804.3225,
+      "std": 604.3801261092553,
+      "p95": 6690.0,
+      "p99": 7449.0,
+      "p50": 5608.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_latency",
+      "min": 5967,
+      "max": 7399,
+      "mean": 6408.3475,
+      "std": 288.7318946900019,
+      "p95": 6819.0,
+      "p99": 7104.85,
+      "p50": 6349.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_latency",
+      "min": 5362,
+      "max": 7535,
+      "mean": 5963.91,
+      "std": 373.9501754703908,
+      "p95": 6770.0,
+      "p99": 7178.920000000003,
+      "p50": 5974.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_latency",
+      "min": 6012,
+      "max": 8279,
+      "mean": 6297.295,
+      "std": 312.9914649280303,
+      "p95": 7027.0,
+      "p99": 7910.080000000007,
+      "p50": 6278.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_batch_size",
+      "min": 1,
+      "max": 39,
+      "mean": 20.0,
+      "std": 11.832159566199233,
+      "p95": 38.9,
+      "p99": 39.0,
+      "p50": 20.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.049918159178027627,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_thruput",
+      "rate": 19.967269651587118,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_thruput",
+      "rate": 19.967808896886888,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_thruput",
+      "rate": 19.967831822933254,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_thruput",
+      "rate": 19.969139691520728,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_thruput",
+      "rate": 19.970669078324666,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_thruput",
+      "rate": 19.971420896696828,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: SPIN TIME: 66666
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: {
+  "name": "ensemble_size_6_trial_2_160914-105329",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 419975
+    },
+    {
+      "name": "queued_predictions",
+      "count": 239
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:prediction_counter",
+      "count": 420144
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:prediction_counter",
+      "count": 420039
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:prediction_counter",
+      "count": 419986
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:prediction_counter",
+      "count": 420130
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:prediction_counter",
+      "count": 420098
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:prediction_counter",
+      "count": 420083
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 168646
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 251329
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9004678849931543
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17045,
+      "max": 20125,
+      "mean": 17067.897616731516,
+      "std": 75.43293015164812,
+      "p95": 17104.0,
+      "p99": 17197.739999999998,
+      "p50": 17055.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 8847,
+      "max": 276917,
+      "mean": 30576.18263618677,
+      "std": 45816.354589760325,
+      "p95": 135754.5499999994,
+      "p99": 261831.12,
+      "p50": 18597.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 6,
+      "mean": 5.054231517509727,
+      "std": 1.1134727410334296,
+      "p95": 6.0,
+      "p99": 6.0,
+      "p50": 5.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_latency",
+      "min": 4163,
+      "max": 9570,
+      "mean": 4665.538910505837,
+      "std": 572.8514031511644,
+      "p95": 5436.0,
+      "p99": 7558.0,
+      "p50": 4498.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_batch_size",
+      "min": 34,
+      "max": 202,
+      "mean": 75.51114306254493,
+      "std": 10.75207431738512,
+      "p95": 91.0,
+      "p99": 110.0,
+      "p50": 73.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_latency",
+      "min": 4900,
+      "max": 10183,
+      "mean": 5862.350802529183,
+      "std": 580.8781675803723,
+      "p95": 6443.75,
+      "p99": 9180.0,
+      "p50": 5759.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_batch_size",
+      "min": 35,
+      "max": 229,
+      "mean": 95.72544998860788,
+      "std": 12.646121034484901,
+      "p95": 111.0,
+      "p99": 145.20000000000074,
+      "p50": 94.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_latency",
+      "min": 7342,
+      "max": 17817,
+      "mean": 8784.488934824903,
+      "std": 1100.1841306645227,
+      "p95": 11157.0,
+      "p99": 13523.0,
+      "p50": 8521.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_batch_size",
+      "min": 36,
+      "max": 338,
+      "mean": 143.67715458276335,
+      "std": 26.105402512587547,
+      "p95": 173.0,
+      "p99": 283.5,
+      "p50": 139.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_latency",
+      "min": 4331,
+      "max": 10289,
+      "mean": 5161.507538910506,
+      "std": 660.0532768576154,
+      "p95": 6045.0,
+      "p99": 8265.0,
+      "p50": 5077.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_batch_size",
+      "min": 35,
+      "max": 205,
+      "mean": 84.63524672708962,
+      "std": 12.548410943559818,
+      "p95": 103.0,
+      "p99": 127.0,
+      "p50": 82.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_latency",
+      "min": 4372,
+      "max": 15811,
+      "mean": 6010.366366731518,
+      "std": 1343.1606393569339,
+      "p95": 8039.0,
+      "p99": 10476.0,
+      "p50": 5695.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_batch_size",
+      "min": 36,
+      "max": 248,
+      "mean": 94.57168579788432,
+      "std": 23.25855455019438,
+      "p95": 134.0,
+      "p99": 167.1200000000008,
+      "p50": 90.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_latency",
+      "min": 4541,
+      "max": 15573,
+      "mean": 6387.918895914397,
+      "std": 1374.953309850539,
+      "p95": 8677.0,
+      "p99": 11948.0,
+      "p50": 6163.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_batch_size",
+      "min": 36,
+      "max": 280,
+      "mean": 100.86005760921748,
+      "std": 24.539863512684215,
+      "p95": 140.0,
+      "p99": 200.65999999999986,
+      "p50": 97.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 13998.102467299017,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_thruput",
+      "rate": 14002.766724055165,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_thruput",
+      "rate": 14000.200869737973,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_thruput",
+      "rate": 13999.30115458779,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_thruput",
+      "rate": 14002.700078488484,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_thruput",
+      "rate": 14001.6337494216,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_thruput",
+      "rate": 14001.66707220494,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:cache_included_thruput",
+      "rate": 13669.922951931407,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:cache_included_thruput",
+      "rate": 10900.721507736474,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:cache_included_thruput",
+      "rate": 10525.253733676285,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:cache_included_thruput",
+      "rate": 13424.33199435672,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:cache_included_thruput",
+      "rate": 8464.223659210456,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:cache_included_thruput",
+      "rate": 13929.81350239584,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: {
+  "name": "ensemble_size_6_trial_2_160914-105329",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 841196
+    },
+    {
+      "name": "queued_predictions",
+      "count": 241
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:prediction_counter",
+      "count": 841320
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:prediction_counter",
+      "count": 841300
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:prediction_counter",
+      "count": 841231
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:prediction_counter",
+      "count": 841298
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:prediction_counter",
+      "count": 841331
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:prediction_counter",
+      "count": 841251
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 341809
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 499387
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9052075853903252
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17045,
+      "max": 20125,
+      "mean": 17065.774075875488,
+      "std": 67.79454975888585,
+      "p95": 17106.0,
+      "p99": 17205.0,
+      "p50": 17054.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 9357,
+      "max": 276917,
+      "mean": 24589.73528696498,
+      "std": 33559.13469111802,
+      "p95": 35779.2,
+      "p99": 245899.07,
+      "p50": 18032.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 6,
+      "mean": 5.190418287937743,
+      "std": 0.897021000260008,
+      "p95": 6.0,
+      "p99": 6.0,
+      "p50": 5.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_latency",
+      "min": 4102,
+      "max": 9570,
+      "mean": 4687.342898832685,
+      "std": 458.1723776539302,
+      "p95": 5387.75,
+      "p99": 6293.0,
+      "p50": 4546.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_batch_size",
+      "min": 34,
+      "max": 202,
+      "mean": 76.76544260700389,
+      "std": 9.56260081788178,
+      "p95": 94.0,
+      "p99": 104.0,
+      "p50": 74.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_latency",
+      "min": 4219,
+      "max": 10183,
+      "mean": 5411.289640077821,
+      "std": 679.6543695368747,
+      "p95": 6208.0,
+      "p99": 7839.0,
+      "p50": 5505.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_batch_size",
+      "min": 35,
+      "max": 229,
+      "mean": 88.11454280155643,
+      "std": 13.734129180669728,
+      "p95": 107.0,
+      "p99": 118.0,
+      "p50": 89.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_latency",
+      "min": 7020,
+      "max": 17817,
+      "mean": 8755.29280155642,
+      "std": 879.7847318411846,
+      "p95": 9808.0,
+      "p99": 13136.25,
+      "p50": 8614.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_batch_size",
+      "min": 36,
+      "max": 338,
+      "mean": 144.7168902648779,
+      "std": 21.291372739571899,
+      "p95": 172.0,
+      "p99": 227.70000000000074,
+      "p50": 142.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_latency",
+      "min": 4204,
+      "max": 10289,
+      "mean": 5126.535870622568,
+      "std": 557.2028579066309,
+      "p95": 5878.0,
+      "p99": 7412.0,
+      "p50": 5082.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_batch_size",
+      "min": 35,
+      "max": 205,
+      "mean": 84.58706225680933,
+      "std": 11.177243081898464,
+      "p95": 102.0,
+      "p99": 115.0,
+      "p50": 83.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_latency",
+      "min": 4374,
+      "max": 15811,
+      "mean": 5825.164275291829,
+      "std": 1115.9083305962288,
+      "p95": 7741.0,
+      "p99": 9624.0,
+      "p50": 5558.5
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_batch_size",
+      "min": 36,
+      "max": 248,
+      "mean": 93.01872568093386,
+      "std": 19.695014731737758,
+      "p95": 129.0,
+      "p99": 150.0,
+      "p50": 89.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_latency",
+      "min": 4541,
+      "max": 15573,
+      "mean": 6138.397859922179,
+      "std": 1201.7117060544265,
+      "p95": 8131.0,
+      "p99": 10733.0,
+      "p50": 5931.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_batch_size",
+      "min": 36,
+      "max": 278,
+      "mean": 97.97361381322958,
+      "std": 21.20680263386692,
+      "p95": 134.0,
+      "p99": 162.75,
+      "p50": 95.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14017.698305874199,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_thruput",
+      "rate": 14019.797606737036,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_thruput",
+      "rate": 14019.730962265201,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_thruput",
+      "rate": 14018.3978392663,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_thruput",
+      "rate": 14019.864017622265,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_thruput",
+      "rate": 14019.030961738192,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_thruput",
+      "rate": 14017.881344618176,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:cache_included_thruput",
+      "rate": 13850.46634177651,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:cache_included_thruput",
+      "rate": 11582.699752926517,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:cache_included_thruput",
+      "rate": 11509.97170559661,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:cache_included_thruput",
+      "rate": 13720.57888504547,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:cache_included_thruput",
+      "rate": 8292.879207099126,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:cache_included_thruput",
+      "rate": 13963.498005462488,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: Submitted 1000000 requests
+INFO:clipper_benchmarks: Submitted 1020000 requests
+INFO:clipper_benchmarks: Submitted 1040000 requests
+INFO:clipper_benchmarks: Submitted 1060000 requests
+INFO:clipper_benchmarks: Submitted 1080000 requests
+INFO:clipper_benchmarks: Submitted 1100000 requests
+INFO:clipper_benchmarks: Submitted 1120000 requests
+INFO:clipper_benchmarks: Submitted 1140000 requests
+INFO:clipper_benchmarks: Submitted 1160000 requests
+INFO:clipper_benchmarks: Submitted 1180000 requests
+INFO:clipper_benchmarks: Submitted 1200000 requests
+INFO:clipper_benchmarks: Submitted 1220000 requests
+INFO:clipper_benchmarks: Submitted 1240000 requests
+INFO:clipper_benchmarks: Submitted 1260000 requests
+INFO:clipper_benchmarks: {
+  "name": "ensemble_size_6_trial_2_160914-105329",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1262647
+    },
+    {
+      "name": "queued_predictions",
+      "count": 240
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:prediction_counter",
+      "count": 1262801
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:prediction_counter",
+      "count": 1262793
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:prediction_counter",
+      "count": 1262594
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:prediction_counter",
+      "count": 1262726
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:prediction_counter",
+      "count": 1262711
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:prediction_counter",
+      "count": 1262669
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 514937
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 747710
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9066500771791324
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17045,
+      "max": 19164,
+      "mean": 17066.243677042803,
+      "std": 67.0439100578572,
+      "p95": 17107.0,
+      "p99": 17219.48,
+      "p50": 17054.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 9300,
+      "max": 276917,
+      "mean": 22538.801009241244,
+      "std": 28091.09682702332,
+      "p95": 30617.1,
+      "p99": 221327.59000000006,
+      "p50": 17910.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 6,
+      "mean": 5.237597276264592,
+      "std": 0.8189062870404846,
+      "p95": 6.0,
+      "p99": 6.0,
+      "p50": 5.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_latency",
+      "min": 4102,
+      "max": 9570,
+      "mean": 4706.645549610895,
+      "std": 422.7929126503506,
+      "p95": 5378.75,
+      "p99": 5882.25,
+      "p50": 4568.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_batch_size",
+      "min": 38,
+      "max": 202,
+      "mean": 77.4783560311284,
+      "std": 9.16386520848207,
+      "p95": 94.0,
+      "p99": 103.0,
+      "p50": 75.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_latency",
+      "min": 4219,
+      "max": 10183,
+      "mean": 5242.11028696498,
+      "std": 638.781308724466,
+      "p95": 6118.75,
+      "p99": 7037.0,
+      "p50": 5255.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_batch_size",
+      "min": 35,
+      "max": 229,
+      "mean": 85.56444552529183,
+      "std": 12.73835065896816,
+      "p95": 105.0,
+      "p99": 115.0,
+      "p50": 85.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_latency",
+      "min": 7020,
+      "max": 17817,
+      "mean": 8799.85372081712,
+      "std": 800.9788617286798,
+      "p95": 9823.0,
+      "p99": 12336.25,
+      "p50": 8697.5
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_batch_size",
+      "min": 36,
+      "max": 338,
+      "mean": 146.29620622568096,
+      "std": 19.437825749845027,
+      "p95": 173.0,
+      "p99": 195.75,
+      "p50": 144.5
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_latency",
+      "min": 4204,
+      "max": 10289,
+      "mean": 5137.792923151751,
+      "std": 522.3246283994104,
+      "p95": 5850.75,
+      "p99": 6756.5,
+      "p50": 5132.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_batch_size",
+      "min": 35,
+      "max": 203,
+      "mean": 84.92436770428016,
+      "std": 10.802725956149996,
+      "p95": 103.0,
+      "p99": 114.0,
+      "p50": 83.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_latency",
+      "min": 4374,
+      "max": 15811,
+      "mean": 5718.844357976654,
+      "std": 1025.2744147473266,
+      "p95": 7577.0,
+      "p99": 8531.0,
+      "p50": 5511.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_batch_size",
+      "min": 38,
+      "max": 248,
+      "mean": 91.85773346303502,
+      "std": 18.021551099829038,
+      "p95": 126.0,
+      "p99": 144.75,
+      "p50": 89.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_latency",
+      "min": 4488,
+      "max": 15573,
+      "mean": 6016.364299610895,
+      "std": 1147.1466746658562,
+      "p95": 7893.5,
+      "p99": 10096.0,
+      "p50": 5846.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_batch_size",
+      "min": 36,
+      "max": 278,
+      "mean": 96.0795233463035,
+      "std": 20.261161196083589,
+      "p95": 132.0,
+      "p99": 153.75,
+      "p50": 93.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14026.273021548534,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_thruput",
+      "rate": 14026.972608867005,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_thruput",
+      "rate": 14027.77231527701,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_thruput",
+      "rate": 14025.573122649494,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_thruput",
+      "rate": 14027.183642502978,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_thruput",
+      "rate": 14026.972608867005,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_thruput",
+      "rate": 14026.572755662002,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:cache_included_thruput",
+      "rate": 13913.235272209553,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:cache_included_thruput",
+      "rate": 11992.073102890745,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:cache_included_thruput",
+      "rate": 11819.637363000793,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:cache_included_thruput",
+      "rate": 13803.204184405315,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:cache_included_thruput",
+      "rate": 8114.684236909968,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:cache_included_thruput",
+      "rate": 13983.489091369245,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 1280000 requests
+INFO:clipper_benchmarks: Submitted 1300000 requests
+INFO:clipper_benchmarks: Submitted 1320000 requests
+INFO:clipper_benchmarks: Submitted 1340000 requests
+INFO:clipper_benchmarks: Submitted 1360000 requests
+INFO:clipper_benchmarks: Submitted 1380000 requests
+INFO:clipper_benchmarks: Submitted 1400000 requests
+INFO:clipper_benchmarks: Submitted 1420000 requests
+INFO:clipper_benchmarks: Submitted 1440000 requests
+INFO:clipper_benchmarks: Submitted 1460000 requests
+INFO:clipper_benchmarks: Submitted 1480000 requests
+INFO:clipper_benchmarks: Submitted 1500000 requests
+INFO:clipper_benchmarks: Submitted 1520000 requests
+INFO:clipper_benchmarks: Submitted 1540000 requests
+INFO:clipper_benchmarks: Submitted 1560000 requests
+INFO:clipper_benchmarks: Submitted 1580000 requests
+INFO:clipper_benchmarks: Submitted 1600000 requests
+INFO:clipper_benchmarks: Submitted 1620000 requests
+INFO:clipper_benchmarks: Submitted 1640000 requests
+INFO:clipper_benchmarks: Submitted 1660000 requests
+INFO:clipper_benchmarks: Submitted 1680000 requests
+INFO:clipper_benchmarks: {
+  "name": "ensemble_size_6_trial_2_160914-105329",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1684064
+    },
+    {
+      "name": "queued_predictions",
+      "count": 238
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:prediction_counter",
+      "count": 1684161
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:prediction_counter",
+      "count": 1684224
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:prediction_counter",
+      "count": 1683899
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:prediction_counter",
+      "count": 1684148
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:prediction_counter",
+      "count": 1684225
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:prediction_counter",
+      "count": 1684145
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 688440
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 995624
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.9076139624147301
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17045,
+      "max": 19486,
+      "mean": 17066.742217898834,
+      "std": 77.87988673410207,
+      "p95": 17105.0,
+      "p99": 17229.87,
+      "p50": 17053.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 9109,
+      "max": 275123,
+      "mean": 21406.676921206225,
+      "std": 24438.451292234302,
+      "p95": 28919.0,
+      "p99": 180634.27000000067,
+      "p50": 17833.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 6,
+      "mean": 5.264105058365759,
+      "std": 0.7821876628539557,
+      "p95": 6.0,
+      "p99": 6.0,
+      "p50": 5.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_latency",
+      "min": 4102,
+      "max": 9570,
+      "mean": 4703.909046692607,
+      "std": 389.4881448183269,
+      "p95": 5364.0,
+      "p99": 5660.5,
+      "p50": 4576.0
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_batch_size",
+      "min": 38,
+      "max": 202,
+      "mean": 77.64980544747081,
+      "std": 8.712310044285584,
+      "p95": 94.0,
+      "p99": 102.0,
+      "p50": 76.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_latency",
+      "min": 4219,
+      "max": 10183,
+      "mean": 5163.905277237354,
+      "std": 594.1947726545993,
+      "p95": 6059.0,
+      "p99": 6679.75,
+      "p50": 5129.0
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_batch_size",
+      "min": 39,
+      "max": 225,
+      "mean": 84.61588035019456,
+      "std": 11.768767970915175,
+      "p95": 104.0,
+      "p99": 114.0,
+      "p50": 83.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_latency",
+      "min": 7020,
+      "max": 15317,
+      "mean": 8788.588278210116,
+      "std": 751.2662918132872,
+      "p95": 9784.75,
+      "p99": 11870.0,
+      "p50": 8698.0
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_batch_size",
+      "min": 38,
+      "max": 336,
+      "mean": 146.25826848249029,
+      "std": 18.17522317366489,
+      "p95": 173.0,
+      "p99": 188.0,
+      "p50": 145.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_latency",
+      "min": 4312,
+      "max": 9762,
+      "mean": 5118.060189688716,
+      "std": 498.6170463600752,
+      "p95": 5822.75,
+      "p99": 6514.0,
+      "p50": 5118.0
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_batch_size",
+      "min": 35,
+      "max": 201,
+      "mean": 84.49112354085604,
+      "std": 10.482320389190332,
+      "p95": 102.0,
+      "p99": 113.0,
+      "p50": 83.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_latency",
+      "min": 4364,
+      "max": 15811,
+      "mean": 5652.37670233463,
+      "std": 962.953338467493,
+      "p95": 7472.75,
+      "p99": 8181.25,
+      "p50": 5488.0
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_batch_size",
+      "min": 38,
+      "max": 246,
+      "mean": 91.09277723735409,
+      "std": 17.263290121420448,
+      "p95": 124.0,
+      "p99": 144.0,
+      "p50": 88.0
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_latency",
+      "min": 4488,
+      "max": 15573,
+      "mean": 6035.041828793775,
+      "std": 1095.211275843227,
+      "p95": 7838.5,
+      "p99": 9872.0,
+      "p50": 5893.5
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_batch_size",
+      "min": 36,
+      "max": 278,
+      "mean": 96.64506322957199,
+      "std": 19.843835591065579,
+      "p95": 132.0,
+      "p99": 150.75,
+      "p50": 94.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 14029.984852878491,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:model_thruput",
+      "rate": 14031.026149797977,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:model_thruput",
+      "rate": 14030.909524542994,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:model_thruput",
+      "rate": 14028.876912956157,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:model_thruput",
+      "rate": 14031.001158671908,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:model_thruput",
+      "rate": 14030.934515669062,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:model_thruput",
+      "rate": 14030.376380520216,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_0_d16:cache_included_thruput",
+      "rate": 13945.160431628003,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_4_d16:cache_included_thruput",
+      "rate": 12230.982888226577,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_5_d16:cache_included_thruput",
+      "rate": 11841.29773132004,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_3_d16:cache_included_thruput",
+      "rate": 13843.944240033774,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_2_d16:cache_included_thruput",
+      "rate": 8146.477082667497,
+      "unit": "events per second"
+    },
+    {
+      "name": "sklearn_rf_comp_1_d16:cache_included_thruput",
+      "rate": 13990.572357955889,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 1700000 requests
+INFO:clipper_benchmarks: Submitted 1720000 requests
+INFO:clipper_benchmarks: Submitted 1740000 requests
+INFO:clipper_benchmarks: Submitted 1760000 requests
+INFO:clipper_benchmarks: Submitted 1780000 requests
+INFO:clipper_benchmarks: Submitted 1800000 requests
+INFO:clipper_benchmarks: Submitted 1820000 requests
+INFO:clipper_benchmarks: Submitted 1840000 requests
+INFO:clipper_benchmarks: Submitted 1860000 requests
+INFO:clipper_benchmarks: Submitted 1880000 requests
+INFO:clipper_benchmarks: Submitted 1900000 requests
+INFO:clipper_benchmarks: Submitted 1920000 requests
+INFO:clipper_benchmarks: Submitted 1940000 requests
+INFO:clipper_benchmarks: Submitted 1960000 requests
+INFO:clipper_benchmarks: Submitted 1980000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/ensemble_size_6_trial_2_160914-105329_results.json
