@@ -966,6 +966,10 @@ fn start_digits_benchmark(conf_path: &String) {
         .unwrap_or(&Value::Integer(100))
         .as_integer()
         .unwrap() as usize;
+    let report_interval_secs = pc.get("report_interval_secs")
+        .unwrap_or(&Value::Integer(10))
+        .as_integer()
+        .unwrap() as u64;
     let salt_cache = pc.get("salt_cache")
         .unwrap_or(&Value::Boolean(true))
         .as_bool()
@@ -1022,7 +1026,6 @@ fn start_digits_benchmark(conf_path: &String) {
     // let clipper = Arc::new(ClipperServer::<AveragePolicy,
     //                                        ()>::new(config));
 
-    let report_interval_secs = 10;
     let (metrics_signal_tx, metrics_signal_rx) = mpsc::channel::<()>();
 
 

@@ -27,6 +27,7 @@ class DigitsBenchmarker:
                  window_size = -1,
                  send_updates = False,
                  salt_cache=True,
+                 track_blocking_latency=True,
                  batch_strategy = { "strategy": "aimd" },
                  ):
         self.remote_node = "c69.millennium.berkeley.edu"
@@ -51,6 +52,7 @@ class DigitsBenchmarker:
                 "num_message_encodes" : 1,
                 "correction_policy" : "logistic_regression",
                 "use_lsh" : False,
+                "track_blocking_latency" : track_blocking_latency,
                 "input_type" : "float",
                 "input_length" : 784,
                 "window_size" : window_size,
@@ -58,7 +60,7 @@ class DigitsBenchmarker:
                 "redis_port" : 6379,
                 "results_path" : "/tmp/benchmarking_logs",
                 "num_predict_workers" : 10,
-                "num_update_workers" : 8,
+                "num_update_workers" : 1,
                 "cache_size" : 10000000,
                 "mnist_path" : "/mnist_data/test.data",
                 # "num_benchmark_requests" : 10000000,
@@ -67,12 +69,14 @@ class DigitsBenchmarker:
                 "target_qps" : target_qps,
                 # "bench_batch_size" : 150*self.NUM_REPS,
                 "bench_batch_size" : bench_batch_size,
+                "report_interval_secs" : 30,
                 # "salt_cache" : False,
                 "salt_cache" : salt_cache,
                 "salt_update_cache" : salt_cache,
                 "send_updates": send_updates,
                 "load_generator": "uniform",
-                "request_generator": "cached_updates",
+                "request_generator": "balanced",
+                # "request_generator": "cached_updates",
                 # "request_generator": "cache_hits",
                 "wait_to_end": False,
                 "batching": batch_strategy,
@@ -94,7 +98,7 @@ class DigitsBenchmarker:
                     "redis": {"image": "redis:alpine", "cpuset": self.reserve_cores(1)},
                     "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
                     "clipper": {"image": "cl-dev-digits",
-                        "cpuset": self.reserve_cores(24),
+                        "cpuset": self.reserve_cores(20),
                         "depends_on": ["redis", "quantilereg"],
                         "environment": {
                             "CLIPPER_BENCH_COMMAND": "digits",
@@ -166,7 +170,7 @@ class DigitsBenchmarker:
 
 
 
-    def add_model(self, name_base, image, mp, container_mp, num_replicas, remote_replicas=0):
+    def add_model(self, name_base, image, mp, container_mp, num_replicas, remote_replicas=0, wait_time_nanos=None):
         model_names = [name_base + "_r%d" % i for i in range(num_replicas)]
         model_addrs = ["%s:6001" % n for n in model_names]
         remote_model_addrs = []
@@ -178,6 +182,8 @@ class DigitsBenchmarker:
                 "num_outputs": 1,
                 "version": 1
         }
+        if wait_time_nanos is not None:
+            clipper_model_def["wait_time_nanos"] = wait_time_nanos
         dc_entries = {}
         for n in model_names:
             if self.isolated_cores:
@@ -201,19 +207,19 @@ class DigitsBenchmarker:
         self.dc_dict["services"].update(dc_entries)
     # return (clipper_model_def, model_names, dc_entries)
 
-    def add_sklearn_rf(self, depth, num_replicas=1):
-        name_base = "rf_d%d" % depth
+    def add_sklearn_rf(self, depth, name_base="sklearn_rf", num_replicas=1):
+        name_base = "%s_d%d" % (name_base, depth)
         image = "clipper/sklearn-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/50rf_pred3_depth%d/" % depth
         container_mp =  "/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas)
+        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=4*1000*1000)
 
     def add_sklearn_log_regression(self, local_replicas=1, remote_replicas=0):
         name_base = "logistic_reg"
         image = "clipper/sklearn-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/log_regression_pred3/",
         container_mp =  "/model"
-        self.add_model(name_base, image, mp, container_mp, local_replicas, remote_replicas=remote_replicas)
+        self.add_model(name_base, image, mp, container_mp, local_replicas, remote_replicas=remote_replicas, wait_time_nanos=5*1000*1000)
 
 
     def add_sklearn_linear_svm(self, num_replicas=1):
@@ -221,7 +227,7 @@ class DigitsBenchmarker:
         image = "clipper/sklearn-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
         container_mp =  "/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas)
+        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=5*1000*1000)
 
     def add_sklearn_kernel_svm(self, num_replicas=1):
         name_base = "kernel_svm"
@@ -239,12 +245,11 @@ class DigitsBenchmarker:
         self.add_model(name_base, image, mp, container_mp, num_replicas)
 
 
-    def add_spark_svm(self, num_replicas=1):
-        name_base = "spark_svm"
+    def add_spark_svm(self, name_base="spark_svm", num_replicas=1):
         image = "clipper/spark-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3",
         container_mp ="/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas)
+        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=0*1000*1000)
 
     def add_spark_rf(self, num_replicas=1):
         name_base = "spark_svm"
@@ -317,56 +322,44 @@ class DigitsBenchmarker:
 
 
 if __name__=='__main__':
-    batch_strats = [
-            { "strategy": "aimd" },
-            { "strategy": "static", "batch_size": 1 },
-            { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
-        ]
+    # batch_strats = [
+    #         { "strategy": "aimd" },
+    #         { "strategy": "static", "batch_size": 1 },
+    #         { "strategy": "learned", "sample_size": 500, "opt_addr": "quantilereg:7777"},
+    #     ]
 
     bs = { "strategy": "aimd" }
     # window = 1
     # salt_cache = False
-    for window in [1, 20, 100]:
-        for salt_cache in [False, True]:
+    # ensemble_size = 1
+    for ensemble_size in [1,] + range(2,21,2):
+        print("STARTING EXPERIMENT: STRAGGLER MITIGATION WITH ENSEMBLE SIZE: %d" % (ensemble_size))
+        time.sleep(5)
+        num_reqs = 2000000
+        num_reps = 1
+        debug = ""
+        # debug = "DEBUG_"
+        exp_name = "%sensemble_size_%d" % (debug, ensemble_size)
+        log_dest = "experiments_logs/straggler_mitigation"
+        benchmarker = DigitsBenchmarker(exp_name,
+                                        log_dest,
+                                        target_qps=15000,
+                                        num_requests=num_reqs,
+                                        send_updates=False,
+                                        batch_strategy=bs,
+                                        salt_cache=True,
+                                        track_blocking_latency=True,
+                                        )
+        for comp_num in range(ensemble_size):
+            # benchmarker.add_spark_svm(name_base="spark_svm_comp_%d" % comp_num, num_replicas=num_reps)
+            benchmarker.add_sklearn_rf(depth=16, name_base="sklearn_rf_comp_%d" % comp_num, num_replicas=num_reps)
+        benchmarker.run_clipper()
 
-            cache_str = "ON"
-            if salt_cache:
-                cache_str = "OFF"
-            print("STARTING EXPERIMENT: WINDOW %d CACHING %s" % (window, cache_str))
-            time.sleep(5)
-            num_reqs = 2000000
-            num_reps = 1
-            debug = ""
-            debug = "DEBUG_"
-            exp_name = "%swindow_%d_caching_%s" % (debug, window, cache_str)
-            log_dest = "experiments_logs/feedback_caching"
-            benchmarker = DigitsBenchmarker(exp_name,
-                                            log_dest,
-                                            target_qps=500000,
-                                            window_size=window,
-                                            num_requests=num_reqs,
-                                            send_updates=True,
-                                            batch_strategy=bs,
-                                            salt_cache=salt_cache,
-                                            )
-
-            # benchmarker.add_noop(num_replicas=num_reps)
-
-
-
-            # benchmarker.add_spark_rf(num_replicas=num_reps)
-            benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
-            benchmarker.add_spark_svm(num_replicas=num_reps)
-            benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
-            benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
-            benchmarker.run_clipper()
-
-        # sys.exit(0)
-
-
-
-
-
+    # benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
+    # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
+    # benchmarker.add_sklearn_log_regression(local_replicas=num_reps)
+    # benchmarker.add_noop(num_replicas=num_reps)
+    # benchmarker.add_spark_rf(num_replicas=num_reps)
 
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

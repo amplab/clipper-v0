@@ -44,6 +44,7 @@ pub struct PredictionBatcher<C>
     predictions_counter: Arc<metrics::Counter>,
     input_type: InputType,
     slo_micros: u32,
+    wait_time_nanos: u64,
     batch_strategy: BatchStrategy,
     join_handles: Option<Arc<Mutex<Vec<Option<JoinHandle<()>>>>>>,
 }
@@ -79,6 +80,7 @@ impl<C> Clone for PredictionBatcher<C>
             predictions_counter: self.predictions_counter.clone(),
             input_type: self.input_type.clone(),
             slo_micros: self.slo_micros,
+            wait_time_nanos: self.wait_time_nanos,
             batch_strategy: self.batch_strategy.clone(),
             join_handles: self.join_handles.clone(),
         }
@@ -97,6 +99,7 @@ impl<C> PredictionBatcher<C>
                metric_register: Arc<RwLock<metrics::Registry>>,
                cache: Arc<C>,
                slo_micros: u32,
+               wait_time_nanos: u64,
                batch_strategy: BatchStrategy)
                -> PredictionBatcher<C> {
 
@@ -132,6 +135,7 @@ impl<C> PredictionBatcher<C>
             predictions_counter: predictions_counter.clone(),
             input_type: input_type.clone(),
             slo_micros: slo_micros,
+            wait_time_nanos: wait_time_nanos,
             batch_strategy: batch_strategy.clone(),
             join_handles: Some(Arc::new(Mutex::new(join_handles))),
         };
@@ -152,6 +156,7 @@ impl<C> PredictionBatcher<C>
            input_type: InputType,
            cache: Arc<C>,
            slo_micros: u32,
+           wait_time_nanos: u64,
            batch_strategy: BatchStrategy,
            metric_register: Arc<RwLock<metrics::Registry>>) {
 
@@ -242,7 +247,7 @@ impl<C> PredictionBatcher<C>
         //     metric_register.write().unwrap().create_histogram(metric_name, 8224)
         // };
 
-        let wait_time_nanos = 1000 * 1000; // 1 ms
+        // let wait_time_nanos = 5 * 1000 * 1000; // 5 ms
         // block until new request, then try to get more requests
         while let Ok(first_req) = receiver.recv() {
             // Drop predictions we have no hope of evaluating in time.
@@ -256,7 +261,7 @@ impl<C> PredictionBatcher<C>
             if first_req.ttl && delay > slo_micros as i64 {
                 continue;
             }
-            let batch_start_time = time::precise_time_ns();
+            let batch_start_time = first_req.recv_time.clone();
             let mut batch: Vec<RpcPredictRequest> = Vec::new();
             batch.push(first_req);
             let start_time = time::PreciseTime::now();
@@ -267,7 +272,9 @@ impl<C> PredictionBatcher<C>
                     // let req_latency = req.req_start_time.to(time::PreciseTime::now()).num_microseconds().unwrap();
                     // println!("req->features latency {} (ms)", (req_latency as f64 / 1000.0));
                     batch.push(req);
-                } else if time::precise_time_ns() > batch_start_time + wait_time_nanos {
+                } else if batch_start_time.to(time::PreciseTime::now())
+                    .num_nanoseconds()
+                    .unwrap() > wait_time_nanos as i64 {
                     break;
                 }
             }
@@ -370,6 +377,7 @@ impl<C> PredictionBatcher<C>
         let cache = self.cache.clone();
         let batch_strategy = self.batch_strategy.clone();
         let slo_micros = self.slo_micros;
+        let wait_time_nanos = self.wait_time_nanos;
         let jh = thread::spawn(move || {
             PredictionBatcher::run(name,
                                    receiver,
@@ -381,6 +389,7 @@ impl<C> PredictionBatcher<C>
                                    input_type,
                                    cache,
                                    slo_micros,
+                                   wait_time_nanos,
                                    batch_strategy,
                                    metric_register);
         });

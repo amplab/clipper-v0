@@ -2,7 +2,7 @@ use std::net::{ToSocketAddrs, SocketAddr};
 use std::sync::{RwLock, Arc};
 use toml::{Parser, Table, Value};
 use metrics;
-use server::InputType;
+use server::{self, InputType};
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
@@ -25,6 +25,7 @@ pub struct ClipperConf {
     pub policy_name: String,
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
+    pub track_blocking_latency: bool,
     pub salt_update_cache: bool,
     pub input_type: InputType,
     // pub batch_size: i32,
@@ -59,7 +60,8 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.redis_port == other.redis_port &&
         self.batch_strategy == other.batch_strategy &&
         self.num_message_encodes == other.num_message_encodes &&
-        self.salt_update_cache == other.salt_update_cache
+        self.salt_update_cache == other.salt_update_cache &&
+        self.track_blocking_latency == other.track_blocking_latency
     }
 }
 
@@ -172,6 +174,10 @@ impl ClipperConf {
                 .unwrap_or(&Value::Boolean(false))
                 .as_bool()
                 .unwrap(),
+            track_blocking_latency: pc.get("track_blocking_latency")
+                .unwrap_or(&Value::Boolean(false))
+                .as_bool()
+                .unwrap(),
             salt_update_cache: pc.get("salt_update_cache")
                 .unwrap_or(&Value::Boolean(false))
                 .as_bool()
@@ -264,6 +270,7 @@ pub struct ModelConf {
     /// The dimension of the output vector this model produces
     pub num_outputs: usize,
     pub version: u32,
+    pub wait_time_nanos: u64,
 }
 
 // impl PartialEq<ModelConf> for ModelConf {
@@ -297,6 +304,10 @@ impl ModelConf {
                 .unwrap_or(&Value::Integer(1))
                 .as_integer()
                 .unwrap() as u32,
+            wait_time_nanos: mt.get("wait_time_nanos")
+                .unwrap_or(&Value::Integer(server::DEFAULT_WAIT_TIME_NANOS as i64))
+                .as_integer()
+                .unwrap() as u64,
         }
     }
 
@@ -310,6 +321,7 @@ impl ModelConf {
             addresses: get_addrs_str(addresses),
             num_outputs: num_outputs,
             version: version,
+            wait_time_nanos: server::DEFAULT_WAIT_TIME_NANOS,
         }
     }
 }
@@ -338,6 +350,7 @@ pub struct ClipperConfBuilder {
     pub policy_name: String,
     pub models: Vec<ModelConf>,
     pub use_lsh: bool,
+    pub track_blocking_latency: bool,
     pub salt_update_cache: bool,
     pub input_type: InputType,
     pub window_size: isize,
@@ -361,6 +374,7 @@ impl ClipperConfBuilder {
             policy_name: "default".to_string(),
             models: Vec::new(),
             use_lsh: false,
+            track_blocking_latency: false,
             salt_update_cache: false,
             input_type: InputType::Integer(-1),
             num_predict_workers: 2,
@@ -502,6 +516,7 @@ impl ClipperConfBuilder {
             policy_name: self.policy_name.clone(),
             models: self.models.drain(..).collect(),
             use_lsh: self.use_lsh,
+            track_blocking_latency: self.track_blocking_latency,
             salt_update_cache: self.salt_update_cache,
             num_predict_workers: self.num_predict_workers,
             num_update_workers: self.num_update_workers,

@@ -6,6 +6,7 @@ use serde::ser::Serialize;
 use serde::de::Deserialize;
 use serde_json;
 use std::sync::{mpsc, RwLock, Arc};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::{HashMap, HashSet};
 use rand::{thread_rng, Rng};
 use std::cmp;
@@ -23,6 +24,8 @@ use correction_policy::CorrectionPolicy;
 use metrics;
 
 // pub const SLO: i64 = 20;
+
+pub const DEFAULT_WAIT_TIME_NANOS: u64 = 1 * 1000 * 1000; // 1 ms
 
 pub type Output = f64;
 
@@ -195,6 +198,7 @@ impl ModelSet {
                                            conf.metrics.clone(),
                                            cache.clone(),
                                            conf.slo_micros - 2,
+                                           m.wait_time_nanos,
                                            conf.batch_strategy.clone());
             batchers.insert(VersionedModel {
                                 name: m.name.clone(),
@@ -254,6 +258,7 @@ impl ModelSet {
                                                  self.metrics.clone(),
                                                  self.cache.clone(),
                                                  self.slo_micros - 2,
+                                                 DEFAULT_WAIT_TIME_NANOS,
                                                  self.batch_strategy.clone());
         if self.batchers.insert(model.clone(), new_batcher.clone()).is_some() {
             warn!("ModelSet already contained a batcher for {:?}, did you mean to add a replica \
@@ -366,6 +371,7 @@ struct ServerMetrics {
 struct PredictionMetrics {
     pub num_queued_predictions_counter: Arc<metrics::Counter>,
     pub latency_hist: Arc<metrics::Histogram>,
+    pub blocking_latency_hist: Arc<metrics::Histogram>,
     pub pred_counter: Arc<metrics::Counter>,
     pub thruput_meter: Arc<metrics::Meter>,
     pub accuracy_counter: Arc<metrics::RatioCounter>,
@@ -393,6 +399,11 @@ impl PredictionMetrics {
             metrics_register.write().unwrap().create_histogram(metric_name, 2056 * 2)
         };
 
+        let blocking_latency_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("straggler_blocking_prediction_latency");
+            metrics_register.write().unwrap().create_histogram(metric_name, 2056 * 8)
+        };
+
         let thruput_meter: Arc<metrics::Meter> = {
             let metric_name = format!("prediction_thruput");
             metrics_register.write().unwrap().create_meter(metric_name)
@@ -416,6 +427,7 @@ impl PredictionMetrics {
         PredictionMetrics {
             num_queued_predictions_counter: queued_predictions_counter,
             latency_hist: latency_hist,
+            blocking_latency_hist: blocking_latency_hist,
             pred_counter: pred_counter,
             thruput_meter: thruput_meter,
             accuracy_counter: accuracy_counter,
@@ -533,7 +545,8 @@ impl<P, S> ClipperServer<P, S>
                                                           models.clone(),
                                                           conf.redis_ip.clone(),
                                                           conf.redis_port,
-                                                          prediction_metrics.clone()));
+                                                          prediction_metrics.clone(),
+                                                          conf.track_blocking_latency));
         }
         let mut update_workers = Vec::with_capacity(conf.num_update_workers.clone());
         for i in 0..conf.num_update_workers {
@@ -712,7 +725,8 @@ impl<P, S> PredictionWorker<P, S>
                models: ModelSet,
                redis_ip: String,
                redis_port: u16,
-               prediction_metrics: PredictionMetrics)
+               prediction_metrics: PredictionMetrics,
+               track_blocking_latency: bool)
                -> PredictionWorker<P, S> {
         let (input_sender, input_receiver) = mpsc::channel::<InputChannelMessage>();
         let (output_sender, output_receiver) = mpsc::channel::<OutputChannelMessage>();
@@ -730,7 +744,8 @@ impl<P, S> PredictionWorker<P, S>
                                                            models,
                                                            redis_ip,
                                                            redis_port,
-                                                           prediction_metrics);
+                                                           prediction_metrics,
+                                                           track_blocking_latency);
             });
         }
         {
@@ -767,7 +782,8 @@ impl<P, S> PredictionWorker<P, S>
                         mut models: ModelSet,
                         redis_ip: String,
                         redis_port: u16,
-                        prediction_metrics: PredictionMetrics) {
+                        prediction_metrics: PredictionMetrics,
+                        track_blocking_latency: bool) {
         let cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
         info!("starting input prediction worker {} ", worker_id);
         // while let Ok((mut req, max_preds)) = request_queue.recv() {
@@ -816,7 +832,29 @@ impl<P, S> PredictionWorker<P, S>
                         for vm in req.offline_models.as_ref().unwrap() {
                             model_name_version_map.insert(&vm.name, vm.version.as_ref().unwrap());
                         }
+                        let finished_preds_counter = Arc::new(AtomicUsize::new(0));
                         while num_requests < max_preds && i < model_req_order.len() {
+
+                            // let track_blocking_latency = true;
+                            if track_blocking_latency {
+                                let blocking_latency_hist = prediction_metrics.blocking_latency_hist
+                                    .clone();
+                                let fpc = finished_preds_counter.clone();
+                                let recv_time = req.recv_time.clone();
+                                cache.add_listener(&model_req_order[i],
+                                                   &req.query,
+                                                   req.salt.clone(),
+                                                   Box::new(move |_| {
+                                    let num_prev_earlier_completions =
+                                        fpc.fetch_add(1, Ordering::Relaxed);
+                                    if num_prev_earlier_completions + 1 == max_preds as usize {
+                                        let end_time = PreciseTime::now();
+                                        let latency =
+                                            recv_time.to(end_time).num_microseconds().unwrap();
+                                        blocking_latency_hist.insert(latency);
+                                    }
+                                }));
+                            }
                             // first check to see if the prediction is already cached
                             if cache.fetch(&model_req_order[i], &req.query, req.salt.clone())
                                 .is_none() {
@@ -891,15 +929,23 @@ impl<P, S> PredictionWorker<P, S>
                                 info!("OUTPUT THREAD: user: {}, error: {}", req.uid, e);
                                 P::new(model_names.clone())
                             });
-                    let elapsed_time = req.recv_time.to(PreciseTime::now());
-                    // NOTE: assumes SLA less than 1 second
-                    if elapsed_time < slo - epsilon {
-                        let sleep_time =
-                    StdDuration::new(0, (slo - elapsed_time).num_nanoseconds().unwrap() as u32);
-                        debug!("prediction worker sleeping for {:?} ms",
-                               sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
-                        thread::sleep(sleep_time);
+                    // let elapsed_time = req.recv_time.to(PreciseTime::now());
+                    // // NOTE: assumes SLA less than 1 second
+                    // if elapsed_time < slo - epsilon {
+                    //     let sleep_time =
+                    // StdDuration::new(0, (slo - elapsed_time).num_nanoseconds().unwrap() as u32);
+                    //     debug!("prediction worker sleeping for {:?} ms",
+                    //            sleep_time.subsec_nanos() as f64 / (1000.0 * 1000.0));
+                    //     thread::sleep(sleep_time);
+                    // }
+
+
+                    // spin
+                    while req.recv_time.to(PreciseTime::now()) < slo - epsilon {
                     }
+
+
+
                     let mut ys = HashMap::new();
                     let mut missing_ys = Vec::new();
                     for model_name in model_names {
