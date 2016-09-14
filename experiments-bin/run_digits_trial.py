@@ -222,12 +222,12 @@ class DigitsBenchmarker:
         self.add_model(name_base, image, mp, container_mp, local_replicas, remote_replicas=remote_replicas, wait_time_nanos=5*1000*1000)
 
 
-    def add_sklearn_linear_svm(self, num_replicas=1):
+    def add_sklearn_linear_svm(self, num_replicas=1, wait_time_nanos=1*1000*1000):
         name_base = "linear_svm"
         image = "clipper/sklearn-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
         container_mp =  "/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=5*1000*1000)
+        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=wait_time_nanos)
 
     def add_sklearn_kernel_svm(self, num_replicas=1):
         name_base = "kernel_svm"
@@ -245,11 +245,11 @@ class DigitsBenchmarker:
         self.add_model(name_base, image, mp, container_mp, num_replicas)
 
 
-    def add_spark_svm(self, name_base="spark_svm", num_replicas=1):
+    def add_spark_svm(self, name_base="spark_svm", num_replicas=1, wait_time_nanos=1*1000*1000):
         image = "clipper/spark-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3",
         container_mp ="/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=0*1000*1000)
+        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=wait_time_nanos)
 
     def add_spark_rf(self, num_replicas=1):
         name_base = "spark_svm"
@@ -332,28 +332,31 @@ if __name__=='__main__':
     # window = 1
     # salt_cache = False
     # ensemble_size = 1
-    for ensemble_size in [1,] + range(2,21,2):
-        print("STARTING EXPERIMENT: STRAGGLER MITIGATION WITH ENSEMBLE SIZE: %d" % (ensemble_size))
-        time.sleep(5)
-        num_reqs = 2000000
-        num_reps = 1
-        debug = ""
-        # debug = "DEBUG_"
-        exp_name = "%sensemble_size_%d" % (debug, ensemble_size)
-        log_dest = "experiments_logs/straggler_mitigation"
-        benchmarker = DigitsBenchmarker(exp_name,
-                                        log_dest,
-                                        target_qps=15000,
-                                        num_requests=num_reqs,
-                                        send_updates=False,
-                                        batch_strategy=bs,
-                                        salt_cache=True,
-                                        track_blocking_latency=True,
-                                        )
-        for comp_num in range(ensemble_size):
-            # benchmarker.add_spark_svm(name_base="spark_svm_comp_%d" % comp_num, num_replicas=num_reps)
-            benchmarker.add_sklearn_rf(depth=16, name_base="sklearn_rf_comp_%d" % comp_num, num_replicas=num_reps)
-        benchmarker.run_clipper()
+    # for wt in range(12):
+    for wt in range(11):
+        for mw in ["spark_svm", "sklearn_svm"]:
+            print("STARTING EXPERIMENT: MODEL: %s, WAIT TIME (MS): %d" % (mw, wt))
+            time.sleep(5)
+            num_reqs = 1000000
+            num_reps = 1
+            debug = ""
+            # debug = "DEBUG_"
+            exp_name = "%swait_time_%d_%s" % (debug, wt, mw)
+            log_dest = "experiments_logs/batch_wait_time"
+            benchmarker = DigitsBenchmarker(exp_name,
+                                            log_dest,
+                                            target_qps=20000,
+                                            num_requests=num_reqs,
+                                            send_updates=False,
+                                            batch_strategy=bs,
+                                            salt_cache=True,
+                                            # track_blocking_latency=True,
+                                            )
+            if mw == "spark_svm":
+                benchmarker.add_spark_svm(name_base="spark_svm", num_replicas=num_reps, wait_time_nanos=wt*1000*1000)
+            else:
+                benchmarker.add_sklearn_linear_svm(num_replicas=num_reps, wait_time_nanos=wt*1000*1000)
+            benchmarker.run_clipper()
 
     # benchmarker.add_sklearn_rf(depth=16, num_replicas=num_reps)
     # benchmarker.add_sklearn_linear_svm(num_replicas=num_reps)
