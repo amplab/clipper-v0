@@ -4,6 +4,7 @@ use std::time::Duration as StdDuration;
 // use std::net::Shutdown
 use std::thread::{self, JoinHandle};
 use std::sync::{RwLock, Arc, mpsc, Mutex};
+use std::sync::atomic::{AtomicIsize, Ordering};
 use std::cmp;
 use std::boxed::Box;
 use rand::{thread_rng, Rng};
@@ -16,6 +17,7 @@ use serde_json;
 use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
 use std::io::{Read, Write, Cursor};
 use std::mem;
+
 
 
 #[derive(Clone)]
@@ -37,6 +39,7 @@ pub struct PredictionBatcher<C>
 {
     name: String,
     input_queues: Vec<mpsc::Sender<RpcPredictRequest>>,
+    load_counters: Vec<Arc<AtomicIsize>>,
     cache: Arc<C>,
     latency_hist: Arc<metrics::Histogram>,
     batch_size_hist: Arc<metrics::Histogram>,
@@ -73,6 +76,7 @@ impl<C> Clone for PredictionBatcher<C>
         PredictionBatcher {
             name: self.name.clone(),
             input_queues: self.input_queues.clone(),
+            load_counters: self.load_counters.clone(),
             cache: self.cache.clone(),
             latency_hist: self.latency_hist.clone(),
             batch_size_hist: self.batch_size_hist.clone(),
@@ -124,10 +128,12 @@ impl<C> PredictionBatcher<C>
         };
 
         let input_queues = Vec::with_capacity(addrs.len());
+        let load_counters = Vec::with_capacity(addrs.len());
         let join_handles = Vec::with_capacity(addrs.len());
         let mut prediction_batcher = PredictionBatcher {
             name: name,
             input_queues: input_queues,
+            load_counters: load_counters,
             cache: cache,
             latency_hist: latency_hist.clone(),
             batch_size_hist: batch_size_hist.clone(),
@@ -158,7 +164,8 @@ impl<C> PredictionBatcher<C>
            slo_micros: u32,
            wait_time_nanos: u64,
            batch_strategy: BatchStrategy,
-           metric_register: Arc<RwLock<metrics::Registry>>) {
+           metric_register: Arc<RwLock<metrics::Registry>>,
+           load_counter: Arc<AtomicIsize>) {
 
 
         let mut stream: TcpStream;
@@ -221,6 +228,31 @@ impl<C> PredictionBatcher<C>
                                              opt_addr)) as Box<Batcher>
             }
         };
+
+        // CREATE REPLICA GAUGES
+        let rep_latency_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("{}:{}:model_latency", name, addr);
+            metric_register.write().unwrap().create_histogram(metric_name, 8224)
+        };
+
+        let rep_thruput_meter: Arc<metrics::Meter> = {
+            let metric_name = format!("{}:{}:model_thruput", name, addr);
+            metric_register.write().unwrap().create_meter(metric_name)
+        };
+
+        let rep_batch_size_hist: Arc<metrics::Histogram> = {
+            let metric_name = format!("{}:{}:model_batch_size", name, addr);
+            metric_register.write().unwrap().create_histogram(metric_name, 8224)
+        };
+
+        let rep_predictions_counter: Arc<metrics::Counter> = {
+            let metric_name = format!("{}:{}:prediction_counter", name, addr);
+            metric_register.write().unwrap().create_counter(metric_name)
+        };
+
+
+
+
 
         // let batch_setup_hist: Arc<metrics::Histogram> = {
         //     let metric_name = format!("{}:batch_setup_hist:", name);
@@ -293,6 +325,7 @@ impl<C> PredictionBatcher<C>
             let latency = start_time.to(end_time).num_microseconds().unwrap();
             for _ in 0..batch.len() {
                 latency_hist.insert(latency);
+                rep_latency_hist.insert(latency);
             }
 
             let measurement_time = time::precise_time_ns();
@@ -314,8 +347,11 @@ impl<C> PredictionBatcher<C>
 
 
             thruput_meter.mark(batch.len());
+            rep_thruput_meter.mark(batch.len());
             predictions_counter.incr(batch.len() as isize);
+            rep_predictions_counter.incr(batch.len() as isize);
             batch_size_hist.insert(batch.len() as i64);
+            rep_batch_size_hist.insert(batch.len() as i64);
             if latency > slo_micros as i64 {
                 trace!("latency: {}, batch size: {}",
                        (latency as f64 / 1000.0),
@@ -333,6 +369,8 @@ impl<C> PredictionBatcher<C>
                           response_floats[r],
                           batch[r].salt.clone());
             }
+            // decrease load_counter
+            load_counter.fetch_sub(batch.len() as isize, Ordering::Relaxed);
         }
         if !rpc::shutdown(&mut stream) {
             warn!("Connection to model: {} did not shut down cleanly", name);
@@ -348,13 +386,24 @@ impl<C> PredictionBatcher<C>
     }
 
 
+    /// Distributes predictions among queues using random load
+    /// balancing with [power of two choices](http://dl.acm.org/citation.cfm?id=504343)
     pub fn request_prediction(&self, req: RpcPredictRequest) {
         // TODO: this could be optimized with
         // https://doc.rust-lang.org/rand/rand/distributions/range/struct.Range.html
         let mut rng = thread_rng();
-        let replica: usize = rng.gen_range(0, self.input_queues.len());
+        let choice_one: usize = rng.gen_range(0, self.input_queues.len());
+        let load_one = self.load_counters[choice_one].load(Ordering::Relaxed);
+        let choice_two: usize = rng.gen_range(0, self.input_queues.len());
+        let load_two = self.load_counters[choice_two].load(Ordering::Relaxed);
+        let (min_load, replica) = cmp::min((load_one, choice_one), (load_two, choice_two));
+        assert!(min_load <= load_one && min_load <= load_two);
+
+
         self.input_queues[replica].send(req).unwrap();
+        self.load_counters[replica].fetch_add(1, Ordering::Relaxed);
     }
+
 
     pub fn incorporate_new_replica(&mut self, new_replica: mpsc::Sender<RpcPredictRequest>) {
         self.input_queues.push(new_replica);
@@ -366,7 +415,9 @@ impl<C> PredictionBatcher<C>
                            -> mpsc::Sender<RpcPredictRequest> {
 
         let (sender, receiver) = mpsc::channel::<RpcPredictRequest>();
+        let load_counter = Arc::new(AtomicIsize::new(0));
         self.input_queues.push(sender.clone());
+        self.load_counters.push(load_counter.clone());
         let name = self.name.clone();
         // let addr = a.clone();
         let latency_hist = self.latency_hist.clone();
@@ -391,7 +442,8 @@ impl<C> PredictionBatcher<C>
                                    slo_micros,
                                    wait_time_nanos,
                                    batch_strategy,
-                                   metric_register);
+                                   metric_register,
+                                   load_counter);
         });
         let mut lock = self.join_handles.as_ref().unwrap().lock().unwrap();
         lock.push(Some(jh));

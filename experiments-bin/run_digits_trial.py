@@ -31,7 +31,7 @@ class DigitsBenchmarker:
                  track_blocking_latency=True,
                  batch_strategy = { "strategy": "aimd" },
                  ):
-        self.remote_node = "c69.millennium.berkeley.edu"
+        self.remote_node = "c67.millennium.berkeley.edu"
         env.key_filename = "~/.ssh/c70.millenium"
         env.user = "crankshaw"
         env.host_string = self.remote_node
@@ -60,7 +60,7 @@ class DigitsBenchmarker:
                 "redis_ip" : "redis",
                 "redis_port" : 6379,
                 "results_path" : "/tmp/benchmarking_logs",
-                "num_predict_workers" : 10,
+                "num_predict_workers" : 24,
                 "num_update_workers" : 1,
                 "cache_size" : 10000000,
                 "mnist_path" : "/mnist_data/test.data",
@@ -70,7 +70,7 @@ class DigitsBenchmarker:
                 "target_qps" : target_qps,
                 # "bench_batch_size" : 150*self.NUM_REPS,
                 "bench_batch_size" : bench_batch_size,
-                "report_interval_secs" : 30,
+                "report_interval_secs" : 20,
                 # "salt_cache" : False,
                 "salt_cache" : salt_cache,
                 "salt_update_cache" : salt_cache,
@@ -99,7 +99,7 @@ class DigitsBenchmarker:
                     "redis": {"image": "redis:alpine", "cpuset": self.reserve_cores(1)},
                     "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
                     "clipper": {"image": "cl-dev-digits",
-                        "cpuset": self.reserve_cores(20),
+                        "cpuset": self.reserve_cores(32),
                         "depends_on": ["redis", "quantilereg"],
                         "environment": {
                             "CLIPPER_BENCH_COMMAND": "digits",
@@ -118,7 +118,7 @@ class DigitsBenchmarker:
         # global cur_model_core_num
         s = "%d-%d" % (self.cur_model_core_num, self.cur_model_core_num + num_cores - 1)
         self.cur_model_core_num += num_cores
-        if self.cur_model_core_num >= self.MAX_CORES:
+        if self.cur_model_core_num > self.MAX_CORES:
             print("WARNING: Trying to reserve more than %d cores: %d" % (self.MAX_CORES, self.cur_model_core_num))
             sys.exit(1)
         return s
@@ -176,7 +176,7 @@ class DigitsBenchmarker:
         model_addrs = ["%s:6001" % n for n in model_names]
         remote_model_addrs = []
         if remote_replicas > 0:
-            remote_model_addrs = self.add_remote_reps(name_base, image, mp, container_mp, num_replicas, remote_replicas)
+            remote_model_addrs = self.add_remote_reps("%s_remote" % name_base, image, mp, container_mp, num_replicas, remote_replicas)
         clipper_model_def = {
                 "name": name_base,
                 "addresses": model_addrs + remote_model_addrs,
@@ -246,11 +246,11 @@ class DigitsBenchmarker:
         self.add_model(name_base, image, mp, container_mp, num_replicas)
 
 
-    def add_spark_svm(self, name_base="spark_svm", num_replicas=1, wait_time_nanos=1*1000*1000):
+    def add_spark_svm(self, name_base="spark_svm", local_replicas=1, remote_replicas=0, wait_time_nanos=1*1000*1000):
         image = "clipper/spark-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3",
         container_mp ="/model"
-        self.add_model(name_base, image, mp, container_mp, num_replicas, wait_time_nanos=wait_time_nanos)
+        self.add_model(name_base, image, mp, container_mp, local_replicas, remote_replicas=remote_replicas, wait_time_nanos=wait_time_nanos)
 
     def add_spark_rf(self, num_replicas=1):
         name_base = "spark_svm"
@@ -274,8 +274,8 @@ class DigitsBenchmarker:
             json.dump({"clipper_conf": self.clipper_conf_dict, "docker_compose_conf": self.dc_dict}, f, indent=4)
         
         if len(self.remote_dc_dict["services"]) > 0:
-            remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
-            with cd(remote_dc_dir):
+            self.remote_dc_dir = "/data/sda1/remote-replica-tmp"
+            with cd(self.remote_dc_dir):
                 with open("/tmp/docker-compose.yml", "w") as f:
                     yaml.dump(self.remote_dc_dict, f)
                     put("/tmp/docker-compose.yml", "docker-compose.yml")
@@ -296,8 +296,8 @@ class DigitsBenchmarker:
 
         # start remote model wrappers
         if len(self.remote_dc_dict["services"]) > 0:
-            remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
-            with cd(remote_dc_dir):
+            # remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
+            with cd(self.remote_dc_dir):
                 sudo("docker-compose up -d")
                 # for sname in self.remote_dc_dict["services"]:
                     # sudo("docker-compose up %s" % sname)
@@ -316,20 +316,14 @@ class DigitsBenchmarker:
 
         # Shutdown remote containers if they exist
         if len(self.remote_dc_dict["services"]) > 0:
-            remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
-            with cd(remote_dc_dir):
+            # remote_dc_dir = "/data/crankshaw/clipper/experiments-bin"
+            with cd(self.remote_dc_dir):
                 sudo("docker-compose stop")
 
 
 
 def straggler_mitigation_exp():
     bs = { "strategy": "aimd" }
-    # window = 1
-    # salt_cache = False
-    # ensemble_size = 1
-
-    # trial = 2
-
     for trial in range(1,6):
         trial_start = datetime.now()
         for ensemble_size in [1,] + range(2,21,2):
@@ -351,7 +345,6 @@ def straggler_mitigation_exp():
                                             track_blocking_latency=True,
                                             )
             for comp_num in range(ensemble_size):
-                # benchmarker.add_spark_svm(name_base="spark_svm_comp_%d" % comp_num, num_replicas=num_reps)
                 benchmarker.add_sklearn_rf(depth=16, name_base="sklearn_rf_comp_%d" % comp_num, num_replicas=num_reps)
             benchmarker.run_clipper()
         trial_end = datetime.now()
@@ -359,9 +352,36 @@ def straggler_mitigation_exp():
             print("TRIAL %d COMPLETED IN %f SECONDS" % (trial, (trial_end-trial_start).total_seconds()))
             print("TRIAL %d COMPLETED IN %f SECONDS" % (trial, (trial_end-trial_start).total_seconds()), file=f)
 
+def replica_scaling_exp():
+    bs = { "strategy": "aimd" }
+    max_local_reps = 8
+    
+    # max_local_reps = 2
+    for reps in [1,] + range(2, 17, 2):
+        remote_reps = max(0, reps - max_local_reps)
+        local_reps = reps - remote_reps
+        print("STARTING EXPERIMENT: %d LOCAL AND %d REMOTE REPLICAS" % (local_reps, remote_reps))
+        time.sleep(5)
+        num_reqs = 2000000*reps
+        debug = ""
+        # debug = "DEBUG_"
+        exp_name = "%s%d_local_reps_%d_remote_reps" % (debug, local_reps, remote_reps)
+        log_dest = "experiments_logs/replica_scaling"
+        benchmarker = DigitsBenchmarker(exp_name,
+                                        log_dest,
+                                        target_qps=100000*reps,
+                                        num_requests=num_reqs,
+                                        send_updates=False,
+                                        batch_strategy=bs,
+                                        salt_cache=True,
+                                        track_blocking_latency=True,
+                                        )
+        benchmarker.add_spark_svm(name_base="spark_svm", local_replicas=local_reps, remote_replicas=remote_reps)
+        benchmarker.run_clipper()
+
 
 
 if __name__=='__main__':
-    straggler_mitigation_exp()
+    replica_scaling_exp()
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
