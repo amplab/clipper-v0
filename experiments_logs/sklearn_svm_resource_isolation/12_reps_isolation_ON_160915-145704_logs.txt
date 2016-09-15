@@ -1,0 +1,5312 @@
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+track_blocking_latency = true
+input_length = 784
+num_benchmark_requests = 24000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 1200000
+name = "12_reps_isolation_ON_160915-145704"
+cache_hit_rate = 0.0
+wait_to_end = false
+send_updates = false
+report_interval_secs = 20
+num_predict_workers = 24
+redis_port = 6379
+cache_size = 10000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+wait_time_nanos = 3000000
+addresses = [ "linear_svm_r0:6001", "linear_svm_r1:6001", "linear_svm_r2:6001", "linear_svm_r3:6001", "linear_svm_r4:6001", "linear_svm_r5:6001", "linear_svm_r6:6001", "linear_svm_r7:6001", "linear_svm_r8:6001", "linear_svm_r9:6001", "linear_svm_r10:6001", "linear_svm_r11:6001",]
+[batching]
+strategy = "aimd"
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+track_blocking_latency = true
+input_length = 784
+num_benchmark_requests = 24000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 1200000
+name = "12_reps_isolation_ON_160915-145704"
+cache_hit_rate = 0.0
+wait_to_end = false
+send_updates = false
+report_interval_secs = 20
+num_predict_workers = 24
+redis_port = 6379
+cache_size = 10000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "linear_svm"
+wait_time_nanos = 3000000
+addresses = [ "linear_svm_r0:6001", "linear_svm_r1:6001", "linear_svm_r2:6001", "linear_svm_r3:6001", "linear_svm_r4:6001", "linear_svm_r5:6001", "linear_svm_r6:6001", "linear_svm_r7:6001", "linear_svm_r8:6001", "linear_svm_r9:6001", "linear_svm_r10:6001", "linear_svm_r11:6001",]
+[batching]
+strategy = "aimd"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+INFO:clipper::configuration: linear_svm_r0:6001
+INFO:clipper::configuration: linear_svm_r1:6001
+INFO:clipper::configuration: linear_svm_r2:6001
+INFO:clipper::configuration: linear_svm_r3:6001
+INFO:clipper::configuration: linear_svm_r4:6001
+INFO:clipper::configuration: linear_svm_r5:6001
+INFO:clipper::configuration: linear_svm_r6:6001
+INFO:clipper::configuration: linear_svm_r7:6001
+INFO:clipper::configuration: linear_svm_r8:6001
+INFO:clipper::configuration: linear_svm_r9:6001
+INFO:clipper::configuration: linear_svm_r10:6001
+INFO:clipper::configuration: linear_svm_r11:6001
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.11:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.12:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.5:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.6:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.8:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.9:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.7:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.13:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.4:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.10:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.14:6001)
+INFO:clipper::batching: Connected to linear_svm model wrapper at V4(172.21.0.15:6001)
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 8 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 8 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 9 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 10 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 9 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 11 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 10 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 12 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 16 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 11 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 14 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 19 
+INFO:clipper::server: starting input prediction worker 12 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 14 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 15 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 15 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 13 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 16 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 17 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 17 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 13 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 18 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 22 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 19 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 23 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 21 
+INFO:clipper::server: starting prediction worker 20 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 21 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 23 
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 20 
+INFO:clipper::server: starting input prediction worker 18 
+INFO:clipper::server: starting input prediction worker 22 
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::server: starting update worker 0
+INFO:clipper::server: Error in getting correction state for update: failed to fill whole buffer
+INFO:clipper::server: Creating model state for new user: 1
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 400
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 34
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 34
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 35
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 33
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 34
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 31
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 34
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 33
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 32
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 33
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 33
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 34
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 65144,
+      "max": 65144,
+      "mean": 65144.0,
+      "std": null,
+      "p95": 65144.0,
+      "p99": 65144.0,
+      "p50": 65144.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 479,
+      "max": 4262,
+      "mean": 1073.315,
+      "std": 1071.9980271439409,
+      "p95": 4039.3999999999998,
+      "p99": 4148.66,
+      "p50": 689.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.938271604938271,
+      "std": 2.873785304317052,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 613,
+      "max": 4111,
+      "mean": 1113.5882352941176,
+      "std": 1101.2830015733319,
+      "p95": 4081.75,
+      "p99": 4111.0,
+      "p50": 719.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.857142857142857,
+      "std": 3.2877840272018798,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 537,
+      "max": 3974,
+      "mean": 1051.9411764705884,
+      "std": 1059.0285983827412,
+      "p95": 3905.75,
+      "p99": 3974.0,
+      "p50": 675.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.857142857142857,
+      "std": 3.2877840272018798,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 593,
+      "max": 4040,
+      "mean": 1023.1714285714286,
+      "std": 1085.6157777071604,
+      "p95": 4040.0,
+      "p99": 4040.0,
+      "p50": 647.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 5.0,
+      "std": 2.6457513110645909,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 520,
+      "max": 4061,
+      "mean": 1052.0,
+      "std": 1114.1519476714116,
+      "p95": 4061.0,
+      "p99": 4061.0,
+      "p50": 688.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.714285714285714,
+      "std": 2.690370836538197,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 622,
+      "max": 4262,
+      "mean": 1114.0294117647059,
+      "std": 1089.6629305152295,
+      "p95": 4262.0,
+      "p99": 4262.0,
+      "p50": 739.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 5.666666666666667,
+      "std": 3.265986323710904,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 6.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 571,
+      "max": 4149,
+      "mean": 1097.4516129032259,
+      "std": 1144.8590841586773,
+      "p95": 4045.7999999999999,
+      "p99": 4149.0,
+      "p50": 684.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 5.166666666666667,
+      "std": 2.8577380332470416,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.5
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 503,
+      "max": 4001,
+      "mean": 1050.2941176470588,
+      "std": 1057.911536927521,
+      "p95": 4001.0,
+      "p99": 4001.0,
+      "p50": 666.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.857142857142857,
+      "std": 3.2877840272018798,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 669,
+      "max": 4115,
+      "mean": 1102.5454545454546,
+      "std": 1128.46956901009,
+      "p95": 4115.0,
+      "p99": 4115.0,
+      "p50": 669.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 5.5,
+      "std": 3.082207001484488,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 6.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 591,
+      "max": 3976,
+      "mean": 1100.03125,
+      "std": 1105.9990516351007,
+      "p95": 3976.0,
+      "p99": 3976.0,
+      "p50": 725.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.571428571428571,
+      "std": 2.819996622760558,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 584,
+      "max": 3965,
+      "mean": 1100.2727272727273,
+      "std": 1032.9532683260432,
+      "p95": 3965.0,
+      "p99": 3965.0,
+      "p50": 733.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.714285714285714,
+      "std": 3.147183169877773,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 479,
+      "max": 4091,
+      "mean": 1057.878787878788,
+      "std": 1116.3239269354056,
+      "p95": 4091.0,
+      "p99": 4091.0,
+      "p50": 682.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.714285714285714,
+      "std": 3.147183169877773,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 552,
+      "max": 3821,
+      "mean": 1022.3235294117648,
+      "std": 1001.9460071519682,
+      "p95": 3821.0,
+      "p99": 3821.0,
+      "p50": 686.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 1,
+      "max": 9,
+      "mean": 4.857142857142857,
+      "std": 3.2877840272018798,
+      "p95": 9.0,
+      "p99": 9.0,
+      "p50": 5.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04987912542141002,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 19.95165414924825,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 1.6960075135128153,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 1.6960732512088015,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 1.7459590650419137,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 1.6462375241385814,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 1.696175548182735,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 1.5465154686717624,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 1.6962261512473973,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 1.6463386252144543,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 1.5964507706466982,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 1.6463506990405069,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 1.646430702879228,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 1.6964092952651769,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: SPIN TIME: 833
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: Submitted 1000000 requests
+INFO:clipper_benchmarks: Submitted 1020000 requests
+INFO:clipper_benchmarks: Submitted 1040000 requests
+INFO:clipper_benchmarks: Submitted 1060000 requests
+INFO:clipper_benchmarks: Submitted 1080000 requests
+INFO:clipper_benchmarks: Submitted 1100000 requests
+INFO:clipper_benchmarks: Submitted 1120000 requests
+INFO:clipper_benchmarks: Submitted 1140000 requests
+INFO:clipper_benchmarks: Submitted 1160000 requests
+INFO:clipper_benchmarks: Submitted 1180000 requests
+INFO:clipper_benchmarks: Submitted 1200000 requests
+INFO:clipper_benchmarks: Submitted 1220000 requests
+INFO:clipper_benchmarks: Submitted 1240000 requests
+INFO:clipper_benchmarks: Submitted 1260000 requests
+INFO:clipper_benchmarks: Submitted 1280000 requests
+INFO:clipper_benchmarks: Submitted 1300000 requests
+INFO:clipper_benchmarks: Submitted 1320000 requests
+INFO:clipper_benchmarks: Submitted 1340000 requests
+INFO:clipper_benchmarks: Submitted 1360000 requests
+INFO:clipper_benchmarks: Submitted 1380000 requests
+INFO:clipper_benchmarks: Submitted 1400000 requests
+INFO:clipper_benchmarks: Submitted 1420000 requests
+INFO:clipper_benchmarks: Submitted 1440000 requests
+INFO:clipper_benchmarks: Submitted 1460000 requests
+INFO:clipper_benchmarks: Submitted 1480000 requests
+INFO:clipper_benchmarks: Submitted 1500000 requests
+INFO:clipper_benchmarks: Submitted 1520000 requests
+INFO:clipper_benchmarks: Submitted 1540000 requests
+INFO:clipper_benchmarks: Submitted 1560000 requests
+INFO:clipper_benchmarks: Submitted 1580000 requests
+INFO:clipper_benchmarks: Submitted 1600000 requests
+INFO:clipper_benchmarks: Submitted 1620000 requests
+INFO:clipper_benchmarks: Submitted 1640000 requests
+INFO:clipper_benchmarks: Submitted 1660000 requests
+INFO:clipper_benchmarks: Submitted 1680000 requests
+INFO:clipper_benchmarks: Submitted 1700000 requests
+INFO:clipper_benchmarks: Submitted 1720000 requests
+INFO:clipper_benchmarks: Submitted 1740000 requests
+INFO:clipper_benchmarks: Submitted 1760000 requests
+INFO:clipper_benchmarks: Submitted 1780000 requests
+INFO:clipper_benchmarks: Submitted 1800000 requests
+INFO:clipper_benchmarks: Submitted 1820000 requests
+INFO:clipper_benchmarks: Submitted 1840000 requests
+INFO:clipper_benchmarks: Submitted 1860000 requests
+INFO:clipper_benchmarks: Submitted 1880000 requests
+INFO:clipper_benchmarks: Submitted 1900000 requests
+INFO:clipper_benchmarks: Submitted 1920000 requests
+INFO:clipper_benchmarks: Submitted 1940000 requests
+INFO:clipper_benchmarks: Submitted 1960000 requests
+INFO:clipper_benchmarks: Submitted 1980000 requests
+INFO:clipper_benchmarks: Submitted 2000000 requests
+INFO:clipper_benchmarks: Submitted 2020000 requests
+INFO:clipper_benchmarks: Submitted 2040000 requests
+INFO:clipper_benchmarks: Submitted 2060000 requests
+INFO:clipper_benchmarks: Submitted 2080000 requests
+INFO:clipper_benchmarks: Submitted 2100000 requests
+INFO:clipper_benchmarks: Submitted 2120000 requests
+INFO:clipper_benchmarks: Submitted 2140000 requests
+INFO:clipper_benchmarks: Submitted 2160000 requests
+INFO:clipper_benchmarks: Submitted 2180000 requests
+INFO:clipper_benchmarks: Submitted 2200000 requests
+INFO:clipper_benchmarks: Submitted 2220000 requests
+INFO:clipper_benchmarks: Submitted 2240000 requests
+INFO:clipper_benchmarks: Submitted 2260000 requests
+INFO:clipper_benchmarks: Submitted 2280000 requests
+INFO:clipper_benchmarks: Submitted 2300000 requests
+INFO:clipper_benchmarks: Submitted 2320000 requests
+INFO:clipper_benchmarks: Submitted 2340000 requests
+INFO:clipper_benchmarks: Submitted 2360000 requests
+INFO:clipper_benchmarks: Submitted 2380000 requests
+INFO:clipper_benchmarks: Submitted 2400000 requests
+INFO:clipper_benchmarks: Submitted 2420000 requests
+INFO:clipper_benchmarks: Submitted 2440000 requests
+INFO:clipper_benchmarks: Submitted 2460000 requests
+INFO:clipper_benchmarks: Submitted 2480000 requests
+INFO:clipper_benchmarks: Submitted 2500000 requests
+INFO:clipper_benchmarks: Submitted 2520000 requests
+INFO:clipper_benchmarks: Submitted 2540000 requests
+INFO:clipper_benchmarks: Submitted 2560000 requests
+INFO:clipper_benchmarks: Submitted 2580000 requests
+INFO:clipper_benchmarks: Submitted 2600000 requests
+INFO:clipper_benchmarks: Submitted 2620000 requests
+INFO:clipper_benchmarks: Submitted 2640000 requests
+INFO:clipper_benchmarks: Submitted 2660000 requests
+INFO:clipper_benchmarks: Submitted 2680000 requests
+INFO:clipper_benchmarks: Submitted 2700000 requests
+INFO:clipper_benchmarks: Submitted 2720000 requests
+INFO:clipper_benchmarks: Submitted 2740000 requests
+INFO:clipper_benchmarks: Submitted 2760000 requests
+INFO:clipper_benchmarks: Submitted 2780000 requests
+INFO:clipper_benchmarks: Submitted 2800000 requests
+INFO:clipper_benchmarks: Submitted 2820000 requests
+INFO:clipper_benchmarks: Submitted 2840000 requests
+INFO:clipper_benchmarks: Submitted 2860000 requests
+INFO:clipper_benchmarks: Submitted 2880000 requests
+INFO:clipper_benchmarks: Submitted 2900000 requests
+INFO:clipper_benchmarks: Submitted 2920000 requests
+INFO:clipper_benchmarks: Submitted 2940000 requests
+INFO:clipper_benchmarks: Submitted 2960000 requests
+INFO:clipper_benchmarks: Submitted 2980000 requests
+INFO:clipper_benchmarks: Submitted 3000000 requests
+INFO:clipper_benchmarks: Submitted 3020000 requests
+INFO:clipper_benchmarks: Submitted 3040000 requests
+INFO:clipper_benchmarks: Submitted 3060000 requests
+INFO:clipper_benchmarks: Submitted 3080000 requests
+INFO:clipper_benchmarks: Submitted 3100000 requests
+INFO:clipper_benchmarks: Submitted 3120000 requests
+INFO:clipper_benchmarks: Submitted 3140000 requests
+INFO:clipper_benchmarks: Submitted 3160000 requests
+INFO:clipper_benchmarks: Submitted 3180000 requests
+INFO:clipper_benchmarks: Submitted 3200000 requests
+INFO:clipper_benchmarks: Submitted 3220000 requests
+INFO:clipper_benchmarks: Submitted 3240000 requests
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1706155
+    },
+    {
+      "name": "queued_predictions",
+      "count": 1533645
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 3239449
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 271872
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 270845
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 269893
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 269730
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 272472
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 269296
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 268836
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 270355
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 270099
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 269536
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 268782
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 267733
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 677321
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 1028834
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8906705428287582
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17020,
+      "max": 9555964,
+      "mean": 4645014.955252918,
+      "std": 2778089.209616162,
+      "p95": 9047957.95,
+      "p99": 9416797.5,
+      "p50": 4532056.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 395,
+      "max": 13557,
+      "mean": 2215.2312135214008,
+      "std": 778.5523439542818,
+      "p95": 3476.5499999999994,
+      "p99": 3752.0600000000015,
+      "p50": 2195.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.9263132295719845,
+      "std": 0.2612922383119224,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 239,
+      "max": 3799,
+      "mean": 2355.0276021400779,
+      "std": 420.83059475862287,
+      "p95": 2777.75,
+      "p99": 3115.0,
+      "p50": 2470.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 36.9579280155642,
+      "std": 6.763327972597259,
+      "p95": 45.0,
+      "p99": 48.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 381,
+      "max": 5258,
+      "mean": 2359.8467898832689,
+      "std": 410.84377645669499,
+      "p95": 2786.0,
+      "p99": 3136.0,
+      "p50": 2464.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.58617829993089,
+      "std": 6.465140331966712,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 236,
+      "max": 5866,
+      "mean": 2338.8009484435799,
+      "std": 431.00229621759407,
+      "p95": 2772.0,
+      "p99": 3066.0,
+      "p50": 2452.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 36.8948372156382,
+      "std": 6.924316572090501,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 269,
+      "max": 7743,
+      "mean": 2371.0024319066149,
+      "std": 415.7683872207644,
+      "p95": 2790.0,
+      "p99": 3076.0,
+      "p50": 2472.5
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 37.25137969094923,
+      "std": 6.427461803948258,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 246,
+      "max": 3525,
+      "mean": 2369.0262645914397,
+      "std": 391.82785942922507,
+      "p95": 2770.0,
+      "p99": 3047.0,
+      "p50": 2472.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.198124913828767,
+      "std": 6.545823610731162,
+      "p95": 45.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 273,
+      "max": 8276,
+      "mean": 2349.8125,
+      "std": 450.7053006272488,
+      "p95": 2782.0,
+      "p99": 3071.0,
+      "p50": 2462.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 37.145134914145547,
+      "std": 6.811830892939354,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 231,
+      "max": 5725,
+      "mean": 2353.210359922179,
+      "std": 428.5856898589926,
+      "p95": 2772.0,
+      "p99": 3118.0,
+      "p50": 2464.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.03188565145685,
+      "std": 6.556449069625458,
+      "p95": 46.0,
+      "p99": 50.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 243,
+      "max": 7648,
+      "mean": 2369.4094114785996,
+      "std": 419.1945570693681,
+      "p95": 2789.0,
+      "p99": 3127.0,
+      "p50": 2469.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.065591842359108,
+      "std": 6.617094504022667,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 247,
+      "max": 5217,
+      "mean": 2338.3808365758757,
+      "std": 427.20729468020218,
+      "p95": 2782.0,
+      "p99": 3068.5,
+      "p50": 2449.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 52,
+      "mean": 37.03957819775404,
+      "std": 6.793726025780004,
+      "p95": 46.0,
+      "p99": 48.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 308,
+      "max": 4027,
+      "mean": 2356.827942607004,
+      "std": 417.74874774159357,
+      "p95": 2784.0,
+      "p99": 3108.5,
+      "p50": 2464.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 1,
+      "max": 60,
+      "mean": 37.190561364887177,
+      "std": 6.499177711636253,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 214,
+      "max": 4225,
+      "mean": 2357.926313229572,
+      "std": 410.8304127455804,
+      "p95": 2769.0,
+      "p99": 3048.0,
+      "p50": 2471.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 1,
+      "max": 58,
+      "mean": 37.0949105914718,
+      "std": 6.460718811596,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 220,
+      "max": 5417,
+      "mean": 2350.4199902723737,
+      "std": 417.59588615546127,
+      "p95": 2779.0,
+      "p99": 3119.75,
+      "p50": 2459.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 36.759190925242588,
+      "std": 6.786859896245762,
+      "p95": 45.0,
+      "p99": 48.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 228,
+      "max": 8967,
+      "mean": 2364.189323929961,
+      "std": 446.84094609897007,
+      "p95": 2801.75,
+      "p99": 3184.25,
+      "p50": 2465.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 36.84488448844885,
+      "std": 6.564964016495937,
+      "p95": 45.0,
+      "p99": 48.0,
+      "p50": 38.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 85303.60776501855,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 161952.81773074709,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 13592.982574286727,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 13532.68322272707,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 13494.71443987051,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 13484.423084608929,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 13622.357219935255,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 13464.789576755526,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 13442.05799917779,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 13515.546265359784,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 13505.954323070904,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 13474.680594566535,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 13437.062195902332,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 13385.55479541637,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 79137.86010977456,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 3260000 requests
+INFO:clipper_benchmarks: Submitted 3280000 requests
+INFO:clipper_benchmarks: Submitted 3300000 requests
+INFO:clipper_benchmarks: Submitted 3320000 requests
+INFO:clipper_benchmarks: Submitted 3340000 requests
+INFO:clipper_benchmarks: Submitted 3360000 requests
+INFO:clipper_benchmarks: Submitted 3380000 requests
+INFO:clipper_benchmarks: Submitted 3400000 requests
+INFO:clipper_benchmarks: Submitted 3420000 requests
+INFO:clipper_benchmarks: Submitted 3440000 requests
+INFO:clipper_benchmarks: Submitted 3460000 requests
+INFO:clipper_benchmarks: Submitted 3480000 requests
+INFO:clipper_benchmarks: Submitted 3500000 requests
+INFO:clipper_benchmarks: Submitted 3520000 requests
+INFO:clipper_benchmarks: Submitted 3540000 requests
+INFO:clipper_benchmarks: Submitted 3560000 requests
+INFO:clipper_benchmarks: Submitted 3580000 requests
+INFO:clipper_benchmarks: Submitted 3600000 requests
+INFO:clipper_benchmarks: Submitted 3620000 requests
+INFO:clipper_benchmarks: Submitted 3640000 requests
+INFO:clipper_benchmarks: Submitted 3660000 requests
+INFO:clipper_benchmarks: Submitted 3680000 requests
+INFO:clipper_benchmarks: Submitted 3700000 requests
+INFO:clipper_benchmarks: Submitted 3720000 requests
+INFO:clipper_benchmarks: Submitted 3740000 requests
+INFO:clipper_benchmarks: Submitted 3760000 requests
+INFO:clipper_benchmarks: Submitted 3780000 requests
+INFO:clipper_benchmarks: Submitted 3800000 requests
+INFO:clipper_benchmarks: Submitted 3820000 requests
+INFO:clipper_benchmarks: Submitted 3840000 requests
+INFO:clipper_benchmarks: Submitted 3860000 requests
+INFO:clipper_benchmarks: Submitted 3880000 requests
+INFO:clipper_benchmarks: Submitted 3900000 requests
+INFO:clipper_benchmarks: Submitted 3920000 requests
+INFO:clipper_benchmarks: Submitted 3940000 requests
+INFO:clipper_benchmarks: Submitted 3960000 requests
+INFO:clipper_benchmarks: Submitted 3980000 requests
+INFO:clipper_benchmarks: Submitted 4000000 requests
+INFO:clipper_benchmarks: Submitted 4020000 requests
+INFO:clipper_benchmarks: Submitted 4040000 requests
+INFO:clipper_benchmarks: Submitted 4060000 requests
+INFO:clipper_benchmarks: Submitted 4080000 requests
+INFO:clipper_benchmarks: Submitted 4100000 requests
+INFO:clipper_benchmarks: Submitted 4120000 requests
+INFO:clipper_benchmarks: Submitted 4140000 requests
+INFO:clipper_benchmarks: Submitted 4160000 requests
+INFO:clipper_benchmarks: Submitted 4180000 requests
+INFO:clipper_benchmarks: Submitted 4200000 requests
+INFO:clipper_benchmarks: Submitted 4220000 requests
+INFO:clipper_benchmarks: Submitted 4240000 requests
+INFO:clipper_benchmarks: Submitted 4260000 requests
+INFO:clipper_benchmarks: Submitted 4280000 requests
+INFO:clipper_benchmarks: Submitted 4300000 requests
+INFO:clipper_benchmarks: Submitted 4320000 requests
+INFO:clipper_benchmarks: Submitted 4340000 requests
+INFO:clipper_benchmarks: Submitted 4360000 requests
+INFO:clipper_benchmarks: Submitted 4380000 requests
+INFO:clipper_benchmarks: Submitted 4400000 requests
+INFO:clipper_benchmarks: Submitted 4420000 requests
+INFO:clipper_benchmarks: Submitted 4440000 requests
+INFO:clipper_benchmarks: Submitted 4460000 requests
+INFO:clipper_benchmarks: Submitted 4480000 requests
+INFO:clipper_benchmarks: Submitted 4500000 requests
+INFO:clipper_benchmarks: Submitted 4520000 requests
+INFO:clipper_benchmarks: Submitted 4540000 requests
+INFO:clipper_benchmarks: Submitted 4560000 requests
+INFO:clipper_benchmarks: Submitted 4580000 requests
+INFO:clipper_benchmarks: Submitted 4600000 requests
+INFO:clipper_benchmarks: Submitted 4620000 requests
+INFO:clipper_benchmarks: Submitted 4640000 requests
+INFO:clipper_benchmarks: Submitted 4660000 requests
+INFO:clipper_benchmarks: Submitted 4680000 requests
+INFO:clipper_benchmarks: Submitted 4700000 requests
+INFO:clipper_benchmarks: Submitted 4720000 requests
+INFO:clipper_benchmarks: Submitted 4740000 requests
+INFO:clipper_benchmarks: Submitted 4760000 requests
+INFO:clipper_benchmarks: Submitted 4780000 requests
+INFO:clipper_benchmarks: Submitted 4800000 requests
+INFO:clipper_benchmarks: Submitted 4820000 requests
+INFO:clipper_benchmarks: Submitted 4840000 requests
+INFO:clipper_benchmarks: Submitted 4860000 requests
+INFO:clipper_benchmarks: Submitted 4880000 requests
+INFO:clipper_benchmarks: Submitted 4900000 requests
+INFO:clipper_benchmarks: Submitted 4920000 requests
+INFO:clipper_benchmarks: Submitted 4940000 requests
+INFO:clipper_benchmarks: Submitted 4960000 requests
+INFO:clipper_benchmarks: Submitted 4980000 requests
+INFO:clipper_benchmarks: Submitted 5000000 requests
+INFO:clipper_benchmarks: Submitted 5020000 requests
+INFO:clipper_benchmarks: Submitted 5040000 requests
+INFO:clipper_benchmarks: Submitted 5060000 requests
+INFO:clipper_benchmarks: Submitted 5080000 requests
+INFO:clipper_benchmarks: Submitted 5100000 requests
+INFO:clipper_benchmarks: Submitted 5120000 requests
+INFO:clipper_benchmarks: Submitted 5140000 requests
+INFO:clipper_benchmarks: Submitted 5160000 requests
+INFO:clipper_benchmarks: Submitted 5180000 requests
+INFO:clipper_benchmarks: Submitted 5200000 requests
+INFO:clipper_benchmarks: Submitted 5220000 requests
+INFO:clipper_benchmarks: Submitted 5240000 requests
+INFO:clipper_benchmarks: Submitted 5260000 requests
+INFO:clipper_benchmarks: Submitted 5280000 requests
+INFO:clipper_benchmarks: Submitted 5300000 requests
+INFO:clipper_benchmarks: Submitted 5320000 requests
+INFO:clipper_benchmarks: Submitted 5340000 requests
+INFO:clipper_benchmarks: Submitted 5360000 requests
+INFO:clipper_benchmarks: Submitted 5380000 requests
+INFO:clipper_benchmarks: Submitted 5400000 requests
+INFO:clipper_benchmarks: Submitted 5420000 requests
+INFO:clipper_benchmarks: Submitted 5440000 requests
+INFO:clipper_benchmarks: Submitted 5460000 requests
+INFO:clipper_benchmarks: Submitted 5480000 requests
+INFO:clipper_benchmarks: Submitted 5500000 requests
+INFO:clipper_benchmarks: Submitted 5520000 requests
+INFO:clipper_benchmarks: Submitted 5540000 requests
+INFO:clipper_benchmarks: Submitted 5560000 requests
+INFO:clipper_benchmarks: Submitted 5580000 requests
+INFO:clipper_benchmarks: Submitted 5600000 requests
+INFO:clipper_benchmarks: Submitted 5620000 requests
+INFO:clipper_benchmarks: Submitted 5640000 requests
+INFO:clipper_benchmarks: Submitted 5660000 requests
+INFO:clipper_benchmarks: Submitted 5680000 requests
+INFO:clipper_benchmarks: Submitted 5700000 requests
+INFO:clipper_benchmarks: Submitted 5720000 requests
+INFO:clipper_benchmarks: Submitted 5740000 requests
+INFO:clipper_benchmarks: Submitted 5760000 requests
+INFO:clipper_benchmarks: Submitted 5780000 requests
+INFO:clipper_benchmarks: Submitted 5800000 requests
+INFO:clipper_benchmarks: Submitted 5820000 requests
+INFO:clipper_benchmarks: Submitted 5840000 requests
+INFO:clipper_benchmarks: Submitted 5860000 requests
+INFO:clipper_benchmarks: Submitted 5880000 requests
+INFO:clipper_benchmarks: Submitted 5900000 requests
+INFO:clipper_benchmarks: Submitted 5920000 requests
+INFO:clipper_benchmarks: Submitted 5940000 requests
+INFO:clipper_benchmarks: Submitted 5960000 requests
+INFO:clipper_benchmarks: Submitted 5980000 requests
+INFO:clipper_benchmarks: Submitted 6000000 requests
+INFO:clipper_benchmarks: Submitted 6020000 requests
+INFO:clipper_benchmarks: Submitted 6040000 requests
+INFO:clipper_benchmarks: Submitted 6060000 requests
+INFO:clipper_benchmarks: Submitted 6080000 requests
+INFO:clipper_benchmarks: Submitted 6100000 requests
+INFO:clipper_benchmarks: Submitted 6120000 requests
+INFO:clipper_benchmarks: Submitted 6140000 requests
+INFO:clipper_benchmarks: Submitted 6160000 requests
+INFO:clipper_benchmarks: Submitted 6180000 requests
+INFO:clipper_benchmarks: Submitted 6200000 requests
+INFO:clipper_benchmarks: Submitted 6220000 requests
+INFO:clipper_benchmarks: Submitted 6240000 requests
+INFO:clipper_benchmarks: Submitted 6260000 requests
+INFO:clipper_benchmarks: Submitted 6280000 requests
+INFO:clipper_benchmarks: Submitted 6300000 requests
+INFO:clipper_benchmarks: Submitted 6320000 requests
+INFO:clipper_benchmarks: Submitted 6340000 requests
+INFO:clipper_benchmarks: Submitted 6360000 requests
+INFO:clipper_benchmarks: Submitted 6380000 requests
+INFO:clipper_benchmarks: Submitted 6400000 requests
+INFO:clipper_benchmarks: Submitted 6420000 requests
+INFO:clipper_benchmarks: Submitted 6440000 requests
+INFO:clipper_benchmarks: Submitted 6460000 requests
+INFO:clipper_benchmarks: Submitted 6480000 requests
+INFO:clipper_benchmarks: Submitted 6500000 requests
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 3312948
+    },
+    {
+      "name": "queued_predictions",
+      "count": 3187229
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 6499982
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 547159
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 543691
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 541876
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 541097
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 546594
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 539970
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 539926
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 540837
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 542423
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 539639
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 537870
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 538900
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 1221226
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 2091722
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 1.5384213028274647e-7
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8626712523106309
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 27997,
+      "max": 19649531,
+      "mean": 9524078.422665369,
+      "std": 5707141.184350291,
+      "p95": 18632694.05,
+      "p99": 19354599.42,
+      "p50": 9377811.5
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 395,
+      "max": 9840,
+      "mean": 2211.6014105058368,
+      "std": 764.9281887843566,
+      "p95": 3477.0,
+      "p99": 3704.0,
+      "p50": 2193.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.8681906614785993,
+      "std": 0.338324508789607,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 302,
+      "max": 4438,
+      "mean": 2370.756444552529,
+      "std": 404.49241521683418,
+      "p95": 2781.75,
+      "p99": 3066.5,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.5687013618677,
+      "std": 6.257139264129427,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 398,
+      "max": 5258,
+      "mean": 2378.146522373541,
+      "std": 383.3941885149082,
+      "p95": 2780.0,
+      "p99": 3015.5,
+      "p50": 2475.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 38.25887645914397,
+      "std": 5.923504547076596,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 236,
+      "max": 5235,
+      "mean": 2363.5594601167315,
+      "std": 403.46617185725918,
+      "p95": 2777.0,
+      "p99": 3078.0,
+      "p50": 2464.5
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.62086575875487,
+      "std": 6.358305632886664,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 269,
+      "max": 7743,
+      "mean": 2380.518725680934,
+      "std": 397.7209748906406,
+      "p95": 2785.0,
+      "p99": 3079.5,
+      "p50": 2476.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 37.721911478599228,
+      "std": 5.992384517551854,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 254,
+      "max": 4532,
+      "mean": 2387.2594844357979,
+      "std": 382.2305328696789,
+      "p95": 2775.0,
+      "p99": 3042.0,
+      "p50": 2485.5
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.60931420233463,
+      "std": 6.091420418573065,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 273,
+      "max": 8276,
+      "mean": 2368.0341682879377,
+      "std": 411.6333118054231,
+      "p95": 2765.0,
+      "p99": 3002.5,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 37.77237354085603,
+      "std": 6.275059292099174,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 262,
+      "max": 10570,
+      "mean": 2363.967898832685,
+      "std": 420.89486814529627,
+      "p95": 2776.0,
+      "p99": 3055.0,
+      "p50": 2467.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.48601653696498,
+      "std": 6.152569830376889,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 302,
+      "max": 7648,
+      "mean": 2372.6200145914397,
+      "std": 407.197459264272,
+      "p95": 2786.0,
+      "p99": 3052.0,
+      "p50": 2475.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.44236381322957,
+      "std": 6.204926787263534,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 266,
+      "max": 5217,
+      "mean": 2360.3187013618678,
+      "std": 413.07268652046118,
+      "p95": 2781.0,
+      "p99": 3069.0,
+      "p50": 2468.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.552529182879379,
+      "std": 6.11822900697639,
+      "p95": 46.0,
+      "p99": 48.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 352,
+      "max": 5867,
+      "mean": 2380.021887159533,
+      "std": 388.7147633178428,
+      "p95": 2787.0,
+      "p99": 3090.0,
+      "p50": 2479.5
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 1,
+      "max": 60,
+      "mean": 37.7642266536965,
+      "std": 5.97552504878019,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 214,
+      "max": 8158,
+      "mean": 2376.6748540856035,
+      "std": 402.22880188672448,
+      "p95": 2780.0,
+      "p99": 3057.0,
+      "p50": 2483.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.49173151750973,
+      "std": 6.076425957683737,
+      "p95": 46.0,
+      "p99": 48.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 281,
+      "max": 3844,
+      "mean": 2369.8109192607005,
+      "std": 399.8507335776463,
+      "p95": 2777.0,
+      "p99": 3128.75,
+      "p50": 2470.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 37.34229085603113,
+      "std": 6.110413907614536,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 320,
+      "max": 8967,
+      "mean": 2372.2637402723737,
+      "std": 420.9896413404214,
+      "p95": 2776.0,
+      "p99": 3085.0,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.37013618677043,
+      "std": 6.147318930339632,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 82783.72900922894,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 162426.2119259333,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 13673.206522276732,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 13585.85301342074,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 13540.939946558447,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 13520.656288301316,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 13658.94256857873,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 13493.029007595604,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 13491.879615501202,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 13515.385285026226,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 13554.628012787984,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 13484.885030550875,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 13440.521515105977,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 13466.274998784125,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 71302.41300809627,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 6520000 requests
+INFO:clipper_benchmarks: Submitted 6540000 requests
+INFO:clipper_benchmarks: Submitted 6560000 requests
+INFO:clipper_benchmarks: Submitted 6580000 requests
+INFO:clipper_benchmarks: Submitted 6600000 requests
+INFO:clipper_benchmarks: Submitted 6620000 requests
+INFO:clipper_benchmarks: Submitted 6640000 requests
+INFO:clipper_benchmarks: Submitted 6660000 requests
+INFO:clipper_benchmarks: Submitted 6680000 requests
+INFO:clipper_benchmarks: Submitted 6700000 requests
+INFO:clipper_benchmarks: Submitted 6720000 requests
+INFO:clipper_benchmarks: Submitted 6740000 requests
+INFO:clipper_benchmarks: Submitted 6760000 requests
+INFO:clipper_benchmarks: Submitted 6780000 requests
+INFO:clipper_benchmarks: Submitted 6800000 requests
+INFO:clipper_benchmarks: Submitted 6820000 requests
+INFO:clipper_benchmarks: Submitted 6840000 requests
+INFO:clipper_benchmarks: Submitted 6860000 requests
+INFO:clipper_benchmarks: Submitted 6880000 requests
+INFO:clipper_benchmarks: Submitted 6900000 requests
+INFO:clipper_benchmarks: Submitted 6920000 requests
+INFO:clipper_benchmarks: Submitted 6940000 requests
+INFO:clipper_benchmarks: Submitted 6960000 requests
+INFO:clipper_benchmarks: Submitted 6980000 requests
+INFO:clipper_benchmarks: Submitted 7000000 requests
+INFO:clipper_benchmarks: Submitted 7020000 requests
+INFO:clipper_benchmarks: Submitted 7040000 requests
+INFO:clipper_benchmarks: Submitted 7060000 requests
+INFO:clipper_benchmarks: Submitted 7080000 requests
+INFO:clipper_benchmarks: Submitted 7100000 requests
+INFO:clipper_benchmarks: Submitted 7120000 requests
+INFO:clipper_benchmarks: Submitted 7140000 requests
+INFO:clipper_benchmarks: Submitted 7160000 requests
+INFO:clipper_benchmarks: Submitted 7180000 requests
+INFO:clipper_benchmarks: Submitted 7200000 requests
+INFO:clipper_benchmarks: Submitted 7220000 requests
+INFO:clipper_benchmarks: Submitted 7240000 requests
+INFO:clipper_benchmarks: Submitted 7260000 requests
+INFO:clipper_benchmarks: Submitted 7280000 requests
+INFO:clipper_benchmarks: Submitted 7300000 requests
+INFO:clipper_benchmarks: Submitted 7320000 requests
+INFO:clipper_benchmarks: Submitted 7340000 requests
+INFO:clipper_benchmarks: Submitted 7360000 requests
+INFO:clipper_benchmarks: Submitted 7380000 requests
+INFO:clipper_benchmarks: Submitted 7400000 requests
+INFO:clipper_benchmarks: Submitted 7420000 requests
+INFO:clipper_benchmarks: Submitted 7440000 requests
+INFO:clipper_benchmarks: Submitted 7460000 requests
+INFO:clipper_benchmarks: Submitted 7480000 requests
+INFO:clipper_benchmarks: Submitted 7500000 requests
+INFO:clipper_benchmarks: Submitted 7520000 requests
+INFO:clipper_benchmarks: Submitted 7540000 requests
+INFO:clipper_benchmarks: Submitted 7560000 requests
+INFO:clipper_benchmarks: Submitted 7580000 requests
+INFO:clipper_benchmarks: Submitted 7600000 requests
+INFO:clipper_benchmarks: Submitted 7620000 requests
+INFO:clipper_benchmarks: Submitted 7640000 requests
+INFO:clipper_benchmarks: Submitted 7660000 requests
+INFO:clipper_benchmarks: Submitted 7680000 requests
+INFO:clipper_benchmarks: Submitted 7700000 requests
+INFO:clipper_benchmarks: Submitted 7720000 requests
+INFO:clipper_benchmarks: Submitted 7740000 requests
+INFO:clipper_benchmarks: Submitted 7760000 requests
+INFO:clipper_benchmarks: Submitted 7780000 requests
+INFO:clipper_benchmarks: Submitted 7800000 requests
+INFO:clipper_benchmarks: Submitted 7820000 requests
+INFO:clipper_benchmarks: Submitted 7840000 requests
+INFO:clipper_benchmarks: Submitted 7860000 requests
+INFO:clipper_benchmarks: Submitted 7880000 requests
+INFO:clipper_benchmarks: Submitted 7900000 requests
+INFO:clipper_benchmarks: Submitted 7920000 requests
+INFO:clipper_benchmarks: Submitted 7940000 requests
+INFO:clipper_benchmarks: Submitted 7960000 requests
+INFO:clipper_benchmarks: Submitted 7980000 requests
+INFO:clipper_benchmarks: Submitted 8000000 requests
+INFO:clipper_benchmarks: Submitted 8020000 requests
+INFO:clipper_benchmarks: Submitted 8040000 requests
+INFO:clipper_benchmarks: Submitted 8060000 requests
+INFO:clipper_benchmarks: Submitted 8080000 requests
+INFO:clipper_benchmarks: Submitted 8100000 requests
+INFO:clipper_benchmarks: Submitted 8120000 requests
+INFO:clipper_benchmarks: Submitted 8140000 requests
+INFO:clipper_benchmarks: Submitted 8160000 requests
+INFO:clipper_benchmarks: Submitted 8180000 requests
+INFO:clipper_benchmarks: Submitted 8200000 requests
+INFO:clipper_benchmarks: Submitted 8220000 requests
+INFO:clipper_benchmarks: Submitted 8240000 requests
+INFO:clipper_benchmarks: Submitted 8260000 requests
+INFO:clipper_benchmarks: Submitted 8280000 requests
+INFO:clipper_benchmarks: Submitted 8300000 requests
+INFO:clipper_benchmarks: Submitted 8320000 requests
+INFO:clipper_benchmarks: Submitted 8340000 requests
+INFO:clipper_benchmarks: Submitted 8360000 requests
+INFO:clipper_benchmarks: Submitted 8380000 requests
+INFO:clipper_benchmarks: Submitted 8400000 requests
+INFO:clipper_benchmarks: Submitted 8420000 requests
+INFO:clipper_benchmarks: Submitted 8440000 requests
+INFO:clipper_benchmarks: Submitted 8460000 requests
+INFO:clipper_benchmarks: Submitted 8480000 requests
+INFO:clipper_benchmarks: Submitted 8500000 requests
+INFO:clipper_benchmarks: Submitted 8520000 requests
+INFO:clipper_benchmarks: Submitted 8540000 requests
+INFO:clipper_benchmarks: Submitted 8560000 requests
+INFO:clipper_benchmarks: Submitted 8580000 requests
+INFO:clipper_benchmarks: Submitted 8600000 requests
+INFO:clipper_benchmarks: Submitted 8620000 requests
+INFO:clipper_benchmarks: Submitted 8640000 requests
+INFO:clipper_benchmarks: Submitted 8660000 requests
+INFO:clipper_benchmarks: Submitted 8680000 requests
+INFO:clipper_benchmarks: Submitted 8700000 requests
+INFO:clipper_benchmarks: Submitted 8720000 requests
+INFO:clipper_benchmarks: Submitted 8740000 requests
+INFO:clipper_benchmarks: Submitted 8760000 requests
+INFO:clipper_benchmarks: Submitted 8780000 requests
+INFO:clipper_benchmarks: Submitted 8800000 requests
+INFO:clipper_benchmarks: Submitted 8820000 requests
+INFO:clipper_benchmarks: Submitted 8840000 requests
+INFO:clipper_benchmarks: Submitted 8860000 requests
+INFO:clipper_benchmarks: Submitted 8880000 requests
+INFO:clipper_benchmarks: Submitted 8900000 requests
+INFO:clipper_benchmarks: Submitted 8920000 requests
+INFO:clipper_benchmarks: Submitted 8940000 requests
+INFO:clipper_benchmarks: Submitted 8960000 requests
+INFO:clipper_benchmarks: Submitted 8980000 requests
+INFO:clipper_benchmarks: Submitted 9000000 requests
+INFO:clipper_benchmarks: Submitted 9020000 requests
+INFO:clipper_benchmarks: Submitted 9040000 requests
+INFO:clipper_benchmarks: Submitted 9060000 requests
+INFO:clipper_benchmarks: Submitted 9080000 requests
+INFO:clipper_benchmarks: Submitted 9100000 requests
+INFO:clipper_benchmarks: Submitted 9120000 requests
+INFO:clipper_benchmarks: Submitted 9140000 requests
+INFO:clipper_benchmarks: Submitted 9160000 requests
+INFO:clipper_benchmarks: Submitted 9180000 requests
+INFO:clipper_benchmarks: Submitted 9200000 requests
+INFO:clipper_benchmarks: Submitted 9220000 requests
+INFO:clipper_benchmarks: Submitted 9240000 requests
+INFO:clipper_benchmarks: Submitted 9260000 requests
+INFO:clipper_benchmarks: Submitted 9280000 requests
+INFO:clipper_benchmarks: Submitted 9300000 requests
+INFO:clipper_benchmarks: Submitted 9320000 requests
+INFO:clipper_benchmarks: Submitted 9340000 requests
+INFO:clipper_benchmarks: Submitted 9360000 requests
+INFO:clipper_benchmarks: Submitted 9380000 requests
+INFO:clipper_benchmarks: Submitted 9400000 requests
+INFO:clipper_benchmarks: Submitted 9420000 requests
+INFO:clipper_benchmarks: Submitted 9440000 requests
+INFO:clipper_benchmarks: Submitted 9460000 requests
+INFO:clipper_benchmarks: Submitted 9480000 requests
+INFO:clipper_benchmarks: Submitted 9500000 requests
+INFO:clipper_benchmarks: Submitted 9520000 requests
+INFO:clipper_benchmarks: Submitted 9540000 requests
+INFO:clipper_benchmarks: Submitted 9560000 requests
+INFO:clipper_benchmarks: Submitted 9580000 requests
+INFO:clipper_benchmarks: Submitted 9600000 requests
+INFO:clipper_benchmarks: Submitted 9620000 requests
+INFO:clipper_benchmarks: Submitted 9640000 requests
+INFO:clipper_benchmarks: Submitted 9660000 requests
+INFO:clipper_benchmarks: Submitted 9680000 requests
+INFO:clipper_benchmarks: Submitted 9700000 requests
+INFO:clipper_benchmarks: Submitted 9720000 requests
+INFO:clipper_benchmarks: Submitted 9740000 requests
+INFO:clipper_benchmarks: Submitted 9760000 requests
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 4875360
+    },
+    {
+      "name": "queued_predictions",
+      "count": 4882841
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 9757820
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 821414
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 815939
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 815200
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 811925
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 820013
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 808171
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 810094
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 811669
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 815761
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 813472
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 806509
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 807653
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 1672246
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 3203114
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 1.0247791600910005e-7
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8374304666732303
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 52881,
+      "max": 30125624,
+      "mean": 14392554.563229572,
+      "std": 8515931.094320812,
+      "p95": 28032997.05,
+      "p99": 29619476.52,
+      "p50": 14335844.5
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 530,
+      "max": 14756,
+      "mean": 2227.8043531128407,
+      "std": 773.906692109552,
+      "p95": 3486.5499999999994,
+      "p99": 3713.0,
+      "p50": 2210.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.8069066147859922,
+      "std": 0.3947736441916494,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 294,
+      "max": 8914,
+      "mean": 2378.2316391050587,
+      "std": 402.1669762070111,
+      "p95": 2779.75,
+      "p99": 3070.0,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.84508754863813,
+      "std": 6.089213130074605,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 392,
+      "max": 3923,
+      "mean": 2389.0091196498058,
+      "std": 369.23501059061308,
+      "p95": 2780.75,
+      "p99": 3012.75,
+      "p50": 2481.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.45537451361868,
+      "std": 5.769495261648312,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 285,
+      "max": 4274,
+      "mean": 2371.1990515564204,
+      "std": 388.44795730703586,
+      "p95": 2760.0,
+      "p99": 3045.0,
+      "p50": 2468.5
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 1,
+      "max": 57,
+      "mean": 37.81225680933852,
+      "std": 6.157980622347451,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 269,
+      "max": 7743,
+      "mean": 2377.130228599222,
+      "std": 394.731811372663,
+      "p95": 2778.75,
+      "p99": 3096.0,
+      "p50": 2469.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 37.934460116731518,
+      "std": 6.010992342663875,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 254,
+      "max": 4532,
+      "mean": 2391.0841439688717,
+      "std": 373.9614742345095,
+      "p95": 2774.0,
+      "p99": 3029.75,
+      "p50": 2487.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.840953307392997,
+      "std": 5.925250527464275,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 273,
+      "max": 5191,
+      "mean": 2368.9041828793776,
+      "std": 403.64800789370289,
+      "p95": 2762.5,
+      "p99": 3016.0,
+      "p50": 2476.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.05070525291829,
+      "std": 6.113919699813832,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 360,
+      "max": 8716,
+      "mean": 2374.5435311284047,
+      "std": 408.7757875199885,
+      "p95": 2776.0,
+      "p99": 3044.0,
+      "p50": 2471.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.73224708171206,
+      "std": 5.862986337118813,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 356,
+      "max": 7648,
+      "mean": 2379.07563229572,
+      "std": 393.5952046015488,
+      "p95": 2781.75,
+      "p99": 3028.75,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.7750486381323,
+      "std": 5.937509922217837,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 288,
+      "max": 5217,
+      "mean": 2368.178501945525,
+      "std": 406.0419862621401,
+      "p95": 2783.75,
+      "p99": 3065.75,
+      "p50": 2473.5
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.8431420233463,
+      "std": 5.907117352321529,
+      "p95": 46.0,
+      "p99": 48.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 352,
+      "max": 7837,
+      "mean": 2383.452577821012,
+      "std": 396.13480881804477,
+      "p95": 2789.0,
+      "p99": 3083.0,
+      "p50": 2480.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 1,
+      "max": 60,
+      "mean": 37.980423151750979,
+      "std": 5.852828888555909,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 214,
+      "max": 8158,
+      "mean": 2385.6635457198447,
+      "std": 401.58793860717199,
+      "p95": 2786.0,
+      "p99": 3058.0,
+      "p50": 2488.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.74148832684825,
+      "std": 6.082516658405326,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 330,
+      "max": 4494,
+      "mean": 2385.6748540856035,
+      "std": 383.70158243212549,
+      "p95": 2788.0,
+      "p99": 3105.5,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 37.592655642023348,
+      "std": 5.924115741492093,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 320,
+      "max": 5320,
+      "mean": 2378.5201848249027,
+      "std": 400.0836679261936,
+      "p95": 2775.0,
+      "p99": 3080.5,
+      "p50": 2475.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.565783073929967,
+      "std": 5.956349502747637,
+      "p95": 46.0,
+      "p99": 48.0,
+      "p50": 38.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 81207.84066606959,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 162541.59521110933,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 13683.74616854441,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 13591.171513801375,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 13579.331179658153,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 13524.325857847183,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 13659.365615890041,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 13462.393084365693,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 13494.100532795044,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 13520.578916725015,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 13588.972855710146,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 13550.087934045445,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 13434.282475691552,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 13453.23367091829,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 65063.25383817022,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 9780000 requests
+INFO:clipper_benchmarks: Submitted 9800000 requests
+INFO:clipper_benchmarks: Submitted 9820000 requests
+INFO:clipper_benchmarks: Submitted 9840000 requests
+INFO:clipper_benchmarks: Submitted 9860000 requests
+INFO:clipper_benchmarks: Submitted 9880000 requests
+INFO:clipper_benchmarks: Submitted 9900000 requests
+INFO:clipper_benchmarks: Submitted 9920000 requests
+INFO:clipper_benchmarks: Submitted 9940000 requests
+INFO:clipper_benchmarks: Submitted 9960000 requests
+INFO:clipper_benchmarks: Submitted 9980000 requests
+INFO:clipper_benchmarks: Submitted 10000000 requests
+INFO:clipper_benchmarks: Submitted 10020000 requests
+INFO:clipper_benchmarks: Submitted 10040000 requests
+INFO:clipper_benchmarks: Submitted 10060000 requests
+INFO:clipper_benchmarks: Submitted 10080000 requests
+INFO:clipper_benchmarks: Submitted 10100000 requests
+INFO:clipper_benchmarks: Submitted 10120000 requests
+INFO:clipper_benchmarks: Submitted 10140000 requests
+INFO:clipper_benchmarks: Submitted 10160000 requests
+INFO:clipper_benchmarks: Submitted 10180000 requests
+INFO:clipper_benchmarks: Submitted 10200000 requests
+INFO:clipper_benchmarks: Submitted 10220000 requests
+INFO:clipper_benchmarks: Submitted 10240000 requests
+INFO:clipper_benchmarks: Submitted 10260000 requests
+INFO:clipper_benchmarks: Submitted 10280000 requests
+INFO:clipper_benchmarks: Submitted 10300000 requests
+INFO:clipper_benchmarks: Submitted 10320000 requests
+INFO:clipper_benchmarks: Submitted 10340000 requests
+INFO:clipper_benchmarks: Submitted 10360000 requests
+INFO:clipper_benchmarks: Submitted 10380000 requests
+INFO:clipper_benchmarks: Submitted 10400000 requests
+INFO:clipper_benchmarks: Submitted 10420000 requests
+INFO:clipper_benchmarks: Submitted 10440000 requests
+INFO:clipper_benchmarks: Submitted 10460000 requests
+INFO:clipper_benchmarks: Submitted 10480000 requests
+INFO:clipper_benchmarks: Submitted 10500000 requests
+INFO:clipper_benchmarks: Submitted 10520000 requests
+INFO:clipper_benchmarks: Submitted 10540000 requests
+INFO:clipper_benchmarks: Submitted 10560000 requests
+INFO:clipper_benchmarks: Submitted 10580000 requests
+INFO:clipper_benchmarks: Submitted 10600000 requests
+INFO:clipper_benchmarks: Submitted 10620000 requests
+INFO:clipper_benchmarks: Submitted 10640000 requests
+INFO:clipper_benchmarks: Submitted 10660000 requests
+INFO:clipper_benchmarks: Submitted 10680000 requests
+INFO:clipper_benchmarks: Submitted 10700000 requests
+INFO:clipper_benchmarks: Submitted 10720000 requests
+INFO:clipper_benchmarks: Submitted 10740000 requests
+INFO:clipper_benchmarks: Submitted 10760000 requests
+INFO:clipper_benchmarks: Submitted 10780000 requests
+INFO:clipper_benchmarks: Submitted 10800000 requests
+INFO:clipper_benchmarks: Submitted 10820000 requests
+INFO:clipper_benchmarks: Submitted 10840000 requests
+INFO:clipper_benchmarks: Submitted 10860000 requests
+INFO:clipper_benchmarks: Submitted 10880000 requests
+INFO:clipper_benchmarks: Submitted 10900000 requests
+INFO:clipper_benchmarks: Submitted 10920000 requests
+INFO:clipper_benchmarks: Submitted 10940000 requests
+INFO:clipper_benchmarks: Submitted 10960000 requests
+INFO:clipper_benchmarks: Submitted 10980000 requests
+INFO:clipper_benchmarks: Submitted 11000000 requests
+INFO:clipper_benchmarks: Submitted 11020000 requests
+INFO:clipper_benchmarks: Submitted 11040000 requests
+INFO:clipper_benchmarks: Submitted 11060000 requests
+INFO:clipper_benchmarks: Submitted 11080000 requests
+INFO:clipper_benchmarks: Submitted 11100000 requests
+INFO:clipper_benchmarks: Submitted 11120000 requests
+INFO:clipper_benchmarks: Submitted 11140000 requests
+INFO:clipper_benchmarks: Submitted 11160000 requests
+INFO:clipper_benchmarks: Submitted 11180000 requests
+INFO:clipper_benchmarks: Submitted 11200000 requests
+INFO:clipper_benchmarks: Submitted 11220000 requests
+INFO:clipper_benchmarks: Submitted 11240000 requests
+INFO:clipper_benchmarks: Submitted 11260000 requests
+INFO:clipper_benchmarks: Submitted 11280000 requests
+INFO:clipper_benchmarks: Submitted 11300000 requests
+INFO:clipper_benchmarks: Submitted 11320000 requests
+INFO:clipper_benchmarks: Submitted 11340000 requests
+INFO:clipper_benchmarks: Submitted 11360000 requests
+INFO:clipper_benchmarks: Submitted 11380000 requests
+INFO:clipper_benchmarks: Submitted 11400000 requests
+INFO:clipper_benchmarks: Submitted 11420000 requests
+INFO:clipper_benchmarks: Submitted 11440000 requests
+INFO:clipper_benchmarks: Submitted 11460000 requests
+INFO:clipper_benchmarks: Submitted 11480000 requests
+INFO:clipper_benchmarks: Submitted 11500000 requests
+INFO:clipper_benchmarks: Submitted 11520000 requests
+INFO:clipper_benchmarks: Submitted 11540000 requests
+INFO:clipper_benchmarks: Submitted 11560000 requests
+INFO:clipper_benchmarks: Submitted 11580000 requests
+INFO:clipper_benchmarks: Submitted 11600000 requests
+INFO:clipper_benchmarks: Submitted 11620000 requests
+INFO:clipper_benchmarks: Submitted 11640000 requests
+INFO:clipper_benchmarks: Submitted 11660000 requests
+INFO:clipper_benchmarks: Submitted 11680000 requests
+INFO:clipper_benchmarks: Submitted 11700000 requests
+INFO:clipper_benchmarks: Submitted 11720000 requests
+INFO:clipper_benchmarks: Submitted 11740000 requests
+INFO:clipper_benchmarks: Submitted 11760000 requests
+INFO:clipper_benchmarks: Submitted 11780000 requests
+INFO:clipper_benchmarks: Submitted 11800000 requests
+INFO:clipper_benchmarks: Submitted 11820000 requests
+INFO:clipper_benchmarks: Submitted 11840000 requests
+INFO:clipper_benchmarks: Submitted 11860000 requests
+INFO:clipper_benchmarks: Submitted 11880000 requests
+INFO:clipper_benchmarks: Submitted 11900000 requests
+INFO:clipper_benchmarks: Submitted 11920000 requests
+INFO:clipper_benchmarks: Submitted 11940000 requests
+INFO:clipper_benchmarks: Submitted 11960000 requests
+INFO:clipper_benchmarks: Submitted 11980000 requests
+INFO:clipper_benchmarks: Submitted 12000000 requests
+INFO:clipper_benchmarks: Submitted 12020000 requests
+INFO:clipper_benchmarks: Submitted 12040000 requests
+INFO:clipper_benchmarks: Submitted 12060000 requests
+INFO:clipper_benchmarks: Submitted 12080000 requests
+INFO:clipper_benchmarks: Submitted 12100000 requests
+INFO:clipper_benchmarks: Submitted 12120000 requests
+INFO:clipper_benchmarks: Submitted 12140000 requests
+INFO:clipper_benchmarks: Submitted 12160000 requests
+INFO:clipper_benchmarks: Submitted 12180000 requests
+INFO:clipper_benchmarks: Submitted 12200000 requests
+INFO:clipper_benchmarks: Submitted 12220000 requests
+INFO:clipper_benchmarks: Submitted 12240000 requests
+INFO:clipper_benchmarks: Submitted 12260000 requests
+INFO:clipper_benchmarks: Submitted 12280000 requests
+INFO:clipper_benchmarks: Submitted 12300000 requests
+INFO:clipper_benchmarks: Submitted 12320000 requests
+INFO:clipper_benchmarks: Submitted 12340000 requests
+INFO:clipper_benchmarks: Submitted 12360000 requests
+INFO:clipper_benchmarks: Submitted 12380000 requests
+INFO:clipper_benchmarks: Submitted 12400000 requests
+INFO:clipper_benchmarks: Submitted 12420000 requests
+INFO:clipper_benchmarks: Submitted 12440000 requests
+INFO:clipper_benchmarks: Submitted 12460000 requests
+INFO:clipper_benchmarks: Submitted 12480000 requests
+INFO:clipper_benchmarks: Submitted 12500000 requests
+INFO:clipper_benchmarks: Submitted 12520000 requests
+INFO:clipper_benchmarks: Submitted 12540000 requests
+INFO:clipper_benchmarks: Submitted 12560000 requests
+INFO:clipper_benchmarks: Submitted 12580000 requests
+INFO:clipper_benchmarks: Submitted 12600000 requests
+INFO:clipper_benchmarks: Submitted 12620000 requests
+INFO:clipper_benchmarks: Submitted 12640000 requests
+INFO:clipper_benchmarks: Submitted 12660000 requests
+INFO:clipper_benchmarks: Submitted 12680000 requests
+INFO:clipper_benchmarks: Submitted 12700000 requests
+INFO:clipper_benchmarks: Submitted 12720000 requests
+INFO:clipper_benchmarks: Submitted 12740000 requests
+INFO:clipper_benchmarks: Submitted 12760000 requests
+INFO:clipper_benchmarks: Submitted 12780000 requests
+INFO:clipper_benchmarks: Submitted 12800000 requests
+INFO:clipper_benchmarks: Submitted 12820000 requests
+INFO:clipper_benchmarks: Submitted 12840000 requests
+INFO:clipper_benchmarks: Submitted 12860000 requests
+INFO:clipper_benchmarks: Submitted 12880000 requests
+INFO:clipper_benchmarks: Submitted 12900000 requests
+INFO:clipper_benchmarks: Submitted 12920000 requests
+INFO:clipper_benchmarks: Submitted 12940000 requests
+INFO:clipper_benchmarks: Submitted 12960000 requests
+INFO:clipper_benchmarks: Submitted 12980000 requests
+INFO:clipper_benchmarks: Submitted 13000000 requests
+INFO:clipper_benchmarks: Submitted 13020000 requests
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 6519492
+    },
+    {
+      "name": "queued_predictions",
+      "count": 6505608
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 13024787
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 1095603
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 1089760
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 1086308
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 1083211
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 1094196
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 1079040
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 1082052
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 1084072
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 1089921
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 1084983
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 1077221
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 1078420
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 2070560
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 4448926
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 2.3032461567458819e-7
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.8124240162491337
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 52881,
+      "max": 40014788,
+      "mean": 19409826.589007785,
+      "std": 11693361.455237342,
+      "p95": 38036269.05,
+      "p99": 39540749.21,
+      "p50": 19129624.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 530,
+      "max": 9840,
+      "mean": 2223.4063107976655,
+      "std": 765.1978738859637,
+      "p95": 3473.5499999999994,
+      "p99": 3705.5300000000008,
+      "p50": 2209.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.7468385214007782,
+      "std": 0.43487554055928626,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 291,
+      "max": 8914,
+      "mean": 2384.270428015564,
+      "std": 395.14312481389796,
+      "p95": 2775.0,
+      "p99": 3066.5,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 38.027966926070039,
+      "std": 5.9099979557459909,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 392,
+      "max": 3804,
+      "mean": 2391.529790856031,
+      "std": 364.3566632095562,
+      "p95": 2777.0,
+      "p99": 3022.0,
+      "p50": 2480.5
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.490029182879379,
+      "std": 5.667069207537194,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 285,
+      "max": 4274,
+      "mean": 2376.593263618677,
+      "std": 389.224689280898,
+      "p95": 2765.75,
+      "p99": 3047.25,
+      "p50": 2473.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 2,
+      "max": 57,
+      "mean": 38.05800097276265,
+      "std": 6.065708278539625,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 269,
+      "max": 10160,
+      "mean": 2373.6887159533077,
+      "std": 409.91206573012229,
+      "p95": 2774.0,
+      "p99": 3090.0,
+      "p50": 2470.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.00705252918288,
+      "std": 5.794439657473125,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 291,
+      "max": 4532,
+      "mean": 2393.244892996109,
+      "std": 370.23083779741,
+      "p95": 2774.0,
+      "p99": 2995.25,
+      "p50": 2488.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.951848249027239,
+      "std": 5.8238036357994729,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 273,
+      "max": 5191,
+      "mean": 2374.948686770428,
+      "std": 393.3770381503777,
+      "p95": 2758.75,
+      "p99": 3024.0,
+      "p50": 2476.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.16050583657587,
+      "std": 5.975731579193438,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 356,
+      "max": 8716,
+      "mean": 2376.1063959143968,
+      "std": 400.9010015264095,
+      "p95": 2774.75,
+      "p99": 3040.0,
+      "p50": 2471.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.824781128404669,
+      "std": 5.741868284205799,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 337,
+      "max": 7648,
+      "mean": 2384.364421206226,
+      "std": 386.79335718042139,
+      "p95": 2772.0,
+      "p99": 3019.75,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 37.942971789883269,
+      "std": 5.794971273021583,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 288,
+      "max": 6464,
+      "mean": 2371.2265321011675,
+      "std": 403.51237559432249,
+      "p95": 2781.0,
+      "p99": 3044.75,
+      "p50": 2475.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.972033073929967,
+      "std": 5.873256661936197,
+      "p95": 46.0,
+      "p99": 48.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 367,
+      "max": 7837,
+      "mean": 2385.667071984436,
+      "std": 389.0388309928974,
+      "p95": 2781.0,
+      "p99": 3058.5,
+      "p50": 2479.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 2,
+      "max": 60,
+      "mean": 38.273589494163427,
+      "std": 5.636614630867867,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 214,
+      "max": 5132,
+      "mean": 2385.2459873540858,
+      "std": 392.64232706682108,
+      "p95": 2783.75,
+      "p99": 3044.0,
+      "p50": 2486.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.834022373540857,
+      "std": 5.993210725068184,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 330,
+      "max": 4494,
+      "mean": 2388.5668774319067,
+      "std": 382.7603845815774,
+      "p95": 2785.0,
+      "p99": 3098.5,
+      "p50": 2479.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.78647859922179,
+      "std": 5.821946180571418,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 329,
+      "max": 9322,
+      "mean": 2378.8567607003894,
+      "std": 401.20588952146178,
+      "p95": 2766.0,
+      "p99": 3064.0,
+      "p50": 2471.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.75243190661479,
+      "std": 5.816668414457223,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 81446.05871063652,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 162711.20330390303,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 13686.645409757124,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 13613.980655783747,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 13570.57924188933,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 13531.736537655766,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 13668.909814073717,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 13480.054340318064,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 13517.310862916642,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 13542.60233400686,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 13616.440769910838,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 13554.142569307185,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 13456.860788465152,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 13471.935753819896,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 60407.93402836617,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 13040000 requests
+INFO:clipper_benchmarks: Submitted 13060000 requests
+INFO:clipper_benchmarks: Submitted 13080000 requests
+INFO:clipper_benchmarks: Submitted 13100000 requests
+INFO:clipper_benchmarks: Submitted 13120000 requests
+INFO:clipper_benchmarks: Submitted 13140000 requests
+INFO:clipper_benchmarks: Submitted 13160000 requests
+INFO:clipper_benchmarks: Submitted 13180000 requests
+INFO:clipper_benchmarks: Submitted 13200000 requests
+INFO:clipper_benchmarks: Submitted 13220000 requests
+INFO:clipper_benchmarks: Submitted 13240000 requests
+INFO:clipper_benchmarks: Submitted 13260000 requests
+INFO:clipper_benchmarks: Submitted 13280000 requests
+INFO:clipper_benchmarks: Submitted 13300000 requests
+INFO:clipper_benchmarks: Submitted 13320000 requests
+INFO:clipper_benchmarks: Submitted 13340000 requests
+INFO:clipper_benchmarks: Submitted 13360000 requests
+INFO:clipper_benchmarks: Submitted 13380000 requests
+INFO:clipper_benchmarks: Submitted 13400000 requests
+INFO:clipper_benchmarks: Submitted 13420000 requests
+INFO:clipper_benchmarks: Submitted 13440000 requests
+INFO:clipper_benchmarks: Submitted 13460000 requests
+INFO:clipper_benchmarks: Submitted 13480000 requests
+INFO:clipper_benchmarks: Submitted 13500000 requests
+INFO:clipper_benchmarks: Submitted 13520000 requests
+INFO:clipper_benchmarks: Submitted 13540000 requests
+INFO:clipper_benchmarks: Submitted 13560000 requests
+INFO:clipper_benchmarks: Submitted 13580000 requests
+INFO:clipper_benchmarks: Submitted 13600000 requests
+INFO:clipper_benchmarks: Submitted 13620000 requests
+INFO:clipper_benchmarks: Submitted 13640000 requests
+INFO:clipper_benchmarks: Submitted 13660000 requests
+INFO:clipper_benchmarks: Submitted 13680000 requests
+INFO:clipper_benchmarks: Submitted 13700000 requests
+INFO:clipper_benchmarks: Submitted 13720000 requests
+INFO:clipper_benchmarks: Submitted 13740000 requests
+INFO:clipper_benchmarks: Submitted 13760000 requests
+INFO:clipper_benchmarks: Submitted 13780000 requests
+INFO:clipper_benchmarks: Submitted 13800000 requests
+INFO:clipper_benchmarks: Submitted 13820000 requests
+INFO:clipper_benchmarks: Submitted 13840000 requests
+INFO:clipper_benchmarks: Submitted 13860000 requests
+INFO:clipper_benchmarks: Submitted 13880000 requests
+INFO:clipper_benchmarks: Submitted 13900000 requests
+INFO:clipper_benchmarks: Submitted 13920000 requests
+INFO:clipper_benchmarks: Submitted 13940000 requests
+INFO:clipper_benchmarks: Submitted 13960000 requests
+INFO:clipper_benchmarks: Submitted 13980000 requests
+INFO:clipper_benchmarks: Submitted 14000000 requests
+INFO:clipper_benchmarks: Submitted 14020000 requests
+INFO:clipper_benchmarks: Submitted 14040000 requests
+INFO:clipper_benchmarks: Submitted 14060000 requests
+INFO:clipper_benchmarks: Submitted 14080000 requests
+INFO:clipper_benchmarks: Submitted 14100000 requests
+INFO:clipper_benchmarks: Submitted 14120000 requests
+INFO:clipper_benchmarks: Submitted 14140000 requests
+INFO:clipper_benchmarks: Submitted 14160000 requests
+INFO:clipper_benchmarks: Submitted 14180000 requests
+INFO:clipper_benchmarks: Submitted 14200000 requests
+INFO:clipper_benchmarks: Submitted 14220000 requests
+INFO:clipper_benchmarks: Submitted 14240000 requests
+INFO:clipper_benchmarks: Submitted 14260000 requests
+INFO:clipper_benchmarks: Submitted 14280000 requests
+INFO:clipper_benchmarks: Submitted 14300000 requests
+INFO:clipper_benchmarks: Submitted 14320000 requests
+INFO:clipper_benchmarks: Submitted 14340000 requests
+INFO:clipper_benchmarks: Submitted 14360000 requests
+INFO:clipper_benchmarks: Submitted 14380000 requests
+INFO:clipper_benchmarks: Submitted 14400000 requests
+INFO:clipper_benchmarks: Submitted 14420000 requests
+INFO:clipper_benchmarks: Submitted 14440000 requests
+INFO:clipper_benchmarks: Submitted 14460000 requests
+INFO:clipper_benchmarks: Submitted 14480000 requests
+INFO:clipper_benchmarks: Submitted 14500000 requests
+INFO:clipper_benchmarks: Submitted 14520000 requests
+INFO:clipper_benchmarks: Submitted 14540000 requests
+INFO:clipper_benchmarks: Submitted 14560000 requests
+INFO:clipper_benchmarks: Submitted 14580000 requests
+INFO:clipper_benchmarks: Submitted 14600000 requests
+INFO:clipper_benchmarks: Submitted 14620000 requests
+INFO:clipper_benchmarks: Submitted 14640000 requests
+INFO:clipper_benchmarks: Submitted 14660000 requests
+INFO:clipper_benchmarks: Submitted 14680000 requests
+INFO:clipper_benchmarks: Submitted 14700000 requests
+INFO:clipper_benchmarks: Submitted 14720000 requests
+INFO:clipper_benchmarks: Submitted 14740000 requests
+INFO:clipper_benchmarks: Submitted 14760000 requests
+INFO:clipper_benchmarks: Submitted 14780000 requests
+INFO:clipper_benchmarks: Submitted 14800000 requests
+INFO:clipper_benchmarks: Submitted 14820000 requests
+INFO:clipper_benchmarks: Submitted 14840000 requests
+INFO:clipper_benchmarks: Submitted 14860000 requests
+INFO:clipper_benchmarks: Submitted 14880000 requests
+INFO:clipper_benchmarks: Submitted 14900000 requests
+INFO:clipper_benchmarks: Submitted 14920000 requests
+INFO:clipper_benchmarks: Submitted 14940000 requests
+INFO:clipper_benchmarks: Submitted 14960000 requests
+INFO:clipper_benchmarks: Submitted 14980000 requests
+INFO:clipper_benchmarks: Submitted 15000000 requests
+INFO:clipper_benchmarks: Submitted 15020000 requests
+INFO:clipper_benchmarks: Submitted 15040000 requests
+INFO:clipper_benchmarks: Submitted 15060000 requests
+INFO:clipper_benchmarks: Submitted 15080000 requests
+INFO:clipper_benchmarks: Submitted 15100000 requests
+INFO:clipper_benchmarks: Submitted 15120000 requests
+INFO:clipper_benchmarks: Submitted 15140000 requests
+INFO:clipper_benchmarks: Submitted 15160000 requests
+INFO:clipper_benchmarks: Submitted 15180000 requests
+INFO:clipper_benchmarks: Submitted 15200000 requests
+INFO:clipper_benchmarks: Submitted 15220000 requests
+INFO:clipper_benchmarks: Submitted 15240000 requests
+INFO:clipper_benchmarks: Submitted 15260000 requests
+INFO:clipper_benchmarks: Submitted 15280000 requests
+INFO:clipper_benchmarks: Submitted 15300000 requests
+INFO:clipper_benchmarks: Submitted 15320000 requests
+INFO:clipper_benchmarks: Submitted 15340000 requests
+INFO:clipper_benchmarks: Submitted 15360000 requests
+INFO:clipper_benchmarks: Submitted 15380000 requests
+INFO:clipper_benchmarks: Submitted 15400000 requests
+INFO:clipper_benchmarks: Submitted 15420000 requests
+INFO:clipper_benchmarks: Submitted 15440000 requests
+INFO:clipper_benchmarks: Submitted 15460000 requests
+INFO:clipper_benchmarks: Submitted 15480000 requests
+INFO:clipper_benchmarks: Submitted 15500000 requests
+INFO:clipper_benchmarks: Submitted 15520000 requests
+INFO:clipper_benchmarks: Submitted 15540000 requests
+INFO:clipper_benchmarks: Submitted 15560000 requests
+INFO:clipper_benchmarks: Submitted 15580000 requests
+INFO:clipper_benchmarks: Submitted 15600000 requests
+INFO:clipper_benchmarks: Submitted 15620000 requests
+INFO:clipper_benchmarks: Submitted 15640000 requests
+INFO:clipper_benchmarks: Submitted 15660000 requests
+INFO:clipper_benchmarks: Submitted 15680000 requests
+INFO:clipper_benchmarks: Submitted 15700000 requests
+INFO:clipper_benchmarks: Submitted 15720000 requests
+INFO:clipper_benchmarks: Submitted 15740000 requests
+INFO:clipper_benchmarks: Submitted 15760000 requests
+INFO:clipper_benchmarks: Submitted 15780000 requests
+INFO:clipper_benchmarks: Submitted 15800000 requests
+INFO:clipper_benchmarks: Submitted 15820000 requests
+INFO:clipper_benchmarks: Submitted 15840000 requests
+INFO:clipper_benchmarks: Submitted 15860000 requests
+INFO:clipper_benchmarks: Submitted 15880000 requests
+INFO:clipper_benchmarks: Submitted 15900000 requests
+INFO:clipper_benchmarks: Submitted 15920000 requests
+INFO:clipper_benchmarks: Submitted 15940000 requests
+INFO:clipper_benchmarks: Submitted 15960000 requests
+INFO:clipper_benchmarks: Submitted 15980000 requests
+INFO:clipper_benchmarks: Submitted 16000000 requests
+INFO:clipper_benchmarks: Submitted 16020000 requests
+INFO:clipper_benchmarks: Submitted 16040000 requests
+INFO:clipper_benchmarks: Submitted 16060000 requests
+INFO:clipper_benchmarks: Submitted 16080000 requests
+INFO:clipper_benchmarks: Submitted 16100000 requests
+INFO:clipper_benchmarks: Submitted 16120000 requests
+INFO:clipper_benchmarks: Submitted 16140000 requests
+INFO:clipper_benchmarks: Submitted 16160000 requests
+INFO:clipper_benchmarks: Submitted 16180000 requests
+INFO:clipper_benchmarks: Submitted 16200000 requests
+INFO:clipper_benchmarks: Submitted 16220000 requests
+INFO:clipper_benchmarks: Submitted 16240000 requests
+INFO:clipper_benchmarks: Submitted 16260000 requests
+INFO:clipper_benchmarks: Submitted 16280000 requests
+INFO:clipper_benchmarks: Submitted 16300000 requests
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 8199431
+    },
+    {
+      "name": "queued_predictions",
+      "count": 8110495
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 16309731
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 1371646
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 1365955
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 1361936
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 1358165
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 1369371
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 1351508
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 1354647
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 1357146
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 1365172
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 1356797
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 1348221
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 1349167
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 2418275
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 5781059
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 2.452494867847927e-7
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.7901618594876121
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 84170,
+      "max": 49637903,
+      "mean": 24642346.960603116,
+      "std": 14651839.020612862,
+      "p95": 47215836.25,
+      "p99": 49203988.16,
+      "p50": 24038571.5
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 530,
+      "max": 9840,
+      "mean": 2224.759545233463,
+      "std": 764.6024314733503,
+      "p95": 3476.0,
+      "p99": 3720.51,
+      "p50": 2208.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.6950389105058366,
+      "std": 0.46044693785177989,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 291,
+      "max": 8914,
+      "mean": 2388.8436284046695,
+      "std": 390.03346300374445,
+      "p95": 2781.0,
+      "p99": 3070.0,
+      "p50": 2480.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 38.179839494163427,
+      "std": 5.729109403963679,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 392,
+      "max": 3804,
+      "mean": 2390.515807392996,
+      "std": 364.4375311187484,
+      "p95": 2774.0,
+      "p99": 3012.5,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 38.511673151750979,
+      "std": 5.567479094528208,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 285,
+      "max": 8522,
+      "mean": 2381.7437986381326,
+      "std": 389.1236547388701,
+      "p95": 2766.0,
+      "p99": 3046.5,
+      "p50": 2476.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 2,
+      "max": 57,
+      "mean": 38.219844357976658,
+      "std": 5.943535454036665,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 285,
+      "max": 10160,
+      "mean": 2379.95063229572,
+      "std": 403.9766309099828,
+      "p95": 2777.0,
+      "p99": 3092.0,
+      "p50": 2473.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.24343385214008,
+      "std": 5.7458077651779739,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 291,
+      "max": 4532,
+      "mean": 2396.4229085603117,
+      "std": 366.9850794480898,
+      "p95": 2770.75,
+      "p99": 3020.0,
+      "p50": 2490.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 38.00255350194553,
+      "std": 5.826496885647928,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 273,
+      "max": 5191,
+      "mean": 2380.7907344357979,
+      "std": 390.4608375702054,
+      "p95": 2763.0,
+      "p99": 3039.25,
+      "p50": 2482.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.26398346303502,
+      "std": 5.872079674276519,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 353,
+      "max": 8716,
+      "mean": 2378.131809338521,
+      "std": 393.78619571244868,
+      "p95": 2771.0,
+      "p99": 3017.0,
+      "p50": 2473.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.92412451361868,
+      "std": 5.647545053733764,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 325,
+      "max": 7648,
+      "mean": 2384.2913424124515,
+      "std": 379.1159602804437,
+      "p95": 2770.0,
+      "p99": 3008.0,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 2,
+      "max": 53,
+      "mean": 38.07307879377432,
+      "std": 5.608373975214372,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 288,
+      "max": 6464,
+      "mean": 2379.085359922179,
+      "std": 397.811658374936,
+      "p95": 2778.0,
+      "p99": 3037.5,
+      "p50": 2481.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 38.028331712062257,
+      "std": 5.8256771080808209,
+      "p95": 46.0,
+      "p99": 48.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 367,
+      "max": 7837,
+      "mean": 2384.2548638132295,
+      "std": 381.2640681360386,
+      "p95": 2771.0,
+      "p99": 3015.75,
+      "p50": 2476.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 2,
+      "max": 55,
+      "mean": 38.37986381322957,
+      "std": 5.555763605120604,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 214,
+      "max": 3923,
+      "mean": 2387.5920476653698,
+      "std": 389.0480866891982,
+      "p95": 2783.75,
+      "p99": 3056.0,
+      "p50": 2487.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 3,
+      "max": 55,
+      "mean": 37.95926556420233,
+      "std": 5.822241715791798,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 258,
+      "max": 4383,
+      "mean": 2392.77298151751,
+      "std": 381.3861804012539,
+      "p95": 2782.0,
+      "p99": 3091.75,
+      "p50": 2485.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.86284046692607,
+      "std": 5.701280112604252,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 329,
+      "max": 9322,
+      "mean": 2377.5751459143968,
+      "std": 399.62212900196217,
+      "p95": 2763.75,
+      "p99": 3049.75,
+      "p50": 2473.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 3,
+      "max": 56,
+      "mean": 37.762767509727627,
+      "std": 5.713924306069634,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 81941.59184529619,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 162987.5827495628,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 13706.973647444882,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 13650.320366038064,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 13610.093635957444,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 13572.504724242768,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 13684.701793687495,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 13505.659873888104,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 13537.393627852212,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 13562.762645898458,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 13642.52653915,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 13559.035592841872,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 13473.196453944907,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 13482.408834477093,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 56425.186359130166,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 16320000 requests
+INFO:clipper_benchmarks: Submitted 16340000 requests
+INFO:clipper_benchmarks: Submitted 16360000 requests
+INFO:clipper_benchmarks: Submitted 16380000 requests
+INFO:clipper_benchmarks: Submitted 16400000 requests
+INFO:clipper_benchmarks: Submitted 16420000 requests
+INFO:clipper_benchmarks: Submitted 16440000 requests
+INFO:clipper_benchmarks: Submitted 16460000 requests
+INFO:clipper_benchmarks: Submitted 16480000 requests
+INFO:clipper_benchmarks: Submitted 16500000 requests
+INFO:clipper_benchmarks: Submitted 16520000 requests
+INFO:clipper_benchmarks: Submitted 16540000 requests
+INFO:clipper_benchmarks: Submitted 16560000 requests
+INFO:clipper_benchmarks: Submitted 16580000 requests
+INFO:clipper_benchmarks: Submitted 16600000 requests
+INFO:clipper_benchmarks: Submitted 16620000 requests
+INFO:clipper_benchmarks: Submitted 16640000 requests
+INFO:clipper_benchmarks: Submitted 16660000 requests
+INFO:clipper_benchmarks: Submitted 16680000 requests
+INFO:clipper_benchmarks: Submitted 16700000 requests
+INFO:clipper_benchmarks: Submitted 16720000 requests
+INFO:clipper_benchmarks: Submitted 16740000 requests
+INFO:clipper_benchmarks: Submitted 16760000 requests
+INFO:clipper_benchmarks: Submitted 16780000 requests
+INFO:clipper_benchmarks: Submitted 16800000 requests
+INFO:clipper_benchmarks: Submitted 16820000 requests
+INFO:clipper_benchmarks: Submitted 16840000 requests
+INFO:clipper_benchmarks: Submitted 16860000 requests
+INFO:clipper_benchmarks: Submitted 16880000 requests
+INFO:clipper_benchmarks: Submitted 16900000 requests
+INFO:clipper_benchmarks: Submitted 16920000 requests
+INFO:clipper_benchmarks: Submitted 16940000 requests
+INFO:clipper_benchmarks: Submitted 16960000 requests
+INFO:clipper_benchmarks: Submitted 16980000 requests
+INFO:clipper_benchmarks: Submitted 17000000 requests
+INFO:clipper_benchmarks: Submitted 17020000 requests
+INFO:clipper_benchmarks: Submitted 17040000 requests
+INFO:clipper_benchmarks: Submitted 17060000 requests
+INFO:clipper_benchmarks: Submitted 17080000 requests
+INFO:clipper_benchmarks: Submitted 17100000 requests
+INFO:clipper_benchmarks: Submitted 17120000 requests
+INFO:clipper_benchmarks: Submitted 17140000 requests
+INFO:clipper_benchmarks: Submitted 17160000 requests
+INFO:clipper_benchmarks: Submitted 17180000 requests
+INFO:clipper_benchmarks: Submitted 17200000 requests
+INFO:clipper_benchmarks: Submitted 17220000 requests
+INFO:clipper_benchmarks: Submitted 17240000 requests
+INFO:clipper_benchmarks: Submitted 17260000 requests
+INFO:clipper_benchmarks: Submitted 17280000 requests
+INFO:clipper_benchmarks: Submitted 17300000 requests
+INFO:clipper_benchmarks: Submitted 17320000 requests
+INFO:clipper_benchmarks: Submitted 17340000 requests
+INFO:clipper_benchmarks: Submitted 17360000 requests
+INFO:clipper_benchmarks: Submitted 17380000 requests
+INFO:clipper_benchmarks: Submitted 17400000 requests
+INFO:clipper_benchmarks: Submitted 17420000 requests
+INFO:clipper_benchmarks: Submitted 17440000 requests
+INFO:clipper_benchmarks: Submitted 17460000 requests
+INFO:clipper_benchmarks: Submitted 17480000 requests
+INFO:clipper_benchmarks: Submitted 17500000 requests
+INFO:clipper_benchmarks: Submitted 17520000 requests
+INFO:clipper_benchmarks: Submitted 17540000 requests
+INFO:clipper_benchmarks: Submitted 17560000 requests
+INFO:clipper_benchmarks: Submitted 17580000 requests
+INFO:clipper_benchmarks: Submitted 17600000 requests
+INFO:clipper_benchmarks: Submitted 17620000 requests
+INFO:clipper_benchmarks: Submitted 17640000 requests
+INFO:clipper_benchmarks: Submitted 17660000 requests
+INFO:clipper_benchmarks: Submitted 17680000 requests
+INFO:clipper_benchmarks: Submitted 17700000 requests
+INFO:clipper_benchmarks: Submitted 17720000 requests
+INFO:clipper_benchmarks: Submitted 17740000 requests
+INFO:clipper_benchmarks: Submitted 17760000 requests
+INFO:clipper_benchmarks: Submitted 17780000 requests
+INFO:clipper_benchmarks: Submitted 17800000 requests
+INFO:clipper_benchmarks: Submitted 17820000 requests
+INFO:clipper_benchmarks: Submitted 17840000 requests
+INFO:clipper_benchmarks: Submitted 17860000 requests
+INFO:clipper_benchmarks: Submitted 17880000 requests
+INFO:clipper_benchmarks: Submitted 17900000 requests
+INFO:clipper_benchmarks: Submitted 17920000 requests
+INFO:clipper_benchmarks: Submitted 17940000 requests
+INFO:clipper_benchmarks: Submitted 17960000 requests
+INFO:clipper_benchmarks: Submitted 17980000 requests
+INFO:clipper_benchmarks: Submitted 18000000 requests
+INFO:clipper_benchmarks: Submitted 18020000 requests
+INFO:clipper_benchmarks: Submitted 18040000 requests
+INFO:clipper_benchmarks: Submitted 18060000 requests
+INFO:clipper_benchmarks: Submitted 18080000 requests
+INFO:clipper_benchmarks: Submitted 18100000 requests
+INFO:clipper_benchmarks: Submitted 18120000 requests
+INFO:clipper_benchmarks: Submitted 18140000 requests
+INFO:clipper_benchmarks: Submitted 18160000 requests
+INFO:clipper_benchmarks: Submitted 18180000 requests
+INFO:clipper_benchmarks: Submitted 18200000 requests
+INFO:clipper_benchmarks: Submitted 18220000 requests
+INFO:clipper_benchmarks: Submitted 18240000 requests
+INFO:clipper_benchmarks: Submitted 18260000 requests
+INFO:clipper_benchmarks: Submitted 18280000 requests
+INFO:clipper_benchmarks: Submitted 18300000 requests
+INFO:clipper_benchmarks: Submitted 18320000 requests
+INFO:clipper_benchmarks: Submitted 18340000 requests
+INFO:clipper_benchmarks: Submitted 18360000 requests
+INFO:clipper_benchmarks: Submitted 18380000 requests
+INFO:clipper_benchmarks: Submitted 18400000 requests
+INFO:clipper_benchmarks: Submitted 18420000 requests
+INFO:clipper_benchmarks: Submitted 18440000 requests
+INFO:clipper_benchmarks: Submitted 18460000 requests
+INFO:clipper_benchmarks: Submitted 18480000 requests
+INFO:clipper_benchmarks: Submitted 18500000 requests
+INFO:clipper_benchmarks: Submitted 18520000 requests
+INFO:clipper_benchmarks: Submitted 18540000 requests
+INFO:clipper_benchmarks: Submitted 18560000 requests
+INFO:clipper_benchmarks: Submitted 18580000 requests
+INFO:clipper_benchmarks: Submitted 18600000 requests
+INFO:clipper_benchmarks: Submitted 18620000 requests
+INFO:clipper_benchmarks: Submitted 18640000 requests
+INFO:clipper_benchmarks: Submitted 18660000 requests
+INFO:clipper_benchmarks: Submitted 18680000 requests
+INFO:clipper_benchmarks: Submitted 18700000 requests
+INFO:clipper_benchmarks: Submitted 18720000 requests
+INFO:clipper_benchmarks: Submitted 18740000 requests
+INFO:clipper_benchmarks: Submitted 18760000 requests
+INFO:clipper_benchmarks: Submitted 18780000 requests
+INFO:clipper_benchmarks: Submitted 18800000 requests
+INFO:clipper_benchmarks: Submitted 18820000 requests
+INFO:clipper_benchmarks: Submitted 18840000 requests
+INFO:clipper_benchmarks: Submitted 18860000 requests
+INFO:clipper_benchmarks: Submitted 18880000 requests
+INFO:clipper_benchmarks: Submitted 18900000 requests
+INFO:clipper_benchmarks: Submitted 18920000 requests
+INFO:clipper_benchmarks: Submitted 18940000 requests
+INFO:clipper_benchmarks: Submitted 18960000 requests
+INFO:clipper_benchmarks: Submitted 18980000 requests
+INFO:clipper_benchmarks: Submitted 19000000 requests
+INFO:clipper_benchmarks: Submitted 19020000 requests
+INFO:clipper_benchmarks: Submitted 19040000 requests
+INFO:clipper_benchmarks: Submitted 19060000 requests
+INFO:clipper_benchmarks: Submitted 19080000 requests
+INFO:clipper_benchmarks: Submitted 19100000 requests
+INFO:clipper_benchmarks: Submitted 19120000 requests
+INFO:clipper_benchmarks: Submitted 19140000 requests
+INFO:clipper_benchmarks: Submitted 19160000 requests
+INFO:clipper_benchmarks: Submitted 19180000 requests
+INFO:clipper_benchmarks: Submitted 19200000 requests
+INFO:clipper_benchmarks: Submitted 19220000 requests
+INFO:clipper_benchmarks: Submitted 19240000 requests
+INFO:clipper_benchmarks: Submitted 19260000 requests
+INFO:clipper_benchmarks: Submitted 19280000 requests
+INFO:clipper_benchmarks: Submitted 19300000 requests
+INFO:clipper_benchmarks: Submitted 19320000 requests
+INFO:clipper_benchmarks: Submitted 19340000 requests
+INFO:clipper_benchmarks: Submitted 19360000 requests
+INFO:clipper_benchmarks: Submitted 19380000 requests
+INFO:clipper_benchmarks: Submitted 19400000 requests
+INFO:clipper_benchmarks: Submitted 19420000 requests
+INFO:clipper_benchmarks: Submitted 19440000 requests
+INFO:clipper_benchmarks: Submitted 19460000 requests
+INFO:clipper_benchmarks: Submitted 19480000 requests
+INFO:clipper_benchmarks: Submitted 19500000 requests
+INFO:clipper_benchmarks: Submitted 19520000 requests
+INFO:clipper_benchmarks: Submitted 19540000 requests
+INFO:clipper_benchmarks: Submitted 19560000 requests
+INFO:clipper_benchmarks: Submitted 19580000 requests
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 9885601
+    },
+    {
+      "name": "queued_predictions",
+      "count": 9695292
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 19580574
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 1648323
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 1640709
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 1636648
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 1629551
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 1643507
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 1621769
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 1625144
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 1630312
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 1638649
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 1626812
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 1619013
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 1620137
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 2715235
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 7170366
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 3.064212409569985e-7
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.770194976492074
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 84170,
+      "max": 59358310,
+      "mean": 29756334.3932393,
+      "std": 17395509.14741949,
+      "p95": 56415400.15,
+      "p99": 58556084.74,
+      "p50": 30211983.5
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 513,
+      "max": 9840,
+      "mean": 2221.9040004863816,
+      "std": 763.0921105919592,
+      "p95": 3474.0,
+      "p99": 3693.51,
+      "p50": 2208.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.6534533073929961,
+      "std": 0.4759276908080219,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 291,
+      "max": 8914,
+      "mean": 2389.6923638132295,
+      "std": 387.2044531535624,
+      "p95": 2781.75,
+      "p99": 3075.0,
+      "p50": 2479.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 38.181906614785997,
+      "std": 5.666518597663638,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 392,
+      "max": 3804,
+      "mean": 2389.140077821012,
+      "std": 363.02856982120206,
+      "p95": 2766.75,
+      "p99": 3010.75,
+      "p50": 2475.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 38.60554474708171,
+      "std": 5.6467884688647509,
+      "p95": 47.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 316,
+      "max": 4851,
+      "mean": 2382.4550097276267,
+      "std": 380.1804575056384,
+      "p95": 2766.0,
+      "p99": 3046.5,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 2,
+      "max": 57,
+      "mean": 38.309216926070039,
+      "std": 5.841544000309609,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 285,
+      "max": 10160,
+      "mean": 2383.2035505836577,
+      "std": 402.4136036593545,
+      "p95": 2782.0,
+      "p99": 3091.75,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 54,
+      "mean": 38.349221789883269,
+      "std": 5.684465701582917,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 304,
+      "max": 4532,
+      "mean": 2397.661357003891,
+      "std": 369.5090550095761,
+      "p95": 2774.0,
+      "p99": 3038.0,
+      "p50": 2491.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 38.070525291828797,
+      "std": 5.725755429977663,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 301,
+      "max": 5671,
+      "mean": 2381.848370622568,
+      "std": 389.0144871089133,
+      "p95": 2761.75,
+      "p99": 3036.5,
+      "p50": 2480.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 38.286843385214009,
+      "std": 5.7777594911206668,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 353,
+      "max": 8716,
+      "mean": 2378.995500972763,
+      "std": 390.272091733425,
+      "p95": 2771.0,
+      "p99": 3020.0,
+      "p50": 2472.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 37.95245622568093,
+      "std": 5.6017927064028,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 325,
+      "max": 7648,
+      "mean": 2382.7012402723737,
+      "std": 376.32300278590477,
+      "p95": 2761.0,
+      "p99": 2992.75,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 2,
+      "max": 53,
+      "mean": 38.12305447470817,
+      "std": 5.472843961135255,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 339,
+      "max": 6464,
+      "mean": 2377.4423638132295,
+      "std": 398.9317848641309,
+      "p95": 2773.0,
+      "p99": 3033.75,
+      "p50": 2481.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 38.068093385214009,
+      "std": 5.826443884612884,
+      "p95": 46.0,
+      "p99": 48.75,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 367,
+      "max": 7837,
+      "mean": 2384.115272373541,
+      "std": 380.24873844833146,
+      "p95": 2770.0,
+      "p99": 3016.0,
+      "p50": 2479.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 38.37135214007782,
+      "std": 5.545560365026901,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 214,
+      "max": 3923,
+      "mean": 2387.604936770428,
+      "std": 383.6967799599945,
+      "p95": 2780.75,
+      "p99": 3053.75,
+      "p50": 2485.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 3,
+      "max": 55,
+      "mean": 37.9300826848249,
+      "std": 5.73292660599732,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 258,
+      "max": 4383,
+      "mean": 2398.190175097276,
+      "std": 374.38854679018888,
+      "p95": 2781.0,
+      "p99": 3078.75,
+      "p50": 2489.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 55,
+      "mean": 37.97373540856031,
+      "std": 5.571141469618714,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 296,
+      "max": 9322,
+      "mean": 2382.6680447470819,
+      "std": 396.7146167476187,
+      "p95": 2768.75,
+      "p99": 3064.0,
+      "p50": 2477.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 3,
+      "max": 54,
+      "mean": 37.798151750972767,
+      "std": 5.726369596588448,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 82322.92251149727,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 163058.66147683736,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 13726.583215851097,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 13663.102257482464,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 13629.138612521072,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 13570.145618024515,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 13686.457873877342,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 13505.36561888476,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 13533.500739102697,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 13576.506810114535,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 13645.916209399498,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 13547.538930983186,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 13482.376028598204,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 13492.02639965164,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 52786.19754118619,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 19600000 requests
+INFO:clipper_benchmarks: Submitted 19620000 requests
+INFO:clipper_benchmarks: Submitted 19640000 requests
+INFO:clipper_benchmarks: Submitted 19660000 requests
+INFO:clipper_benchmarks: Submitted 19680000 requests
+INFO:clipper_benchmarks: Submitted 19700000 requests
+INFO:clipper_benchmarks: Submitted 19720000 requests
+INFO:clipper_benchmarks: Submitted 19740000 requests
+INFO:clipper_benchmarks: Submitted 19760000 requests
+INFO:clipper_benchmarks: Submitted 19780000 requests
+INFO:clipper_benchmarks: Submitted 19800000 requests
+INFO:clipper_benchmarks: Submitted 19820000 requests
+INFO:clipper_benchmarks: Submitted 19840000 requests
+INFO:clipper_benchmarks: Submitted 19860000 requests
+INFO:clipper_benchmarks: Submitted 19880000 requests
+INFO:clipper_benchmarks: Submitted 19900000 requests
+INFO:clipper_benchmarks: Submitted 19920000 requests
+INFO:clipper_benchmarks: Submitted 19940000 requests
+INFO:clipper_benchmarks: Submitted 19960000 requests
+INFO:clipper_benchmarks: Submitted 19980000 requests
+INFO:clipper_benchmarks: Submitted 20000000 requests
+INFO:clipper_benchmarks: Submitted 20020000 requests
+INFO:clipper_benchmarks: Submitted 20040000 requests
+INFO:clipper_benchmarks: Submitted 20060000 requests
+INFO:clipper_benchmarks: Submitted 20080000 requests
+INFO:clipper_benchmarks: Submitted 20100000 requests
+INFO:clipper_benchmarks: Submitted 20120000 requests
+INFO:clipper_benchmarks: Submitted 20140000 requests
+INFO:clipper_benchmarks: Submitted 20160000 requests
+INFO:clipper_benchmarks: Submitted 20180000 requests
+INFO:clipper_benchmarks: Submitted 20200000 requests
+INFO:clipper_benchmarks: Submitted 20220000 requests
+INFO:clipper_benchmarks: Submitted 20240000 requests
+INFO:clipper_benchmarks: Submitted 20260000 requests
+INFO:clipper_benchmarks: Submitted 20280000 requests
+INFO:clipper_benchmarks: Submitted 20300000 requests
+INFO:clipper_benchmarks: Submitted 20320000 requests
+INFO:clipper_benchmarks: Submitted 20340000 requests
+INFO:clipper_benchmarks: Submitted 20360000 requests
+INFO:clipper_benchmarks: Submitted 20380000 requests
+INFO:clipper_benchmarks: Submitted 20400000 requests
+INFO:clipper_benchmarks: Submitted 20420000 requests
+INFO:clipper_benchmarks: Submitted 20440000 requests
+INFO:clipper_benchmarks: Submitted 20460000 requests
+INFO:clipper_benchmarks: Submitted 20480000 requests
+INFO:clipper_benchmarks: Submitted 20500000 requests
+INFO:clipper_benchmarks: Submitted 20520000 requests
+INFO:clipper_benchmarks: Submitted 20540000 requests
+INFO:clipper_benchmarks: Submitted 20560000 requests
+INFO:clipper_benchmarks: Submitted 20580000 requests
+INFO:clipper_benchmarks: Submitted 20600000 requests
+INFO:clipper_benchmarks: Submitted 20620000 requests
+INFO:clipper_benchmarks: Submitted 20640000 requests
+INFO:clipper_benchmarks: Submitted 20660000 requests
+INFO:clipper_benchmarks: Submitted 20680000 requests
+INFO:clipper_benchmarks: Submitted 20700000 requests
+INFO:clipper_benchmarks: Submitted 20720000 requests
+INFO:clipper_benchmarks: Submitted 20740000 requests
+INFO:clipper_benchmarks: Submitted 20760000 requests
+INFO:clipper_benchmarks: Submitted 20780000 requests
+INFO:clipper_benchmarks: Submitted 20800000 requests
+INFO:clipper_benchmarks: Submitted 20820000 requests
+INFO:clipper_benchmarks: Submitted 20840000 requests
+INFO:clipper_benchmarks: Submitted 20860000 requests
+INFO:clipper_benchmarks: Submitted 20880000 requests
+INFO:clipper_benchmarks: Submitted 20900000 requests
+INFO:clipper_benchmarks: Submitted 20920000 requests
+INFO:clipper_benchmarks: Submitted 20940000 requests
+INFO:clipper_benchmarks: Submitted 20960000 requests
+INFO:clipper_benchmarks: Submitted 20980000 requests
+INFO:clipper_benchmarks: Submitted 21000000 requests
+INFO:clipper_benchmarks: Submitted 21020000 requests
+INFO:clipper_benchmarks: Submitted 21040000 requests
+INFO:clipper_benchmarks: Submitted 21060000 requests
+INFO:clipper_benchmarks: Submitted 21080000 requests
+INFO:clipper_benchmarks: Submitted 21100000 requests
+INFO:clipper_benchmarks: Submitted 21120000 requests
+INFO:clipper_benchmarks: Submitted 21140000 requests
+INFO:clipper_benchmarks: Submitted 21160000 requests
+INFO:clipper_benchmarks: Submitted 21180000 requests
+INFO:clipper_benchmarks: Submitted 21200000 requests
+INFO:clipper_benchmarks: Submitted 21220000 requests
+INFO:clipper_benchmarks: Submitted 21240000 requests
+INFO:clipper_benchmarks: Submitted 21260000 requests
+INFO:clipper_benchmarks: Submitted 21280000 requests
+INFO:clipper_benchmarks: Submitted 21300000 requests
+INFO:clipper_benchmarks: Submitted 21320000 requests
+INFO:clipper_benchmarks: Submitted 21340000 requests
+INFO:clipper_benchmarks: Submitted 21360000 requests
+INFO:clipper_benchmarks: Submitted 21380000 requests
+INFO:clipper_benchmarks: Submitted 21400000 requests
+INFO:clipper_benchmarks: Submitted 21420000 requests
+INFO:clipper_benchmarks: Submitted 21440000 requests
+INFO:clipper_benchmarks: Submitted 21460000 requests
+INFO:clipper_benchmarks: Submitted 21480000 requests
+INFO:clipper_benchmarks: Submitted 21500000 requests
+INFO:clipper_benchmarks: Submitted 21520000 requests
+INFO:clipper_benchmarks: Submitted 21540000 requests
+INFO:clipper_benchmarks: Submitted 21560000 requests
+INFO:clipper_benchmarks: Submitted 21580000 requests
+INFO:clipper_benchmarks: Submitted 21600000 requests
+INFO:clipper_benchmarks: Submitted 21620000 requests
+INFO:clipper_benchmarks: Submitted 21640000 requests
+INFO:clipper_benchmarks: Submitted 21660000 requests
+INFO:clipper_benchmarks: Submitted 21680000 requests
+INFO:clipper_benchmarks: Submitted 21700000 requests
+INFO:clipper_benchmarks: Submitted 21720000 requests
+INFO:clipper_benchmarks: Submitted 21740000 requests
+INFO:clipper_benchmarks: Submitted 21760000 requests
+INFO:clipper_benchmarks: Submitted 21780000 requests
+INFO:clipper_benchmarks: Submitted 21800000 requests
+INFO:clipper_benchmarks: Submitted 21820000 requests
+INFO:clipper_benchmarks: Submitted 21840000 requests
+INFO:clipper_benchmarks: Submitted 21860000 requests
+INFO:clipper_benchmarks: Submitted 21880000 requests
+INFO:clipper_benchmarks: Submitted 21900000 requests
+INFO:clipper_benchmarks: Submitted 21920000 requests
+INFO:clipper_benchmarks: Submitted 21940000 requests
+INFO:clipper_benchmarks: Submitted 21960000 requests
+INFO:clipper_benchmarks: Submitted 21980000 requests
+INFO:clipper_benchmarks: Submitted 22000000 requests
+INFO:clipper_benchmarks: Submitted 22020000 requests
+INFO:clipper_benchmarks: Submitted 22040000 requests
+INFO:clipper_benchmarks: Submitted 22060000 requests
+INFO:clipper_benchmarks: Submitted 22080000 requests
+INFO:clipper_benchmarks: Submitted 22100000 requests
+INFO:clipper_benchmarks: Submitted 22120000 requests
+INFO:clipper_benchmarks: Submitted 22140000 requests
+INFO:clipper_benchmarks: Submitted 22160000 requests
+INFO:clipper_benchmarks: Submitted 22180000 requests
+INFO:clipper_benchmarks: Submitted 22200000 requests
+INFO:clipper_benchmarks: Submitted 22220000 requests
+INFO:clipper_benchmarks: Submitted 22240000 requests
+INFO:clipper_benchmarks: Submitted 22260000 requests
+INFO:clipper_benchmarks: Submitted 22280000 requests
+INFO:clipper_benchmarks: Submitted 22300000 requests
+INFO:clipper_benchmarks: Submitted 22320000 requests
+INFO:clipper_benchmarks: Submitted 22340000 requests
+INFO:clipper_benchmarks: Submitted 22360000 requests
+INFO:clipper_benchmarks: Submitted 22380000 requests
+INFO:clipper_benchmarks: Submitted 22400000 requests
+INFO:clipper_benchmarks: Submitted 22420000 requests
+INFO:clipper_benchmarks: Submitted 22440000 requests
+INFO:clipper_benchmarks: Submitted 22460000 requests
+INFO:clipper_benchmarks: Submitted 22480000 requests
+INFO:clipper_benchmarks: Submitted 22500000 requests
+INFO:clipper_benchmarks: Submitted 22520000 requests
+INFO:clipper_benchmarks: Submitted 22540000 requests
+INFO:clipper_benchmarks: Submitted 22560000 requests
+INFO:clipper_benchmarks: Submitted 22580000 requests
+INFO:clipper_benchmarks: Submitted 22600000 requests
+INFO:clipper_benchmarks: Submitted 22620000 requests
+INFO:clipper_benchmarks: Submitted 22640000 requests
+INFO:clipper_benchmarks: Submitted 22660000 requests
+INFO:clipper_benchmarks: Submitted 22680000 requests
+INFO:clipper_benchmarks: Submitted 22700000 requests
+INFO:clipper_benchmarks: Submitted 22720000 requests
+INFO:clipper_benchmarks: Submitted 22740000 requests
+INFO:clipper_benchmarks: Submitted 22760000 requests
+INFO:clipper_benchmarks: Submitted 22780000 requests
+INFO:clipper_benchmarks: Submitted 22800000 requests
+INFO:clipper_benchmarks: Submitted 22820000 requests
+INFO:clipper_benchmarks: Submitted 22840000 requests
+INFO:clipper_benchmarks: Submitted 22860000 requests
+INFO:clipper_benchmarks: Submitted 22880000 requests
+INFO:clipper_benchmarks: Submitted 22900000 requests
+INFO:clipper_benchmarks: Submitted 22920000 requests
+INFO:clipper_benchmarks: {
+  "name": "12_reps_isolation_ON_160915-145704",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 11567998
+    },
+    {
+      "name": "queued_predictions",
+      "count": 11358962
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "linear_svm:prediction_counter",
+      "count": 22656195
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:prediction_counter",
+      "count": 1917566
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:prediction_counter",
+      "count": 1892130
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:prediction_counter",
+      "count": 1896821
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:prediction_counter",
+      "count": 1890994
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:prediction_counter",
+      "count": 1886682
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:prediction_counter",
+      "count": 1881981
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:prediction_counter",
+      "count": 1887321
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:prediction_counter",
+      "count": 1875962
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:prediction_counter",
+      "count": 1900955
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:prediction_counter",
+      "count": 1877564
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:prediction_counter",
+      "count": 1882440
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:prediction_counter",
+      "count": 1865779
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 2967695
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 8600303
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 3.9255107296639026e-7
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.7523731418349139
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 84170,
+      "max": 69067734,
+      "mean": 34633813.49100195,
+      "std": 20219352.132881229,
+      "p95": 65765192.25,
+      "p99": 68455540.41,
+      "p50": 35585886.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 513,
+      "max": 9840,
+      "mean": 2218.700024319066,
+      "std": 761.9823489654989,
+      "p95": 3469.5499999999994,
+      "p99": 3686.51,
+      "p50": 2206.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.607976653696498,
+      "std": 0.48826121970885885,
+      "p95": 1.0,
+      "p99": 1.0,
+      "p50": 1.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "linear_svm:model_latency",
+      "min": 291,
+      "max": 8914,
+      "mean": 2389.1821498054475,
+      "std": 386.2664832428622,
+      "p95": 2772.0,
+      "p99": 3054.75,
+      "p50": 2480.0
+    },
+    {
+      "name": "linear_svm:model_batch_size",
+      "min": 1,
+      "max": 79,
+      "mean": 38.34399319066148,
+      "std": 5.769223566886464,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_latency",
+      "min": 369,
+      "max": 3804,
+      "mean": 2384.6493190661478,
+      "std": 367.0170398719778,
+      "p95": 2765.0,
+      "p99": 3005.75,
+      "p50": 2472.0
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_batch_size",
+      "min": 1,
+      "max": 90,
+      "mean": 38.78757295719844,
+      "std": 5.895559146719365,
+      "p95": 47.0,
+      "p99": 50.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_latency",
+      "min": 316,
+      "max": 4851,
+      "mean": 2383.150656614786,
+      "std": 375.9028290998423,
+      "p95": 2761.0,
+      "p99": 3046.5,
+      "p50": 2474.0
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_batch_size",
+      "min": 2,
+      "max": 58,
+      "mean": 38.43263618677043,
+      "std": 5.813727380490007,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_latency",
+      "min": 285,
+      "max": 10160,
+      "mean": 2380.376094357977,
+      "std": 394.4569344107471,
+      "p95": 2774.0,
+      "p99": 3065.25,
+      "p50": 2474.0
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 68,
+      "mean": 38.500972762645918,
+      "std": 5.689137784314635,
+      "p95": 46.0,
+      "p99": 50.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_latency",
+      "min": 304,
+      "max": 4532,
+      "mean": 2396.9027237354086,
+      "std": 371.19565501066168,
+      "p95": 2774.0,
+      "p99": 3028.75,
+      "p50": 2491.0
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_batch_size",
+      "min": 1,
+      "max": 68,
+      "mean": 38.28100680933852,
+      "std": 5.805845591590137,
+      "p95": 46.0,
+      "p99": 50.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_latency",
+      "min": 301,
+      "max": 5671,
+      "mean": 2380.748540856031,
+      "std": 388.9960936043092,
+      "p95": 2758.0,
+      "p99": 3036.5,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_batch_size",
+      "min": 1,
+      "max": 53,
+      "mean": 38.4505107003891,
+      "std": 5.732089287938288,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_latency",
+      "min": 353,
+      "max": 8716,
+      "mean": 2379.230909533074,
+      "std": 388.05309274017,
+      "p95": 2768.0,
+      "p99": 3009.0,
+      "p50": 2472.5
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_batch_size",
+      "min": 1,
+      "max": 65,
+      "mean": 38.16330252918288,
+      "std": 5.725613013113356,
+      "p95": 46.0,
+      "p99": 50.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_latency",
+      "min": 325,
+      "max": 7648,
+      "mean": 2383.8435068093388,
+      "std": 376.7616156701101,
+      "p95": 2768.0,
+      "p99": 3007.75,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_batch_size",
+      "min": 2,
+      "max": 77,
+      "mean": 38.31699902723735,
+      "std": 5.676625476563139,
+      "p95": 46.0,
+      "p99": 50.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_latency",
+      "min": 339,
+      "max": 6464,
+      "mean": 2380.5404912451365,
+      "std": 396.8763190990476,
+      "p95": 2769.0,
+      "p99": 3037.75,
+      "p50": 2484.0
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_batch_size",
+      "min": 1,
+      "max": 56,
+      "mean": 38.150291828793779,
+      "std": 5.798411714785096,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_latency",
+      "min": 367,
+      "max": 7837,
+      "mean": 2386.29109922179,
+      "std": 380.0214352762522,
+      "p95": 2763.75,
+      "p99": 2996.25,
+      "p50": 2478.0
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_batch_size",
+      "min": 1,
+      "max": 67,
+      "mean": 38.639713035019457,
+      "std": 5.658439167330473,
+      "p95": 46.0,
+      "p99": 50.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_latency",
+      "min": 214,
+      "max": 3923,
+      "mean": 2390.8242947470819,
+      "std": 378.89208086084718,
+      "p95": 2778.0,
+      "p99": 3056.0,
+      "p50": 2486.0
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_batch_size",
+      "min": 3,
+      "max": 63,
+      "mean": 38.0278453307393,
+      "std": 5.766701744604286,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_latency",
+      "min": 258,
+      "max": 4383,
+      "mean": 2399.206225680934,
+      "std": 370.66783129627057,
+      "p95": 2779.0,
+      "p99": 3078.75,
+      "p50": 2490.0
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_batch_size",
+      "min": 1,
+      "max": 85,
+      "mean": 38.24136673151751,
+      "std": 5.930275967930233,
+      "p95": 46.0,
+      "p99": 51.0,
+      "p50": 39.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_latency",
+      "min": 296,
+      "max": 4459,
+      "mean": 2385.042436770428,
+      "std": 385.71706932538077,
+      "p95": 2768.0,
+      "p99": 3046.25,
+      "p50": 2480.0
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_batch_size",
+      "min": 3,
+      "max": 54,
+      "mean": 37.89080739299611,
+      "std": 5.681244117657721,
+      "p95": 46.0,
+      "p99": 49.0,
+      "p50": 38.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 82570.57611171862,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:model_thruput",
+      "rate": 161694.96400530224,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.11:6001:model_thruput",
+      "rate": 13685.473900087432,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.12:6001:model_thruput",
+      "rate": 13503.939749960331,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.5:6001:model_thruput",
+      "rate": 13537.418940801905,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.6:6001:model_thruput",
+      "rate": 13495.832136951258,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.8:6001:model_thruput",
+      "rate": 13465.057830859047,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.9:6001:model_thruput",
+      "rate": 13431.507271271968,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.7:6001:model_thruput",
+      "rate": 13469.618308965013,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.13:6001:model_thruput",
+      "rate": 13388.550183982461,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.4:6001:model_thruput",
+      "rate": 13566.922685530079,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.10:6001:model_thruput",
+      "rate": 13399.983495208775,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.14:6001:model_thruput",
+      "rate": 13434.783011775262,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:172.21.0.15:6001:model_thruput",
+      "rate": 13315.87514764191,
+      "unit": "events per second"
+    },
+    {
+      "name": "linear_svm:cache_included_thruput",
+      "rate": 49449.769039406805,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 22940000 requests
+INFO:clipper_benchmarks: Submitted 22960000 requests
+INFO:clipper_benchmarks: Submitted 22980000 requests
+INFO:clipper_benchmarks: Submitted 23000000 requests
+INFO:clipper_benchmarks: Submitted 23020000 requests
+INFO:clipper_benchmarks: Submitted 23040000 requests
+INFO:clipper_benchmarks: Submitted 23060000 requests
+INFO:clipper_benchmarks: Submitted 23080000 requests
+INFO:clipper_benchmarks: Submitted 23100000 requests
+INFO:clipper_benchmarks: Submitted 23120000 requests
+INFO:clipper_benchmarks: Submitted 23140000 requests
+INFO:clipper_benchmarks: Submitted 23160000 requests
+INFO:clipper_benchmarks: Submitted 23180000 requests
+INFO:clipper_benchmarks: Submitted 23200000 requests
+INFO:clipper_benchmarks: Submitted 23220000 requests
+INFO:clipper_benchmarks: Submitted 23240000 requests
+INFO:clipper_benchmarks: Submitted 23260000 requests
+INFO:clipper_benchmarks: Submitted 23280000 requests
+INFO:clipper_benchmarks: Submitted 23300000 requests
+INFO:clipper_benchmarks: Submitted 23320000 requests
+INFO:clipper_benchmarks: Submitted 23340000 requests
+INFO:clipper_benchmarks: Submitted 23360000 requests
+INFO:clipper_benchmarks: Submitted 23380000 requests
+INFO:clipper_benchmarks: Submitted 23400000 requests
+INFO:clipper_benchmarks: Submitted 23420000 requests
+INFO:clipper_benchmarks: Submitted 23440000 requests
+INFO:clipper_benchmarks: Submitted 23460000 requests
+INFO:clipper_benchmarks: Submitted 23480000 requests
+INFO:clipper_benchmarks: Submitted 23500000 requests
+INFO:clipper_benchmarks: Submitted 23520000 requests
+INFO:clipper_benchmarks: Submitted 23540000 requests
+INFO:clipper_benchmarks: Submitted 23560000 requests
+INFO:clipper_benchmarks: Submitted 23580000 requests
+INFO:clipper_benchmarks: Submitted 23600000 requests
+INFO:clipper_benchmarks: Submitted 23620000 requests
+INFO:clipper_benchmarks: Submitted 23640000 requests
+INFO:clipper_benchmarks: Submitted 23660000 requests
+INFO:clipper_benchmarks: Submitted 23680000 requests
+INFO:clipper_benchmarks: Submitted 23700000 requests
+INFO:clipper_benchmarks: Submitted 23720000 requests
+INFO:clipper_benchmarks: Submitted 23740000 requests
+INFO:clipper_benchmarks: Submitted 23760000 requests
+INFO:clipper_benchmarks: Submitted 23780000 requests
+INFO:clipper_benchmarks: Submitted 23800000 requests
+INFO:clipper_benchmarks: Submitted 23820000 requests
+INFO:clipper_benchmarks: Submitted 23840000 requests
+INFO:clipper_benchmarks: Submitted 23860000 requests
+INFO:clipper_benchmarks: Submitted 23880000 requests
+INFO:clipper_benchmarks: Submitted 23900000 requests
+INFO:clipper_benchmarks: Submitted 23920000 requests
+INFO:clipper_benchmarks: Submitted 23940000 requests
+INFO:clipper_benchmarks: Submitted 23960000 requests
+INFO:clipper_benchmarks: Submitted 23980000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/12_reps_isolation_ON_160915-145704_results.json
