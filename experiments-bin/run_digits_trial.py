@@ -388,31 +388,32 @@ def resource_isolation_exp():
     
     # max_local_reps = 2
     for reps in range(1, 13):
-        for isolate_cores in [True, False]:
-            # remote_reps = max(0, reps - max_local_reps)
-            local_reps = reps
-            print("STARTING EXPERIMENT: %d REPLICAS, ISOLATED_CORES: %s" % (local_reps, str(isolate_cores).upper()))
-            time.sleep(5)
-            num_reqs = 2000000*reps
-            debug = ""
-            iso_str = "OFF"
-            if isolate_cores:
-                iso_str = "ON"
+        isolate_cores=False
+        # for isolate_cores in [True, False]:
+        local_reps = reps
+        print("STARTING EXPERIMENT: %d REPLICAS, ISOLATED_CORES: %s" % (local_reps, str(isolate_cores).upper()))
+        time.sleep(5)
+        num_reqs = 2000000*reps
+        debug = ""
+        iso_str = "OFF"
+        if isolate_cores:
+            iso_str = "ON"
 
-            exp_name = "%s%d_reps_isolation_%s" % (debug, local_reps, iso_str)
-            log_dest = "experiments_logs/sklearn_svm_resource_isolation"
-            benchmarker = DigitsBenchmarker(exp_name,
-                                            log_dest,
-                                            target_qps=100000*reps,
-                                            num_requests=num_reqs,
-                                            send_updates=False,
-                                            batch_strategy=bs,
-                                            salt_cache=True,
-                                            track_blocking_latency=True,
-                                            isolate_cores=isolate_cores)
-            # benchmarker.add_spark_svm(name_base="sklearn_svm", local_replicas=local_reps)
-            benchmarker.add_sklearn_linear_svm(num_replicas=local_reps)
-            benchmarker.run_clipper()
+        exp_name = "%s%d_reps_isolation_%s_CORE_BUDGET" % (debug, local_reps, iso_str)
+        log_dest = "experiments_logs/sklearn_svm_resource_isolation"
+        benchmarker = DigitsBenchmarker(exp_name,
+                                        log_dest,
+                                        target_qps=100000*reps,
+                                        num_requests=num_reqs,
+                                        send_updates=False,
+                                        batch_strategy=bs,
+                                        salt_cache=True,
+                                        track_blocking_latency=True,
+                                        isolate_cores=isolate_cores)
+        benchmarker.MAX_CORES = benchmarker.cur_model_core_num + local_reps - 1
+        # benchmarker.add_spark_svm(name_base="sklearn_svm", local_replicas=local_reps)
+        benchmarker.add_sklearn_linear_svm(num_replicas=local_reps)
+        benchmarker.run_clipper()
 
 
 
