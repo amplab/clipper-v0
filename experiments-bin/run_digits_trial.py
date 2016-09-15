@@ -225,7 +225,7 @@ class DigitsBenchmarker:
         self.add_model(name_base, image, mp, container_mp, local_replicas, remote_replicas=remote_replicas, wait_time_nanos=5*1000*1000)
 
 
-    def add_sklearn_linear_svm(self, num_replicas=1, wait_time_nanos=1*1000*1000):
+    def add_sklearn_linear_svm(self, num_replicas=1, wait_time_nanos=3*1000*1000):
         name_base = "linear_svm"
         image = "clipper/sklearn-mw-dev"
         mp = "${CLIPPER_ROOT}/model_wrappers/python/sklearn_models/linearsvm_pred3/",
@@ -400,7 +400,7 @@ def resource_isolation_exp():
                 iso_str = "ON"
 
             exp_name = "%s%d_reps_isolation_%s" % (debug, local_reps, iso_str)
-            log_dest = "experiments_logs/resource_isolation"
+            log_dest = "experiments_logs/sklearn_svm_resource_isolation"
             benchmarker = DigitsBenchmarker(exp_name,
                                             log_dest,
                                             target_qps=100000*reps,
@@ -410,12 +410,13 @@ def resource_isolation_exp():
                                             salt_cache=True,
                                             track_blocking_latency=True,
                                             isolate_cores=isolate_cores)
-            benchmarker.add_spark_svm(name_base="spark_svm", local_replicas=local_reps)
+            # benchmarker.add_spark_svm(name_base="sklearn_svm", local_replicas=local_reps)
+            benchmarker.add_sklearn_linear_svm(num_replicas=local_reps)
             benchmarker.run_clipper()
 
 
 
 if __name__=='__main__':
-    replica_scaling_exp()
+    resource_isolation_exp()
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
