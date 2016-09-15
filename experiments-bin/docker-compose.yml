@@ -1,44 +1,61 @@
 services:
   clipper:
-    cpuset: 2-33
+    cpuset: 2-29
     depends_on: [redis, quantilereg, spark_svm_r0, spark_svm_r1, spark_svm_r2, spark_svm_r3,
-      spark_svm_r4, spark_svm_r5, spark_svm_r6, spark_svm_r7]
+      spark_svm_r4, spark_svm_r5, spark_svm_r6, spark_svm_r7, spark_svm_r8, spark_svm_r9,
+      spark_svm_r10, spark_svm_r11]
     environment: {CLIPPER_BENCH_COMMAND: digits, CLIPPER_CONF_PATH: /tmp/exp_conf.toml}
     image: cl-dev-digits
     volumes: ['${MNIST_PATH}:/mnist_data:ro', '${CLIPPER_ROOT}/exp_conf.toml:/tmp/exp_conf.toml:ro',
-      '${CLIPPER_ROOT}/experiments_logs/replica_scaling:/tmp/benchmarking_logs']
+      '${CLIPPER_ROOT}/experiments_logs/resource_isolation:/tmp/benchmarking_logs']
   quantilereg: {cpuset: 1-1, image: clipper/quantile-reg}
   redis: {cpuset: 0-0, image: 'redis:alpine'}
   spark_svm_r0:
-    cpuset: 34-34
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
   spark_svm_r1:
-    cpuset: 35-35
+    cpuset: 30-47
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r10:
+    cpuset: 30-47
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r11:
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
   spark_svm_r2:
-    cpuset: 36-36
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
   spark_svm_r3:
-    cpuset: 37-37
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
   spark_svm_r4:
-    cpuset: 38-38
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
   spark_svm_r5:
-    cpuset: 39-39
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
   spark_svm_r6:
-    cpuset: 40-40
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
   spark_svm_r7:
-    cpuset: 41-41
+    cpuset: 30-47
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r8:
+    cpuset: 30-47
+    image: clipper/spark-mw-dev
+    volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
+  spark_svm_r9:
+    cpuset: 30-47
     image: clipper/spark-mw-dev
     volumes: ['${CLIPPER_ROOT}/model_wrappers/python/spark_models/svm_predict_3:/model:ro']
 version: '2'

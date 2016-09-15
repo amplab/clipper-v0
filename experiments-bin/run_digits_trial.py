@@ -30,7 +30,7 @@ class DigitsBenchmarker:
                  salt_cache=True,
                  track_blocking_latency=True,
                  batch_strategy = { "strategy": "aimd" },
-                 ):
+                 isolate_cores=True):
         self.remote_node = "c67.millennium.berkeley.edu"
         env.key_filename = "~/.ssh/c70.millenium"
         env.user = "crankshaw"
@@ -40,7 +40,7 @@ class DigitsBenchmarker:
         self.remote_port_start = 7001
         self.MAX_CORES = 47
         # self.NUM_REPS = NUM_REPS
-        self.isolated_cores = True
+        self.isolated_cores = isolate_cores
         # self.experiment_name = "DEBUG_sklearn_logreg_%d_replicas_%s" % (NUM_REPS, str(time.strftime("%y%m%d-%H%M%S")))
         self.experiment_name = "%s_%s" % (experiment_name, str(time.strftime("%y%m%d-%H%M%S")))
         # self.benchmarking_logs = "benchmarking_logs/replica-scaling"
@@ -99,7 +99,7 @@ class DigitsBenchmarker:
                     "redis": {"image": "redis:alpine", "cpuset": self.reserve_cores(1)},
                     "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
                     "clipper": {"image": "cl-dev-digits",
-                        "cpuset": self.reserve_cores(32),
+                        "cpuset": self.reserve_cores(28),
                         "depends_on": ["redis", "quantilereg"],
                         "environment": {
                             "CLIPPER_BENCH_COMMAND": "digits",
@@ -379,9 +379,40 @@ def replica_scaling_exp():
         benchmarker.add_spark_svm(name_base="spark_svm", local_replicas=local_reps, remote_replicas=remote_reps)
         benchmarker.run_clipper()
 
+def resource_isolation_exp():
+    bs = { "strategy": "aimd" }
+    # max_local_reps = 8
+    
+    # max_local_reps = 2
+    for reps in range(1, 13):
+        for isolate_cores in [True, False]:
+            # remote_reps = max(0, reps - max_local_reps)
+            local_reps = reps
+            print("STARTING EXPERIMENT: %d REPLICAS, ISOLATED_CORES: %s" % (local_reps, str(isolate_cores).upper()))
+            time.sleep(5)
+            num_reqs = 2000000*reps
+            debug = ""
+            iso_str = "OFF"
+            if isolate_cores:
+                iso_str = "ON"
+
+            exp_name = "%s%d_reps_isolation_%s" % (debug, local_reps, iso_str)
+            log_dest = "experiments_logs/resource_isolation"
+            benchmarker = DigitsBenchmarker(exp_name,
+                                            log_dest,
+                                            target_qps=100000*reps,
+                                            num_requests=num_reqs,
+                                            send_updates=False,
+                                            batch_strategy=bs,
+                                            salt_cache=True,
+                                            track_blocking_latency=True,
+                                            isolate_cores=isolate_cores)
+            benchmarker.add_spark_svm(name_base="spark_svm", local_replicas=local_reps)
+            benchmarker.run_clipper()
+
 
 
 if __name__=='__main__':
-    replica_scaling_exp()
+    resource_isolation_exp()
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
