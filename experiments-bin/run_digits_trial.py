@@ -30,7 +30,8 @@ class DigitsBenchmarker:
                  salt_cache=True,
                  track_blocking_latency=True,
                  batch_strategy = { "strategy": "aimd" },
-                 isolate_cores=True):
+                 isolate_cores=True,
+                 slo_micros=20000):
         self.remote_node = "192.168.142.68"
         env.key_filename = "~/.ssh/c70.millenium"
         env.user = "crankshaw"
@@ -49,7 +50,7 @@ class DigitsBenchmarker:
 
         self.clipper_conf_dict = {
                 "name" : self.experiment_name,
-                "slo_micros" : 20000,
+                "slo_micros" : slo_micros,
                 "num_message_encodes" : 1,
                 "correction_policy" : "logistic_regression",
                 "use_lsh" : False,
@@ -354,8 +355,9 @@ def straggler_mitigation_exp():
             print("TRIAL %d COMPLETED IN %f SECONDS" % (trial, (trial_end-trial_start).total_seconds()), file=f)
 
 def replica_scaling_exp():
-    bs = { "strategy": "aimd" }
-    max_local_reps = 8
+    # bs = { "strategy": "aimd" }
+    bs = { "strategy": "static", "batch_size": 400 }
+    # max_local_reps = 8
     
     # max_local_reps = 2
     for reps in range(8,17) + range(1,8):

@@ -32,4 +32,5 @@ name = "spark_svm"
 wait_time_nanos = 1000000
 addresses = [ "spark_svm_r0:6001", "spark_svm_r1:6001", "spark_svm_r2:6001", "spark_svm_r3:6001", "spark_svm_r4:6001", "spark_svm_r5:6001", "spark_svm_r6:6001",]
 [batching]
-strategy = "aimd"
+batch_size = 400
+strategy = "static"
