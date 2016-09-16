@@ -1,0 +1,1236 @@
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+track_blocking_latency = true
+input_length = 784
+num_benchmark_requests = 6000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 300000
+name = "3_local_reps_0_remote_reps_160916-162152"
+cache_hit_rate = 0.0
+wait_to_end = false
+send_updates = false
+report_interval_secs = 20
+num_predict_workers = 20
+redis_port = 6379
+cache_size = 10000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+wait_time_nanos = 1000000
+addresses = [ "spark_svm_r0:6001", "spark_svm_r1:6001", "spark_svm_r2:6001",]
+[batching]
+strategy = "aimd"
+INFO:clipper_benchmarks: MNIST data loaded: 10000 points
+INFO:clipper::configuration: spark_svm_r0:6001
+/tmp/exp_conf.toml contains:
+salt_update_cache = true
+num_message_encodes = 1
+use_lsh = false
+window_size = -1
+load_generator = "uniform"
+input_type = "float"
+request_generator = "balanced"
+results_path = "/tmp/benchmarking_logs"
+num_update_workers = 1
+track_blocking_latency = true
+input_length = 784
+num_benchmark_requests = 6000000
+redis_ip = "redis"
+mnist_path = "/mnist_data/test.data"
+bench_batch_size = 100
+target_qps = 300000
+name = "3_local_reps_0_remote_reps_160916-162152"
+cache_hit_rate = 0.0
+wait_to_end = false
+send_updates = false
+report_interval_secs = 20
+num_predict_workers = 20
+redis_port = 6379
+cache_size = 10000000
+slo_micros = 20000
+correction_policy = "logistic_regression"
+salt_cache = true
+[[models]]
+version = 1
+num_outputs = 1
+name = "spark_svm"
+wait_time_nanos = 1000000
+addresses = [ "spark_svm_r0:6001", "spark_svm_r1:6001", "spark_svm_r2:6001",]
+[batching]
+strategy = "aimd"
+INFO:clipper::configuration: spark_svm_r1:6001
+INFO:clipper::configuration: spark_svm_r2:6001
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 0 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 0 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 1 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 1 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 2 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 2 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 3 
+INFO:clipper::server: starting input prediction worker 4 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 3 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 4 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 5 
+INFO:clipper::server: starting prediction worker 6 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 5 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 7 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 6 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 7 
+INFO:clipper::server: starting input prediction worker 9 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 8 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 8 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 10 
+INFO:clipper::server: starting prediction worker 10 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 11 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 9 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 12 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 12 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 11 
+INFO:clipper::server: starting prediction worker 13 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 13 
+INFO:clipper::server: starting input prediction worker 14 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting prediction worker 14 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 15 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 16 
+INFO:clipper::server: starting input prediction worker 15 
+INFO:clipper::cmt: RedisCMT connection string redis://redis:6379/1
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting input prediction worker 17 
+INFO:clipper::server: starting input prediction worker 18 
+INFO:clipper::server: starting prediction worker 19 output thread with 20 ms SLO
+INFO:clipper::server: starting input prediction worker 19 
+INFO:clipper::server: starting prediction worker 18 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 16 output thread with 20 ms SLO
+INFO:clipper::server: starting prediction worker 17 output thread with 20 ms SLO
+INFO:clipper::cmt: RedisUpdateTable connection string redis://redis:6379/2
+INFO:clipper_benchmarks: starting benchmark
+INFO:clipper::cmt: Trying to connect to Redis
+INFO:clipper::server: starting update worker 0
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Couldn't connect to spark_svm model wrapper. Sleeping 1 second
+INFO:clipper::batching: Connected to spark_svm model wrapper at V4(172.19.0.4:6001)
+INFO:clipper::batching: Connected to spark_svm model wrapper at V4(172.19.0.3:6001)
+INFO:clipper::batching: Connected to spark_svm model wrapper at V4(172.19.0.5:6001)
+INFO:clipper_benchmarks: {
+  "name": "3_local_reps_0_remote_reps_160916-162152",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_predictions",
+      "count": 0
+    },
+    {
+      "name": "update_counter",
+      "count": 1
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 5600
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 0
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:prediction_counter",
+      "count": 1867
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:prediction_counter",
+      "count": 1866
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:prediction_counter",
+      "count": 1867
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": null
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 1114681,
+      "max": 1114681,
+      "mean": 1114681.0,
+      "std": null,
+      "p95": 1114681.0,
+      "p99": 1114681.0,
+      "p50": 1114681.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 474,
+      "max": 3583,
+      "mean": 2270.8517857142858,
+      "std": 660.2871399314093,
+      "p95": 3397.0,
+      "p99": 3583.0,
+      "p50": 2265.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 85,
+      "mean": 42.42424242424242,
+      "std": 24.919142895127928,
+      "p95": 81.69999999999999,
+      "p99": 85.0,
+      "p50": 42.0
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_latency",
+      "min": 498,
+      "max": 3486,
+      "mean": 2273.9914301017677,
+      "std": 676.2798021331487,
+      "p95": 3433.0,
+      "p99": 3486.0,
+      "p50": 2180.0
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_batch_size",
+      "min": 1,
+      "max": 85,
+      "mean": 42.43181818181818,
+      "std": 25.103875108328308,
+      "p95": 82.5,
+      "p99": 85.0,
+      "p50": 42.0
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_latency",
+      "min": 474,
+      "max": 3360,
+      "mean": 2246.1495176848877,
+      "std": 630.5955138036251,
+      "p95": 3216.0,
+      "p99": 3360.0,
+      "p50": 2281.0
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_batch_size",
+      "min": 1,
+      "max": 85,
+      "mean": 42.40909090909091,
+      "std": 25.126950399195608,
+      "p95": 82.5,
+      "p99": 85.0,
+      "p50": 42.0
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_latency",
+      "min": 543,
+      "max": 3583,
+      "mean": 2292.401178361007,
+      "std": 672.5282936379156,
+      "p95": 3397.0,
+      "p99": 3583.0,
+      "p50": 2273.0
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 85,
+      "mean": 42.43181818181818,
+      "std": 25.103875108328308,
+      "p95": 82.5,
+      "p99": 85.0,
+      "p50": 42.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.04991165138588185,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 279.5053454149519,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_thruput",
+      "rate": 206.8106845909978,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_thruput",
+      "rate": 206.70341615612069,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_thruput",
+      "rate": 206.81622866009892,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: SPIN TIME: 3333
+INFO:clipper_benchmarks: Submitted 0 requests
+INFO:clipper_benchmarks: Submitted 20000 requests
+INFO:clipper_benchmarks: Submitted 40000 requests
+INFO:clipper_benchmarks: Submitted 60000 requests
+INFO:clipper_benchmarks: Submitted 80000 requests
+INFO:clipper_benchmarks: Submitted 100000 requests
+INFO:clipper_benchmarks: Submitted 120000 requests
+INFO:clipper_benchmarks: Submitted 140000 requests
+INFO:clipper_benchmarks: Submitted 160000 requests
+INFO:clipper_benchmarks: Submitted 180000 requests
+INFO:clipper_benchmarks: Submitted 200000 requests
+INFO:clipper_benchmarks: Submitted 220000 requests
+INFO:clipper_benchmarks: Submitted 240000 requests
+INFO:clipper_benchmarks: Submitted 260000 requests
+INFO:clipper_benchmarks: Submitted 280000 requests
+INFO:clipper_benchmarks: Submitted 300000 requests
+INFO:clipper_benchmarks: Submitted 320000 requests
+INFO:clipper_benchmarks: Submitted 340000 requests
+INFO:clipper_benchmarks: Submitted 360000 requests
+INFO:clipper_benchmarks: Submitted 380000 requests
+INFO:clipper_benchmarks: Submitted 400000 requests
+INFO:clipper_benchmarks: Submitted 420000 requests
+INFO:clipper_benchmarks: Submitted 440000 requests
+INFO:clipper_benchmarks: Submitted 460000 requests
+INFO:clipper_benchmarks: Submitted 480000 requests
+INFO:clipper_benchmarks: Submitted 500000 requests
+INFO:clipper_benchmarks: Submitted 520000 requests
+INFO:clipper_benchmarks: Submitted 540000 requests
+INFO:clipper_benchmarks: Submitted 560000 requests
+INFO:clipper_benchmarks: Submitted 580000 requests
+INFO:clipper_benchmarks: Submitted 600000 requests
+INFO:clipper_benchmarks: Submitted 620000 requests
+INFO:clipper_benchmarks: Submitted 640000 requests
+INFO:clipper_benchmarks: Submitted 660000 requests
+INFO:clipper_benchmarks: Submitted 680000 requests
+INFO:clipper_benchmarks: Submitted 700000 requests
+INFO:clipper_benchmarks: Submitted 720000 requests
+INFO:clipper_benchmarks: Submitted 740000 requests
+INFO:clipper_benchmarks: Submitted 760000 requests
+INFO:clipper_benchmarks: Submitted 780000 requests
+INFO:clipper_benchmarks: Submitted 800000 requests
+INFO:clipper_benchmarks: Submitted 820000 requests
+INFO:clipper_benchmarks: Submitted 840000 requests
+INFO:clipper_benchmarks: Submitted 860000 requests
+INFO:clipper_benchmarks: Submitted 880000 requests
+INFO:clipper_benchmarks: Submitted 900000 requests
+INFO:clipper_benchmarks: Submitted 920000 requests
+INFO:clipper_benchmarks: Submitted 940000 requests
+INFO:clipper_benchmarks: Submitted 960000 requests
+INFO:clipper_benchmarks: Submitted 980000 requests
+INFO:clipper_benchmarks: Submitted 1000000 requests
+INFO:clipper_benchmarks: Submitted 1020000 requests
+INFO:clipper_benchmarks: Submitted 1040000 requests
+INFO:clipper_benchmarks: Submitted 1060000 requests
+INFO:clipper_benchmarks: Submitted 1080000 requests
+INFO:clipper_benchmarks: Submitted 1100000 requests
+INFO:clipper_benchmarks: Submitted 1120000 requests
+INFO:clipper_benchmarks: Submitted 1140000 requests
+INFO:clipper_benchmarks: Submitted 1160000 requests
+INFO:clipper_benchmarks: Submitted 1180000 requests
+INFO:clipper_benchmarks: Submitted 1200000 requests
+INFO:clipper_benchmarks: Submitted 1220000 requests
+INFO:clipper_benchmarks: Submitted 1240000 requests
+INFO:clipper_benchmarks: Submitted 1260000 requests
+INFO:clipper_benchmarks: Submitted 1280000 requests
+INFO:clipper_benchmarks: Submitted 1300000 requests
+INFO:clipper_benchmarks: Submitted 1320000 requests
+INFO:clipper_benchmarks: Submitted 1340000 requests
+INFO:clipper_benchmarks: Submitted 1360000 requests
+INFO:clipper_benchmarks: Submitted 1380000 requests
+INFO:clipper_benchmarks: Submitted 1400000 requests
+INFO:clipper_benchmarks: Submitted 1420000 requests
+INFO:clipper_benchmarks: Submitted 1440000 requests
+INFO:clipper_benchmarks: Submitted 1460000 requests
+INFO:clipper_benchmarks: Submitted 1480000 requests
+INFO:clipper_benchmarks: Submitted 1500000 requests
+INFO:clipper_benchmarks: Submitted 1520000 requests
+INFO:clipper_benchmarks: Submitted 1540000 requests
+INFO:clipper_benchmarks: Submitted 1560000 requests
+INFO:clipper_benchmarks: Submitted 1580000 requests
+INFO:clipper_benchmarks: Submitted 1600000 requests
+INFO:clipper_benchmarks: Submitted 1620000 requests
+INFO:clipper_benchmarks: Submitted 1640000 requests
+INFO:clipper_benchmarks: Submitted 1660000 requests
+INFO:clipper_benchmarks: Submitted 1680000 requests
+INFO:clipper_benchmarks: Submitted 1700000 requests
+INFO:clipper_benchmarks: Submitted 1720000 requests
+INFO:clipper_benchmarks: Submitted 1740000 requests
+INFO:clipper_benchmarks: Submitted 1760000 requests
+INFO:clipper_benchmarks: Submitted 1780000 requests
+INFO:clipper_benchmarks: Submitted 1800000 requests
+INFO:clipper_benchmarks: Submitted 1820000 requests
+INFO:clipper_benchmarks: Submitted 1840000 requests
+INFO:clipper_benchmarks: Submitted 1860000 requests
+INFO:clipper_benchmarks: Submitted 1880000 requests
+INFO:clipper_benchmarks: Submitted 1900000 requests
+INFO:clipper_benchmarks: Submitted 1920000 requests
+INFO:clipper_benchmarks: Submitted 1940000 requests
+INFO:clipper_benchmarks: Submitted 1960000 requests
+INFO:clipper_benchmarks: Submitted 1980000 requests
+INFO:clipper_benchmarks: Submitted 2000000 requests
+INFO:clipper_benchmarks: Submitted 2020000 requests
+INFO:clipper_benchmarks: Submitted 2040000 requests
+INFO:clipper_benchmarks: Submitted 2060000 requests
+INFO:clipper_benchmarks: Submitted 2080000 requests
+INFO:clipper_benchmarks: Submitted 2100000 requests
+INFO:clipper_benchmarks: Submitted 2120000 requests
+INFO:clipper_benchmarks: Submitted 2140000 requests
+INFO:clipper_benchmarks: Submitted 2160000 requests
+INFO:clipper_benchmarks: Submitted 2180000 requests
+INFO:clipper_benchmarks: Submitted 2200000 requests
+INFO:clipper_benchmarks: Submitted 2220000 requests
+INFO:clipper_benchmarks: Submitted 2240000 requests
+INFO:clipper_benchmarks: Submitted 2260000 requests
+INFO:clipper_benchmarks: Submitted 2280000 requests
+INFO:clipper_benchmarks: Submitted 2300000 requests
+INFO:clipper_benchmarks: {
+  "name": "3_local_reps_0_remote_reps_160916-162152",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 1842605
+    },
+    {
+      "name": "queued_predictions",
+      "count": 462259
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 1670974
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 1836605
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 6000
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:prediction_counter",
+      "count": 577037
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:prediction_counter",
+      "count": 557447
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:prediction_counter",
+      "count": 536490
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5029431142631686
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 17352,
+      "max": 4248761,
+      "mean": 2009321.842655642,
+      "std": 1103159.0402115987,
+      "p95": 3841667.0,
+      "p99": 4049696.6999999999,
+      "p50": 2064889.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 10102,
+      "max": 5646942,
+      "mean": 2793787.690418288,
+      "std": 1542397.7180968985,
+      "p95": 5207043.649999999,
+      "p99": 5482124.08,
+      "p50": 2931357.5
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.008754863813229572,
+      "std": 0.09316827328732774,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 1230,
+      "max": 31397,
+      "mean": 14579.964737354085,
+      "std": 3160.2781657790117,
+      "p95": 18612.0,
+      "p99": 21631.0,
+      "p50": 14956.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 861,
+      "mean": 568.8316326530612,
+      "std": 209.15005468646943,
+      "p95": 782.0,
+      "p99": 836.1800000000003,
+      "p50": 648.5
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_latency",
+      "min": 1171,
+      "max": 31397,
+      "mean": 14711.233098249028,
+      "std": 3250.5120075300526,
+      "p95": 18712.0,
+      "p99": 21073.0,
+      "p50": 15192.0
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_batch_size",
+      "min": 3,
+      "max": 861,
+      "mean": 585.8243654822335,
+      "std": 217.43317966010168,
+      "p95": 804.6999999999999,
+      "p99": 855.28,
+      "p50": 671.0
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_latency",
+      "min": 1005,
+      "max": 26161,
+      "mean": 14878.618312256809,
+      "std": 3115.5168056324234,
+      "p95": 18458.0,
+      "p99": 21839.0,
+      "p50": 15510.0
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_batch_size",
+      "min": 1,
+      "max": 816,
+      "mean": 576.0030959752322,
+      "std": 217.0689016148012,
+      "p95": 790.0,
+      "p99": 808.0,
+      "p50": 660.0
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_latency",
+      "min": 988,
+      "max": 25703,
+      "mean": 14106.364421206226,
+      "std": 2983.5372344966306,
+      "p95": 18667.0,
+      "p99": 21016.0,
+      "p50": 14105.0
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 727,
+      "mean": 544.8083164300203,
+      "std": 189.91773472012458,
+      "p95": 697.0,
+      "p99": 715.13,
+      "p50": 633.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 92124.89550742136,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 83582.30125223141,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_thruput",
+      "rate": 28839.446154209072,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_thruput",
+      "rate": 27895.352209014905,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_thruput",
+      "rate": 26847.501547209467,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:cache_included_thruput",
+      "rate": 839.3227852150533,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 2320000 requests
+INFO:clipper_benchmarks: Submitted 2340000 requests
+INFO:clipper_benchmarks: Submitted 2360000 requests
+INFO:clipper_benchmarks: Submitted 2380000 requests
+INFO:clipper_benchmarks: Submitted 2400000 requests
+INFO:clipper_benchmarks: Submitted 2420000 requests
+INFO:clipper_benchmarks: Submitted 2440000 requests
+INFO:clipper_benchmarks: Submitted 2460000 requests
+INFO:clipper_benchmarks: Submitted 2480000 requests
+INFO:clipper_benchmarks: Submitted 2500000 requests
+INFO:clipper_benchmarks: Submitted 2520000 requests
+INFO:clipper_benchmarks: Submitted 2540000 requests
+INFO:clipper_benchmarks: Submitted 2560000 requests
+INFO:clipper_benchmarks: Submitted 2580000 requests
+INFO:clipper_benchmarks: Submitted 2600000 requests
+INFO:clipper_benchmarks: Submitted 2620000 requests
+INFO:clipper_benchmarks: Submitted 2640000 requests
+INFO:clipper_benchmarks: Submitted 2660000 requests
+INFO:clipper_benchmarks: Submitted 2680000 requests
+INFO:clipper_benchmarks: Submitted 2700000 requests
+INFO:clipper_benchmarks: Submitted 2720000 requests
+INFO:clipper_benchmarks: Submitted 2740000 requests
+INFO:clipper_benchmarks: Submitted 2760000 requests
+INFO:clipper_benchmarks: Submitted 2780000 requests
+INFO:clipper_benchmarks: Submitted 2800000 requests
+INFO:clipper_benchmarks: Submitted 2820000 requests
+INFO:clipper_benchmarks: Submitted 2840000 requests
+INFO:clipper_benchmarks: Submitted 2860000 requests
+INFO:clipper_benchmarks: Submitted 2880000 requests
+INFO:clipper_benchmarks: Submitted 2900000 requests
+INFO:clipper_benchmarks: Submitted 2920000 requests
+INFO:clipper_benchmarks: Submitted 2940000 requests
+INFO:clipper_benchmarks: Submitted 2960000 requests
+INFO:clipper_benchmarks: Submitted 2980000 requests
+INFO:clipper_benchmarks: Submitted 3000000 requests
+INFO:clipper_benchmarks: Submitted 3020000 requests
+INFO:clipper_benchmarks: Submitted 3040000 requests
+INFO:clipper_benchmarks: Submitted 3060000 requests
+INFO:clipper_benchmarks: Submitted 3080000 requests
+INFO:clipper_benchmarks: Submitted 3100000 requests
+INFO:clipper_benchmarks: Submitted 3120000 requests
+INFO:clipper_benchmarks: Submitted 3140000 requests
+INFO:clipper_benchmarks: Submitted 3160000 requests
+INFO:clipper_benchmarks: Submitted 3180000 requests
+INFO:clipper_benchmarks: Submitted 3200000 requests
+INFO:clipper_benchmarks: Submitted 3220000 requests
+INFO:clipper_benchmarks: Submitted 3240000 requests
+INFO:clipper_benchmarks: Submitted 3260000 requests
+INFO:clipper_benchmarks: Submitted 3280000 requests
+INFO:clipper_benchmarks: Submitted 3300000 requests
+INFO:clipper_benchmarks: Submitted 3320000 requests
+INFO:clipper_benchmarks: Submitted 3340000 requests
+INFO:clipper_benchmarks: Submitted 3360000 requests
+INFO:clipper_benchmarks: Submitted 3380000 requests
+INFO:clipper_benchmarks: Submitted 3400000 requests
+INFO:clipper_benchmarks: Submitted 3420000 requests
+INFO:clipper_benchmarks: Submitted 3440000 requests
+INFO:clipper_benchmarks: Submitted 3460000 requests
+INFO:clipper_benchmarks: Submitted 3480000 requests
+INFO:clipper_benchmarks: Submitted 3500000 requests
+INFO:clipper_benchmarks: Submitted 3520000 requests
+INFO:clipper_benchmarks: Submitted 3540000 requests
+INFO:clipper_benchmarks: Submitted 3560000 requests
+INFO:clipper_benchmarks: Submitted 3580000 requests
+INFO:clipper_benchmarks: Submitted 3600000 requests
+INFO:clipper_benchmarks: Submitted 3620000 requests
+INFO:clipper_benchmarks: Submitted 3640000 requests
+INFO:clipper_benchmarks: Submitted 3660000 requests
+INFO:clipper_benchmarks: Submitted 3680000 requests
+INFO:clipper_benchmarks: Submitted 3700000 requests
+INFO:clipper_benchmarks: Submitted 3720000 requests
+INFO:clipper_benchmarks: Submitted 3740000 requests
+INFO:clipper_benchmarks: Submitted 3760000 requests
+INFO:clipper_benchmarks: Submitted 3780000 requests
+INFO:clipper_benchmarks: Submitted 3800000 requests
+INFO:clipper_benchmarks: Submitted 3820000 requests
+INFO:clipper_benchmarks: Submitted 3840000 requests
+INFO:clipper_benchmarks: Submitted 3860000 requests
+INFO:clipper_benchmarks: Submitted 3880000 requests
+INFO:clipper_benchmarks: Submitted 3900000 requests
+INFO:clipper_benchmarks: Submitted 3920000 requests
+INFO:clipper_benchmarks: Submitted 3940000 requests
+INFO:clipper_benchmarks: Submitted 3960000 requests
+INFO:clipper_benchmarks: Submitted 3980000 requests
+INFO:clipper_benchmarks: Submitted 4000000 requests
+INFO:clipper_benchmarks: Submitted 4020000 requests
+INFO:clipper_benchmarks: Submitted 4040000 requests
+INFO:clipper_benchmarks: Submitted 4060000 requests
+INFO:clipper_benchmarks: Submitted 4080000 requests
+INFO:clipper_benchmarks: Submitted 4100000 requests
+INFO:clipper_benchmarks: Submitted 4120000 requests
+INFO:clipper_benchmarks: Submitted 4140000 requests
+INFO:clipper_benchmarks: Submitted 4160000 requests
+INFO:clipper_benchmarks: Submitted 4180000 requests
+INFO:clipper_benchmarks: Submitted 4200000 requests
+INFO:clipper_benchmarks: Submitted 4220000 requests
+INFO:clipper_benchmarks: Submitted 4240000 requests
+INFO:clipper_benchmarks: Submitted 4260000 requests
+INFO:clipper_benchmarks: Submitted 4280000 requests
+INFO:clipper_benchmarks: Submitted 4300000 requests
+INFO:clipper_benchmarks: Submitted 4320000 requests
+INFO:clipper_benchmarks: Submitted 4340000 requests
+INFO:clipper_benchmarks: Submitted 4360000 requests
+INFO:clipper_benchmarks: Submitted 4380000 requests
+INFO:clipper_benchmarks: Submitted 4400000 requests
+INFO:clipper_benchmarks: Submitted 4420000 requests
+INFO:clipper_benchmarks: Submitted 4440000 requests
+INFO:clipper_benchmarks: Submitted 4460000 requests
+INFO:clipper_benchmarks: Submitted 4480000 requests
+INFO:clipper_benchmarks: Submitted 4500000 requests
+INFO:clipper_benchmarks: Submitted 4520000 requests
+INFO:clipper_benchmarks: Submitted 4540000 requests
+INFO:clipper_benchmarks: Submitted 4560000 requests
+INFO:clipper_benchmarks: Submitted 4580000 requests
+INFO:clipper_benchmarks: Submitted 4600000 requests
+INFO:clipper_benchmarks: Submitted 4620000 requests
+INFO:clipper_benchmarks: Submitted 4640000 requests
+INFO:clipper_benchmarks: Submitted 4660000 requests
+INFO:clipper_benchmarks: Submitted 4680000 requests
+INFO:clipper_benchmarks: Submitted 4700000 requests
+INFO:clipper_benchmarks: Submitted 4720000 requests
+INFO:clipper_benchmarks: {
+  "name": "3_local_reps_0_remote_reps_160916-162152",
+  "counters": [
+    {
+      "name": "prediction_counter",
+      "count": 3775960
+    },
+    {
+      "name": "queued_predictions",
+      "count": 951606
+    },
+    {
+      "name": "update_counter",
+      "count": 0
+    },
+    {
+      "name": "queued_updates",
+      "count": 0
+    },
+    {
+      "name": "spark_svm:prediction_counter",
+      "count": 3427065
+    },
+    {
+      "name": "pred_ones_counter",
+      "count": 3769960
+    },
+    {
+      "name": "pred_zeros_counter",
+      "count": 6000
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:prediction_counter",
+      "count": 1161633
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:prediction_counter",
+      "count": 1145882
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:prediction_counter",
+      "count": 1119550
+    }
+  ],
+  "ratio_counters": [
+    {
+      "name": "prediction accuracy ratio",
+      "ratio": null
+    },
+    {
+      "name": "cache_hits",
+      "ratio": 0.0
+    },
+    {
+      "name": "update_cache_hits",
+      "ratio": null
+    },
+    {
+      "name": "digits accuracy ratio",
+      "ratio": 0.5014248032288478
+    }
+  ],
+  "histograms": [
+    {
+      "name": "prediction_latency",
+      "min": 21839,
+      "max": 8187448,
+      "mean": 4039309.3049610897,
+      "std": 2268337.8669371495,
+      "p95": 7557591.05,
+      "p99": 7864115.22,
+      "p50": 4112546.0
+    },
+    {
+      "name": "straggler_blocking_prediction_latency",
+      "min": 10102,
+      "max": 10853106,
+      "mean": 5478261.191573444,
+      "std": 3041789.881627948,
+      "p95": 10208045.999999999,
+      "p99": 10641320.24,
+      "p50": 5656019.0
+    },
+    {
+      "name": "in_time_predictions",
+      "min": 0,
+      "max": 1,
+      "mean": 0.0029182879377431909,
+      "std": 0.05394885851109574,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "update_latency",
+      "min": 0,
+      "max": 0,
+      "mean": 0.0,
+      "std": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "p50": 0.0
+    },
+    {
+      "name": "spark_svm:model_latency",
+      "min": 1277,
+      "max": 31397,
+      "mean": 15234.068336575876,
+      "std": 2677.7317709924448,
+      "p95": 18696.25,
+      "p99": 21953.75,
+      "p50": 15484.0
+    },
+    {
+      "name": "spark_svm:model_batch_size",
+      "min": 1,
+      "max": 861,
+      "mean": 640.6926528323052,
+      "std": 177.24844633447087,
+      "p95": 799.0,
+      "p99": 831.0,
+      "p50": 693.0
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_latency",
+      "min": 1241,
+      "max": 31397,
+      "mean": 15175.55240758755,
+      "std": 2609.899299507697,
+      "p95": 18685.0,
+      "p99": 21609.0,
+      "p50": 15314.0
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_batch_size",
+      "min": 3,
+      "max": 861,
+      "mean": 646.4290484140233,
+      "std": 177.1913078536371,
+      "p95": 800.0999999999999,
+      "p99": 851.0,
+      "p50": 701.0
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_latency",
+      "min": 1392,
+      "max": 30574,
+      "mean": 15599.829280155642,
+      "std": 2536.8815555786375,
+      "p95": 18722.75,
+      "p99": 21953.0,
+      "p50": 15925.0
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_batch_size",
+      "min": 1,
+      "max": 845,
+      "mean": 652.5523917995445,
+      "std": 184.56583408389836,
+      "p95": 808.0,
+      "p99": 827.0,
+      "p50": 716.0
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_latency",
+      "min": 988,
+      "max": 26322,
+      "mean": 14896.06602626459,
+      "std": 2632.637564020836,
+      "p95": 18578.0,
+      "p99": 21139.25,
+      "p50": 15100.5
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_batch_size",
+      "min": 1,
+      "max": 816,
+      "mean": 623.3574610244989,
+      "std": 168.56015599609374,
+      "p95": 782.0,
+      "p99": 807.03,
+      "p50": 667.0
+    }
+  ],
+  "meters": [
+    {
+      "name": "prediction_thruput",
+      "rate": 94378.41997520434,
+      "unit": "events per second"
+    },
+    {
+      "name": "update_thruput",
+      "rate": 0.0,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:model_thruput",
+      "rate": 85647.82805901086,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.4:6001:model_thruput",
+      "rate": 29031.06403049635,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.3:6001:model_thruput",
+      "rate": 28637.421382995504,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:172.19.0.5:6001:model_thruput",
+      "rate": 27979.34264551901,
+      "unit": "events per second"
+    },
+    {
+      "name": "spark_svm:cache_included_thruput",
+      "rate": 419.51733978751806,
+      "unit": "events per second"
+    }
+  ]
+}
+INFO:clipper_benchmarks: Submitted 4740000 requests
+INFO:clipper_benchmarks: Submitted 4760000 requests
+INFO:clipper_benchmarks: Submitted 4780000 requests
+INFO:clipper_benchmarks: Submitted 4800000 requests
+INFO:clipper_benchmarks: Submitted 4820000 requests
+INFO:clipper_benchmarks: Submitted 4840000 requests
+INFO:clipper_benchmarks: Submitted 4860000 requests
+INFO:clipper_benchmarks: Submitted 4880000 requests
+INFO:clipper_benchmarks: Submitted 4900000 requests
+INFO:clipper_benchmarks: Submitted 4920000 requests
+INFO:clipper_benchmarks: Submitted 4940000 requests
+INFO:clipper_benchmarks: Submitted 4960000 requests
+INFO:clipper_benchmarks: Submitted 4980000 requests
+INFO:clipper_benchmarks: Submitted 5000000 requests
+INFO:clipper_benchmarks: Submitted 5020000 requests
+INFO:clipper_benchmarks: Submitted 5040000 requests
+INFO:clipper_benchmarks: Submitted 5060000 requests
+INFO:clipper_benchmarks: Submitted 5080000 requests
+INFO:clipper_benchmarks: Submitted 5100000 requests
+INFO:clipper_benchmarks: Submitted 5120000 requests
+INFO:clipper_benchmarks: Submitted 5140000 requests
+INFO:clipper_benchmarks: Submitted 5160000 requests
+INFO:clipper_benchmarks: Submitted 5180000 requests
+INFO:clipper_benchmarks: Submitted 5200000 requests
+INFO:clipper_benchmarks: Submitted 5220000 requests
+INFO:clipper_benchmarks: Submitted 5240000 requests
+INFO:clipper_benchmarks: Submitted 5260000 requests
+INFO:clipper_benchmarks: Submitted 5280000 requests
+INFO:clipper_benchmarks: Submitted 5300000 requests
+INFO:clipper_benchmarks: Submitted 5320000 requests
+INFO:clipper_benchmarks: Submitted 5340000 requests
+INFO:clipper_benchmarks: Submitted 5360000 requests
+INFO:clipper_benchmarks: Submitted 5380000 requests
+INFO:clipper_benchmarks: Submitted 5400000 requests
+INFO:clipper_benchmarks: Submitted 5420000 requests
+INFO:clipper_benchmarks: Submitted 5440000 requests
+INFO:clipper_benchmarks: Submitted 5460000 requests
+INFO:clipper_benchmarks: Submitted 5480000 requests
+INFO:clipper_benchmarks: Submitted 5500000 requests
+INFO:clipper_benchmarks: Submitted 5520000 requests
+INFO:clipper_benchmarks: Submitted 5540000 requests
+INFO:clipper_benchmarks: Submitted 5560000 requests
+INFO:clipper_benchmarks: Submitted 5580000 requests
+INFO:clipper_benchmarks: Submitted 5600000 requests
+INFO:clipper_benchmarks: Submitted 5620000 requests
+INFO:clipper_benchmarks: Submitted 5640000 requests
+INFO:clipper_benchmarks: Submitted 5660000 requests
+INFO:clipper_benchmarks: Submitted 5680000 requests
+INFO:clipper_benchmarks: Submitted 5700000 requests
+INFO:clipper_benchmarks: Submitted 5720000 requests
+INFO:clipper_benchmarks: Submitted 5740000 requests
+INFO:clipper_benchmarks: Submitted 5760000 requests
+INFO:clipper_benchmarks: Submitted 5780000 requests
+INFO:clipper_benchmarks: Submitted 5800000 requests
+INFO:clipper_benchmarks: Submitted 5820000 requests
+INFO:clipper_benchmarks: Submitted 5840000 requests
+INFO:clipper_benchmarks: Submitted 5860000 requests
+INFO:clipper_benchmarks: Submitted 5880000 requests
+INFO:clipper_benchmarks: Submitted 5900000 requests
+INFO:clipper_benchmarks: Submitted 5920000 requests
+INFO:clipper_benchmarks: Submitted 5940000 requests
+INFO:clipper_benchmarks: Submitted 5960000 requests
+INFO:clipper_benchmarks: Submitted 5980000 requests
+INFO:clipper_benchmarks: writing results to: /tmp/benchmarking_logs/3_local_reps_0_remote_reps_160916-162152_results.json

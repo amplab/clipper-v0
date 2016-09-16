@@ -31,7 +31,7 @@ class DigitsBenchmarker:
                  track_blocking_latency=True,
                  batch_strategy = { "strategy": "aimd" },
                  isolate_cores=True):
-        self.remote_node = "c67.millennium.berkeley.edu"
+        self.remote_node = "192.168.142.68"
         env.key_filename = "~/.ssh/c70.millenium"
         env.user = "crankshaw"
         env.host_string = self.remote_node
@@ -60,7 +60,7 @@ class DigitsBenchmarker:
                 "redis_ip" : "redis",
                 "redis_port" : 6379,
                 "results_path" : "/tmp/benchmarking_logs",
-                "num_predict_workers" : 24,
+                "num_predict_workers" : 20,
                 "num_update_workers" : 1,
                 "cache_size" : 10000000,
                 "mnist_path" : "/mnist_data/test.data",
@@ -97,10 +97,11 @@ class DigitsBenchmarker:
                 "version": "2",
                 "services": {
                     "redis": {"image": "redis:alpine", "cpuset": self.reserve_cores(1)},
-                    "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
+                    # "quantilereg": {"image": "clipper/quantile-reg", "cpuset": self.reserve_cores(1)},
                     "clipper": {"image": "cl-dev-digits",
                         "cpuset": self.reserve_cores(28),
-                        "depends_on": ["redis", "quantilereg"],
+                        # "depends_on": ["redis", "quantilereg"],
+                        "depends_on": ["redis",],
                         "environment": {
                             "CLIPPER_BENCH_COMMAND": "digits",
                             "CLIPPER_CONF_PATH":"/tmp/exp_conf.toml",
@@ -274,7 +275,7 @@ class DigitsBenchmarker:
             json.dump({"clipper_conf": self.clipper_conf_dict, "docker_compose_conf": self.dc_dict}, f, indent=4)
         
         if len(self.remote_dc_dict["services"]) > 0:
-            self.remote_dc_dir = "/data/sda1/remote-replica-tmp"
+            self.remote_dc_dir = "/data/crankshaw/remote-replica-tmp"
             with cd(self.remote_dc_dir):
                 with open("/tmp/docker-compose.yml", "w") as f:
                     yaml.dump(self.remote_dc_dict, f)
@@ -357,7 +358,7 @@ def replica_scaling_exp():
     max_local_reps = 8
     
     # max_local_reps = 2
-    for reps in [1,] + range(2, 17, 2):
+    for reps in range(8,17) + range(1,8):
         remote_reps = max(0, reps - max_local_reps)
         local_reps = reps - remote_reps
         print("STARTING EXPERIMENT: %d LOCAL AND %d REMOTE REPLICAS" % (local_reps, remote_reps))
@@ -366,7 +367,7 @@ def replica_scaling_exp():
         debug = ""
         # debug = "DEBUG_"
         exp_name = "%s%d_local_reps_%d_remote_reps" % (debug, local_reps, remote_reps)
-        log_dest = "experiments_logs/replica_scaling"
+        log_dest = "experiments_logs/replica_scaling_fast_network"
         benchmarker = DigitsBenchmarker(exp_name,
                                         log_dest,
                                         target_qps=100000*reps,
@@ -413,6 +414,6 @@ def resource_isolation_exp():
 
 
 if __name__=='__main__':
-    resource_isolation_exp()
+    replica_scaling_exp()
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
