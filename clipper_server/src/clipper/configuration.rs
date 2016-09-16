@@ -215,12 +215,20 @@ impl ClipperConf {
                         .as_str()
                         .unwrap()
                         .to_string(),
-            influx_port: influx_port,   
-            influx_ip: influx_ip.clone(),        
-            metrics: Arc::new(RwLock::new(metrics::Registry::new(
-                pc.get("name").unwrap().as_str().unwrap().to_string(),
-                influx_ip.clone(),
-                influx_port))),
+            influx_port: pc.get("influx_port")
+                          .unwrap_or(&Value::Integer(8086))
+                          .as_integer()
+                          .unwrap() as u16,   
+            influx_ip: pc.get("influx_ip")
+                        .unwrap_or(&Value::String("127.0.0.1".to_string()))
+                        .as_str()
+                        .unwrap()
+                        .to_string(),        
+            metrics: Arc::new(RwLock::new(metrics::Registry::new(pc.get("name")
+                                                                   .unwrap()
+                                                                   .as_str()
+                                                                   .unwrap()
+                                                                   .to_string()))),
         };
         conf
     }
@@ -473,10 +481,7 @@ impl ClipperConfBuilder {
             redis_port: self.redis_port,
             influx_ip: self.influx_ip.clone(),
             influx_port: self.influx_port,
-            metrics: Arc::new(RwLock::new(metrics::Registry::new(
-                self.name.clone(),
-                self.influx_ip.clone(),
-                self.influx_port))),
+            metrics: Arc::new(RwLock::new(metrics::Registry::new(self.name.clone()))),
         }
     }
 }
