@@ -1,7 +1,7 @@
 use curl::easy::Easy;
 use std::io::Read;
 use url::{Url, form_urlencoded};
-use metrics::{Counter, Meter};
+use metrics::{Counter, Meter, RatioCounter, Histogram};
 use std::sync::{Arc};
 use time;
 use regex::Regex;
@@ -9,55 +9,93 @@ use regex::Regex;
 //const BASE_URL: &'static str = "http://localhost:8086";
 //const CREATE_DB_BODY: &'static str = "CREATE DATABASE";
 
-pub fn create(db_name: &str) {
-    let url = "http://localhost:8086/query";
+const SECONDS_IN_NANOS: u64 = 1000000000;
+
+pub struct Tsdb {
+	name: String,
+	ip: String,
+	port: u16,
+}
+
+impl Tsdb {
+	pub fn new(name: String, ip: String, port: u16) -> Tsdb {
+		create_influx(&name, &ip, port);
+		Tsdb {
+			name: name.clone(),
+			ip: ip.clone(),
+			port: port,
+		}
+	}
+
+	pub fn new_write(&self) -> Write {
+		Write::new(self)
+	}
+}
+
+fn create_influx(name: &str, ip: &str, port: u16) {
+    let url = format!("http://{}:{}/query", ip, port);
 	let encoded_body = form_urlencoded::Serializer::new(String::new())
-        .append_pair("q", &format!("{} \"{}\"", "CREATE DATABASE", db_name))
+        .append_pair("q", &format!("{} \"{}\"", "CREATE DATABASE", name))
         .finish();
-    send_post_request(url, &encoded_body);
+    send_post_request(&url, &encoded_body);
 }
 
 pub struct Write<'a> {
-	db_name: &'a str,
+	db: &'a Tsdb,
 	timestamp: String,
 	write_ops: Vec<String>,
 }
 
 impl <'a> Write<'a> {
-	pub fn new(db_name: &str) -> Write {
+	fn new(db: &'a Tsdb) -> Write {
 		let sys_time = time::get_time();
-		let ts = ((sys_time.sec as i64) * 1000) + ((sys_time.nsec as i64) / 1000);
+		let ts = ((sys_time.sec as u64) * (SECONDS_IN_NANOS as u64)) + (sys_time.nsec as u64);
 		Write {
-			db_name: db_name,
+			db: db,
 			timestamp: ts.to_string(),
 			write_ops: Vec::new(),
 		}
 	}
 
 	pub fn append_counter(&mut self, counter: &Arc<Counter>) {
-		let op = format!("{} value={} {}", counter.name, counter.value(), self.timestamp);
+		let re = Regex::new(r"\s").unwrap();
+		let name = re.replace_all(&counter.name, "_");
+		let op = format!("{} value={} {}", name, counter.value(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
 	}
 
-	// pub fn append_ratio(&mut self, ratio: &Arc<RatioCounter>) {
-
-	// }
+	pub fn append_ratio(&mut self, ratio: &Arc<RatioCounter>) {
+		let re = Regex::new(r"\s").unwrap();
+		let name = re.replace_all(&ratio.name, "_");
+		let op = format!("{} value={} {}", name, ratio.get_ratio(), self.timestamp);
+		info!("Added influx write op: {}", op);
+		self.write_ops.push(op);
+	}
 
 	pub fn append_meter(&mut self, meter: &Arc<Meter>) {
 		let re = Regex::new(r"\s").unwrap();
 		let unit = format!("units={}", re.replace_all(&meter.unit, "-"));
-		let op = format!("{},{} value={} {}", meter.name, unit, meter.get_rate_secs(), self.timestamp);
+		let name = re.replace_all(&meter.name, "_");
+		let op = format!("{},{} value={} {}", name, unit, meter.get_rate_secs(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
 	}
 
-	// pub fn append_histogram(&mut self, histogram: &Arc<Histogram>) {
-
-	// }
+	pub fn append_histogram(&mut self, hist: &Arc<Histogram>) {
+		let stats = hist.stats();
+		let re = Regex::new(r"\s").unwrap();
+		let name = re.replace_all(&hist.name, "_");
+		let op = 
+			format!(
+				"{} size={},min={},max={},mean={},std={},p95={},p99={},p50={} {}",
+				name, stats.size, stats.min, stats.max, stats.mean, stats.std, stats.p95, stats.p99, stats.p50, self.timestamp);
+		info!("Added influx write op: {}", op);
+		self.write_ops.push(op);
+	}
 
 	pub fn execute(&mut self) {
-		let raw_url = &format!("http://localhost:8086/write?db={}", self.db_name);
+		let raw_url = &format!("http://{}:{}/write?db={}", self.db.ip, self.db.port, self.db.name);
 		let encoded_url = Url::parse(raw_url).unwrap();	
 		let body = self.write_ops.join("\n");
 		send_post_request(encoded_url.as_str(), &body);

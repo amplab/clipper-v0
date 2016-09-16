@@ -3,7 +3,7 @@ use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
-use tsdb;
+use tsdb::{Tsdb};
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
@@ -197,6 +197,7 @@ impl Metric for Meter {
 #[derive(Debug)]
 pub struct HistStats {
     pub name: String,
+    pub size: u64,
     pub min: i64,
     pub max: i64,
     pub mean: f64,
@@ -233,6 +234,7 @@ impl Histogram {
         if sample_size == 0 {
             HistStats {
                 name: self.name.clone(),
+                size: 0,
                 min: 0,
                 max: 0,
                 mean: 0.0,
@@ -254,6 +256,7 @@ impl Histogram {
             var = var / (sample_size - 1) as f64;
             HistStats {
                 name: self.name.clone(),
+                size: sample_size as u64,
                 min: *min,
                 max: *max,
                 mean: mean,
@@ -423,6 +426,7 @@ impl ReservoirSampler {
 
 pub struct Registry {
     pub name: String,
+    db: Tsdb,
     counters: Vec<Arc<Counter>>,
     // sum_counters: Vec<SumCounter>,
     ratio_counters: Vec<Arc<RatioCounter>>,
@@ -433,9 +437,9 @@ pub struct Registry {
 impl Registry {
     pub fn new(name: String) -> Registry {
         // Create a new time series database to store these metrics
-        tsdb::create(&name);
         Registry {
-            name: name,
+            name: name.clone(),
+            db: Tsdb::new(name.clone(), "localhost".to_string(), 8086),
             counters: Vec::new(),
             ratio_counters: Vec::new(),
             histograms: Vec::new(),
@@ -505,12 +509,18 @@ impl Registry {
     }
 
     pub fn persist(&self) {
-        let mut write = tsdb::Write::new(&self.name);
+        let mut write = self.db.new_write();
         for x in self.counters.iter() {
             write.append_counter(x);
         }
         for x in self.meters.iter() {
             write.append_meter(x);
+        }
+        for x in self.ratio_counters.iter() {
+            write.append_ratio(x);
+        }
+        for x in self.histograms.iter() {
+            write.append_histogram(x);
         }
         write.execute();
     }
