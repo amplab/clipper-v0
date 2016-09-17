@@ -435,11 +435,11 @@ pub struct Registry {
 }
 
 impl Registry {
-    pub fn new(name: String) -> Registry {
+    pub fn new(name: String, db_ip: String, db_port: u16) -> Registry {
         // Create a new time series database to store these metrics
         Registry {
             name: name.clone(),
-            db: Tsdb::new(name.clone(), "localhost".to_string(), 8086),
+            db: Tsdb::new(name.clone(), db_ip.to_string(), db_port),
             counters: Vec::new(),
             ratio_counters: Vec::new(),
             histograms: Vec::new(),
