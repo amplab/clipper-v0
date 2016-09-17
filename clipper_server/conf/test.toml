@@ -5,7 +5,7 @@ slo_micros = 10000
 correction_policy = "logistic_regression"
 use_lsh = true
 input_type = "int"
-input_length = 784
+input_length = -1
 window_size = -1
 redis_ip = "127.0.0.1"
 redis_port = 6379
@@ -20,8 +20,7 @@ cache_size = 49999
 
 [[models]]
 name = "m1"
-addresses = ["127.0.0.1:32768"]
-num_outputs = 1
+addresses = ["127.0.0.1:6000"]
 
 # [[models]]
 # name = "m2"

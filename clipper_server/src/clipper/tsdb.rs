@@ -9,7 +9,7 @@ use regex::Regex;
 //const BASE_URL: &'static str = "http://localhost:8086";
 //const CREATE_DB_BODY: &'static str = "CREATE DATABASE";
 
-const SECONDS_IN_NANOS: u64 = 1000000000;
+const NUM_NANOS_PER_SEC: u64 = 1_000_000_000;
 
 pub struct Tsdb {
 	name: String,
@@ -49,7 +49,7 @@ pub struct Write<'a> {
 impl <'a> Write<'a> {
 	fn new(db: &'a Tsdb) -> Write {
 		let sys_time = time::get_time();
-		let ts = ((sys_time.sec as u64) * (SECONDS_IN_NANOS as u64)) + (sys_time.nsec as u64);
+		let ts = ((sys_time.sec as u64) * (NUM_NANOS_PER_SEC as u64)) + (sys_time.nsec as u64);
 		Write {
 			db: db,
 			timestamp: ts.to_string(),
