@@ -252,8 +252,11 @@ impl Histogram {
             let p95 = Histogram::percentile(&snapshot, 0.95);
             let p50 = Histogram::percentile(&snapshot, 0.50);
             let mean = snapshot.iter().fold(0, |acc, &x| acc + x) as f64 / snapshot.len() as f64;
-            let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
-            var = var / (sample_size - 1) as f64;
+            let var: f64 = if sample_size > 1 {
+                snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2)) / (sample_size - 1) as f64
+            } else {
+                0.0
+            };
             HistStats {
                 name: self.name.clone(),
                 size: sample_size as u64,
