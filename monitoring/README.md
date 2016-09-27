@@ -6,8 +6,8 @@
 
 ### Install and start InfluxDB
 
-#### macOS / OSX
-1. From a bash prompt, Execute the following:
+#### macOS / OS X
+1. From a bash prompt, execute the following:
 
   `$ brew update`
 
@@ -17,14 +17,36 @@
 
   `$ influxd`
   
-3. By default, InfluxDB is hosted locally at `http://127.0.0.1` on port `8086`. Enter InfluxDB's address and port number
-within
+3. By default, InfluxDB is hosted locally on port `8086`. Enter InfluxDB's ip address and port number within your Clipper configuration file (`test.toml`, for example) in the corresponding `influx_ip` and `influx_port` fields.
+
+For more information on setting up InfluxDB, see the full [Installation Instructions for OS X](https://docs.influxdata.com/influxdb/v1.0/introduction/installation#mac-os-x).
 
 #### Docker
 
 ### Install and start Grafana
 
 #### macOS / OSX
+1. From a bash prompt, execute the following:
+
+  `$ brew install grafana`
+  
+2. To run Grafana, execute
+
+  `$ brew services start grafana`
+  
+3. By default, Grafana is hosted locally on port `3000`. Visit [http://localhost:3000](http://localhost:3000).
+
+4. Sign up for Grafana by inputting an email address (does not have to be valid when running locally for testing purposes).
+
+5. Click the Grafana logo in the top left corner of the screen, and hover your cursor over the menu item displaying the email address that you signed up with. Select the **New Organization** item (`+` icon).
+
+6. Again, click the Grafana logo and select the **Data Sources** menu item. Click the `Add data source` button. Enter a name for your database, and select "InfluxDB" as the type. Under *Http Settings*, enter the address at which InfluxDB can be accessed ([http://localhost:8086](http://localhost:8086) by default). Under *InfluxDB Details*, enter the name of the database, replacing spaces with dashes (this is important! For example, "clipper test" becomes "clipper-test"). Finally, enter a username and password used to authenticate with InfluxDB; unless you have set up specific credentials for authorization, entering any username and password should work. Click `Save & Test`.
+
+7. Click the Grafana logo and hover your cursor over the **Dashboards** menu item. Select the **Import** item (`+` icon). Click the "Upload .json File" button and select the dashboard JSON template located at `clipper/monitoring/grafana_dashboard.json`. Enter a name for your dashboard and select the InfluxDB data source you added in step 6. Finally, click the `Save & Open` button.
+
+8. You should now see a dashboard that includes visualizations for simple metrics like predictions over time, throughput, and latency.
+
+For more information on getting started with Grafana, see the full [Getting Started Guide](http://docs.grafana.org/guides/gettingstarted/).
 
 #### Docker
 
