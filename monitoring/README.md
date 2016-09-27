@@ -28,7 +28,7 @@ For more information on setting up InfluxDB, see the full [Installation Instruct
 ### Start Clipper
 
 1. Start Redis on the port specified in your `.toml` configuration file of choice.
-2. Begin serving a model wrapper. For example, execute
+2. Begin serving a model wrapper. For example, execute the following from a bash prompt:
 
   `$ python clipper/model_wrappers/python/test_new_rpc.py`
   
@@ -52,7 +52,7 @@ For more information on setting up InfluxDB, see the full [Installation Instruct
 
 5. Click the Grafana logo in the top left corner of the screen, and hover your cursor over the menu item displaying the email address that you signed up with. Select the **New Organization** item (`+` icon).
 
-6. Again, click the Grafana logo and select the **Data Sources** menu item. Click the `Add data source` button. Enter a name for your database, and select "InfluxDB" as the type. Under *Http Settings*, enter the address at which InfluxDB can be accessed ([http://localhost:8086](http://localhost:8086) by default). Under *InfluxDB Details*, enter the name of the database, replacing spaces with dashes (this is important! For example, "clipper test" becomes "clipper-test"). Finally, enter a username and password used to authenticate with InfluxDB; unless you have set up specific credentials for authorization, entering any username and password should work. Click `Save & Test`.
+6. Again, click the Grafana logo and select the **Data Sources** menu item. Click the `Add data source` button. Enter a name for your database, and select "InfluxDB" as the type. Under *Http Settings*, enter the address at which InfluxDB can be accessed ([http://localhost:8086](http://localhost:8086) by default). Under *InfluxDB Details*, enter the name of the database. The database name is the value associated with the `name` field in your `.toml` configuration file; **replace spaces in this name with dashes (for example, "clipper test" becomes "clipper-test")**. Finally, enter a username and password used to authenticate with InfluxDB; unless you have set up specific credentials for authorization, entering any username and password should work. Click `Save & Test`.
 
 7. Click the Grafana logo and hover your cursor over the **Dashboards** menu item. Select the **Import** item (`+` icon). Click the "Upload .json File" button and select the dashboard JSON template located at `clipper/monitoring/grafana_dashboard.json`. Enter a name for your dashboard and select the InfluxDB data source you added in step 6. Finally, click the `Save & Open` button.
 
