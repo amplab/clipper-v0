@@ -6,9 +6,6 @@ use std::sync::{Arc};
 use time;
 use regex::Regex;
 
-//const BASE_URL: &'static str = "http://localhost:8086";
-//const CREATE_DB_BODY: &'static str = "CREATE DATABASE";
-
 const NUM_NANOS_PER_SEC: u64 = 1_000_000_000;
 
 pub struct Tsdb {
@@ -19,9 +16,11 @@ pub struct Tsdb {
 
 impl Tsdb {
 	pub fn new(name: String, ip: String, port: u16) -> Tsdb {
-		create_influx(&name, &ip, port);
+		let re = Regex::new(r"\s").unwrap();
+		let db_name = re.replace_all(&name, "-");
+		create_influx(&db_name, &ip, port);
 		Tsdb {
-			name: name.clone(),
+			name: db_name.clone(),
 			ip: ip.clone(),
 			port: port,
 		}
@@ -32,10 +31,8 @@ impl Tsdb {
 	}
 }
 
-fn create_influx(name: &str, ip: &str, port: u16) {
+fn create_influx(db_name: &str, ip: &str, port: u16) {
     let url = format!("http://{}:{}/query", ip, port);
-    let re = Regex::new(r"\s").unwrap();
-	let db_name = re.replace_all(name, "-");
 	let encoded_body = form_urlencoded::Serializer::new(String::new())
         .append_pair("q", &format!("{} \"{}\"", "CREATE DATABASE", db_name))
         .finish();
