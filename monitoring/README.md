@@ -2,6 +2,8 @@
 
 ## Overview
 
+Clipper regularly reports metrics associated with system performance and model behavior at consistent time intervals. These metrics are stored in a time series database instance, [InfluxDB](https://www.influxdata.com/time-series-platform/influxdb/). To view and analyze these metrics graphically, we use [Grafana](http://grafana.org/), an open-source visualization library compatible with InfluxDB. The following set of instructions will walk you through the process of installing and running InfluxDB and Grafana in conjunction with Clipper.
+
 ## Steps
 
 ### Install and start InfluxDB
@@ -23,9 +25,19 @@ For more information on setting up InfluxDB, see the full [Installation Instruct
 
 #### Docker
 
+### Start Clipper
+
+1. Start Redis on the port specified in your `.toml` configuration file of choice.
+2. Begin serving a model wrapper. For example, execute
+
+  `$ python clipper/model_wrappers/python/test_new_rpc.py`
+  
+3. Execute the following command, replacing `conf/test.toml` with the path to your configuration file if necessary.
+  `$ RUST_LOG=info RUST_BACKTRACE=1 clipper/clipper_server/target/debug/clipper-rest start --conf conf/test.toml`
+
 ### Install and start Grafana
 
-#### macOS / OSX
+#### macOS / OS X
 1. From a bash prompt, execute the following:
 
   `$ brew install grafana`
@@ -34,7 +46,7 @@ For more information on setting up InfluxDB, see the full [Installation Instruct
 
   `$ brew services start grafana`
   
-3. By default, Grafana is hosted locally on port `3000`. Visit [http://localhost:3000](http://localhost:3000).
+3. By default, Grafana is hosted locally on port `3000`. Using your browser of choice, visit [http://localhost:3000](http://localhost:3000).
 
 4. Sign up for Grafana by inputting an email address (does not have to be valid when running locally for testing purposes).
 
