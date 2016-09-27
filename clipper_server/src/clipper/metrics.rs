@@ -528,10 +528,6 @@ impl Registry {
         write.execute();
     }
 
-    // pub fn report_and_reset(&self) -> String {
-    //
-    // }
-
     pub fn reset(&self) {
         for x in self.counters.iter() {
             x.clear();

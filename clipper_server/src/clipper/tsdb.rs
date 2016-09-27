@@ -34,8 +34,10 @@ impl Tsdb {
 
 fn create_influx(name: &str, ip: &str, port: u16) {
     let url = format!("http://{}:{}/query", ip, port);
+    let re = Regex::new(r"\s").unwrap();
+	let db_name = re.replace_all(name, "-");
 	let encoded_body = form_urlencoded::Serializer::new(String::new())
-        .append_pair("q", &format!("{} \"{}\"", "CREATE DATABASE", name))
+        .append_pair("q", &format!("{} \"{}\"", "CREATE DATABASE", db_name))
         .finish();
     send_post_request(&url, &encoded_body);
 }
