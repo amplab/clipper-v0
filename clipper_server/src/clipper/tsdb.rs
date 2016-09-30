@@ -69,7 +69,7 @@ impl <'a> Write<'a> {
 	pub fn append_counter(&mut self, counter: &Arc<Counter>) {
 		let re = Regex::new(r"\s").unwrap();
 		let name = re.replace_all(&counter.name, "_");
-		// Construct the InfluxSQL write operation that should be executed by InfluxDB
+		// Construct the arguments of the InfluxSQL write operation that will be executed
 		let op = format!("{} value={} {}", name, counter.value(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
@@ -78,7 +78,7 @@ impl <'a> Write<'a> {
 	pub fn append_ratio(&mut self, ratio: &Arc<RatioCounter>) {
 		let re = Regex::new(r"\s").unwrap();
 		let name = re.replace_all(&ratio.name, "_");
-		// Construct the InfluxSQL write operation that should be executed by InfluxDB
+		// Construct the arguments of the InfluxSQL write operation that will be executed
 		let op = format!("{} value={} {}", name, ratio.get_ratio(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
@@ -88,7 +88,7 @@ impl <'a> Write<'a> {
 		let re = Regex::new(r"\s").unwrap();
 		let unit = format!("units={}", re.replace_all(&meter.unit, "-"));
 		let name = re.replace_all(&meter.name, "_");
-		// Construct the InfluxSQL write operation that should be executed by InfluxDB
+		// Construct the arguments of the InfluxSQL write operation that will be executed
 		let op = format!("{},{} value={} {}", name, unit, meter.get_rate_secs(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
@@ -98,7 +98,7 @@ impl <'a> Write<'a> {
 		let stats = hist.stats();
 		let re = Regex::new(r"\s").unwrap();
 		let name = re.replace_all(&hist.name, "_");
-		// Construct the InfluxSQL write operation that should be executed by InfluxDB
+		// Construct the arguments of the InfluxSQL write operation that will be executed
 		let op = 
 			format!(
 				"{} size={},min={},max={},mean={},std={},p95={},p99={},p50={} {}",
@@ -112,8 +112,8 @@ impl <'a> Write<'a> {
 	pub fn execute(&mut self) {
 		let raw_url = &format!("http://{}:{}/write?db={}", self.db.ip, self.db.port, self.db.name);
 		let encoded_url = Url::parse(raw_url).unwrap();	
-		// The body of the post request to InfluxDB is a series of InfluxSQL write operations
-		// created via "append" methods, delimited by new lines (one operation per line)
+		// The body of the post request to InfluxDB is a series of InfluxSQL write arguments
+		// created via "append" methods, delimited by new lines (one write argument set per line)
 		let body = self.write_ops.join("\n");
 		match send_post_request(encoded_url.as_str(), &body) {
 			Ok(_) => {},
