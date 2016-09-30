@@ -1,4 +1,5 @@
 use curl::easy::Easy;
+use curl::Error;
 use std::io::Read;
 use url::{Url, form_urlencoded};
 use metrics::{Counter, Meter, RatioCounter, Histogram};
@@ -36,22 +37,31 @@ fn create_influx(db_name: &str, ip: &str, port: u16) {
 	let encoded_body = form_urlencoded::Serializer::new(String::new())
         .append_pair("q", &format!("{} \"{}\"", "CREATE DATABASE", db_name))
         .finish();
-    send_post_request(&url, &encoded_body);
+    match send_post_request(&url, &encoded_body) {
+    	Ok(_) => {},
+    	Err(_) => {
+    		info!("Failed to create influx database! Is Influx running at {} on port {}?", ip, port);
+    	},
+    }
 }
 
 pub struct Write<'a> {
 	db: &'a Tsdb,
-	timestamp: String,
+	timestamp: u64,
 	write_ops: Vec<String>,
 }
 
+/// Implements methods for performing a batch write operation of multiple
+/// metrics to a specified time series database. "Append" methods add new
+/// metrics to be written, and the "execute" method persists the data when
+/// the caller has finished adding metrics.
 impl <'a> Write<'a> {
 	fn new(db: &'a Tsdb) -> Write {
 		let sys_time = time::get_time();
 		let ts = ((sys_time.sec as u64) * (NUM_NANOS_PER_SEC as u64)) + (sys_time.nsec as u64);
 		Write {
 			db: db,
-			timestamp: ts.to_string(),
+			timestamp: ts,
 			write_ops: Vec::new(),
 		}
 	}
@@ -59,6 +69,7 @@ impl <'a> Write<'a> {
 	pub fn append_counter(&mut self, counter: &Arc<Counter>) {
 		let re = Regex::new(r"\s").unwrap();
 		let name = re.replace_all(&counter.name, "_");
+		// Construct the InfluxSQL write operation that should be executed by InfluxDB
 		let op = format!("{} value={} {}", name, counter.value(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
@@ -67,6 +78,7 @@ impl <'a> Write<'a> {
 	pub fn append_ratio(&mut self, ratio: &Arc<RatioCounter>) {
 		let re = Regex::new(r"\s").unwrap();
 		let name = re.replace_all(&ratio.name, "_");
+		// Construct the InfluxSQL write operation that should be executed by InfluxDB
 		let op = format!("{} value={} {}", name, ratio.get_ratio(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
@@ -76,6 +88,7 @@ impl <'a> Write<'a> {
 		let re = Regex::new(r"\s").unwrap();
 		let unit = format!("units={}", re.replace_all(&meter.unit, "-"));
 		let name = re.replace_all(&meter.name, "_");
+		// Construct the InfluxSQL write operation that should be executed by InfluxDB
 		let op = format!("{},{} value={} {}", name, unit, meter.get_rate_secs(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
@@ -85,6 +98,7 @@ impl <'a> Write<'a> {
 		let stats = hist.stats();
 		let re = Regex::new(r"\s").unwrap();
 		let name = re.replace_all(&hist.name, "_");
+		// Construct the InfluxSQL write operation that should be executed by InfluxDB
 		let op = 
 			format!(
 				"{} size={},min={},max={},mean={},std={},p95={},p99={},p50={} {}",
@@ -93,15 +107,24 @@ impl <'a> Write<'a> {
 		self.write_ops.push(op);
 	}
 
+	/// Persists the metrics appended to this write operation to the associated
+	/// time series database (InfluxDB instance). 
 	pub fn execute(&mut self) {
 		let raw_url = &format!("http://{}:{}/write?db={}", self.db.ip, self.db.port, self.db.name);
 		let encoded_url = Url::parse(raw_url).unwrap();	
+		// The body of the post request to InfluxDB is a series of InfluxSQL write operations
+		// created via "append" methods, delimited by new lines (one operation per line)
 		let body = self.write_ops.join("\n");
-		send_post_request(encoded_url.as_str(), &body);
+		match send_post_request(encoded_url.as_str(), &body) {
+			Ok(_) => {},
+			Err(_) => {
+				info!("Failed to write metrics to influx database at {} on port {}", self.db.ip, self.db.port);
+			}
+		}
 	}
 }
 
-fn send_post_request(url: &str, body: &str) {
+fn send_post_request(url: &str, body: &str) -> Result<(), Error> {
 	let mut data = body.as_bytes();
 
 	let mut request = Easy::new();
@@ -109,9 +132,11 @@ fn send_post_request(url: &str, body: &str) {
 	request.post(true).unwrap();
 	request.post_field_size(data.len() as u64).unwrap();
 
+	// Reads data from the CURL request object and 
+	// posts it to the destination specified by the request
 	let mut transfer = request.transfer();
     transfer.read_function(|buf| {
         Ok(data.read(buf).unwrap_or(0))
     }).unwrap();
-    transfer.perform().unwrap();
+    transfer.perform()
 }
