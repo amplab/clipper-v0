@@ -1,4 +1,3 @@
-
 use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
@@ -6,6 +5,12 @@ use std::sync::{RwLock, Arc};
 use tsdb::{Tsdb};
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
+const NUM_NANOS_PER_SEC: i64 = 1_000_000_000;
+const SECONDS_PER_MINUTE: f64 = 60.0;
+const FIVE_SECONDS: f64 = 5.0;
+const ONE_MINUTE: u16 = 1;
+const FIVE_MINUTES: u16 = 5;
+const FIFTEEN_MINUTES: u16 = 15;
 
 trait Metric {
 
@@ -120,10 +125,58 @@ impl RatioCounter {
     }
 }
 
+enum LoadAverage {
+    OneMinute,
+    FiveMinutes,
+    FifteenMinutes,
+}
 
+struct EWMA {
+    uncounted: AtomicUsize,
+    alpha: f64,
+    interval: f64,
+    rate: RwLock<f64>,
+}
 
+impl EWMA {
+    fn new(interval: f64, load_avg: LoadAverage) -> EWMA {
+        let alpha_exp = match load_avg {
+            LoadAverage::OneMinute => (-interval / (SECONDS_PER_MINUTE as f64) / (ONE_MINUTE as f64)).exp(),
+            LoadAverage::FiveMinutes => (-interval / (SECONDS_PER_MINUTE as f64) / (FIVE_MINUTES as f64)).exp(),
+            LoadAverage::FifteenMinutes => (-interval / (SECONDS_PER_MINUTE as f64) / (FIFTEEN_MINUTES as f64)).exp(),
+        };
 
+        EWMA {
+            uncounted: AtomicUsize::new(0),
+            alpha: 1.0 - alpha_exp,
+            interval: interval,
+            rate: RwLock::new(-1.0),
+        }
+    }
 
+    fn tick(&self) {
+        let count = self.uncounted.swap(0, Ordering::Relaxed);
+        let current_rate = (count as f64) / self.interval;
+        match self.rate.write() {
+            Ok(mut rate) => {
+                if *rate == -1.0 {
+                    *rate = current_rate;
+                } else {
+                    *rate = self.alpha * (current_rate - *rate);
+                }
+            },
+            Err(_) => {},
+        }
+    }
+
+    fn mark(&self, num: usize) {
+        self.uncounted.fetch_add(num, Ordering::Relaxed);
+    }
+
+    fn get_rate(&self) -> f64 {
+        *self.rate.read().unwrap()
+    }
+}
 
 /// Measures the rate of an event occurring
 // TODO: add support for exponentially weighted moving averages. See
@@ -133,21 +186,37 @@ pub struct Meter {
     pub name: String,
     pub unit: String,
     start_time: RwLock<time::PreciseTime>,
+    tick_interval: f64,
+    last_tick: AtomicUsize,
     count: AtomicUsize,
+    m1rate: EWMA,
+    m5rate: EWMA,
+    m15rate: EWMA,
 }
 
 impl Meter {
     pub fn new(name: String) -> Meter {
+        let curr_time = time::get_time();
+        let curr_nanos = (curr_time.sec * NUM_NANOS_PER_SEC) + curr_time.nsec as i64;
+        let tick_interval = FIVE_SECONDS as f64;
         Meter {
             name: name,
             unit: "events per second".to_string(),
             start_time: RwLock::new(time::PreciseTime::now()),
+            last_tick: AtomicUsize::new(curr_nanos as usize),
+            tick_interval: tick_interval,
             count: AtomicUsize::new(0),
+            m1rate: EWMA::new(tick_interval, LoadAverage::OneMinute),
+            m5rate: EWMA::new(tick_interval, LoadAverage::FiveMinutes),
+            m15rate: EWMA::new(tick_interval, LoadAverage::FifteenMinutes),
         }
     }
 
     pub fn mark(&self, num: usize) {
         self.count.fetch_add(num, Ordering::Relaxed);
+        self.m1rate.mark(num);
+        self.m5rate.mark(num);
+        self.m15rate.mark(num);
     }
 
     fn get_rate_micros(&self) -> f64 {
@@ -160,6 +229,41 @@ impl Meter {
         let total_micros = whole_secs.num_seconds() * NUM_MICROS_PER_SEC + sub_sec_micros;
         let rate = count as f64 / total_micros as f64;
         rate
+    }
+
+    fn tick_if_necessary(&self) {
+        let curr_time = time::get_time();
+        let curr_nanos = (curr_time.sec * NUM_NANOS_PER_SEC) + curr_time.nsec as i64;
+        let last_tick_nanos = self.last_tick.load(Ordering::SeqCst);
+        let time_since_tick = curr_nanos - last_tick_nanos as i64;
+        let tick_interval_nanos = self.tick_interval as i64 * NUM_NANOS_PER_SEC;
+
+        if time_since_tick > tick_interval_nanos {
+            let new_last_tick = curr_nanos - (time_since_tick % tick_interval_nanos);
+            if self.last_tick.compare_and_swap(last_tick_nanos, new_last_tick as usize, Ordering::SeqCst) == last_tick_nanos {
+                let num_ticks = time_since_tick / tick_interval_nanos;
+                for _ in 0..num_ticks {
+                    self.m1rate.tick();
+                    self.m5rate.tick();
+                    self.m15rate.tick();
+                }
+            }
+        }
+    }
+
+    pub fn get_one_minute_rate(&self) -> f64 {
+        self.tick_if_necessary();
+        self.m1rate.get_rate()
+    }
+
+    pub fn get_five_minute_rate(&self) -> f64 {
+        self.tick_if_necessary();
+        self.m5rate.get_rate()
+    }   
+
+    pub fn get_fifteen_minute_rate(&self) -> f64 {
+        self.tick_if_necessary();
+        self.m15rate.get_rate()
     }
 
     /// Returns the rate of this meter in
