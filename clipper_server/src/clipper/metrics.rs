@@ -3,6 +3,7 @@ use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
+use tsdb::{Tsdb};
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
@@ -56,6 +57,10 @@ impl Counter {
 
     pub fn decr(&self, decrement: isize) {
         self.count.fetch_sub(decrement, Ordering::Relaxed);
+    }
+
+    pub fn value(&self) -> isize {
+        self.count.load(Ordering::SeqCst)
     }
 }
 
@@ -126,6 +131,7 @@ impl RatioCounter {
 // for details.
 pub struct Meter {
     pub name: String,
+    pub unit: String,
     start_time: RwLock<time::PreciseTime>,
     count: AtomicUsize,
 }
@@ -134,6 +140,7 @@ impl Meter {
     pub fn new(name: String) -> Meter {
         Meter {
             name: name,
+            unit: "events per second".to_string(),
             start_time: RwLock::new(time::PreciseTime::now()),
             count: AtomicUsize::new(0),
         }
@@ -181,7 +188,7 @@ impl Metric for Meter {
         let stats = MeterStats {
             name: self.name.clone(),
             rate: self.get_rate_secs(),
-            unit: "events per second".to_string(),
+            unit: self.unit.clone(),
         };
         format!("{:?}", stats)
     }
@@ -190,6 +197,7 @@ impl Metric for Meter {
 #[derive(Debug)]
 pub struct HistStats {
     pub name: String,
+    pub size: u64,
     pub min: i64,
     pub max: i64,
     pub mean: f64,
@@ -226,6 +234,7 @@ impl Histogram {
         if sample_size == 0 {
             HistStats {
                 name: self.name.clone(),
+                size: 0,
                 min: 0,
                 max: 0,
                 mean: 0.0,
@@ -243,10 +252,14 @@ impl Histogram {
             let p95 = Histogram::percentile(&snapshot, 0.95);
             let p50 = Histogram::percentile(&snapshot, 0.50);
             let mean = snapshot.iter().fold(0, |acc, &x| acc + x) as f64 / snapshot.len() as f64;
-            let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
-            var = var / (sample_size - 1) as f64;
+            let var: f64 = if sample_size > 1 {
+                snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2)) / (sample_size - 1) as f64
+            } else {
+                0.0
+            };
             HistStats {
                 name: self.name.clone(),
+                size: sample_size as u64,
                 min: *min,
                 max: *max,
                 mean: mean,
@@ -416,6 +429,7 @@ impl ReservoirSampler {
 
 pub struct Registry {
     pub name: String,
+    db: Tsdb,
     counters: Vec<Arc<Counter>>,
     // sum_counters: Vec<SumCounter>,
     ratio_counters: Vec<Arc<RatioCounter>>,
@@ -424,9 +438,11 @@ pub struct Registry {
 }
 
 impl Registry {
-    pub fn new(name: String) -> Registry {
+    pub fn new(name: String, db_ip: String, db_port: u16) -> Registry {
+        // Create a new time series database to store these metrics
         Registry {
-            name: name,
+            name: name.clone(),
+            db: Tsdb::new(name.clone(), db_ip.to_string(), db_port),
             counters: Vec::new(),
             ratio_counters: Vec::new(),
             histograms: Vec::new(),
@@ -495,9 +511,22 @@ impl Registry {
         report_string
     }
 
-    // pub fn report_and_reset(&self) -> String {
-    //
-    // }
+    pub fn persist(&self) {
+        let mut write = self.db.new_write();
+        for x in self.counters.iter() {
+            write.append_counter(x);
+        }
+        for x in self.meters.iter() {
+            write.append_meter(x);
+        }
+        for x in self.ratio_counters.iter() {
+            write.append_ratio(x);
+        }
+        for x in self.histograms.iter() {
+            write.append_histogram(x);
+        }
+        write.execute();
+    }
 
     pub fn reset(&self) {
         for x in self.counters.iter() {

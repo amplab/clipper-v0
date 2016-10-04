@@ -414,6 +414,7 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
                     thread::sleep(Duration::new(report_interval_secs, 0));
                     let m = metrics_register.read().unwrap();
                     info!("{}", m.report());
+                    m.persist();
                     m.reset();
                 }
                 Err(mpsc::TryRecvError::Disconnected) => break,
