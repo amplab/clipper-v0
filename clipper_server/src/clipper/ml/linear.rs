@@ -169,7 +169,7 @@ impl Parameters {
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct LogisticRegressionModel {
-    pub params: Parameters,
+    // pub params: Parameters,
     pub nr_class: i32,
     pub nr_feature: i32,
     pub w: Vec<f64>,
@@ -182,7 +182,7 @@ impl LogisticRegressionModel {
     fn from_raw(model: *const linear_raw::Struct_model) -> LogisticRegressionModel {
         let safe_model: LogisticRegressionModel = unsafe {
             let _model = LogisticRegressionModel {
-                params: Parameters::from_raw((*model).param),
+                // params: Parameters::from_raw((*model).param),
                 nr_class: (*model).nr_class,
                 nr_feature: (*model).nr_feature,
                 // w: slice::from_raw_parts((*model).w, max_index as usize).to_vec(),
@@ -200,9 +200,22 @@ impl LogisticRegressionModel {
         safe_model
     }
 
+    pub fn new(dim: usize) -> LogisticRegressionModel {
+        LogisticRegressionModel {
+            // params: Parameters::default(),
+            nr_class: 2,
+            nr_feature: dim as i32,
+            w: vec![1.0 / (dim as f64); dim],
+            label: Some(vec![1]),
+            bias: 0.0,
+        }
+
+    }
+
     pub fn logistic_regression_predict(&self, x: &Vec<f64>) -> f64 {
         let dot = linalg::dot(&self.w, x);
         let (pos, neg) = self.get_labels();
+        // info!("pos label: {}, neg label: {}", pos, neg);
         let pred = if dot > 0_f64 {
             pos
         } else {
@@ -250,3 +263,13 @@ pub fn train_logistic_regression(prob: Problem,
     };
     model
 }
+
+
+// #[cfg_attr(rustfmt, rustfmt_skip)]
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//
+//
+// }

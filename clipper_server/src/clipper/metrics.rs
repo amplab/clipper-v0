@@ -3,17 +3,17 @@ use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
-use tsdb::{Tsdb};
+use serde::ser::Serialize;
+use serde::de::Deserialize;
+use serde_json;
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 
-trait Metric {
-
-    fn report(&self) -> String;
+trait Metric<R: Serialize + Deserialize> {
+    fn report(&self) -> R;
 
     /// Must have way to atomically clear state
     fn clear(&self);
-
 }
 
 
@@ -23,23 +23,22 @@ pub struct Counter {
     count: AtomicIsize,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct CounterStats {
     name: String,
     count: isize,
 }
 
-impl Metric for Counter {
+impl Metric<CounterStats> for Counter {
     fn clear(&self) {
         self.count.store(0, Ordering::SeqCst);
     }
 
-    fn report(&self) -> String {
-        let stats = CounterStats {
+    fn report(&self) -> CounterStats {
+        CounterStats {
             name: self.name.clone(),
             count: self.count.load(Ordering::SeqCst),
-        };
-        format!("{:?}", stats)
+        }
     }
 }
 
@@ -58,10 +57,6 @@ impl Counter {
     pub fn decr(&self, decrement: isize) {
         self.count.fetch_sub(decrement, Ordering::Relaxed);
     }
-
-    pub fn value(&self) -> isize {
-        self.count.load(Ordering::SeqCst)
-    }
 }
 
 pub struct RatioCounter {
@@ -70,27 +65,26 @@ pub struct RatioCounter {
     denominator: AtomicUsize,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct RatioStats {
     name: String,
     ratio: f64,
 }
 
-impl Metric for RatioCounter {
+impl Metric<RatioStats> for RatioCounter {
     // TODO: This has a race condition.
     fn clear(&self) {
         self.denominator.store(0, Ordering::SeqCst);
         self.numerator.store(0, Ordering::SeqCst);
     }
 
-    fn report(&self) -> String {
+    fn report(&self) -> RatioStats {
         let ratio = self.numerator.load(Ordering::SeqCst) as f64 /
                     self.denominator.load(Ordering::SeqCst) as f64;
-        let stats = RatioStats {
+        RatioStats {
             name: self.name.clone(),
             ratio: ratio,
-        };
-        format!("{:?}", stats)
+        }
     }
 }
 
@@ -104,7 +98,9 @@ impl RatioCounter {
     }
 
     pub fn incr(&self, n_incr: usize, d_incr: usize) {
-        self.numerator.fetch_add(n_incr, Ordering::Relaxed);
+        if n_incr > 0 {
+            self.numerator.fetch_add(n_incr, Ordering::Relaxed);
+        }
         self.denominator.fetch_add(d_incr, Ordering::Relaxed);
     }
 
@@ -131,7 +127,6 @@ impl RatioCounter {
 // for details.
 pub struct Meter {
     pub name: String,
-    pub unit: String,
     start_time: RwLock<time::PreciseTime>,
     count: AtomicUsize,
 }
@@ -140,7 +135,6 @@ impl Meter {
     pub fn new(name: String) -> Meter {
         Meter {
             name: name,
-            unit: "events per second".to_string(),
             start_time: RwLock::new(time::PreciseTime::now()),
             count: AtomicUsize::new(0),
         }
@@ -169,35 +163,33 @@ impl Meter {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct MeterStats {
     name: String,
     rate: f64,
     unit: String,
 }
 
-impl Metric for Meter {
+impl Metric<MeterStats> for Meter {
     fn clear(&self) {
         let mut t = self.start_time.write().unwrap();
         *t = time::PreciseTime::now();
         self.count.store(0, Ordering::SeqCst);
     }
 
-    fn report(&self) -> String {
+    fn report(&self) -> MeterStats {
 
-        let stats = MeterStats {
+        MeterStats {
             name: self.name.clone(),
             rate: self.get_rate_secs(),
-            unit: self.unit.clone(),
-        };
-        format!("{:?}", stats)
+            unit: "events per second".to_string(),
+        }
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct HistStats {
     pub name: String,
-    pub size: u64,
     pub min: i64,
     pub max: i64,
     pub mean: f64,
@@ -234,7 +226,6 @@ impl Histogram {
         if sample_size == 0 {
             HistStats {
                 name: self.name.clone(),
-                size: 0,
                 min: 0,
                 max: 0,
                 mean: 0.0,
@@ -252,14 +243,10 @@ impl Histogram {
             let p95 = Histogram::percentile(&snapshot, 0.95);
             let p50 = Histogram::percentile(&snapshot, 0.50);
             let mean = snapshot.iter().fold(0, |acc, &x| acc + x) as f64 / snapshot.len() as f64;
-            let var: f64 = if sample_size > 1 {
-                snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2)) / (sample_size - 1) as f64
-            } else {
-                0.0
-            };
+            let mut var: f64 = snapshot.iter().fold(0.0, |acc, &x| acc + (x as f64 - mean).powi(2));
+            var = var / (sample_size - 1) as f64;
             HistStats {
                 name: self.name.clone(),
-                size: sample_size as u64,
                 min: *min,
                 max: *max,
                 mean: mean,
@@ -374,14 +361,14 @@ mod tests {
 
 
 
-impl Metric for Histogram {
+impl Metric<HistStats> for Histogram {
     fn clear(&self) {
         let mut res = self.sample.write().unwrap();
         res.clear();
     }
 
-    fn report(&self) -> String {
-        format!("{:?}", self.stats())
+    fn report(&self) -> HistStats {
+        self.stats()
     }
 }
 
@@ -427,9 +414,19 @@ impl ReservoirSampler {
 }
 
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct Stats {
+    // #[serde(rename="Name")]
+    name: String,
+    counters: Option<Vec<CounterStats>>,
+    // #[serde(rename="RatioCounters")]
+    ratio_counters: Option<Vec<RatioStats>>,
+    histograms: Option<Vec<HistStats>>,
+    meters: Option<Vec<MeterStats>>,
+}
+
 pub struct Registry {
     pub name: String,
-    db: Tsdb,
     counters: Vec<Arc<Counter>>,
     // sum_counters: Vec<SumCounter>,
     ratio_counters: Vec<Arc<RatioCounter>>,
@@ -438,11 +435,9 @@ pub struct Registry {
 }
 
 impl Registry {
-    pub fn new(name: String, db_ip: String, db_port: u16) -> Registry {
-        // Create a new time series database to store these metrics
+    pub fn new(name: String) -> Registry {
         Registry {
-            name: name.clone(),
-            db: Tsdb::new(name.clone(), db_ip.to_string(), db_port),
+            name: name,
             counters: Vec::new(),
             ratio_counters: Vec::new(),
             histograms: Vec::new(),
@@ -475,58 +470,79 @@ impl Registry {
     }
 
     pub fn report(&self) -> String {
-        let mut report_string = String::new();
-        report_string.push_str(&format!("\n{} Metrics\n", self.name));
+        let counter_stats = if self.counters.len() > 0 {
+            Some(self.counters.iter().map(|x| x.report()).collect::<Vec<CounterStats>>())
+        } else {
+            None
+        };
 
-        if self.counters.len() > 0 {
-            report_string.push_str("\tCounters:\n");
-            for x in self.counters.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let ratio_stats = if self.ratio_counters.len() > 0 {
+            Some(self.ratio_counters.iter().map(|x| x.report()).collect::<Vec<RatioStats>>())
+        } else {
+            None
+        };
 
-        if self.ratio_counters.len() > 0 {
-            report_string.push_str("\tRatios:\n");
-            for x in self.ratio_counters.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let hist_stats = if self.histograms.len() > 0 {
+            Some(self.histograms.iter().map(|x| x.report()).collect::<Vec<HistStats>>())
+        } else {
+            None
+        };
 
-        if self.histograms.len() > 0 {
-            report_string.push_str("\tHistograms:\n");
-            for x in self.histograms.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let meter_stats = if self.meters.len() > 0 {
+            Some(self.meters.iter().map(|x| x.report()).collect::<Vec<MeterStats>>())
+        } else {
+            None
+        };
 
-        if self.meters.len() > 0 {
-            report_string.push_str("\tMeters:\n");
-            for x in self.meters.iter() {
-                report_string.push_str(&format!("\t\t{}\n", x.report()));
-            }
-        }
+        let stats = Stats {
+            name: self.name.clone(),
+            counters: counter_stats,
+            ratio_counters: ratio_stats,
+            histograms: hist_stats,
+            meters: meter_stats,
+        };
+
+        serde_json::ser::to_string_pretty(&stats).unwrap()
+
+        // let mut report_string = String::new();
+        // report_string.push_str(&format!("\n{} Metrics\n", self.name));
+
+        // if self.counters.len() > 0 {
+        //     report_string.push_str("\tCounters:\n");
+        //     for x in self.counters.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
+        //
+        // if self.ratio_counters.len() > 0 {
+        //     report_string.push_str("\tRatios:\n");
+        //     for x in self.ratio_counters.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
+        //
+        // if self.histograms.len() > 0 {
+        //     report_string.push_str("\tHistograms:\n");
+        //     for x in self.histograms.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
+        //
+        // if self.meters.len() > 0 {
+        //     report_string.push_str("\tMeters:\n");
+        //     for x in self.meters.iter() {
+        //         report_string.push_str(&format!("\t\t{}\n", x.report()));
+        //     }
+        // }
 
 
-        debug!("{}", report_string);
-        report_string
+        // debug!("{}", report_string);
+        // report_string
     }
 
-    pub fn persist(&self) {
-        let mut write = self.db.new_write();
-        for x in self.counters.iter() {
-            write.append_counter(x);
-        }
-        for x in self.meters.iter() {
-            write.append_meter(x);
-        }
-        for x in self.ratio_counters.iter() {
-            write.append_ratio(x);
-        }
-        for x in self.histograms.iter() {
-            write.append_histogram(x);
-        }
-        write.execute();
-    }
+    // pub fn report_and_reset(&self) -> String {
+    //
+    // }
 
     pub fn reset(&self) {
         for x in self.counters.iter() {

@@ -4,12 +4,9 @@
 
 extern crate serde;
 extern crate bincode;
+extern crate serde_json;
 #[macro_use]
 extern crate log;
-extern crate lz4;
-extern crate curl;
-extern crate url;
-extern crate regex;
 
 #[cfg(feature = "serde_macros")]
 include!("lib.rs.in");

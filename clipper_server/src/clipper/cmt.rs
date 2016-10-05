@@ -13,7 +13,10 @@ use std::error::Error;
 use redis::{self, Commands};
 use std::marker::PhantomData;
 use std::isize;
-use server::{Input, Output};
+use server::{Input, Output, VersionedModel};
+use std::hash::{Hash, SipHasher, Hasher};
+use std::thread;
+use std::time::Duration as StdDuration;
 
 pub const REDIS_CMT_DB: u32 = 1;
 pub const REDIS_UPDATE_DB: u32 = 2;
@@ -21,21 +24,9 @@ pub const REDIS_DEFAULT_PORT: u16 = 6379;
 // pub const REDIS_DEFAULT_PORT: u16 = 32775;
 pub const DEFAULT_REDIS_SOCKET: &'static str = "/tmp/redis.sock";
 
-pub trait CorrectionModelTable<S> where S: Serialize + Deserialize {
-
-    // fn new() -> Self;
-
-    // fn insert(&mut self, uid: u32, state: S);
-
-    fn put(&mut self, uid: u32, state: &S) -> Result<(), String>;
-
-    fn get(&self, uid: u32) -> Result<S, String>;
-
-}
 
 
 pub trait UpdateTable {
-
     // fn new() -> Self;
 
     /// Get the most `max_items` most recent updates for a user.
@@ -46,11 +37,35 @@ pub trait UpdateTable {
     fn get_updates(&self, uid: u32, max_items: isize) -> Result<Vec<(Input, Output)>, String>;
 
     fn add_update(&mut self, uid: u32, item: &Input, label: &Output) -> Result<(), String>;
-
 }
 
 pub struct RedisUpdateTable {
     connection: redis::Connection,
+}
+
+
+fn redis_connect(conn_string: String) -> redis::Connection {
+    info!("Trying to connect to Redis");
+    loop {
+        match redis::Client::open(conn_string.as_str()) {
+            Ok(client) => {
+                match client.get_connection() {
+                    Ok(con) => return con,
+                    _ => {
+                        info!("Couldn't connect to Redis: {}, sleeping 1 second",
+                              conn_string);
+                        thread::sleep(StdDuration::from_millis(500));
+                    }
+                }
+            }
+            _ => {
+                info!("Couldn't connect to Redis: {}, sleeping 1 second",
+                      conn_string);
+                thread::sleep(StdDuration::from_millis(500));
+            }
+        }
+    }
+
 }
 
 impl RedisUpdateTable {
@@ -58,18 +73,18 @@ impl RedisUpdateTable {
         // let conn_string = format!("unix:///tmp/redis.sock?db={}", REDIS_UPDATE_DB);
         let conn_string = format!("unix://{}?db={}", socket_file, db);
         info!("RedisUpdateTable connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
-        RedisUpdateTable { connection: con }
+        RedisUpdateTable { connection: redis_connect(conn_string) }
     }
+
 
     pub fn new_tcp_connection(addr: &str, port: u16, db: u32) -> RedisUpdateTable {
         // let conn_string = format!("redis://127.0.0.1/{}", REDIS_UPDATE_DB);
         let conn_string = format!("redis://{}:{}/{}", addr, port, db);
         info!("RedisUpdateTable connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
-        RedisUpdateTable { connection: con }
+        RedisUpdateTable { connection: redis_connect(conn_string) }
+        // let client = redis::Client::open(conn_string.as_str()).unwrap();
+        // let con = client.get_connection().unwrap();
+        // RedisUpdateTable { connection: con }
     }
 }
 
@@ -92,14 +107,14 @@ impl UpdateTable for RedisUpdateTable {
             max_items - 1
         };
         let bytes: Vec<Vec<u8>> = try!(self.connection
-                                           .lrange(uid, low_idx, high_idx)
-                                           .map_err(|e| format!("{}", e.description())));
+            .lrange(uid, low_idx, high_idx)
+            .map_err(|e| format!("{}", e.description())));
 
 
         let mut train_data: Vec<(Input, Output)> = Vec::with_capacity(bytes.len());
         for b in bytes {
             let example: (Input, Output) = try!(bincode::serde::deserialize(&b)
-                                                    .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             train_data.push(example);
         }
         // let train_data: Vec<(Input, Output)> = bytes.iter()
@@ -115,16 +130,28 @@ impl UpdateTable for RedisUpdateTable {
 
     fn add_update(&mut self, uid: u32, item: &Input, label: &Output) -> Result<(), String> {
         let bytes = try!(bincode::serde::serialize(&(item, label), bincode::SizeLimit::Infinite)
-                             .map_err(|e| format!("{}", e.description())));
+            .map_err(|e| format!("{}", e.description())));
         let _: () = try!(self.connection
-                             .lpush(uid, bytes)
-                             .map_err(|e| format!("{}", e.description())));
+            .lpush(uid, bytes)
+            .map_err(|e| format!("{}", e.description())));
         Ok(())
 
     }
 }
 
 
+pub trait CorrectionModelTable<S>
+    where S: Serialize + Deserialize
+{
+    // TODO: how to store correction state version? Hash of Vec<VersionedModel>??
+    fn put(&mut self,
+           uid: u32,
+           state: &S,
+           versioned_models: &Vec<VersionedModel>)
+           -> Result<(), String>;
+
+    fn get(&self, uid: u32, versioned_models: &Vec<VersionedModel>) -> Result<S, String>;
+}
 
 
 pub struct RedisCMT<S>
@@ -134,16 +161,18 @@ pub struct RedisCMT<S>
     _correction_state_marker: PhantomData<S>,
 }
 
-impl<S> RedisCMT<S> where S: Serialize + Deserialize
+impl<S> RedisCMT<S>
+    where S: Serialize + Deserialize
 {
     pub fn new_socket_connection(socket_file: &str, db: u32) -> RedisCMT<S> {
         // let conn_string = format!("unix:///tmp/redis.sock?db={}", REDIS_CMT_DB);
         let conn_string = format!("unix://{}?db={}", socket_file, db);
         info!("RedisCMT connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
+        // RedisUpdateTable { connection: redis_connect(conn_string) }
+        // let client = redis::Client::open(conn_string.as_str()).unwrap();
+        // let con = client.get_connection().unwrap();
         RedisCMT {
-            connection: con,
+            connection: redis_connect(conn_string),
             _correction_state_marker: PhantomData,
         }
     }
@@ -152,36 +181,60 @@ impl<S> RedisCMT<S> where S: Serialize + Deserialize
         // let conn_string = format!("redis://127.0.0.1/{}", REDIS_CMT_DB);
         let conn_string = format!("redis://{}:{}/{}", addr, port, db);
         info!("RedisCMT connection string {}", conn_string);
-        let client = redis::Client::open(conn_string.as_str()).unwrap();
-        let con = client.get_connection().unwrap();
+        // let client = redis::Client::open(conn_string.as_str()).unwrap();
+        // let con = client.get_connection().unwrap();
         RedisCMT {
-            connection: con,
+            connection: redis_connect(conn_string),
             _correction_state_marker: PhantomData,
         }
     }
 }
 
+/// NOTE: This hash function must be order independent because
+/// we only care about the set of versioned models, not the particular
+/// order they are in. Hashing in an order-dependent way causes
+/// missed lookups.
+fn versioned_model_hash(vms: &Vec<VersionedModel>) -> u64 {
+    vms.iter().fold(0, |sum, vm| {
+        let mut s = SipHasher::new();
+        vm.hash(&mut s);
+        sum + s.finish()
+    })
+    // NOTE: this hash function must be independnet
+    // versioned_models.hash(&mut s);
+    // let version_hash = s.finish();
 
-impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
+}
+
+impl<S> CorrectionModelTable<S> for RedisCMT<S>
+    where S: Serialize + Deserialize
 {
     // TODO: should this be immutable
-    fn put(&mut self, uid: u32, state: &S) -> Result<(), String> {
+    fn put(&mut self,
+           uid: u32,
+           state: &S,
+           versioned_models: &Vec<VersionedModel>)
+           -> Result<(), String> {
         let bytes = try!(bincode::serde::serialize(state, bincode::SizeLimit::Infinite)
-                             .map_err(|e| format!("{}", e.description())));
+            .map_err(|e| format!("{}", e.description())));
+        let version_hash = versioned_model_hash(versioned_models);
+        // info!("CMT PUT: versioned models: {:?}, hash: {}", versioned_models, version_hash);
         let _: () = try!(self.connection
-                             .set(uid, bytes)
-                             .map_err(|e| format!("{}", e.description())));
+            .hset(uid, version_hash, bytes)
+            .map_err(|e| format!("{}", e.description())));
         Ok(())
 
     }
 
-    fn get(&self, uid: u32) -> Result<S, String> {
-        info!("fetching state for uid: {}", uid);
+    fn get(&self, uid: u32, versioned_models: &Vec<VersionedModel>) -> Result<S, String> {
+        trace!("fetching state for uid: {}", uid);
+        let version_hash = versioned_model_hash(versioned_models);
+        // info!("CMT GET: versioned models: {:?}, hash: {}", versioned_models, version_hash);
         let bytes: Vec<u8> = try!(self.connection
-                                      .get(uid)
-                                      .map_err(|e| format!("{}", e.description())));
+            .hget(uid, version_hash)
+            .map_err(|e| format!("{}", e.description())));
         let stored_state: S = try!(bincode::serde::deserialize(&bytes)
-                                       .map_err(|e| format!("{}", e.description())));
+            .map_err(|e| format!("{}", e.description())));
         Ok(stored_state)
     }
 }
@@ -227,7 +280,7 @@ mod tests {
     use super::*;
     // use redis::{self, Commands};
     use redis;
-    use server::{Input, Output};
+    use server::{Input, Output, VersionedModel};
 
     use std::process;
     use std::thread::sleep;
@@ -247,11 +300,11 @@ mod tests {
         pub fn new(port: u16) -> RedisServer {
             let mut cmd = process::Command::new("redis-server");
             cmd.stdout(process::Stdio::null())
-               .stderr(process::Stdio::null())
-               .arg("--port")
-               .arg(port.to_string())
-               .arg("--bind")
-               .arg("127.0.0.1");
+                .stderr(process::Stdio::null())
+                .arg("--port")
+                .arg(port.to_string())
+                .arg("--bind")
+                .arg("127.0.0.1");
 
             let process = cmd.spawn().unwrap();
             RedisServer {
@@ -288,11 +341,11 @@ mod tests {
             let server = RedisServer::new(port);
 
             let client = redis::Client::open(redis::ConnectionInfo {
-                             addr: Box::new(server.get_client_addr()),
-                             db: db as i64,
-                             passwd: None,
-                         })
-                             .unwrap();
+                    addr: Box::new(server.get_client_addr()),
+                    db: db as i64,
+                    passwd: None,
+                })
+                .unwrap();
             let con;
 
             // try to connect in loop to ensure Redis server is running
@@ -342,8 +395,16 @@ mod tests {
 
         let user_id = 33;
         let state = vec![4, 3, 2, 6, 73345, 2312];
-        cmt.put(user_id, &state).unwrap();
-        let fetched_state = cmt.get(user_id).unwrap();
+        let versioned_models = vec![VersionedModel {
+                                        name: "m1".to_string(),
+                                        version: Some(0),
+                                    },
+                                    VersionedModel {
+                                        name: "m3".to_string(),
+                                        version: Some(1),
+                                    }];
+        cmt.put(user_id, &state, &versioned_models).unwrap();
+        let fetched_state = cmt.get(user_id, &versioned_models).unwrap();
         assert_eq!(state, fetched_state);
     }
 

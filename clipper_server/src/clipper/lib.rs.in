@@ -13,10 +13,11 @@ extern crate redis;
 extern crate threadpool;
 extern crate liblinear_sys as linear_raw;
 extern crate libsvm_sys as svm_raw;
+extern crate backtrace;
 
 // TODO: some of these should probably not be public
 pub mod server;
-pub mod digits;
+// pub mod digits;
 pub mod batching;
 pub mod metrics;
 pub mod hashing;
@@ -26,4 +27,3 @@ pub mod cmt;
 pub mod configuration;
 pub mod correction_policy;
 pub mod ml;
-pub mod tsdb;
