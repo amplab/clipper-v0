@@ -100,45 +100,63 @@ impl<V: 'static + Clone> Cache<V> {
 /// Handles higher-level semantics of caching predictions. This includes
 /// locality-sensitive hashing and other specialized hash functions.
 pub trait PredictionCache<V: 'static + Clone> {
-
     /// Look up the key in the cache and return immediately
-    fn fetch(&self, model: &String, input: &Input) -> Option<V>;
+    fn fetch(&self, model: &String, input: &Input, salt: Option<i32>) -> Option<V>;
 
 
     /// Insert the key-value pair into the hash, evicting an older entry
     /// if necessary. Called by model batch schedulers
-    fn put(&self, model: String, input: &Input, v: V);
+    fn put(&self, model: String, input: &Input, v: V, salt: Option<i32>);
 
     fn add_listener(&self,
                     model: &String,
                     input: &Input,
+                    salt: Option<i32>,
                     listener: Box<Fn(V) -> () + Send + Sync>);
-
 }
 
 pub struct SimplePredictionCache<V: 'static + Clone, H: HashStrategy + Send + Sync> {
-    caches: Arc<HashMap<String, Cache<V>>>,
+    caches: Arc<RwLock<HashMap<String, Cache<V>>>>,
     hash_strategy: H,
+    cache_size: usize,
 }
 
 impl<V, H> SimplePredictionCache<V, H>
     where V: Clone,
           H: HashStrategy + Send + Sync
 {
-    /// Creates a new prediction cache for the provided set of models. All
-    /// caches will be the same size and use the same hash function.
-    pub fn new(model_conf: &Vec<ModelConf>, cache_size: usize) -> SimplePredictionCache<V, H> {
+    /// Similar to `Vec::new()`, this creates an empty prediction cache.
+    pub fn new(cache_size: usize) -> SimplePredictionCache<V, H> {
+        let hash_strategy = H::new();
+
+        let caches: HashMap<String, Cache<V>> = HashMap::new();
+        SimplePredictionCache {
+            caches: Arc::new(RwLock::new(caches)),
+            hash_strategy: hash_strategy,
+            cache_size: cache_size,
+        }
+
+    }
+
+    /// Similar to `Vec::with_capacity(), creates a new prediction cache
+    /// for the provided set of models. All caches will be the same
+    /// size and use the same hash function.
+    pub fn with_models(model_conf: &Vec<ModelConf>,
+                       cache_size: usize)
+                       -> SimplePredictionCache<V, H> {
         let mut caches: HashMap<String, Cache<V>> = HashMap::new();
         for m in model_conf.iter() {
             caches.insert(m.name.clone(), Cache::new(cache_size));
         }
 
-        // hashing might be stateful (e.g. LSH) which is why we create a new instance here
+        // The hash function might be stateful (e.g. LSH) which is why we
+        // create a new instance here.
         let hash_strategy = H::new();
 
         SimplePredictionCache {
-            caches: Arc::new(caches),
+            caches: Arc::new(RwLock::new(caches)),
             hash_strategy: hash_strategy,
+            cache_size: cache_size,
         }
     }
 }
@@ -147,54 +165,142 @@ impl<V, H> PredictionCache<V> for SimplePredictionCache<V, H>
     where V: Clone,
           H: HashStrategy + Send + Sync
 {
-    fn fetch(&self, model: &String, input: &Input) -> Option<V> {
-        match self.caches.get(model) {
+    fn fetch(&self, model: &String, input: &Input, salt: Option<i32>) -> Option<V> {
+        let cache_reader = self.caches.read().unwrap();
+        match cache_reader.get(model) {
             Some(c) => {
-                let hashkey = self.hash_strategy.hash(input, None);
+                let hashkey = self.hash_strategy.hash(input, salt);
                 c.get(hashkey)
             }
-            None => panic!("no cache for model {}", model),
+            None => {
+                warn!("no cache for model {}", model);
+                None
+            }
         }
     }
 
-    // fn request(&self, model: String, input: Input) {
-    //     if self.fetch(model.clone(), &input).is_none() {
-    //         // TODO: schedule for evaluation
-    //         unimplemented!();
-    //     }
-    // }
-
-
-    fn put(&self, model: String, input: &Input, v: V) {
-        match self.caches.get(&model) {
-            Some(c) => {
-                let hashkey = self.hash_strategy.hash(input, None);
-                c.put(hashkey, v);
+    fn put(&self, model: String, input: &Input, v: V, salt: Option<i32>) {
+        // very basic OCC
+        let mut maybe_add_cache = false;
+        let hashkey = self.hash_strategy.hash(input, salt);
+        {
+            let cache_reader = self.caches.read().unwrap();
+            match cache_reader.get(&model) {
+                Some(c) => {
+                    c.put(hashkey, v.clone());
+                }
+                None => {
+                    maybe_add_cache = true;
+                    // If we haven't seen this model before, assume
+                    // it's a new model and create a new cache for it.
+                    // let model_cache = Cache::new(cache_size);
+                    // info!("Creating a cache for new model {}", model);
+                    // let hashkey = self.hash_strategy.hash(input, None);
+                    // model_cache.put(hashkey, v);
+                    // let cache_writer = caches.write.unwrap();
+                    // cache_writer.insert(model.clone(), model_cache);
+                }
+            };
+        }
+        if maybe_add_cache {
+            let mut cache_writer = self.caches.write().unwrap();
+            let mut create_cache = false;
+            {
+                if let Some(c) = cache_writer.get(&model) {
+                    c.put(hashkey, v.clone());
+                } else {
+                    create_cache = true;
+                }
             }
-            None => panic!("no cache for model {}", model),
-        };
-    }
+            if create_cache {
+                let model_cache = Cache::new(self.cache_size);
+                info!("Creating a cache for new model {}", model);
+                model_cache.put(hashkey, v);
+                cache_writer.insert(model.clone(), model_cache);
+            }
 
+            // let model_cache_option = cache_writer.get(&model);
+            // // Check if some other call to put() has added the model cache in
+            // // the mean time, because we only want to create the model once.
+            // match model_cache_option {
+            //     Some(c) => {
+            //         // let hashkey = self.hash_strategy.hash(input, None);
+            //         c.put(hashkey, v);
+            //     }
+            //     None => {
+            //         // If we haven't seen this model before, assume
+            //         // it's a new model and create a new cache for it.
+            //         let model_cache = Cache::new(self.cache_size);
+            //         info!("Creating a cache for new model {}", model);
+            //         model_cache.put(hashkey, v);
+            //         cache_writer.insert(model.clone(), model_cache);
+            //     }
+            // };
+        }
+    }
 
     fn add_listener(&self,
                     model: &String,
                     input: &Input,
+                    salt: Option<i32>,
                     listener: Box<Fn(V) -> () + Send + Sync>) {
-        match self.caches.get(model) {
-            Some(c) => {
-                let hashkey = self.hash_strategy.hash(input, None);
-                let wrapped_listener = Box::new(move |h, v| {
-                    if h == hashkey {
-                        (listener)(v);
-                        true
-                    } else {
-                        false
-                    }
-                });
-                c.add_listener(hashkey, CacheListener { listener: wrapped_listener });
+
+        // Simple form of OCC
+        let maybe_add_cache;
+        let hashkey = self.hash_strategy.hash(input, salt);
+        let wrapped_listener = Box::new(move |h, v| {
+            if h == hashkey {
+                (listener)(v);
+                true
+            } else {
+                false
             }
-            None => panic!("no cache for model {}", model),
-        };
+        });
+        {
+            // First check to see if a cache for this model exists
+            let cache_reader = self.caches.read().unwrap();
+            match cache_reader.get(model) {
+                Some(_) => {
+                    maybe_add_cache = false;
+                    // c.add_listener(hashkey, CacheListener { listener: wrapped_listener });
+                }
+                None => {
+                    maybe_add_cache = true;
+                }
+            };
+        }
+        if maybe_add_cache {
+            // If the model cache didn't exist during the previous check,
+            // we lock the cache with a write lock and check again, creating it
+            // if it doesn't exist.
+            let mut cache_writer = self.caches.write().unwrap();
+            let create_cache;
+            {
+                if let Some(_) = cache_writer.get(model) {
+                    create_cache = false;
+                } else {
+                    create_cache = true;
+                }
+            }
+            if create_cache {
+                let model_cache = Cache::new(self.cache_size);
+                info!("Creating a cache for new model {}", model);
+                model_cache.add_listener(hashkey, CacheListener { listener: wrapped_listener });
+                cache_writer.insert(model.clone(), model_cache);
+            } else {
+                cache_writer.get(model)
+                    .unwrap()
+                    .add_listener(hashkey, CacheListener { listener: wrapped_listener });
+            }
+        } else {
+            // Model caches are never deleted, so if it existed during the
+            // earlier check it is guaranteed to still exist.
+            let cache_reader = self.caches.read().unwrap();
+            cache_reader.get(model)
+                .unwrap()
+                .add_listener(hashkey, CacheListener { listener: wrapped_listener });
+
+        }
     }
 }
 
@@ -205,6 +311,7 @@ mod tests {
     use super::*;
     use hashing::{HashStrategy, HashKey};
     use server::Input;
+    #[allow(unused_imports)]
     use configuration::ModelConf;
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
@@ -231,11 +338,13 @@ mod tests {
     }
 
     fn create_cache(size: usize) -> SimplePredictionCache<i32, IdentityHasher> {
-        let m1 = ModelConf { name: "m1".to_string(), addresses: Vec::new(), num_outputs: 1 };
-        let m2 = ModelConf { name: "m2".to_string(), addresses: Vec::new(), num_outputs: 1 };
-        let model_conf = vec![m1, m2];
+// let m1 = ModelConf { name: "m1".to_string(), addresses: Vec::new(), num_outputs: 1, version: 0 };
+// let m2 = ModelConf { name: "m2".to_string(), addresses: Vec::new(), num_outputs: 1, version: 0 };
+// let model_conf = vec![m1, m2];
+// let cache: SimplePredictionCache<i32, IdentityHasher> =
+//     SimplePredictionCache::with_models(&model_conf, size);
         let cache: SimplePredictionCache<i32, IdentityHasher> =
-            SimplePredictionCache::new(&model_conf, size);
+            SimplePredictionCache::new(size);
         cache
     }
 
@@ -261,7 +370,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
+// #[should_panic]
     fn fetch_nonexistent_model() {
         let cache = create_cache(100);
         let input = Input::Ints { i: vec![3], length: 1 };
@@ -323,4 +432,14 @@ mod tests {
         cache.put("m1".to_string(), &input, 33);
         assert!(listener_fired.load(Ordering::SeqCst));
     }
+
+    #[test]
+    #[should_panic]
+    fn deal_with_versioned_cache() {
+// panic!("We don't deal with versioned cache yet");
+        unimplemented!();
+    }
+
+
+
 }
