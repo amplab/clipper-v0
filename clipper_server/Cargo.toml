@@ -50,10 +50,10 @@ cln = [
 
 [features]
 default = ["serde_codegen"]
-nightly = ["serde_macros"]
+nightly = ["serde_derive"]
 
 [build-dependencies]
-serde_codegen = { version = "*", optional = true }
+serde_codegen = { version = "0.8", optional = true }
 
 [lib]
 name = "clipper"
@@ -69,21 +69,21 @@ path = "src/bin/clipper-rest.rs"
 rand = "0.3"
 time = "0.1"
 # mio = "0.5"
-num_cpus = "0.2"
-toml = "0.1"
+# num_cpus = "0.2"
+toml = "0.2"
 docopt = "0.6"
 rustc-serialize = "0.3"  # if you're using `derive(RustcDecodable)`
 net2 = "0.2.21"
-byteorder = "0.4"
+byteorder = "0.5"
 log = "0.3"
 env_logger = "0.3"
 spmc = "0.2"
 libc = "0.2"
-serde = "0.7"
-bincode = "0.5"
-serde_json = "0.7"
-serde_macros = { version = "*", optional = true }
-threadpool = "0.1"
+bincode = "0.6"
+serde = "0.8"
+serde_derive = { version = "0.8", optional = true }
+serde_json = "0.8"
+# threadpool = "0.1"
 liblinear-sys = {path = "liblinear-sys", version = "0.1"}
 libsvm-sys = {path = "libsvm-sys", version = "0.1"}
 chan-signal = "0.1"
@@ -101,5 +101,5 @@ git = "https://github.com/servo/rust-url"
 git = "https://github.com/hyperium/hyper"
 
 [dependencies.redis]
-version = "0.5.3"
+version = "0.7"
 features = ["unix_socket"]
