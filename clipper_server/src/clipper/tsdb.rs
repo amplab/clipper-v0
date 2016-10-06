@@ -89,7 +89,11 @@ impl <'a> Write<'a> {
 		let unit = format!("units={}", re.replace_all(&meter.unit, "-"));
 		let name = re.replace_all(&meter.name, "_");
 		// Construct the arguments of the InfluxSQL write operation that will be executed
-		let op = format!("{},{} value={} {}", name, unit, meter.get_rate_secs(), self.timestamp);
+		let op = 
+			format!(
+				"{},{} rate={},one_min={},five_min={},fifteen_min={} {}", 
+				name, unit, meter.get_rate_secs(), meter.get_one_minute_rate(), 
+				meter.get_five_minute_rate(), meter.get_fifteen_minute_rate(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
 	}

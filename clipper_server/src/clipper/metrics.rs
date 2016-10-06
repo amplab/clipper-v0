@@ -125,12 +125,18 @@ impl RatioCounter {
     }
 }
 
+/// Represents the different load average options for exponentially
+/// weighted moving averages (EWMA) within meters. For a one minute EWMA,
+/// we use the OneMinute load average, etc...
 enum LoadAverage {
     OneMinute,
     FiveMinutes,
     FifteenMinutes,
 }
 
+/// Represents an exponentially weighted moving average.
+/// Multiple EWMAs are included within a single meter
+/// corresponding to different load averages.
 struct EWMA {
     uncounted: AtomicUsize,
     alpha: f64,
@@ -139,6 +145,10 @@ struct EWMA {
 }
 
 impl EWMA {
+    /// Constructs a new exponentially weighted moving average.
+    ///
+    /// * `interval` - The tick interval in seconds for the EWMA (how frequently updates are expected)
+    /// * `load_avg` - The load average for the EWMA (see LoadAverage enum for details)
     fn new(interval: f64, load_avg: LoadAverage) -> EWMA {
         let alpha_exp = match load_avg {
             LoadAverage::OneMinute => (-interval / (SECONDS_PER_MINUTE as f64) / (ONE_MINUTE as f64)).exp(),
@@ -154,6 +164,8 @@ impl EWMA {
         }
     }
 
+    /// Updates the rate of the EWMA by incoporating unaccounted data 
+    /// and decaying based on the calculated "alpha" factor.
     fn tick(&self) {
         match self.rate.write() {
             Ok(mut rate) => {
@@ -178,10 +190,7 @@ impl EWMA {
     }
 }
 
-/// Measures the rate of an event occurring
-// TODO: add support for exponentially weighted moving averages. See
-// https://github.com/dropwizard/metrics/blob/4286d49c7f0da1d9cdb90b4fdc15dd3c91e7a22c/metrics-core/src/main/java/io/dropwizard/metrics/Meter.java
-// for details.
+/// Measures the rate of an event occurring.
 pub struct Meter {
     pub name: String,
     pub unit: String,
@@ -251,23 +260,32 @@ impl Meter {
         }
     }
 
+    /// Returns the rate of this meter in events
+    /// per second for the last minute, based on an
+    /// exponentially weighted moving average
     pub fn get_one_minute_rate(&self) -> f64 {
         self.tick_if_necessary();
         self.m1rate.get_rate()
     }
 
+    /// Returns the rate of this meter in events
+    /// per second for the last five minutes, based on an
+    /// exponentially weighted moving average
     pub fn get_five_minute_rate(&self) -> f64 {
         self.tick_if_necessary();
         self.m5rate.get_rate()
     }   
 
+    /// Returns the rate of this meter in events
+    /// per second for the fifteen minutes, based on an
+    /// exponentially weighted moving average
     pub fn get_fifteen_minute_rate(&self) -> f64 {
         self.tick_if_necessary();
         self.m15rate.get_rate()
     }
 
     /// Returns the rate of this meter in
-    /// events per second.
+    /// events per second since the time of initialization.
     pub fn get_rate_secs(&self) -> f64 {
         self.get_rate_micros() * NUM_MICROS_PER_SEC as f64
     }
@@ -277,6 +295,9 @@ impl Meter {
 struct MeterStats {
     name: String,
     rate: f64,
+    one_min_rate: f64,
+    five_min_rate: f64,
+    fifteen_min_rate: f64,
     unit: String,
 }
 
@@ -292,6 +313,9 @@ impl Metric for Meter {
         let stats = MeterStats {
             name: self.name.clone(),
             rate: self.get_rate_secs(),
+            one_min_rate: self.get_one_minute_rate(),
+            five_min_rate: self.get_five_minute_rate(),
+            fifteen_min_rate: self.get_fifteen_minute_rate(),
             unit: self.unit.clone(),
         };
         format!("{:?}", stats)
