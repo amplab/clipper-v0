@@ -155,14 +155,14 @@ impl EWMA {
     }
 
     fn tick(&self) {
-        let count = self.uncounted.swap(0, Ordering::Relaxed);
-        let current_rate = (count as f64) / self.interval;
         match self.rate.write() {
             Ok(mut rate) => {
+                let count = self.uncounted.swap(0, Ordering::Relaxed);
+                let current_rate = (count as f64) / self.interval;
                 if *rate == -1.0 {
                     *rate = current_rate;
                 } else {
-                    *rate = self.alpha * (current_rate - *rate);
+                    *rate += self.alpha * (current_rate - *rate);
                 }
             },
             Err(_) => {},
