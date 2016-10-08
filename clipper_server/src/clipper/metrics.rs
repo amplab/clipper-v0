@@ -325,6 +325,39 @@ impl Histogram {
     // }
 }
 
+// Bucketed multiclass histogram
+pub struct BucketHistogram {
+    pub name: String,
+    pub num_buckets: usize,
+    buckets: Vec<AtomicUsize>,
+}
+
+impl BucketHistogram {
+    pub fn new(name: String, num_buckets: usize) -> BucketHistogram {
+        let mut buckets = Vec::new();
+        for _ in 0..num_buckets {
+            buckets.push(AtomicUsize::new(0));
+        }
+
+        BucketHistogram {
+            name: name,
+            num_buckets: num_buckets,
+            buckets: buckets,
+        }
+    }
+
+    pub fn incr(&self, bucket: usize) {
+        self.buckets[bucket].fetch_add(1, Ordering::Relaxed);
+    }
+
+    pub fn get_values(&self) -> Vec<u32> {
+        let mut vec = Vec::new();
+        for i in 0..self.num_buckets {
+            vec.push(self.buckets[i].load(Ordering::Relaxed) as u32);
+        }
+        vec
+    }
+}
 
 #[cfg(test)]
 #[cfg_attr(rustfmt, rustfmt_skip)]
