@@ -155,6 +155,10 @@ impl<P, S> ClipperServer<P, S>
         // let models = Arc::new(model_batchers);
         let models = model_batchers;
 
+        // predictions histogram (for now, just track discrete predictions)
+        let predictions_hist: Arc<metrics::BucketHistogram> =
+            conf.metrics.write().unwrap().create_bucket_hist(conf.name.clone());
+
 
 
 
@@ -164,6 +168,7 @@ impl<P, S> ClipperServer<P, S>
                                                           conf.slo_micros.clone(),
                                                           cache.clone(),
                                                           models.clone(),
+                                                          predictions_hist.clone(),
                                                           conf.redis_ip.clone(),
                                                           conf.redis_port));
         }
@@ -259,6 +264,7 @@ impl<P, S> PredictionWorker<P, S>
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: HashMap<String,
                                PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+               predictions_hist: Arc<metrics::BucketHistogram>,
                redis_ip: String,
                redis_port: u16)
                -> PredictionWorker<P, S> {
@@ -269,6 +275,7 @@ impl<P, S> PredictionWorker<P, S>
                                           receiver,
                                           cache.clone(),
                                           models,
+                                          predictions_hist.clone(),
                                           redis_ip,
                                           redis_port);
         });
@@ -289,6 +296,7 @@ impl<P, S> PredictionWorker<P, S>
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
                            PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+           predictions_hist: Arc<metrics::BucketHistogram>,
            redis_ip: String,
            redis_port: u16) {
         let slo = Duration::microseconds(slo_micros as i64);
@@ -359,6 +367,9 @@ impl<P, S> PredictionWorker<P, S>
             // pred_metrics.latency_hist.insert(latency);
             // pred_metrics.thruput_meter.mark(1);
             // pred_metrics.pred_counter.incr(1);
+            // TODO: include metrics pertaining to y-value tracking
+            //       how does one distinguish between different kinds of predictions?
+            predictions_hist.incr(prediction as i32);
         }
         info!("ending loop: prediction worker {}", worker_id);
     }

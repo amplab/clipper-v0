@@ -1,6 +1,7 @@
 
 use time;
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
+use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
 use tsdb::{Tsdb};
@@ -325,6 +326,62 @@ impl Histogram {
     // }
 }
 
+// Bucketed multiclass histogram
+pub struct BucketHistogram {
+    pub name: String,
+    buckets: RwLock<HashMap<i32, AtomicUsize>>,
+}
+
+impl BucketHistogram {
+    pub fn new(name: String) -> BucketHistogram {
+        BucketHistogram {
+            name: name,
+            buckets: RwLock::new(HashMap::new()),
+        }
+    }
+
+    pub fn incr(&self, bucket: i32) {
+        let mut buckets = self.buckets.write().unwrap();
+        if !buckets.contains_key(&bucket) {
+            buckets.insert(bucket, AtomicUsize::new(0));
+        }
+        buckets.get_mut(&bucket).unwrap().fetch_add(1, Ordering::Relaxed);
+        println!("Incrementing {} {}", bucket,
+                 buckets.get(&bucket).unwrap().load(Ordering::Relaxed));
+    }
+
+    pub fn stats(&self) -> BucketHistStats {
+        let mut retmap = HashMap::new();
+        let buckets = self.buckets.read().unwrap();
+        for (i, b) in buckets.iter() {
+            retmap.insert(i.clone(), b.load(Ordering::Relaxed));
+        }
+
+        BucketHistStats {
+            name: self.name.clone(),
+            buckets: retmap,
+        }
+    }
+
+
+}
+
+impl Metric for BucketHistogram {
+    fn clear(&self) {
+        let mut buckets = self.buckets.write().unwrap();
+        buckets.clear();
+    }
+
+    fn report(&self) -> String {
+        format!("{:?}", self.stats())
+    }
+}
+
+#[derive(Debug)]
+pub struct BucketHistStats {
+    name: String,
+    buckets: HashMap<i32, usize>,
+}
 
 #[cfg(test)]
 #[cfg_attr(rustfmt, rustfmt_skip)]
@@ -435,6 +492,7 @@ pub struct Registry {
     ratio_counters: Vec<Arc<RatioCounter>>,
     histograms: Vec<Arc<Histogram>>,
     meters: Vec<Arc<Meter>>,
+    bucket_histograms: Vec<Arc<BucketHistogram>>,
 }
 
 impl Registry {
@@ -447,6 +505,7 @@ impl Registry {
             ratio_counters: Vec::new(),
             histograms: Vec::new(),
             meters: Vec::new(),
+            bucket_histograms: Vec::new(),
         }
     }
 
@@ -472,6 +531,12 @@ impl Registry {
         let counter = Arc::new(Counter::new(name, 0));
         self.counters.push(counter.clone());
         counter
+    }
+
+    pub fn create_bucket_hist(&mut self, name: String) -> Arc<BucketHistogram> {
+        let bucket_hist = Arc::new(BucketHistogram::new(name));
+        self.bucket_histograms.push(bucket_hist.clone());
+        bucket_hist
     }
 
     pub fn report(&self) -> String {
@@ -506,6 +571,13 @@ impl Registry {
             }
         }
 
+        if self.bucket_histograms.len() > 0 {
+            report_string.push_str("\tBucket Histograms:\n");
+            for x in self.bucket_histograms.iter() {
+                report_string.push_str(&format!("\t\t{}\n", x.report()));
+            }
+        }
+
 
         debug!("{}", report_string);
         report_string
@@ -525,6 +597,9 @@ impl Registry {
         for x in self.histograms.iter() {
             write.append_histogram(x);
         }
+        for x in self.bucket_histograms.iter() {
+            write.append_bucket_histogram(x);
+        }
         write.execute();
     }
 
@@ -532,6 +607,7 @@ impl Registry {
         for x in self.counters.iter() {
             x.clear();
         }
+
         for x in self.ratio_counters.iter() {
             x.clear();
         }
@@ -541,6 +617,10 @@ impl Registry {
         }
 
         for x in self.meters.iter() {
+            x.clear();
+        }
+
+        for x in self.bucket_histograms.iter() {
             x.clear();
         }
     }
