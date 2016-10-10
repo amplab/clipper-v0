@@ -2,7 +2,7 @@ use curl::easy::Easy;
 use curl::Error;
 use std::io::Read;
 use url::{Url, form_urlencoded};
-use metrics::{Counter, Meter, RatioCounter, Histogram};
+use metrics::{Counter, Meter, RatioCounter, Histogram, BucketHistogram};
 use std::sync::{Arc};
 use time;
 use regex::Regex;
@@ -106,6 +106,11 @@ impl <'a> Write<'a> {
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
 	}
+
+	pub fn append_bucket_histogram(&mut self, bucket_hist: &Arc<BucketHistogram>) {
+        let stats = bucket_hist.stats();
+        info!("{:?}", stats);
+    }
 
 	/// Persists the metrics appended to this write operation to the associated
 	/// time series database (InfluxDB instance). 
