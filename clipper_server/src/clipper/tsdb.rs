@@ -2,7 +2,7 @@ use curl::easy::Easy;
 use curl::Error;
 use std::io::Read;
 use url::{Url, form_urlencoded};
-use metrics::{Counter, Meter, RatioCounter, Histogram};
+use metrics::{Counter, Meter, RatioCounter, Histogram, RealtimeClock};
 use std::sync::{Arc};
 use time;
 use regex::Regex;
@@ -84,7 +84,7 @@ impl <'a> Write<'a> {
 		self.write_ops.push(op);
 	}
 
-	pub fn append_meter(&mut self, meter: &Arc<Meter>) {
+	pub fn append_meter(&mut self, meter: &Arc<Meter<RealtimeClock>>) {
 		let re = Regex::new(r"\s").unwrap();
 		let unit = format!("units={}", re.replace_all(&meter.unit, "-"));
 		let name = re.replace_all(&meter.name, "_");
@@ -92,8 +92,8 @@ impl <'a> Write<'a> {
 		let op = 
 			format!(
 				"{},{} rate={},one_min={},five_min={},fifteen_min={} {}", 
-				name, unit, meter.get_rate_secs(), meter.get_one_minute_rate(), 
-				meter.get_five_minute_rate(), meter.get_fifteen_minute_rate(), self.timestamp);
+				name, unit, meter.get_rate_secs(), meter.get_one_minute_rate_secs(), 
+				meter.get_five_minute_rate_secs(), meter.get_fifteen_minute_rate_secs(), self.timestamp);
 		info!("Added influx write op: {}", op);
 		self.write_ops.push(op);
 	}

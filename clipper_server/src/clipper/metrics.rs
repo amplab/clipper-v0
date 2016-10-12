@@ -1,4 +1,6 @@
 use time;
+use time::{Timespec};
+use std::cell::{RefCell};
 use std::sync::atomic::{AtomicUsize, AtomicIsize, Ordering};
 use rand::{thread_rng, Rng};
 use std::sync::{RwLock, Arc};
@@ -6,6 +8,7 @@ use tsdb::{Tsdb};
 
 const NUM_MICROS_PER_SEC: i64 = 1_000_000;
 const NUM_NANOS_PER_SEC: i64 = 1_000_000_000;
+const NUM_NANOS_PER_MICRO: i64 = 1_000;
 const SECONDS_PER_MINUTE: f64 = 60.0;
 const FIVE_SECONDS: f64 = 5.0;
 const ONE_MINUTE: u16 = 1;
@@ -172,6 +175,8 @@ impl EWMA {
                 let count = self.uncounted.swap(0, Ordering::Relaxed);
                 let current_rate = (count as f64) / self.interval;
                 if *rate == -1.0 {
+                    // If our rate is -1, we have never calculated a valid rate before, so
+                    // set the rate to the be the number of events over the first interval
                     *rate = current_rate;
                 } else {
                     *rate += self.alpha * (current_rate - *rate);
@@ -185,16 +190,56 @@ impl EWMA {
         self.uncounted.fetch_add(num, Ordering::Relaxed);
     }
 
-    fn get_rate(&self) -> f64 {
+    fn get_rate_secs(&self) -> f64 {
         *self.rate.read().unwrap()
     }
 }
 
+pub trait Clock {
+    fn get_time(&self) -> Timespec;
+}
+
+pub struct RealtimeClock {
+
+}
+
+impl RealtimeClock {
+    fn new() -> RealtimeClock {
+        RealtimeClock {}
+    }
+}
+
+impl Clock for RealtimeClock {
+    fn get_time(&self) -> Timespec {
+        time::get_time()
+    } 
+}
+
+pub struct ManualClock {
+    time: RefCell<Vec<Timespec>>,
+}
+
+impl ManualClock {
+    pub fn new(times: Vec<Timespec>) -> ManualClock {
+        ManualClock {
+            time: RefCell::new(times),
+        }
+    }
+}
+
+impl Clock for ManualClock {
+    fn get_time(&self) -> Timespec {
+        self.time.borrow_mut().pop().unwrap()
+    }
+}
+
+
 /// Measures the rate of an event occurring.
-pub struct Meter {
+pub struct Meter<C> where C: Clock {
     pub name: String,
     pub unit: String,
-    start_time: RwLock<time::PreciseTime>,
+    pub clock: C,
+    start_time: RwLock<Timespec>,
     tick_interval: f64,
     last_tick: AtomicUsize,
     count: AtomicUsize,
@@ -203,15 +248,16 @@ pub struct Meter {
     m15rate: EWMA,
 }
 
-impl Meter {
-    pub fn new(name: String) -> Meter {
-        let curr_time = time::get_time();
+impl <C> Meter<C> where C: Clock {
+    pub fn new(name: String, clock: C) -> Meter<C> {
+        let curr_time = clock.get_time();
         let curr_nanos = (curr_time.sec * NUM_NANOS_PER_SEC) + curr_time.nsec as i64;
         let tick_interval = FIVE_SECONDS as f64;
         Meter {
             name: name,
             unit: "events per second".to_string(),
-            start_time: RwLock::new(time::PreciseTime::now()),
+            clock: clock,
+            start_time: RwLock::new(curr_time),
             last_tick: AtomicUsize::new(curr_nanos as usize),
             tick_interval: tick_interval,
             count: AtomicUsize::new(0),
@@ -229,19 +275,17 @@ impl Meter {
     }
 
     fn get_rate_micros(&self) -> f64 {
-        let cur_time = time::PreciseTime::now();
+        let cur_time = self.clock.get_time();
+        let cur_micros = (cur_time.sec * NUM_MICROS_PER_SEC) + (cur_time.nsec as i64 / NUM_NANOS_PER_MICRO);
+        let start_time = self.start_time.read().unwrap();
+        let start_micros = (start_time.sec * NUM_MICROS_PER_SEC) + (start_time.nsec as i64 / NUM_NANOS_PER_MICRO);
         let count = self.count.load(Ordering::SeqCst);
-        let dur: time::Duration = self.start_time.read().unwrap().to(cur_time);
-        let whole_secs = time::Duration::seconds(dur.num_seconds());
-        let sub_sec_micros = (dur - whole_secs).num_microseconds().unwrap();
-        assert!(sub_sec_micros <= NUM_MICROS_PER_SEC);
-        let total_micros = whole_secs.num_seconds() * NUM_MICROS_PER_SEC + sub_sec_micros;
-        let rate = count as f64 / total_micros as f64;
+        let rate = count as f64 / (cur_micros - start_micros) as f64;
         rate
     }
 
     fn tick_if_necessary(&self) {
-        let curr_time = time::get_time();
+        let curr_time = self.clock.get_time();
         let curr_nanos = (curr_time.sec * NUM_NANOS_PER_SEC) + curr_time.nsec as i64;
         let last_tick_nanos = self.last_tick.load(Ordering::SeqCst);
         let time_since_tick = curr_nanos - last_tick_nanos as i64;
@@ -263,25 +307,25 @@ impl Meter {
     /// Returns the rate of this meter in events
     /// per second for the last minute, based on an
     /// exponentially weighted moving average
-    pub fn get_one_minute_rate(&self) -> f64 {
+    pub fn get_one_minute_rate_secs(&self) -> f64 {
         self.tick_if_necessary();
-        self.m1rate.get_rate()
+        self.m1rate.get_rate_secs()
     }
 
     /// Returns the rate of this meter in events
     /// per second for the last five minutes, based on an
     /// exponentially weighted moving average
-    pub fn get_five_minute_rate(&self) -> f64 {
+    pub fn get_five_minute_rate_secs(&self) -> f64 {
         self.tick_if_necessary();
-        self.m5rate.get_rate()
+        self.m5rate.get_rate_secs()
     }   
 
     /// Returns the rate of this meter in events
     /// per second for the fifteen minutes, based on an
     /// exponentially weighted moving average
-    pub fn get_fifteen_minute_rate(&self) -> f64 {
+    pub fn get_fifteen_minute_rate_secs(&self) -> f64 {
         self.tick_if_necessary();
-        self.m15rate.get_rate()
+        self.m15rate.get_rate_secs()
     }
 
     /// Returns the rate of this meter in
@@ -301,10 +345,10 @@ struct MeterStats {
     unit: String,
 }
 
-impl Metric for Meter {
+impl <C> Metric for Meter<C> where C: Clock {
     fn clear(&self) {
         let mut t = self.start_time.write().unwrap();
-        *t = time::PreciseTime::now();
+        *t = self.clock.get_time();
         self.count.store(0, Ordering::SeqCst);
     }
 
@@ -313,9 +357,9 @@ impl Metric for Meter {
         let stats = MeterStats {
             name: self.name.clone(),
             rate: self.get_rate_secs(),
-            one_min_rate: self.get_one_minute_rate(),
-            five_min_rate: self.get_five_minute_rate(),
-            fifteen_min_rate: self.get_fifteen_minute_rate(),
+            one_min_rate: self.get_one_minute_rate_secs(),
+            five_min_rate: self.get_five_minute_rate_secs(),
+            fifteen_min_rate: self.get_fifteen_minute_rate_secs(),
             unit: self.unit.clone(),
         };
         format!("{:?}", stats)
@@ -458,6 +502,7 @@ impl Histogram {
 #[cfg_attr(rustfmt, rustfmt_skip)]
 mod tests {
     use super::*;
+    use time::Timespec;
 
     #[test]
     fn percentile() {
@@ -497,6 +542,18 @@ mod tests {
         let snap = Vec::new();
         let p = 0.5;
         let _ = Histogram::percentile(&snap, p);
+    }
+
+    #[test]
+    fn meter_test() {
+        let mut times: Vec<Timespec> = Vec::new();
+        times.push(Timespec::new(5,0));
+        times.push(Timespec::new(0,0));
+        let clock = ManualClock::new(times.to_owned());
+        let meter = Meter::new("test".to_string(), clock);
+        meter.mark(1);
+        let rate = meter.get_one_minute_rate_secs();
+        info!("RATE: {}", rate);
     }
 }
 
@@ -562,7 +619,7 @@ pub struct Registry {
     // sum_counters: Vec<SumCounter>,
     ratio_counters: Vec<Arc<RatioCounter>>,
     histograms: Vec<Arc<Histogram>>,
-    meters: Vec<Arc<Meter>>,
+    meters: Vec<Arc<Meter<RealtimeClock>>>,
 }
 
 impl Registry {
@@ -584,8 +641,8 @@ impl Registry {
         hist
     }
 
-    pub fn create_meter(&mut self, name: String) -> Arc<Meter> {
-        let meter = Arc::new(Meter::new(name));
+    pub fn create_meter(&mut self, name: String) -> Arc<Meter<RealtimeClock>> {
+        let meter = Arc::new(Meter::new(name,RealtimeClock::new()));
         self.meters.push(meter.clone());
         meter
     }
