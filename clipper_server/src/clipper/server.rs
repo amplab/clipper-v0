@@ -155,6 +155,9 @@ impl<P, S> ClipperServer<P, S>
         // let models = Arc::new(model_batchers);
         let models = model_batchers;
 
+        // Create Ratio counter for measuring prediction accuracy
+        let prediction_ratio: Arc<metrics::RatioCounter> =
+            conf.metrics.write().unwrap().create_ratio_counter(format!("prediction_ratio"));
 
 
 
@@ -172,6 +175,7 @@ impl<P, S> ClipperServer<P, S>
             update_workers.push(UpdateWorker::new(i as i32,
                                                   cache.clone(),
                                                   models.clone(),
+                                                  prediction_ratio.clone(),
                                                   conf.window_size,
                                                   conf.redis_ip.clone(),
                                                   conf.redis_port));
@@ -404,6 +408,7 @@ impl<P, S> UpdateWorker<P, S>
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: HashMap<String,
                                PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+               prediction_ratio: Arc<metrics::RatioCounter>,
                window_size: isize,
                redis_ip: String,
                redis_port: u16)
@@ -415,6 +420,7 @@ impl<P, S> UpdateWorker<P, S>
                                       receiver,
                                       cache.clone(),
                                       models,
+                                      prediction_ratio.clone(),
                                       window_size,
                                       redis_ip,
                                       redis_port);
@@ -447,6 +453,7 @@ impl<P, S> UpdateWorker<P, S>
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
                            PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+           prediction_ratio: Arc<metrics::RatioCounter>,
            window_size: isize,
            redis_ip: String,
            redis_port: u16) {
@@ -509,6 +516,7 @@ impl<P, S> UpdateWorker<P, S>
             UpdateWorker::<P, S>::execute_updates(update_batch_size,
                                                   &mut ready_updates,
                                                   // &mut update_order,
+                                                  prediction_ratio.clone(),
                                                   models.keys().collect::<Vec<&String>>(),
                                                   &mut cmt);
 
@@ -669,6 +677,7 @@ impl<P, S> UpdateWorker<P, S>
     fn execute_updates(max_updates: usize,
                        ready_updates: &mut Vec<UpdateDependencies>,
                        // update_order: &mut VecDeque<usize>,
+                       prediction_ratio: Arc<metrics::RatioCounter>,
                        model_names: Vec<&String>,
                        cmt: &mut RedisCMT<S>) {
         let num_updates = ready_updates.len();
@@ -689,6 +698,14 @@ impl<P, S> UpdateWorker<P, S>
             for (preds, update) in update_dep.predictions
                                              .drain(..)
                                              .zip(update_dep.req.updates.drain(..)) {
+                /* start record metrics */
+                if P::predict(&correction_state, preds.clone(), Vec::new()) == update.label {
+                    prediction_ratio.incr(1, 1);
+                } else {
+                    prediction_ratio.incr(0, 1);
+                }
+                /* end record metrics */
+
                 collected_inputs.push(update.query);
                 collected_predictions.push(preds);
                 collected_labels.push(update.label);
