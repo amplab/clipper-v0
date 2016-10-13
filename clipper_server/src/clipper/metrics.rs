@@ -216,6 +216,8 @@ pub struct RealtimeClock {
 
 }
 
+/// Used for time keeping within meters and other rate-measuring metrics.
+/// A clock that obtains the current system time when queried.
 impl RealtimeClock {
     fn new() -> RealtimeClock {
         RealtimeClock {}
@@ -228,6 +230,7 @@ impl Clock for RealtimeClock {
     } 
 }
 
+/// USED FOR TESTING PURPOSES ONLY.
 /// A clock with a prespecified stack of times. Every request for 
 /// the current time yields the next entry in the predefined stack.
 pub struct PresetClock {
