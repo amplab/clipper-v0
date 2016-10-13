@@ -140,10 +140,23 @@ enum LoadAverage {
 /// Represents an exponentially weighted moving average.
 /// Multiple EWMAs are included within a single meter
 /// corresponding to different load averages.
+///
+/// The EWMA is updated using "ticks" at a frequency determined
+/// by a specified tick interval. For a detailed explanation of the update 
+/// (tick) procedure and decay mechanisms, see the following:
+/// 1. http://www.teamquest.com/pdfs/whitepaper/ldavg1.pdf
+/// 2. http://www.teamquest.com/pdfs/whitepaper/ldavg2.pdf
+/// 3. http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average
 struct EWMA {
+    // The number of new events to be included
+    // in the rate at the next tick
     uncounted: AtomicUsize,
+    // The exponential decay factor applied to the previous
+    // rate at every tick
     alpha: f64,
+    // The time interval, in nanoseconds, between ticks
     interval: f64,
+    // The current rate in events per second
     rate: RwLock<f64>,
 }
 
@@ -175,8 +188,8 @@ impl EWMA {
                 let count = self.uncounted.swap(0, Ordering::Relaxed);
                 let current_rate = (count as f64) / self.interval;
                 if *rate == -1.0 {
-                    // If our rate is -1, we have never calculated a valid rate before, so
-                    // set the rate to the be the number of events over the first interval
+                    // If rate is -1, current_rate is the first rate we've calculated,
+                    // so we set rate to current_rate. 
                     *rate = current_rate;
                 } else {
                     *rate += self.alpha * (current_rate - *rate);
@@ -215,19 +228,25 @@ impl Clock for RealtimeClock {
     } 
 }
 
-pub struct ManualClock {
+/// A clock with a prespecified stack of times. Every request for 
+/// the current time yields the next entry in the predefined stack.
+pub struct PresetClock {
     time: RefCell<Vec<Timespec>>,
 }
 
-impl ManualClock {
-    pub fn new(times: Vec<Timespec>) -> ManualClock {
-        ManualClock {
+impl PresetClock {
+    /// Initializes a new PresetClock with a specified stack (vector)
+    /// of times. Times are used in LIFO (stack) order based on their
+    /// addition to the specified input.
+    pub fn new(times: Vec<Timespec>) -> PresetClock {
+        PresetClock {
             time: RefCell::new(times),
         }
     }
 }
 
-impl Clock for ManualClock {
+impl Clock for PresetClock {
+    /// Pops and returns the top element of the predefined times stack.
     fn get_time(&self) -> Timespec {
         self.time.borrow_mut().pop().unwrap()
     }
@@ -240,7 +259,11 @@ pub struct Meter<C> where C: Clock {
     pub unit: String,
     pub clock: C,
     start_time: RwLock<Timespec>,
+    // The time interval, in nanoseconds, between update ticks for exponentially 
+    // weighted moving averages (see EWMA struct for more information)
     tick_interval: f64,
+    // The system time, in nanoseconds, corresponding to the last
+    // tick for EWMA updates
     last_tick: AtomicUsize,
     count: AtomicUsize,
     m1rate: EWMA,
@@ -291,7 +314,7 @@ impl <C> Meter<C> where C: Clock {
         let time_since_tick = curr_nanos - last_tick_nanos as i64;
         let tick_interval_nanos = self.tick_interval as i64 * NUM_NANOS_PER_SEC;
 
-        if time_since_tick > tick_interval_nanos {
+        if time_since_tick >= tick_interval_nanos {
             let new_last_tick = curr_nanos - (time_since_tick % tick_interval_nanos);
             if self.last_tick.compare_and_swap(last_tick_nanos, new_last_tick as usize, Ordering::SeqCst) == last_tick_nanos {
                 let num_ticks = time_since_tick / tick_interval_nanos;
@@ -545,15 +568,44 @@ mod tests {
     }
 
     #[test]
-    fn meter_test() {
+    fn ewma_accuracy() {
+        // Initialize a vector of times to be returned by our
+        // PresetClock instance (see PresetClock for functionality)
         let mut times: Vec<Timespec> = Vec::new();
+        times.push(Timespec::new(960,0));
+        times.push(Timespec::new(960,0));
+        times.push(Timespec::new(150,0));
+        times.push(Timespec::new(150,0));
+        times.push(Timespec::new(30,0));
         times.push(Timespec::new(5,0));
         times.push(Timespec::new(0,0));
-        let clock = ManualClock::new(times.to_owned());
+        // Initialize a PresetClock with the times vector,
+        // also initialize a meter with the new clock. This
+        // consumes the top element of our times stack (zero seconds)
+        let clock = PresetClock::new(times.to_owned());
         let meter = Meter::new("test".to_string(), clock);
+        // Indicate that one new event has occurred at time zero seconds
         meter.mark(1);
-        let rate = meter.get_one_minute_rate_secs();
-        info!("RATE: {}", rate);
+        // Validate the one minute rate after five seconds
+        let rate1 = meter.get_one_minute_rate_secs();
+        assert_eq!(rate1, 0.2);
+        // Indicate that two new events have occurred at time five seconds
+        meter.mark(2);
+        // Validate the one minute rate after 30 seconds
+        let rate2 = meter.get_one_minute_rate_secs();
+        assert!((rate2 - 0.15).abs() < 0.01);
+        // Validate the five minute rate after 150 seconds
+        let rate3 = meter.get_five_minute_rate_secs();
+        assert!((rate3 - 0.13).abs() < 0.01);
+        // Validate the fifteen minute rate after 150 seconds
+        let rate4 = meter.get_fifteen_minute_rate_secs();
+        assert!((rate4 - 0.17).abs() < 0.01);
+        // Validate the five minute rate after 960 seconds
+        let rate5 = meter.get_five_minute_rate_secs();
+        assert!(rate5 < 0.01);
+        // Validate the fifteen minute rate after 960 seconds
+        let rate6 = meter.get_fifteen_minute_rate_secs();
+        assert!((rate6 - 0.07).abs() < 0.01);
     }
 }
 
