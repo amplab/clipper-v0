@@ -167,7 +167,7 @@ fn decode_predict_input(input_type: &InputType,
     match input_type {
         &InputType::Integer(length) => {
             let i: IntsInput = try!(serde_json::from_str(&json_string)
-                                        .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -181,7 +181,7 @@ fn decode_predict_input(input_type: &InputType,
         }
         &InputType::Float(length) => {
             let i: FloatsInput = try!(serde_json::from_str(&json_string)
-                                          .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -195,7 +195,7 @@ fn decode_predict_input(input_type: &InputType,
         }
         &InputType::Byte(length) => {
             let i: BytesInput = try!(serde_json::from_str(&json_string)
-                                         .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -209,7 +209,7 @@ fn decode_predict_input(input_type: &InputType,
         }
         &InputType::Str => {
             let i: StrInput = try!(serde_json::from_str(&json_string)
-                                       .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             Ok((i.uid, Input::Str { s: i.input }))
         }
     }
@@ -221,7 +221,7 @@ fn decode_update_input(input_type: &InputType,
     match input_type {
         &InputType::Integer(length) => {
             let i: IntsInput = try!(serde_json::from_str(&json_string)
-                                        .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -239,7 +239,7 @@ fn decode_update_input(input_type: &InputType,
         }
         &InputType::Float(length) => {
             let i: FloatsInput = try!(serde_json::from_str(&json_string)
-                                          .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -257,7 +257,7 @@ fn decode_update_input(input_type: &InputType,
         }
         &InputType::Byte(length) => {
             let i: BytesInput = try!(serde_json::from_str(&json_string)
-                                         .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             if length >= 0 && i.input.len() != length as usize {
                 return Err(format!("Wrong input length: expected {}, received {}",
                                    length,
@@ -275,7 +275,7 @@ fn decode_update_input(input_type: &InputType,
         }
         &InputType::Str => {
             let i: StrInput = try!(serde_json::from_str(&json_string)
-                                       .map_err(|e| format!("{}", e.description())));
+                .map_err(|e| format!("{}", e.description())));
             if i.label.is_none() {
                 return Err(format!("No label for update"));
             }
@@ -307,7 +307,7 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
         }
 
         match *req.uri() {
-            RequestUri::AbsolutePath(ref path) => {
+            RequestUri::AbsolutePath { ref path, query: _ } => {
                 match (req.method(), &path[..]) {
                     (&Post, PREDICT) => {
                         // self.uid = extract_uid_from_path(path);
@@ -410,7 +410,8 @@ fn launch_monitor_thread(metrics_register: Arc<RwLock<metrics::Registry>>,
     thread::spawn(move || {
         loop {
             match shutdown_signal_rx.try_recv() {
-                Ok(_) | Err(mpsc::TryRecvError::Empty) => {
+                Ok(_) |
+                Err(mpsc::TryRecvError::Empty) => {
                     thread::sleep(Duration::new(report_interval_secs, 0));
                     let m = metrics_register.read().unwrap();
                     info!("{}", m.report());
@@ -443,12 +444,9 @@ fn start_listening<P, S>(shutdown_signal: mpsc::Receiver<()>, clipper: Arc<Clipp
                                   metrics_signal_rx);
     let input_type = clipper.get_input_type();
 
-    let (listening, server) = rest_server.handle(|ctrl| {
-                                             RequestHandler::new(clipper.clone(),
-                                                                 ctrl,
-                                                                 input_type.clone())
-                                         })
-                                         .unwrap();
+    let (listening, server) =
+        rest_server.handle(|ctrl| RequestHandler::new(clipper.clone(), ctrl, input_type.clone()))
+            .unwrap();
 
     let jh = thread::spawn(move || {
         println!("Listening on http://{}", listening);
