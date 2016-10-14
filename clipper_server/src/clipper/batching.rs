@@ -72,7 +72,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
             metric_register.write().unwrap().create_histogram(metric_name, 2056)
         };
 
-        let thruput_meter: Arc<metrics::Meter> = {
+        let thruput_meter: Arc<metrics::Meter<metrics::RealtimeClock>> = {
             let metric_name = format!("{}_model_thruput", name);
             metric_register.write().unwrap().create_meter(metric_name)
         };
@@ -119,7 +119,7 @@ impl<C> PredictionBatcher<C> where C: PredictionCache<Output> + 'static + Send +
            receiver: mpsc::Receiver<RpcPredictRequest>,
            addr: SocketAddr,
            latency_hist: Arc<metrics::Histogram>,
-           thruput_meter: Arc<metrics::Meter>,
+           thruput_meter: Arc<metrics::Meter<metrics::RealtimeClock>>,
            predictions_counter: Arc<metrics::Counter>,
            input_type: InputType,
            cache: Arc<C>,

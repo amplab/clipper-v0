@@ -723,7 +723,7 @@ impl<P, S> Drop for UpdateWorker<P, S>
 struct PredictionMetrics {
     latency_hist: Arc<metrics::Histogram>,
     pred_counter: Arc<metrics::Counter>,
-    thruput_meter: Arc<metrics::Meter>,
+    thruput_meter: Arc<metrics::Meter<metrics::RealtimeClock>>,
     accuracy_counter: Arc<metrics::RatioCounter>,
 }
 
@@ -746,7 +746,7 @@ impl PredictionMetrics {
             metrics_register.write().unwrap().create_histogram(metric_name, 2056)
         };
 
-        let thruput_meter: Arc<metrics::Meter> = {
+        let thruput_meter: Arc<metrics::Meter<metrics::RealtimeClock>> = {
             let metric_name = format!("prediction_thruput");
             metrics_register.write().unwrap().create_meter(metric_name)
         };
