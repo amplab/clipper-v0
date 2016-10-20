@@ -76,9 +76,9 @@ For more information on getting started with Grafana, see the full [Getting Star
  
 2. Execute the **init_metrics.sh** script via bash to start and set up InfluxDB and Grafana:
   
-  `$ ./clipper/monitoring/init_metrics.sh
+  `$ ./clipper/monitoring/init_metrics.sh`
   
-3. Navigate to ([http://localhost:3000](http://localhost:3000) and log in with username "admin" and the password "admin".
+3. Navigate to [http://localhost:3000](http://localhost:3000) and log in with username "admin" and the password "admin".
 
 4. On Grafana home screen, you should see a "Clipper Metrics" link in the list of recently viewed dashboards. Click the link to access the default metrics dashboard.
 
