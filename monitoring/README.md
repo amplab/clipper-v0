@@ -70,7 +70,7 @@ For more information on getting started with Grafana, see the full [Getting Star
 
 #### Docker
 
-1. Install the Grafana Docker image **tutum/influxdb**. To install via bash, execute
+1. Install the Grafana Docker image **grafana/grafana**. To install via bash, execute
 
   `$ docker pull grafana/grafana`
  
