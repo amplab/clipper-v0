@@ -25,7 +25,15 @@ For more information on setting up InfluxDB, see the full [Installation Instruct
 
 #### Docker
 
+1. Install the Docker image **tutum/influxdb**. To install via bash, execute
+
+  `$ docker pull tutum/influxdb`
+  
+2. Proceed to the **Install and start Grafana** section. Complete this before starting Clipper.
+
 ### Start Clipper
+
+**If you're using docker, install and start Grafana first (see below)**
 
 1. Start Redis on the port specified in your `.toml` configuration file of choice.
 2. Begin serving a model wrapper. For example, execute the following from a bash prompt:
@@ -61,5 +69,19 @@ For more information on setting up InfluxDB, see the full [Installation Instruct
 For more information on getting started with Grafana, see the full [Getting Started Guide](http://docs.grafana.org/guides/gettingstarted/).
 
 #### Docker
+
+1. Install the Grafana Docker image **grafana/grafana**. To install via bash, execute
+
+  `$ docker pull grafana/grafana`
+ 
+2. Execute the **init_metrics.sh** script via bash to start and set up InfluxDB and Grafana:
+  
+  `$ ./clipper/monitoring/init_metrics.sh`
+  
+3. Navigate to [http://localhost:3000](http://localhost:3000) and log in with username "admin" and the password "admin".
+
+4. On the Grafana home screen, you should see a "Clipper Metrics" link in the list of recently viewed dashboards. Click the link to access the default metrics dashboard.
+
+5. Start Clipper (see section above)
 
 ### 
