@@ -33,6 +33,7 @@ pub struct ClipperConf {
     pub metrics: Arc<RwLock<metrics::Registry>>,
     pub redis_ip: String,
     pub redis_port: u16,
+    pub influx_dbname: String,
     pub influx_ip: String,
     pub influx_port: u16,
 }
@@ -43,8 +44,8 @@ impl fmt::Debug for ClipperConf {
                "ClipperConf (\n\tname: {:?},\n\tslo_micros: {:?},\n\tpolicy_name: \
                 {:?},\n\tmodels: {:?},\n\tuse_lsh: {:?},\n\tinput_type: \
                 {:?},\n\tnum_predict_workers: {:?},\n\tnum_update_workers: {:?},\n\tcache_size: \
-                {:?}\n\twindow_size: {:?}\n\tredis_ip: {:?}\n\tredis_port: {:?}, \n\tinflux_ip: \
-                {:?}\n\tinflux_port: {:?})",
+                {:?}\n\twindow_size: {:?}\n\tredis_ip: {:?}\n\tredis_port: {:?}, \n\tinflux_dbname: \
+                {:?}\n\tinflux_ip: {:?}\n\tinflux_port: {:?})",
                self.name,
                self.slo_micros,
                self.policy_name,
@@ -57,6 +58,7 @@ impl fmt::Debug for ClipperConf {
                self.window_size,
                self.redis_ip,
                self.redis_port,
+               self.influx_dbname,
                self.influx_ip,
                self.influx_port)
     }
@@ -71,7 +73,8 @@ impl PartialEq<ClipperConf> for ClipperConf {
         self.num_update_workers == other.num_update_workers &&
         self.cache_size == other.cache_size && self.window_size == other.window_size &&
         self.redis_ip == other.redis_ip && self.redis_port == other.redis_port &&
-        self.influx_ip == other.influx_ip && self.influx_port == other.influx_port
+        self.influx_dbname == other.influx_dbname && self.influx_ip == other.influx_ip && 
+        self.influx_port == other.influx_port
     }
 }
 
@@ -162,6 +165,11 @@ impl ClipperConf {
                         .as_str()
                         .unwrap()
                         .to_string(); 
+        let influx_dbname = pc.get("influx_dbname")
+                            .unwrap()
+                            .as_str()
+                            .unwrap()
+                            .to_string();
 
 
         let conf = ClipperConf {
@@ -215,10 +223,11 @@ impl ClipperConf {
                         .as_str()
                         .unwrap()
                         .to_string(),
+            influx_dbname: influx_dbname,
             influx_port: influx_port,   
             influx_ip: influx_ip.clone(),        
             metrics: Arc::new(RwLock::new(metrics::Registry::new(
-                pc.get("name").unwrap().as_str().unwrap().to_string(),
+                influx_dbname.clone(),
                 influx_ip.clone(),
                 influx_port))),
         };
@@ -310,6 +319,7 @@ pub struct ClipperConfBuilder {
     pub window_size: isize,
     pub redis_ip: String,
     pub redis_port: u16,
+    pub influx_dbname: String,
     pub influx_ip: String,
     pub influx_port: u16,
 
@@ -334,6 +344,7 @@ impl ClipperConfBuilder {
             window_size: -1,
             redis_ip: "127.0.0.1".to_string(),
             redis_port: 6379,
+            influx_dbname: "DEFAULT".to_string(),
             influx_ip: "127.0.0.1".to_string(),
             influx_port: 8086,
         }
@@ -391,6 +402,11 @@ impl ClipperConfBuilder {
 
     pub fn redis_port(&mut self, rp: u16) -> &mut ClipperConfBuilder {
         self.redis_port = rp;
+        self
+    }
+
+    pub fn influx_dbname(&mut self, dbn: String) -> &mut ClipperConfBuilder {
+        self.influx_dbname = dbn;
         self
     }
 
@@ -471,10 +487,11 @@ impl ClipperConfBuilder {
             window_size: self.window_size,
             redis_ip: self.redis_ip.clone(),
             redis_port: self.redis_port,
+            influx_dbname: self.influx_dbname.clone(),
             influx_ip: self.influx_ip.clone(),
             influx_port: self.influx_port,
             metrics: Arc::new(RwLock::new(metrics::Registry::new(
-                self.name.clone(),
+                self.influx_dbname.clone(),
                 self.influx_ip.clone(),
                 self.influx_port))),
         }
