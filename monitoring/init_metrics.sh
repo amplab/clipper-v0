@@ -24,6 +24,8 @@ while read p; do
 done < "../clipper_server/conf/test.toml"
 
 # Start InfluxDB
+docker run -d -p 8083:8083 -p $influxport:$influxport tutum/influxdb > /dev/null
+sleep 5
 
 # Start Grafana
 echo -e "Starting Grafana ..."

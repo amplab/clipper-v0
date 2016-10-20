@@ -76,7 +76,7 @@
               ],
               "hide": false,
               "policy": "default",
-              "query": "SELECT \"value\" FROM m1_prediction_counter",
+              "query": "SELECT \"value\" FROM /m[0-9]+_prediction_counter/",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -302,7 +302,7 @@
               ],
               "hide": false,
               "policy": "default",
-              "query": "SELECT value FROM m1_model_thruput fill(null)",
+              "query": "SELECT rate FROM /m[0-9]+_model_thruput/ fill(null)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -367,8 +367,8 @@
     }
   ],
   "time": {
-    "from": "2016-09-25T15:41:57.214Z",
-    "to": "2016-09-26T03:41:57.214Z"
+    "from": "now-10m",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -429,9 +429,9 @@
   "annotations": {
     "list": []
   },
-  "refresh": false,
+  "refresh": "5s",
   "schemaVersion": 12,
-  "version": 6,
+  "version": 4,
   "links": [],
   "gnetId": null
 }
