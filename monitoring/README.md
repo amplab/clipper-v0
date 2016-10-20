@@ -33,7 +33,7 @@ For more information on setting up InfluxDB, see the full [Installation Instruct
 
 ### Start Clipper
 
-** If you're using docker, install and start Grafana first (see below) **
+**If you're using docker, install and start Grafana first (see below)**
 
 1. Start Redis on the port specified in your `.toml` configuration file of choice.
 2. Begin serving a model wrapper. For example, execute the following from a bash prompt:
