@@ -80,7 +80,7 @@ For more information on getting started with Grafana, see the full [Getting Star
   
 3. Navigate to [http://localhost:3000](http://localhost:3000) and log in with username "admin" and the password "admin".
 
-4. On Grafana home screen, you should see a "Clipper Metrics" link in the list of recently viewed dashboards. Click the link to access the default metrics dashboard.
+4. On the Grafana home screen, you should see a "Clipper Metrics" link in the list of recently viewed dashboards. Click the link to access the default metrics dashboard.
 
 5. Start Clipper (see section above)
 
