@@ -17,6 +17,7 @@ use server::{Input, Output};
 
 pub const REDIS_CMT_DB: u32 = 1;
 pub const REDIS_UPDATE_DB: u32 = 2;
+pub const REDIS_PREDICTION_DB: u32 = 3;
 pub const REDIS_DEFAULT_PORT: u16 = 6379;
 // pub const REDIS_DEFAULT_PORT: u16 = 32775;
 pub const DEFAULT_REDIS_SOCKET: &'static str = "/tmp/redis.sock";
@@ -43,9 +44,9 @@ pub trait UpdateTable {
     /// will be returned.
     ///
     /// If `max_items` is less than 0, all updates will be provided.
-    fn get_updates(&self, uid: u32, max_items: isize) -> Result<Vec<(Input, Output)>, String>;
+    fn get_updates(&self, uid: u32, max_items: isize) -> Result<Vec<(Input, Output, u32)>, String>;
 
-    fn add_update(&mut self, uid: u32, item: &Input, label: &Output) -> Result<(), String>;
+    fn add_update(&mut self, uid: u32, item: &Input, label: &Output, qid: u32) -> Result<(), String>;
 
 }
 
@@ -79,7 +80,7 @@ impl UpdateTable for RedisUpdateTable {
     /// will be returned.
     ///
     /// If `max_items` is less than 0, all updates will be provided.
-    fn get_updates(&self, uid: u32, max_items: isize) -> Result<Vec<(Input, Output)>, String> {
+    fn get_updates(&self, uid: u32, max_items: isize) -> Result<Vec<(Input, Output, u32)>, String> {
         if max_items == 0 {
             return Ok(Vec::new());
         }
@@ -96,10 +97,10 @@ impl UpdateTable for RedisUpdateTable {
                                            .map_err(|e| format!("{}", e.description())));
 
 
-        let mut train_data: Vec<(Input, Output)> = Vec::with_capacity(bytes.len());
+        let mut train_data: Vec<(Input, Output, u32)> = Vec::with_capacity(bytes.len());
         for b in bytes {
-            let example: (Input, Output) = try!(bincode::serde::deserialize(&b)
-                                                    .map_err(|e| format!("{}", e.description())));
+            let example: (Input, Output, u32) = try!(bincode::serde::deserialize(&b)
+                                                         .map_err(|e| format!("{}", e.description())));
             train_data.push(example);
         }
         // let train_data: Vec<(Input, Output)> = bytes.iter()
@@ -113,8 +114,8 @@ impl UpdateTable for RedisUpdateTable {
         Ok(train_data)
     }
 
-    fn add_update(&mut self, uid: u32, item: &Input, label: &Output) -> Result<(), String> {
-        let bytes = try!(bincode::serde::serialize(&(item, label), bincode::SizeLimit::Infinite)
+    fn add_update(&mut self, uid: u32, item: &Input, label: &Output, qid: u32) -> Result<(), String> {
+        let bytes = try!(bincode::serde::serialize(&(item, label, qid), bincode::SizeLimit::Infinite)
                              .map_err(|e| format!("{}", e.description())));
         let _: () = try!(self.connection
                              .lpush(uid, bytes)
@@ -186,6 +187,53 @@ impl<S> CorrectionModelTable<S> for RedisCMT<S> where S: Serialize + Deserialize
     }
 }
 
+pub trait PredictionTable {
+    fn put(&mut self, qid: u32, pred: Output) -> Result<(), String>;
+
+    fn get(&self, qid: u32) -> Result<Output, String>;
+}
+
+pub struct RedisPredictionTable {
+    connection: redis::Connection,
+}
+
+impl RedisPredictionTable {
+    pub fn new_socket_connection(socket_file: &str, db: u32) -> RedisPredictionTable {
+        let conn_string = format!("unix://{}?db={}", socket_file, db);
+        info!("RedisPredictionTable connection string {}", conn_string);
+        let client = redis::Client::open(conn_string.as_str()).unwrap();
+        let con = client.get_connection().unwrap();
+        RedisPredictionTable { connection: con }
+    }
+
+    pub fn new_tcp_connection(addr: &str, port: u16, db: u32) -> RedisPredictionTable {
+        let conn_string = format!("redis://{}:{}/{}", addr, port, db);
+        info!("RedisPredictionTable connection string {}", conn_string);
+        let client = redis::Client::open(conn_string.as_str()).unwrap();
+        let con = client.get_connection().unwrap();
+        RedisPredictionTable { connection: con }
+    }
+}
+
+impl PredictionTable for RedisPredictionTable {
+    fn put(&mut self, qid: u32, pred: Output) -> Result<(), String> {
+        let bytes = try!(bincode::serde::serialize(&pred, bincode::SizeLimit::Infinite)
+                             .map_err(|e| format!("{}", e.description())));
+        let _: () = try!(self.connection
+                             .set(qid, bytes)
+                             .map_err(|e| format!("{}", e.description())));
+        Ok(())
+    }
+
+    fn get(&self, qid: u32) -> Result<Output, String> {
+        let bytes: Vec<u8> = try!(self.connection
+                                      .get(qid)
+                                      .map_err(|e| format!("{}", e.description())));
+        let pred: Output = try!(bincode::serde::deserialize(&bytes)
+                                       .map_err(|e| format!("{}", e.description())));
+        Ok(pred)
+    }
+}
 
 #[cfg(test)]
 // #[cfg_attr(rustfmt, rustfmt_skip)]

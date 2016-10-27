@@ -4,6 +4,7 @@ use std::marker::PhantomData;
 use serde::ser::Serialize;
 use serde::de::Deserialize;
 use std::sync::{mpsc, RwLock, Arc};
+use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
 use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 use std::cmp;
@@ -11,8 +12,8 @@ use std::thread::{self, JoinHandle};
 use std::time::Duration as StdDuration;
 
 #[allow(unused_imports)]
-use cmt::{CorrectionModelTable, RedisCMT, UpdateTable, RedisUpdateTable, REDIS_CMT_DB,
-          REDIS_UPDATE_DB, DEFAULT_REDIS_SOCKET, REDIS_DEFAULT_PORT};
+use cmt::{CorrectionModelTable, RedisCMT, UpdateTable, PredictionTable, RedisUpdateTable, RedisPredictionTable,
+          REDIS_CMT_DB, REDIS_UPDATE_DB, REDIS_PREDICTION_DB, DEFAULT_REDIS_SOCKET, REDIS_DEFAULT_PORT};
 use cache::{PredictionCache, SimplePredictionCache};
 use configuration::ClipperConf;
 use hashing::EqualityHasher;
@@ -24,8 +25,10 @@ use metrics;
 
 pub type Output = f64;
 
-pub type OnPredict = Fn(Output) -> () + Send;
+pub type OnPredict = Fn(Output, u32) -> () + Send;
 
+// For generation of qid's
+static GLOBAL_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
 
 
 /// Specifies the input type and expected length. A negative length indicates
@@ -63,15 +66,20 @@ pub enum Input {
 pub struct PredictionRequest {
     recv_time: PreciseTime,
     uid: u32,
+    qid: u32,
     query: Input,
     on_predict: Box<OnPredict>,
 }
 
 impl PredictionRequest {
     pub fn new(uid: u32, input: Input, on_predict: Box<OnPredict>) -> PredictionRequest {
+        /* Increment global counter for construction of PredictionRequests */
+        let prev = GLOBAL_COUNTER.load(Ordering::Relaxed);
+        GLOBAL_COUNTER.store(prev + 1, Ordering::Relaxed);
         PredictionRequest {
             recv_time: PreciseTime::now(),
             uid: uid,
+            qid: prev as u32,
             query: input,
             on_predict: on_predict,
         }
@@ -84,6 +92,7 @@ impl PredictionRequest {
 pub struct Update {
     pub query: Input,
     pub label: Output,
+    pub qid: u32,
 }
 
 #[derive(Clone)]
@@ -155,6 +164,9 @@ impl<P, S> ClipperServer<P, S>
         // let models = Arc::new(model_batchers);
         let models = model_batchers;
 
+        // Create Ratio counter for measuring prediction accuracy
+        let prediction_ratio: Arc<metrics::RatioCounter> =
+            conf.metrics.write().unwrap().create_ratio_counter(format!("prediction_ratio"));
 
 
 
@@ -172,6 +184,7 @@ impl<P, S> ClipperServer<P, S>
             update_workers.push(UpdateWorker::new(i as i32,
                                                   cache.clone(),
                                                   models.clone(),
+                                                  prediction_ratio.clone(),
                                                   conf.window_size,
                                                   conf.redis_ip.clone(),
                                                   conf.redis_port));
@@ -296,6 +309,8 @@ impl<P, S> PredictionWorker<P, S>
         let epsilon = Duration::milliseconds(1);
         // let mut cmt = RedisCMT::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_CMT_DB);
         let mut cmt = RedisCMT::new_tcp_connection(&redis_ip, redis_port, REDIS_CMT_DB);
+        let mut pred_table = RedisPredictionTable::new_tcp_connection(&redis_ip, redis_port,
+                                                                      REDIS_PREDICTION_DB);
         info!("starting prediction worker {} with {} ms SLO",
               worker_id,
               slo_micros as f64 / 1000.0);
@@ -352,13 +367,15 @@ impl<P, S> PredictionWorker<P, S>
             // use correction policy to make the final prediction
             let prediction = P::predict(&correction_state, ys, missing_ys);
             // execute the user's callback on this thread
-            (req.on_predict)(prediction);
+            (req.on_predict)(prediction.clone(), req.qid.clone());
             let end_time = PreciseTime::now();
             // TODO: metrics
             let latency = req.recv_time.to(end_time).num_microseconds().unwrap();
             // pred_metrics.latency_hist.insert(latency);
             // pred_metrics.thruput_meter.mark(1);
             // pred_metrics.pred_counter.incr(1);
+            /* Add prediction to pred table */
+            pred_table.put(req.qid, prediction).unwrap();
         }
         info!("ending loop: prediction worker {}", worker_id);
     }
@@ -404,6 +421,7 @@ impl<P, S> UpdateWorker<P, S>
                cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
                models: HashMap<String,
                                PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+               prediction_ratio: Arc<metrics::RatioCounter>,
                window_size: isize,
                redis_ip: String,
                redis_port: u16)
@@ -415,6 +433,7 @@ impl<P, S> UpdateWorker<P, S>
                                       receiver,
                                       cache.clone(),
                                       models,
+                                      prediction_ratio.clone(),
                                       window_size,
                                       redis_ip,
                                       redis_port);
@@ -447,6 +466,7 @@ impl<P, S> UpdateWorker<P, S>
            cache: Arc<SimplePredictionCache<Output, EqualityHasher>>,
            models: HashMap<String,
                            PredictionBatcher<SimplePredictionCache<Output, EqualityHasher>>>,
+           prediction_ratio: Arc<metrics::RatioCounter>,
            window_size: isize,
            redis_ip: String,
            redis_port: u16) {
@@ -458,6 +478,8 @@ impl<P, S> UpdateWorker<P, S>
                                                                 REDIS_CMT_DB);
         let mut update_table: RedisUpdateTable =
             RedisUpdateTable::new_tcp_connection(&redis_ip, redis_port, REDIS_UPDATE_DB);
+        let mut pred_table = RedisPredictionTable::new_tcp_connection(&redis_ip, redis_port,
+                                                                      REDIS_PREDICTION_DB);
         // RedisUpdateTable::new_socket_connection(DEFAULT_REDIS_SOCKET, REDIS_UPDATE_DB);
         info!("starting update worker {}", worker_id);
 
@@ -509,8 +531,9 @@ impl<P, S> UpdateWorker<P, S>
             UpdateWorker::<P, S>::execute_updates(update_batch_size,
                                                   &mut ready_updates,
                                                   // &mut update_order,
+                                                  prediction_ratio.clone(),
                                                   models.keys().collect::<Vec<&String>>(),
-                                                  &mut cmt);
+                                                  &mut cmt, &mut pred_table);
 
 
             if sleep {
@@ -545,6 +568,7 @@ impl<P, S> UpdateWorker<P, S>
                                               Update {
                                                   query: u.0,
                                                   label: u.1,
+                                                  qid: u.2,
                                               }
                                           })
                                           .collect::<Vec<_>>();
@@ -553,7 +577,8 @@ impl<P, S> UpdateWorker<P, S>
         // now write new updates to UpdateTable
         for i in 0..num_new_updates {
             // TODO: better error handling
-            update_table.add_update(req.uid, &req.updates[i].query, &req.updates[i].label)
+            update_table.add_update(req.uid, &req.updates[i].query, &req.updates[i].label,
+                                    req.updates[i].qid)
                         .unwrap();
 
         }
@@ -669,8 +694,10 @@ impl<P, S> UpdateWorker<P, S>
     fn execute_updates(max_updates: usize,
                        ready_updates: &mut Vec<UpdateDependencies>,
                        // update_order: &mut VecDeque<usize>,
+                       prediction_ratio: Arc<metrics::RatioCounter>,
                        model_names: Vec<&String>,
-                       cmt: &mut RedisCMT<S>) {
+                       cmt: &mut RedisCMT<S>,
+                       pred_table: &mut RedisPredictionTable) {
         let num_updates = ready_updates.len();
         for mut update_dep in ready_updates.drain(0..cmp::min(max_updates, num_updates)) {
             let uid = update_dep.req.uid;
@@ -689,6 +716,14 @@ impl<P, S> UpdateWorker<P, S>
             for (preds, update) in update_dep.predictions
                                              .drain(..)
                                              .zip(update_dep.req.updates.drain(..)) {
+                /* start record metrics */
+                if pred_table.get(update.qid).unwrap() == update.label {
+                    prediction_ratio.incr(1, 1);
+                } else {
+                    prediction_ratio.incr(0, 1);
+                }
+                /* end record metrics */
+
                 collected_inputs.push(update.query);
                 collected_predictions.push(preds);
                 collected_labels.push(update.label);

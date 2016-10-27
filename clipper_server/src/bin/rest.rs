@@ -57,24 +57,28 @@ struct IntsInput {
     uid: u32,
     input: Vec<i32>,
     label: Option<Output>,
+    qid: Option<u32>,
 }
 #[derive(Serialize,Deserialize)]
 struct FloatsInput {
     uid: u32,
     input: Vec<f64>,
     label: Option<Output>,
+    qid: Option<u32>,
 }
 #[derive(Serialize,Deserialize)]
 struct StrInput {
     uid: u32,
     input: String,
     label: Option<Output>,
+    qid: Option<u32>,
 }
 #[derive(Serialize,Deserialize)]
 struct BytesInput {
     uid: u32,
     input: Vec<u8>,
     label: Option<Output>,
+    qid: Option<u32>,
 }
 
 
@@ -217,7 +221,7 @@ fn decode_predict_input(input_type: &InputType,
 
 fn decode_update_input(input_type: &InputType,
                        json_string: &String)
-                       -> Result<(u32, Input, Output), String> {
+                       -> Result<(u32, Input, Output, u32), String> {
     match input_type {
         &InputType::Integer(length) => {
             let i: IntsInput = try!(serde_json::from_str(&json_string)
@@ -235,7 +239,8 @@ fn decode_update_input(input_type: &InputType,
                 i: i.input,
                 length: length,
             },
-                i.label.unwrap()))
+                i.label.unwrap(),
+                i.qid.unwrap()))
         }
         &InputType::Float(length) => {
             let i: FloatsInput = try!(serde_json::from_str(&json_string)
@@ -253,7 +258,8 @@ fn decode_update_input(input_type: &InputType,
                 f: i.input,
                 length: length,
             },
-                i.label.unwrap()))
+                i.label.unwrap(),
+                i.qid.unwrap()))
         }
         &InputType::Byte(length) => {
             let i: BytesInput = try!(serde_json::from_str(&json_string)
@@ -271,7 +277,8 @@ fn decode_update_input(input_type: &InputType,
                 b: i.input,
                 length: length,
             },
-                i.label.unwrap()))
+                i.label.unwrap(),
+                i.qid.unwrap()))
         }
         &InputType::Str => {
             let i: StrInput = try!(serde_json::from_str(&json_string)
@@ -279,7 +286,7 @@ fn decode_update_input(input_type: &InputType,
             if i.label.is_none() {
                 return Err(format!("No label for update"));
             }
-            Ok((i.uid, Input::Str { s: i.input }, i.label.unwrap()))
+            Ok((i.uid, Input::Str { s: i.input }, i.label.unwrap(), i.qid.unwrap()))
         }
     }
 }
@@ -338,8 +345,8 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
                         let ctrl = self.ctrl.clone();
                         let (tx, rx) = mpsc::channel::<String>();
                         self.result_channel = Some(rx);
-                        let on_pred = Box::new(move |y| {
-                            tx.send(format!("predict: {}", y).to_string()).unwrap();
+                        let on_pred = Box::new(move |y, qid| {
+                            tx.send(format!("predict: {} {}", y, qid).to_string()).unwrap();
                             ctrl.ready(Next::write()).unwrap();
                         });
                         let r = PredictionRequest::new(self.uid, input, on_pred);
@@ -354,13 +361,14 @@ impl<P, S> Handler<HttpStream> for RequestHandler<P, S>
             }
             Some(RequestType::Update) => {
                 match decode_update_input(&self.input_type, &json_string) {
-                    Ok((uid, input, label)) => {
+                    Ok((uid, input, label, qid)) => {
                         self.uid = uid;
-                        info!("/update for user: {}", self.uid);
+                        info!("/update for user: {} {}", self.uid, qid);
                         let u = UpdateRequest::new(self.uid,
                                                    vec![Update {
                                                             query: input,
                                                             label: label,
+                                                            qid: qid,
                                                         }]);
                         self.clipper.schedule_update(u);
                         self.result_string = "Update scheduled".to_string();
