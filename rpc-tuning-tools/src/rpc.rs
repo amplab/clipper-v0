@@ -34,6 +34,7 @@ fn start_listening() {
         let header_bytes = 2 * mem::size_of::<u32>() + 1;
         let mut header_buffer: Vec<u8> = vec![0; header_bytes];
         stream.read_exact(&mut header_buffer).unwrap();
+        let start_time = time::precise_time_ns();
         let mut header_cursor = Cursor::new(header_buffer);
         let code = header_cursor.read_u8().unwrap();
         // println!("read type code");
@@ -55,6 +56,9 @@ fn start_listening() {
             }
             inputs.push(cur_input);
         }
+        let end_time = time::precise_time_ns();
+        let latency = (end_time - start_time) as f64 / 1000.0;
+        println!("Latency {}", latency);
         let mut response_message: Vec<u8> = Vec::new();
         for _ in 0..num_inputs {
             response_message.write_f64::<LittleEndian>(1.0).unwrap();
