@@ -1,0 +1,11 @@
+# FROM frolvlad/alpine-glibc
+# FROM alpine:3.4
+FROM clipper/fast-rpc
+
+MAINTAINER Dan Crankshaw <dscrankshaw@gmail.com>
+
+COPY sklearn_dt_modelwrapper.py /modelwrapper/
+
+CMD ["python", "/modelwrapper/sklearn_dt_modelwrapper.py"]
+
+
